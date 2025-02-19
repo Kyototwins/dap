@@ -12,6 +12,7 @@ import ProfileSetup from "./pages/ProfileSetup";
 import Matches from "./pages/Matches";
 import Messages from "./pages/Messages";
 import Events from "./pages/Events";
+import CreateEvent from "./pages/CreateEvent";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 
@@ -51,6 +52,14 @@ const App = () => (
             element={
               <AppLayout>
                 <Events />
+              </AppLayout>
+            }
+          />
+          <Route
+            path="/events/new"
+            element={
+              <AppLayout>
+                <CreateEvent />
               </AppLayout>
             }
           />
