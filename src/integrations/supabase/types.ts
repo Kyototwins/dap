@@ -248,11 +248,14 @@ export type Database = {
           first_name: string | null
           gender: string | null
           id: string
+          ideal_date: string | null
           image_url_1: string | null
           image_url_2: string | null
           last_name: string | null
+          life_goal: string | null
           origin: string | null
           sexuality: string | null
+          superpower: string | null
         }
         Insert: {
           about_me?: string | null
@@ -262,11 +265,14 @@ export type Database = {
           first_name?: string | null
           gender?: string | null
           id: string
+          ideal_date?: string | null
           image_url_1?: string | null
           image_url_2?: string | null
           last_name?: string | null
+          life_goal?: string | null
           origin?: string | null
           sexuality?: string | null
+          superpower?: string | null
         }
         Update: {
           about_me?: string | null
@@ -276,11 +282,14 @@ export type Database = {
           first_name?: string | null
           gender?: string | null
           id?: string
+          ideal_date?: string | null
           image_url_1?: string | null
           image_url_2?: string | null
           last_name?: string | null
+          life_goal?: string | null
           origin?: string | null
           sexuality?: string | null
+          superpower?: string | null
         }
         Relationships: []
       }
