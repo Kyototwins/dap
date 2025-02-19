@@ -20,23 +20,40 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        throw error;
+      if (authError) {
+        throw authError;
       }
 
-      // ログイン成功
+      // プロフィール情報を取得
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      // ログイン成功のトースト表示
       toast({
         title: "ログインしました",
         description: "アプリへようこそ！",
       });
 
-      // TODO: ユーザーのプロフィール設定状況に応じて適切なページにリダイレクト
-      navigate("/matches");
+      // プロフィールの設定状況に応じてリダイレクト
+      if (!profileData.first_name || !profileData.last_name) {
+        // プロフィール未設定の場合はプロフィール設定画面へ
+        navigate("/profile/setup");
+      } else {
+        // プロフィール設定済みの場合はマッチング画面へ
+        navigate("/matches");
+      }
 
     } catch (error: any) {
       toast({
