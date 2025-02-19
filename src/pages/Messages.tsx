@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Send } from "lucide-react";
@@ -100,46 +99,32 @@ export default function Messages() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("認証されていません");
 
-      const { data: matchesData, error: matchesError } = await supabase
+      const { data: matchesData, error } = await supabase
         .from("matches")
         .select(`
           *,
-          user1:profiles!matches_user1_id_fkey (
-            id,
-            first_name,
-            last_name,
-            avatar_url
-          ),
-          user2:profiles!matches_user2_id_fkey (
-            id,
-            first_name,
-            last_name,
-            avatar_url
-          ),
-          messages:messages (
-            content,
-            created_at
-          )
+          user1:profiles!matches_user1_id_fkey (id, first_name, last_name, avatar_url, about_me, age, gender, ideal_date, image_url_1, image_url_2, life_goal, origin, sexuality, superpower, university, created_at),
+          user2:profiles!matches_user2_id_fkey (id, first_name, last_name, avatar_url, about_me, age, gender, ideal_date, image_url_1, image_url_2, life_goal, origin, sexuality, superpower, university, created_at),
+          messages (content, created_at)
         `)
-        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
-        .order('created_at', { ascending: false });
+        .order("created_at", { ascending: false });
 
-      if (matchesError) throw matchesError;
+      if (error) throw error;
 
-      const processedMatches = matchesData.map(match => ({
+      const processedMatches = matchesData.map((match) => ({
         ...match,
         otherUser: match.user1_id === user.id ? match.user2 : match.user1,
-        lastMessage: match.messages[0]
+        lastMessage: match.messages[0],
       }));
 
       setMatches(processedMatches);
+      setLoading(false);
     } catch (error: any) {
       toast({
         title: "エラーが発生しました",
         description: error.message,
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -256,7 +241,7 @@ export default function Messages() {
             ))}
             {matches.length === 0 && (
               <p className="text-center text-muted-foreground py-4">
-                まだマッチしているユーザーがいません
+                まだマッチしてい��ユーザーがいません
               </p>
             )}
           </div>

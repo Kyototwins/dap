@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUpload } from "@/components/profile/ImageUpload";
 import {
   Select,
   SelectContent,
@@ -24,7 +25,15 @@ export default function CreateEvent() {
     date: "",
     category: "",
     max_participants: "",
-    image_url: "",
+  });
+  const [image, setImage] = useState<{
+    file: File | null;
+    preview: string;
+    uploading: boolean;
+  }>({
+    file: null,
+    preview: "",
+    uploading: false,
   });
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -38,6 +47,44 @@ export default function CreateEvent() {
     "その他",
   ];
 
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    setImage({
+      file,
+      preview: URL.createObjectURL(file),
+      uploading: true,
+    });
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("認証されていません");
+
+      const fileExt = file.name.split('.').pop();
+      const filePath = `event-images/${user.id}/${crypto.randomUUID()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('events')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('events')
+        .getPublicUrl(filePath);
+
+      setImage(prev => ({ ...prev, uploading: false }));
+      return publicUrl;
+    } catch (error: any) {
+      toast({
+        title: "画像のアップロードに失敗しました",
+        description: error.message,
+        variant: "destructive",
+      });
+      setImage(prev => ({ ...prev, uploading: false }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -45,6 +92,11 @@ export default function CreateEvent() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("認証されていません");
+
+      let imageUrl = "";
+      if (image.file) {
+        imageUrl = await handleImageChange({ target: { files: [image.file] } } as any) || "";
+      }
 
       const { error } = await supabase
         .from("events")
@@ -56,7 +108,7 @@ export default function CreateEvent() {
             date: formData.date,
             category: formData.category,
             max_participants: parseInt(formData.max_participants),
-            image_url: formData.image_url,
+            image_url: imageUrl,
             creator_id: user.id,
             current_participants: 1,
             status: "active",
@@ -84,9 +136,12 @@ export default function CreateEvent() {
 
   return (
     <div className="container max-w-2xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6">イベントを作成</h1>
+      <div className="mb-8 text-center">
+        <img src="/lovable-uploads/65f3a573-3b4d-4ec7-90e5-78fab77b800d.png" alt="DAP Logo" className="w-16 h-16 mx-auto mb-4" />
+        <h1 className="text-2xl font-bold">イベントを作成</h1>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 bg-black/5 p-6 rounded-lg">
         <div className="space-y-2">
           <Label htmlFor="title">タイトル</Label>
           <Input
@@ -95,6 +150,7 @@ export default function CreateEvent() {
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
+            className="border-amber-600/20 focus-visible:ring-amber-600"
             required
           />
         </div>
@@ -107,7 +163,18 @@ export default function CreateEvent() {
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
+            className="border-amber-600/20 focus-visible:ring-amber-600"
             required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>イベント画像</Label>
+          <ImageUpload
+            label="画像をアップロード"
+            image={image}
+            onChange={handleImageChange}
+            loading={loading}
           />
         </div>
 
@@ -119,6 +186,7 @@ export default function CreateEvent() {
             onChange={(e) =>
               setFormData({ ...formData, location: e.target.value })
             }
+            className="border-amber-600/20 focus-visible:ring-amber-600"
             required
           />
         </div>
@@ -132,6 +200,7 @@ export default function CreateEvent() {
             onChange={(e) =>
               setFormData({ ...formData, date: e.target.value })
             }
+            className="border-amber-600/20 focus-visible:ring-amber-600"
             required
           />
         </div>
@@ -145,7 +214,7 @@ export default function CreateEvent() {
             }
             required
           >
-            <SelectTrigger>
+            <SelectTrigger className="border-amber-600/20 focus-visible:ring-amber-600">
               <SelectValue placeholder="カテゴリーを選択" />
             </SelectTrigger>
             <SelectContent>
@@ -168,20 +237,8 @@ export default function CreateEvent() {
             onChange={(e) =>
               setFormData({ ...formData, max_participants: e.target.value })
             }
+            className="border-amber-600/20 focus-visible:ring-amber-600"
             required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="image_url">画像URL</Label>
-          <Input
-            id="image_url"
-            type="url"
-            value={formData.image_url}
-            onChange={(e) =>
-              setFormData({ ...formData, image_url: e.target.value })
-            }
-            placeholder="https://example.com/image.jpg"
           />
         </div>
 
@@ -190,10 +247,15 @@ export default function CreateEvent() {
             type="button"
             variant="outline"
             onClick={() => navigate("/events")}
+            className="border-amber-600/20 hover:bg-amber-600/5"
           >
             キャンセル
           </Button>
-          <Button type="submit" disabled={loading}>
+          <Button 
+            type="submit" 
+            disabled={loading}
+            className="bg-amber-600 hover:bg-amber-700"
+          >
             {loading ? "作成中..." : "作成する"}
           </Button>
         </div>
