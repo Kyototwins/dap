@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +11,7 @@ import ProfileSetup from "./pages/ProfileSetup";
 import Matches from "./pages/Matches";
 import Events from "./pages/Events";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -59,10 +59,7 @@ const App = () => (
             path="/profile"
             element={
               <AppLayout>
-                <div className="py-6">
-                  <h1 className="text-2xl font-bold mb-4">プロフィール</h1>
-                  <p className="text-muted-foreground">実装中です...</p>
-                </div>
+                <Profile />
               </AppLayout>
             }
           />
