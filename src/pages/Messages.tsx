@@ -14,6 +14,18 @@ interface Profile {
   first_name: string | null;
   last_name: string | null;
   avatar_url: string | null;
+  about_me: string | null;
+  age: number | null;
+  gender: string | null;
+  ideal_date: string | null;
+  image_url_1: string | null;
+  image_url_2: string | null;
+  life_goal: string | null;
+  origin: string | null;
+  sexuality: string | null;
+  superpower: string | null;
+  university: string | null;
+  created_at: string | null;
 }
 
 interface Message {
@@ -64,7 +76,15 @@ export default function Messages() {
             .single();
           
           if (senderData) {
-            setMessages(prev => [...prev, { ...payload.new, sender: senderData }]);
+            const newMessage: Message = {
+              id: payload.new.id,
+              content: payload.new.content,
+              created_at: payload.new.created_at,
+              match_id: payload.new.match_id,
+              sender_id: payload.new.sender_id,
+              sender: senderData
+            };
+            setMessages(prev => [...prev, newMessage]);
           }
         }
       })
@@ -130,20 +150,25 @@ export default function Messages() {
         .from("messages")
         .select(`
           *,
-          sender:profiles!messages_sender_id_fkey (
-            id,
-            first_name,
-            last_name,
-            avatar_url
-          )
+          sender:profiles!messages_sender_id_fkey (*)
         `)
         .eq("match_id", matchId)
         .order("created_at", { ascending: true });
 
       if (error) throw error;
       
-      // senderが存在することを確認
-      const validMessages = (data || []).filter(message => message.sender);
+      // senderが存在することを確認し、型を保証
+      const validMessages = (data || [])
+        .filter(message => message.sender)
+        .map(message => ({
+          id: message.id,
+          content: message.content,
+          created_at: message.created_at,
+          match_id: message.match_id,
+          sender_id: message.sender_id,
+          sender: message.sender
+        }));
+
       setMessages(validMessages);
     } catch (error: any) {
       toast({
