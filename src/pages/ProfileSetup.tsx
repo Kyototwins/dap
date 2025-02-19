@@ -7,8 +7,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ImageUpload } from "@/components/profile/ImageUpload";
 import { ProfileForm } from "@/components/profile/ProfileForm";
+import { AdditionalQuestions } from "@/components/profile/AdditionalQuestions";
 
-interface ImageUploadState {
+interface ImageUpload {
   file: File | null;
   preview: string;
   uploading: boolean;
@@ -25,10 +26,15 @@ export default function ProfileSetup() {
     sexuality: "",
     aboutMe: "",
   });
+  const [additionalData, setAdditionalData] = useState({
+    idealDate: "",
+    lifeGoal: "",
+    superpower: "",
+  });
   const [images, setImages] = useState<{
-    avatar: ImageUploadState;
-    image1: ImageUploadState;
-    image2: ImageUploadState;
+    avatar: ImageUpload;
+    image1: ImageUpload;
+    image2: ImageUpload;
   }>({
     avatar: { file: null, preview: "", uploading: false },
     image1: { file: null, preview: "", uploading: false },
@@ -105,6 +111,9 @@ export default function ProfileSetup() {
           avatar_url: avatarUrl,
           image_url_1: imageUrl1,
           image_url_2: imageUrl2,
+          ideal_date: additionalData.idealDate,
+          life_goal: additionalData.lifeGoal,
+          superpower: additionalData.superpower,
         })
         .eq('id', user.id);
 
@@ -130,6 +139,10 @@ export default function ProfileSetup() {
 
   const handleChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAdditionalChange = (name: string, value: string) => {
+    setAdditionalData(prev => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -164,6 +177,15 @@ export default function ProfileSetup() {
           onChange={handleChange}
           loading={loading}
         />
+
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-medium mb-4">追加の質問</h3>
+          <AdditionalQuestions
+            data={additionalData}
+            onChange={handleAdditionalChange}
+            loading={loading}
+          />
+        </div>
 
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? "保存中..." : "プロフィールを保存"}
