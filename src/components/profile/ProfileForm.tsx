@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 interface ProfileFormData {
   firstName: string;
@@ -19,6 +19,9 @@ interface ProfileFormData {
   sexuality: string;
   aboutMe: string;
   university: string;
+  hobbies?: string[];
+  languages?: string[];
+  learning_languages?: string[];
 }
 
 interface ProfileFormProps {
@@ -26,6 +29,28 @@ interface ProfileFormProps {
   onChange: (name: string, value: string) => void;
   loading?: boolean;
 }
+
+const HOBBY_OPTIONS = [
+  "写真",
+  "ハイキング",
+  "アート",
+  "読書",
+  "料理",
+  "旅行",
+  "音楽",
+  "スポーツ",
+  "ゲーム",
+  "プログラミング"
+];
+
+const LANGUAGE_OPTIONS = [
+  "日本語",
+  "英語",
+  "中国語",
+  "韓国語",
+  "スペイン語",
+  "フランス語"
+];
 
 export function ProfileForm({ formData, onChange, loading }: ProfileFormProps) {
   return (
@@ -150,6 +175,71 @@ export function ProfileForm({ formData, onChange, loading }: ProfileFormProps) {
           className="min-h-[100px]"
           disabled={loading}
         />
+      </div>
+
+      {/* 趣味タグ */}
+      <div className="space-y-2">
+        <Label>趣味・興味</Label>
+        <div className="flex flex-wrap gap-2">
+          {HOBBY_OPTIONS.map((hobby) => (
+            <Badge
+              key={hobby}
+              variant={formData.hobbies?.includes(hobby) ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => {
+                const newHobbies = formData.hobbies?.includes(hobby)
+                  ? formData.hobbies.filter(h => h !== hobby)
+                  : [...(formData.hobbies || []), hobby];
+                onChange("hobbies", newHobbies);
+              }}
+            >
+              {hobby}
+            </Badge>
+          ))}
+        </div>
+      </div>
+
+      {/* 言語 */}
+      <div className="space-y-2">
+        <Label>使用言語</Label>
+        <div className="flex flex-wrap gap-2">
+          {LANGUAGE_OPTIONS.map((lang) => (
+            <Badge
+              key={lang}
+              variant={formData.languages?.includes(lang) ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => {
+                const newLangs = formData.languages?.includes(lang)
+                  ? formData.languages.filter(l => l !== lang)
+                  : [...(formData.languages || []), lang];
+                onChange("languages", newLangs);
+              }}
+            >
+              {lang}
+            </Badge>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>学習中の言語</Label>
+        <div className="flex flex-wrap gap-2">
+          {LANGUAGE_OPTIONS.map((lang) => (
+            <Badge
+              key={lang}
+              variant={formData.learning_languages?.includes(lang) ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => {
+                const newLangs = formData.learning_languages?.includes(lang)
+                  ? formData.learning_languages.filter(l => l !== lang)
+                  : [...(formData.learning_languages || []), lang];
+                onChange("learning_languages", newLangs);
+              }}
+            >
+              {lang}
+            </Badge>
+          ))}
+        </div>
       </div>
     </>
   );

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
@@ -16,6 +17,11 @@ interface Profile {
   age: number | null;
   avatar_url: string | null;
   about_me: string | null;
+  university: string | null;
+  hobbies?: string[];
+  ideologies?: string[];
+  languages?: string[];
+  learning_languages?: string[];
 }
 
 export default function Matches() {
@@ -108,7 +114,6 @@ export default function Matches() {
 
   return (
     <div className="py-6">
-      <h1 className="text-2xl font-bold mb-6">マッチング</h1>
       <div className="flex items-center gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -125,35 +130,67 @@ export default function Matches() {
       {loading ? (
         <div className="text-center py-8">読み込み中...</div>
       ) : (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="space-y-4">
           {filteredProfiles.map((profile) => (
-            <Card key={profile.id} className="overflow-hidden">
+            <Card key={profile.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="aspect-[4/3] relative">
+                <img
+                  src={profile.avatar_url || "/placeholder.svg"}
+                  alt={`${profile.first_name}のプロフィール`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <div className="p-4">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-12 w-12">
-                    <img
-                      src={profile.avatar_url || "/placeholder.svg"}
-                      alt={`${profile.first_name}のアバター`}
-                      className="object-cover"
-                    />
-                  </Avatar>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">
-                      {profile.first_name} {profile.last_name}
-                    </h3>
-                    {profile.age && (
-                      <p className="text-sm text-muted-foreground">{profile.age}歳</p>
-                    )}
-                  </div>
-                  <Button onClick={() => handleMatch(profile.id)}>
-                    マッチする
-                  </Button>
-                </div>
+                <h3 className="text-xl font-semibold mb-1">
+                  {profile.first_name} {profile.last_name}
+                  {profile.age && <span className="text-base font-normal text-muted-foreground ml-2">{profile.age}歳</span>}
+                </h3>
+                
+                {profile.university && (
+                  <p className="text-muted-foreground text-sm mb-3">
+                    {profile.university}
+                  </p>
+                )}
+
                 {profile.about_me && (
-                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                  <p className="text-sm text-muted-foreground mb-4">
                     {profile.about_me}
                   </p>
                 )}
+
+                {/* 趣味タグ */}
+                {profile.hobbies && profile.hobbies.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {profile.hobbies.map((hobby) => (
+                      <Badge key={hobby} variant="secondary">
+                        {hobby}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {/* 言語 */}
+                {(profile.languages || profile.learning_languages) && (
+                  <div className="mb-4">
+                    {profile.languages && (
+                      <div className="text-sm mb-1">
+                        使用言語: {profile.languages.join(", ")}
+                      </div>
+                    )}
+                    {profile.learning_languages && (
+                      <div className="text-sm text-muted-foreground">
+                        学習中: {profile.learning_languages.join(", ")}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <Button 
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
+                  onClick={() => handleMatch(profile.id)}
+                >
+                  メッセージを送る
+                </Button>
               </div>
             </Card>
           ))}
