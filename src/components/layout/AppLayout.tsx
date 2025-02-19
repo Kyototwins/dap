@@ -24,13 +24,13 @@ export function AppLayout({ children }: LayoutProps) {
       <header className="fixed top-0 right-0 left-0 z-50 bg-white/80 backdrop-blur-md border-b border-amber-600/10">
         <div className="container max-w-lg mx-auto px-4 h-16 flex justify-between items-center">
           <div className="flex-1" /> {/* 左側のスペーサー */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <img
               src="/lovable-uploads/65f3a573-3b4d-4ec7-90e5-78fab77b800d.png"
               alt="DAP Logo"
               className="w-8 h-8"
             />
-            <span className="font-bold text-lg text-amber-700">DAP</span>
+            <span className="font-bold text-xl text-foreground">DAP</span>
           </div>
         </div>
       </header>
