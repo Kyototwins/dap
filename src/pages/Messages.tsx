@@ -16,6 +16,15 @@ interface Profile {
   avatar_url: string | null;
 }
 
+interface Message {
+  id: string;
+  content: string;
+  created_at: string;
+  sender: Profile;
+  match_id: string;
+  sender_id: string;
+}
+
 interface Match {
   id: string;
   user1_id: string;
@@ -30,7 +39,7 @@ interface Match {
 export default function Messages() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -45,9 +54,18 @@ export default function Messages() {
         event: 'INSERT',
         schema: 'public',
         table: 'messages'
-      }, payload => {
+      }, async payload => {
         if (payload.new && selectedMatch?.id === payload.new.match_id) {
-          setMessages(prev => [...prev, payload.new]);
+          // 送信者の情報を取得
+          const { data: senderData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', payload.new.sender_id)
+            .single();
+          
+          if (senderData) {
+            setMessages(prev => [...prev, { ...payload.new, sender: senderData }]);
+          }
         }
       })
       .subscribe();
@@ -123,7 +141,10 @@ export default function Messages() {
         .order("created_at", { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+      
+      // senderが存在することを確認
+      const validMessages = (data || []).filter(message => message.sender);
+      setMessages(validMessages);
     } catch (error: any) {
       toast({
         title: "エラーが発生しました",
@@ -243,24 +264,26 @@ export default function Messages() {
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${
-                    message.sender.id === selectedMatch.otherUser.id
-                      ? "justify-start"
-                      : "justify-end"
-                  }`}
-                >
+                message.sender && (  // sender の存在確認を追加
                   <div
-                    className={`max-w-[70%] ${
+                    key={message.id}
+                    className={`flex ${
                       message.sender.id === selectedMatch.otherUser.id
-                        ? "bg-accent"
-                        : "bg-primary text-primary-foreground"
-                    } rounded-lg p-3`}
+                        ? "justify-start"
+                        : "justify-end"
+                    }`}
                   >
-                    <p>{message.content}</p>
+                    <div
+                      className={`max-w-[70%] ${
+                        message.sender.id === selectedMatch.otherUser.id
+                          ? "bg-accent"
+                          : "bg-primary text-primary-foreground"
+                      } rounded-lg p-3`}
+                    >
+                      <p>{message.content}</p>
+                    </div>
                   </div>
-                </div>
+                )
               ))}
             </div>
 
