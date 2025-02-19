@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
@@ -58,7 +57,6 @@ export default function Matches() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("認証されていません");
 
-      // すでにマッチしているか確認
       const { data: existingMatch, error: matchError } = await supabase
         .from("matches")
         .select("*")
@@ -75,7 +73,6 @@ export default function Matches() {
         return;
       }
 
-      // マッチを作成
       const { error: createError } = await supabase
         .from("matches")
         .insert([
@@ -110,7 +107,8 @@ export default function Matches() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="py-6">
+      <h1 className="text-2xl font-bold mb-6">マッチング</h1>
       <div className="flex items-center gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -127,45 +125,35 @@ export default function Matches() {
       {loading ? (
         <div className="text-center py-8">読み込み中...</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-4">
           {filteredProfiles.map((profile) => (
-            <Card key={profile.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="relative aspect-video">
-                <img
-                  src={profile.avatar_url || "/placeholder.svg"}
-                  alt={`${profile.first_name}のプロフィール画像`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+            <Card key={profile.id} className="overflow-hidden">
               <div className="p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <Avatar className="h-10 w-10">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12">
                     <img
                       src={profile.avatar_url || "/placeholder.svg"}
                       alt={`${profile.first_name}のアバター`}
+                      className="object-cover"
                     />
                   </Avatar>
-                  <div>
+                  <div className="flex-1">
                     <h3 className="font-semibold">
                       {profile.first_name} {profile.last_name}
                     </h3>
-                    {profile.age && <p className="text-sm text-gray-600">{profile.age}歳</p>}
+                    {profile.age && (
+                      <p className="text-sm text-muted-foreground">{profile.age}歳</p>
+                    )}
                   </div>
-                </div>
-                {profile.about_me && (
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{profile.about_me}</p>
-                )}
-                <div className="flex justify-between items-center">
-                  <Button
-                    variant="outline"
-                    onClick={() => navigate(`/profile/${profile.id}`)}
-                  >
-                    プロフィールを見る
-                  </Button>
                   <Button onClick={() => handleMatch(profile.id)}>
                     マッチする
                   </Button>
                 </div>
+                {profile.about_me && (
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    {profile.about_me}
+                  </p>
+                )}
               </div>
             </Card>
           ))}
@@ -173,7 +161,7 @@ export default function Matches() {
       )}
 
       {!loading && filteredProfiles.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-muted-foreground">
           マッチするユーザーが見つかりませんでした
         </div>
       )}
