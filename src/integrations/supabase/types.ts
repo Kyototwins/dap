@@ -248,6 +248,8 @@ export type Database = {
           first_name: string | null
           gender: string | null
           id: string
+          image_url_1: string | null
+          image_url_2: string | null
           last_name: string | null
           origin: string | null
           sexuality: string | null
@@ -260,6 +262,8 @@ export type Database = {
           first_name?: string | null
           gender?: string | null
           id: string
+          image_url_1?: string | null
+          image_url_2?: string | null
           last_name?: string | null
           origin?: string | null
           sexuality?: string | null
@@ -272,6 +276,8 @@ export type Database = {
           first_name?: string | null
           gender?: string | null
           id?: string
+          image_url_1?: string | null
+          image_url_2?: string | null
           last_name?: string | null
           origin?: string | null
           sexuality?: string | null
