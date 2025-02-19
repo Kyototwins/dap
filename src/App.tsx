@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,7 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import ProfileSetup from "./pages/ProfileSetup";
 import Matches from "./pages/Matches";
+import Messages from "./pages/Messages";
 import Events from "./pages/Events";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
@@ -40,10 +42,7 @@ const App = () => (
             path="/messages"
             element={
               <AppLayout>
-                <div className="py-6">
-                  <h1 className="text-2xl font-bold mb-4">メッセージ</h1>
-                  <p className="text-muted-foreground">実装中です...</p>
-                </div>
+                <Messages />
               </AppLayout>
             }
           />
