@@ -25,6 +25,7 @@ export default function ProfileSetup() {
     origin: "",
     sexuality: "",
     aboutMe: "",
+    university: "", // 追加
   });
   const [additionalData, setAdditionalData] = useState({
     idealDate: "",
@@ -108,6 +109,7 @@ export default function ProfileSetup() {
           origin: formData.origin,
           sexuality: formData.sexuality,
           about_me: formData.aboutMe,
+          university: formData.university, // 追加
           avatar_url: avatarUrl,
           image_url_1: imageUrl1,
           image_url_2: imageUrl2,

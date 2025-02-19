@@ -18,6 +18,7 @@ interface ProfileFormData {
   origin: string;
   sexuality: string;
   aboutMe: string;
+  university: string;
 }
 
 interface ProfileFormProps {
@@ -52,6 +53,18 @@ export function ProfileForm({ formData, onChange, loading }: ProfileFormProps) {
             disabled={loading}
           />
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="university">大学</Label>
+        <Input
+          id="university"
+          placeholder="〇〇大学"
+          value={formData.university}
+          onChange={(e) => onChange("university", e.target.value)}
+          required
+          disabled={loading}
+        />
       </div>
 
       <div className="space-y-2">

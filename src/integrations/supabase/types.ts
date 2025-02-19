@@ -256,6 +256,7 @@ export type Database = {
           origin: string | null
           sexuality: string | null
           superpower: string | null
+          university: string | null
         }
         Insert: {
           about_me?: string | null
@@ -273,6 +274,7 @@ export type Database = {
           origin?: string | null
           sexuality?: string | null
           superpower?: string | null
+          university?: string | null
         }
         Update: {
           about_me?: string | null
@@ -290,6 +292,7 @@ export type Database = {
           origin?: string | null
           sexuality?: string | null
           superpower?: string | null
+          university?: string | null
         }
         Relationships: []
       }

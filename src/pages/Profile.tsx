@@ -20,6 +20,7 @@ interface Profile {
   ideal_date: string | null;
   life_goal: string | null;
   superpower: string | null;
+  university: string | null;
 }
 
 export default function Profile() {
@@ -36,7 +37,6 @@ export default function Profile() {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
       if (!user) {
-        // ユーザーが認証されていない場合はログインページにリダイレクト
         window.location.href = "/login";
         return;
       }
@@ -117,24 +117,34 @@ export default function Profile() {
         <h1 className="mt-4 text-2xl font-bold">
           {profile.first_name} {profile.last_name}
         </h1>
-        <div className="mt-2 flex justify-center gap-2">
+        <div className="mt-2 flex justify-center gap-2 flex-wrap">
           {profile.age && <Badge variant="secondary">{profile.age}歳</Badge>}
           {profile.gender && <Badge variant="secondary">{genderText}</Badge>}
           {profile.origin && <Badge variant="secondary">{originText}</Badge>}
+          {profile.university && (
+            <Badge variant="secondary">{profile.university}</Badge>
+          )}
         </div>
       </div>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <h2 className="text-lg font-semibold">自己紹介</h2>
+          <h2 className="text-lg font-semibold">基本情報</h2>
           <Button variant="ghost" size="icon">
             <Edit2 className="w-4 h-4" />
           </Button>
         </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {profile.about_me || "自己紹介文が未設定です"}
-          </p>
+        <CardContent className="space-y-4">
+          <div>
+            <h3 className="font-medium mb-2">大学</h3>
+            <p className="text-muted-foreground">{profile.university || "未設定"}</p>
+          </div>
+          <div>
+            <h3 className="font-medium mb-2">自己紹介</h3>
+            <p className="text-muted-foreground">
+              {profile.about_me || "自己紹介文が未設定です"}
+            </p>
+          </div>
         </CardContent>
       </Card>
 
