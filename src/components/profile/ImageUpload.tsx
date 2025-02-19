@@ -21,7 +21,7 @@ export function ImageUpload({ label, image, onChange, loading }: ImageUploadProp
     <div className="space-y-2">
       <Label>{label}</Label>
       <div className="flex items-center gap-4">
-        <div className="relative w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
+        <label className="relative w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden cursor-pointer hover:border-gray-400 transition-colors">
           {image.preview ? (
             <img
               src={image.preview}
@@ -38,9 +38,9 @@ export function ImageUpload({ label, image, onChange, loading }: ImageUploadProp
             accept="image/*"
             onChange={onChange}
             disabled={loading}
-            className="absolute inset-0 opacity-0 cursor-pointer"
+            className="hidden"
           />
-        </div>
+        </label>
         {image.uploading && <Loader2 className="w-6 h-6 animate-spin" />}
       </div>
     </div>
