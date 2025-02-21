@@ -58,7 +58,8 @@ export default function Matches() {
     }
   };
 
-  const handleMatch = async (matchUserId: string) => {
+  const handleMatch = async (event: React.MouseEvent, matchUserId: string) => {
+    event.stopPropagation(); // カード全体のクリックイベントが発火するのを防ぐ
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("認証されていません");
@@ -103,6 +104,10 @@ export default function Matches() {
     }
   };
 
+  const handleCardClick = (profileId: string) => {
+    navigate(`/profile/${profileId}`);
+  };
+
   const filteredProfiles = profiles.filter((profile) => {
     const searchLower = searchQuery.toLowerCase();
     return (
@@ -132,7 +137,11 @@ export default function Matches() {
       ) : (
         <div className="space-y-4">
           {filteredProfiles.map((profile) => (
-            <Card key={profile.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card 
+              key={profile.id} 
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => handleCardClick(profile.id)}
+            >
               <div className="aspect-[4/3] relative">
                 <img
                   src={profile.avatar_url || "/placeholder.svg"}
@@ -158,7 +167,6 @@ export default function Matches() {
                   </p>
                 )}
 
-                {/* 趣味タグ */}
                 {profile.hobbies && profile.hobbies.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-3">
                     {profile.hobbies.map((hobby) => (
@@ -169,7 +177,6 @@ export default function Matches() {
                   </div>
                 )}
 
-                {/* 言語 */}
                 {(profile.languages || profile.learning_languages) && (
                   <div className="mb-4">
                     {profile.languages && (
@@ -187,7 +194,7 @@ export default function Matches() {
 
                 <Button 
                   className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
-                  onClick={() => handleMatch(profile.id)}
+                  onClick={(e) => handleMatch(e, profile.id)}
                 >
                   メッセージを送る
                 </Button>
