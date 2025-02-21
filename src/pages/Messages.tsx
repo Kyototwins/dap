@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -159,29 +160,31 @@ export default function Messages() {
   }
 
   return (
-    <div className="fixed inset-0 pt-20 flex flex-col">
-      <div className="flex-none">
-        <MatchList 
-          matches={matches} 
-          selectedMatch={selectedMatch} 
-          onSelectMatch={handleSelectMatch}
-        />
-      </div>
-      
-      <div className="flex-1 overflow-hidden">
-        {selectedMatch ? (
-          <MessageChat
-            selectedMatch={selectedMatch}
-            messages={messages}
-            newMessage={newMessage}
-            onNewMessageChange={setNewMessage}
-            onSendMessage={handleSendMessage}
+    <div className="fixed inset-0 pt-20">
+      <div className="h-full flex flex-col">
+        <div className="flex-none">
+          <MatchList 
+            matches={matches} 
+            selectedMatch={selectedMatch} 
+            onSelectMatch={handleSelectMatch}
           />
-        ) : (
-          <div className="flex items-center justify-center h-full text-muted-foreground">
-            メッセージを表示するには、上のリストからユーザーを選択してください
-          </div>
-        )}
+        </div>
+        
+        <div className="flex-1 overflow-hidden">
+          {selectedMatch ? (
+            <MessageChat
+              selectedMatch={selectedMatch}
+              messages={messages}
+              newMessage={newMessage}
+              onNewMessageChange={setNewMessage}
+              onSendMessage={handleSendMessage}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-muted-foreground">
+              メッセージを表示するには、上のリストからユーザーを選択してください
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -70,7 +70,7 @@ export function MessageChat({
         </div>
       </ScrollArea>
 
-      <div className="flex-none border-t p-4">
+      <div className="flex-none border-t p-4 bg-background">
         <form onSubmit={onSendMessage} className="flex gap-2">
           <Input
             type="text"
