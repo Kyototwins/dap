@@ -74,7 +74,7 @@ export default function Events() {
           created_at,
           event_id,
           user_id,
-          user:profiles!user_id(
+          user:profiles!event_comments_user_id_fkey(
             first_name,
             last_name,
             avatar_url
