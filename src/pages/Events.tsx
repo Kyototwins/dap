@@ -60,6 +60,53 @@ export default function Events() {
   useEffect(() => {
     if (selectedEvent) {
       fetchComments(selectedEvent.id);
+      
+      // リアルタイムサブスクリプションを設定
+      const channel = supabase
+        .channel('event-comments')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'event_comments',
+            filter: `event_id=eq.${selectedEvent.id}`
+          },
+          async (payload) => {
+            console.log('New comment received:', payload);
+            // 新しいコメントを取得
+            const { data, error } = await supabase
+              .from('event_comments')
+              .select(`
+                id,
+                content,
+                created_at,
+                event_id,
+                user_id,
+                user:profiles!event_comments_user_id_fkey(
+                  first_name,
+                  last_name,
+                  avatar_url
+                )
+              `)
+              .eq('id', payload.new.id)
+              .single();
+
+            if (error) {
+              console.error('Error fetching new comment:', error);
+              return;
+            }
+
+            if (data) {
+              setComments(prev => [...prev, data]);
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [selectedEvent]);
 
@@ -122,7 +169,6 @@ export default function Events() {
       }
 
       console.log('Comment submitted successfully');
-      await fetchComments(selectedEvent.id);
       setNewComment("");
       
       toast({
