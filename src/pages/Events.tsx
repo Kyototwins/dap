@@ -402,12 +402,12 @@ export default function Events() {
       )}
 
       <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
+        <DialogContent className="max-w-3xl h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{selectedEvent?.title}</DialogTitle>
           </DialogHeader>
           
-          <div className="flex-1 min-h-0 flex flex-col gap-4">
+          <div className="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden">
             <div className="flex-shrink-0">
               <img
                 src={selectedEvent?.image_url || "/placeholder.svg"}
@@ -426,38 +426,40 @@ export default function Events() {
               </div>
             </div>
 
-            <div className="flex-1 min-h-0 flex flex-col gap-4 mt-4">
-              <h3 className="font-semibold">コメント</h3>
-              <ScrollArea className="flex-1 min-h-0 border rounded-lg p-4 h-[300px]">
-                <div className="space-y-4">
-                  {comments.map((comment) => (
-                    <div key={comment.id} className="flex gap-3">
-                      <Avatar className="h-8 w-8 flex-shrink-0">
-                        <img
-                          src={comment.user?.avatar_url || "/placeholder.svg"}
-                          alt={`${comment.user?.first_name}のアバター`}
-                        />
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm">
-                            {comment.user?.first_name} {comment.user?.last_name}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {new Date(comment.created_at).toLocaleString()}
-                          </span>
+            <div className="flex-1 min-h-0 flex flex-col">
+              <h3 className="font-semibold mb-4">コメント</h3>
+              <div className="flex-1 min-h-0">
+                <ScrollArea className="h-full border rounded-lg">
+                  <div className="p-4 space-y-4">
+                    {comments.map((comment) => (
+                      <div key={comment.id} className="flex gap-3">
+                        <Avatar className="h-8 w-8 flex-shrink-0">
+                          <img
+                            src={comment.user?.avatar_url || "/placeholder.svg"}
+                            alt={`${comment.user?.first_name}のアバター`}
+                          />
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-sm">
+                              {comment.user?.first_name} {comment.user?.last_name}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {new Date(comment.created_at).toLocaleString()}
+                            </span>
+                          </div>
+                          <p className="text-sm mt-1">{comment.content}</p>
                         </div>
-                        <p className="text-sm mt-1">{comment.content}</p>
                       </div>
-                    </div>
-                  ))}
-                  {comments.length === 0 && (
-                    <p className="text-center text-gray-500">まだコメントはありません</p>
-                  )}
-                </div>
-              </ScrollArea>
+                    ))}
+                    {comments.length === 0 && (
+                      <p className="text-center text-gray-500">まだコメントはありません</p>
+                    )}
+                  </div>
+                </ScrollArea>
+              </div>
 
-              <div className="flex gap-2 items-start">
+              <div className="flex gap-2 items-start mt-4">
                 <Textarea
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
