@@ -1,12 +1,14 @@
-
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Event {
@@ -27,14 +29,23 @@ interface Event {
   };
 }
 
-interface EventParticipation {
+interface Comment {
   id: string;
-  event_id: string;
+  content: string;
+  created_at: string;
   user_id: string;
+  user: {
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
+  };
 }
 
 export default function Events() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
   const [participations, setParticipations] = useState<{[key: string]: boolean}>({});
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -44,6 +55,70 @@ export default function Events() {
     fetchEvents();
     fetchUserParticipations();
   }, []);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      fetchComments(selectedEvent.id);
+    }
+  }, [selectedEvent]);
+
+  const fetchComments = async (eventId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('event_comments')
+        .select(`
+          *,
+          user:profiles!user_id(
+            first_name,
+            last_name,
+            avatar_url
+          )
+        `)
+        .eq('event_id', eventId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setComments(data || []);
+    } catch (error: any) {
+      toast({
+        title: "コメントの取得に失敗しました",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSubmitComment = async () => {
+    if (!selectedEvent || !newComment.trim()) return;
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("認証されていません");
+
+      const { error } = await supabase
+        .from('event_comments')
+        .insert({
+          event_id: selectedEvent.id,
+          user_id: user.id,
+          content: newComment.trim()
+        });
+
+      if (error) throw error;
+
+      setNewComment("");
+      fetchComments(selectedEvent.id);
+      
+      toast({
+        title: "コメントを投稿しました",
+      });
+    } catch (error: any) {
+      toast({
+        title: "コメントの投稿に失敗しました",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   const fetchEvents = async () => {
     try {
@@ -100,7 +175,6 @@ export default function Events() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("認証されていません");
 
-    // メッセージグループを作成
     const { data: groupData, error: groupError } = await supabase
       .from("message_groups")
       .insert([
@@ -114,7 +188,6 @@ export default function Events() {
 
     if (groupError) throw groupError;
 
-    // グループメンバーとして登録
     const { error: memberError } = await supabase
       .from("message_group_members")
       .insert([
@@ -134,7 +207,6 @@ export default function Events() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("認証されていません");
 
-      // イベント参加を記録
       const { error: participationError } = await supabase
         .from("event_participants")
         .insert([
@@ -146,7 +218,6 @@ export default function Events() {
 
       if (participationError) throw participationError;
 
-      // 現在の参加者数を更新
       const { error: updateError } = await supabase
         .from("events")
         .update({ current_participants: events.find(e => e.id === eventId)?.current_participants + 1 })
@@ -154,16 +225,13 @@ export default function Events() {
 
       if (updateError) throw updateError;
 
-      // メッセージグループを作成または参加
       await createMessageGroup(eventId, eventTitle);
 
-      // 状態を更新
       setParticipations(prev => ({
         ...prev,
         [eventId]: true
       }));
 
-      // イベント一覧を更新
       fetchEvents();
 
       toast({
@@ -194,7 +262,11 @@ export default function Events() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event) => (
-            <Card key={event.id} className="overflow-hidden">
+            <Card 
+              key={event.id} 
+              className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => setSelectedEvent(event)}
+            >
               <div className="relative aspect-video">
                 <img
                   src={event.image_url || "/placeholder.svg"}
@@ -241,7 +313,10 @@ export default function Events() {
                     className="w-full"
                     disabled={event.current_participants >= event.max_participants || participations[event.id]}
                     variant={participations[event.id] ? "secondary" : "default"}
-                    onClick={() => handleJoinEvent(event.id, event.title)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleJoinEvent(event.id, event.title);
+                    }}
                   >
                     {participations[event.id] 
                       ? "参加済み"
@@ -261,6 +336,80 @@ export default function Events() {
           現在開催予定のイベントはありません
         </div>
       )}
+
+      <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>{selectedEvent?.title}</DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 min-h-0 flex flex-col gap-4">
+            <div className="flex-shrink-0">
+              <img
+                src={selectedEvent?.image_url || "/placeholder.svg"}
+                alt={selectedEvent?.title}
+                className="w-full h-48 object-cover rounded-lg"
+              />
+              <p className="mt-4 text-gray-600">{selectedEvent?.description}</p>
+              <div className="mt-2 flex gap-2 flex-wrap">
+                <Badge variant="outline">{selectedEvent?.category}</Badge>
+                <span className="text-sm text-gray-600">
+                  {selectedEvent?.location}
+                </span>
+                <span className="text-sm text-gray-600">
+                  {selectedEvent && new Date(selectedEvent.date).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-0 flex flex-col gap-4 mt-4">
+              <h3 className="font-semibold">コメント</h3>
+              <ScrollArea className="flex-1 min-h-0 border rounded-lg p-4">
+                <div className="space-y-4">
+                  {comments.map((comment) => (
+                    <div key={comment.id} className="flex gap-3">
+                      <Avatar className="h-8 w-8 flex-shrink-0">
+                        <img
+                          src={comment.user?.avatar_url || "/placeholder.svg"}
+                          alt={`${comment.user?.first_name}のアバター`}
+                        />
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm">
+                            {comment.user?.first_name} {comment.user?.last_name}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(comment.created_at).toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-sm mt-1">{comment.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+
+              <div className="flex gap-2 items-start">
+                <Textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="コメントを入力..."
+                  className="flex-1"
+                  rows={2}
+                />
+                <Button
+                  onClick={handleSubmitComment}
+                  disabled={!newComment.trim()}
+                  size="icon"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
