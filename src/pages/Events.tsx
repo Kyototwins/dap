@@ -27,14 +27,22 @@ interface Event {
   };
 }
 
+interface EventParticipation {
+  id: string;
+  event_id: string;
+  user_id: string;
+}
+
 export default function Events() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [participations, setParticipations] = useState<{[key: string]: boolean}>({});
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     fetchEvents();
+    fetchUserParticipations();
   }, []);
 
   const fetchEvents = async () => {
@@ -65,30 +73,69 @@ export default function Events() {
     }
   };
 
-  const handleJoinEvent = async (eventId: string) => {
+  const fetchUserParticipations = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("event_participants")
+        .select("event_id")
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      const participationsMap = (data || []).reduce((acc: {[key: string]: boolean}, participation) => {
+        acc[participation.event_id] = true;
+        return acc;
+      }, {});
+
+      setParticipations(participationsMap);
+    } catch (error: any) {
+      console.error("参加状況の取得に失敗しました:", error);
+    }
+  };
+
+  const createMessageGroup = async (eventId: string, eventTitle: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("認証されていません");
+
+    // メッセージグループを作成
+    const { data: groupData, error: groupError } = await supabase
+      .from("message_groups")
+      .insert([
+        {
+          name: eventTitle,
+          event_id: eventId
+        }
+      ])
+      .select()
+      .single();
+
+    if (groupError) throw groupError;
+
+    // グループメンバーとして登録
+    const { error: memberError } = await supabase
+      .from("message_group_members")
+      .insert([
+        {
+          group_id: groupData.id,
+          user_id: user.id
+        }
+      ]);
+
+    if (memberError) throw memberError;
+
+    return groupData;
+  };
+
+  const handleJoinEvent = async (eventId: string, eventTitle: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("認証されていません");
 
-      // 既に参加しているか確認
-      const { data: existing, error: checkError } = await supabase
-        .from("event_participants")
-        .select("*")
-        .eq("event_id", eventId)
-        .eq("user_id", user.id);
-
-      if (checkError) throw checkError;
-
-      if (existing && existing.length > 0) {
-        toast({
-          title: "既に参加しています",
-          description: "このイベントには既に参加登録されています。",
-        });
-        return;
-      }
-
-      // 参加者を追加
-      const { error: joinError } = await supabase
+      // イベント参加を記録
+      const { error: participationError } = await supabase
         .from("event_participants")
         .insert([
           {
@@ -97,7 +144,7 @@ export default function Events() {
           },
         ]);
 
-      if (joinError) throw joinError;
+      if (participationError) throw participationError;
 
       // 現在の参加者数を更新
       const { error: updateError } = await supabase
@@ -107,13 +154,22 @@ export default function Events() {
 
       if (updateError) throw updateError;
 
-      toast({
-        title: "イベントに参加しました",
-        description: "イベントに参加登録が完了しました。",
-      });
+      // メッセージグループを作成または参加
+      await createMessageGroup(eventId, eventTitle);
+
+      // 状態を更新
+      setParticipations(prev => ({
+        ...prev,
+        [eventId]: true
+      }));
 
       // イベント一覧を更新
       fetchEvents();
+
+      toast({
+        title: "イベントに参加しました",
+        description: "イベントに参加登録が完了しました。グループメッセージにも参加しました。",
+      });
     } catch (error: any) {
       toast({
         title: "エラーが発生しました",
@@ -183,12 +239,15 @@ export default function Events() {
                 <div className="mt-4">
                   <Button
                     className="w-full"
-                    disabled={event.current_participants >= event.max_participants}
-                    onClick={() => handleJoinEvent(event.id)}
+                    disabled={event.current_participants >= event.max_participants || participations[event.id]}
+                    variant={participations[event.id] ? "secondary" : "default"}
+                    onClick={() => handleJoinEvent(event.id, event.title)}
                   >
-                    {event.current_participants >= event.max_participants
-                      ? "満員です"
-                      : "参加する"}
+                    {participations[event.id] 
+                      ? "参加済み"
+                      : event.current_participants >= event.max_participants
+                        ? "満員です"
+                        : "参加する"}
                   </Button>
                 </div>
               </div>
