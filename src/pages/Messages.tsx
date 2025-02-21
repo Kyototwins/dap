@@ -144,7 +144,6 @@ export default function Messages() {
 
       if (error) throw error;
       
-      // senderが存在することを確認し、型を保証
       const validMessages = (data || [])
         .filter(message => message.sender)
         .map(message => ({
@@ -204,8 +203,8 @@ export default function Messages() {
       {/* マッチ一覧 - 横スクロール */}
       <div className="border-b p-4">
         <h2 className="text-lg font-semibold mb-4">メッセージ</h2>
-        <ScrollArea className="w-full" orientation="horizontal">
-          <div className="flex gap-2 pb-4 min-w-min">
+        <div className="overflow-x-auto">
+          <div className="flex gap-2 pb-4">
             {matches.map((match) => (
               <Card
                 key={match.id}
@@ -247,7 +246,7 @@ export default function Messages() {
               </p>
             )}
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
       {/* メッセージ表示エリア */}
