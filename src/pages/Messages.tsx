@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Send } from "lucide-react";
@@ -6,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/components/ui/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Profile {
@@ -198,16 +200,16 @@ export default function Messages() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-80px)]">
-      {/* マッチ一覧 */}
-      <div className="w-1/3 border-r overflow-y-auto">
-        <div className="p-4">
-          <h2 className="text-lg font-semibold mb-4">メッセージ</h2>
-          <div className="space-y-2">
+    <div className="flex flex-col h-[calc(100vh-80px)]">
+      {/* マッチ一覧 - 横スクロール */}
+      <div className="border-b p-4">
+        <h2 className="text-lg font-semibold mb-4">メッセージ</h2>
+        <ScrollArea className="w-full" orientation="horizontal">
+          <div className="flex gap-2 pb-4 min-w-min">
             {matches.map((match) => (
               <Card
                 key={match.id}
-                className={`p-4 cursor-pointer hover:bg-accent transition-colors ${
+                className={`p-4 cursor-pointer hover:bg-accent transition-colors flex-shrink-0 w-[200px] ${
                   selectedMatch?.id === match.id ? "bg-accent" : ""
                 }`}
                 onClick={() => {
@@ -215,8 +217,8 @@ export default function Messages() {
                   fetchMessages(match.id);
                 }}
               >
-                <div className="flex items-center gap-3">
-                  <Avatar>
+                <div className="flex flex-col items-center gap-3">
+                  <Avatar className="h-12 w-12">
                     <AvatarImage
                       src={match.otherUser.avatar_url || "/placeholder.svg"}
                       alt={`${match.otherUser.first_name}のアバター`}
@@ -226,12 +228,12 @@ export default function Messages() {
                       {match.otherUser.last_name?.[0]}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1 min-w-0">
+                  <div className="text-center w-full">
                     <p className="font-medium truncate">
                       {match.otherUser.first_name} {match.otherUser.last_name}
                     </p>
                     {match.lastMessage && (
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-sm text-muted-foreground truncate mt-1">
                         {match.lastMessage.content}
                       </p>
                     )}
@@ -241,11 +243,11 @@ export default function Messages() {
             ))}
             {matches.length === 0 && (
               <p className="text-center text-muted-foreground py-4">
-                まだマッチしてい��ユーザーがいません
+                まだマッチしているユーザーがいません
               </p>
             )}
           </div>
-        </div>
+        </ScrollArea>
       </div>
 
       {/* メッセージ表示エリア */}
@@ -272,30 +274,32 @@ export default function Messages() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message) => (
-                message.sender && (  // sender の存在確認を追加
-                  <div
-                    key={message.id}
-                    className={`flex ${
-                      message.sender.id === selectedMatch.otherUser.id
-                        ? "justify-start"
-                        : "justify-end"
-                    }`}
-                  >
+            <ScrollArea className="flex-1 p-4">
+              <div className="space-y-4">
+                {messages.map((message) => (
+                  message.sender && (
                     <div
-                      className={`max-w-[70%] ${
+                      key={message.id}
+                      className={`flex ${
                         message.sender.id === selectedMatch.otherUser.id
-                          ? "bg-accent"
-                          : "bg-primary text-primary-foreground"
-                      } rounded-lg p-3`}
+                          ? "justify-start"
+                          : "justify-end"
+                      }`}
                     >
-                      <p>{message.content}</p>
+                      <div
+                        className={`max-w-[70%] ${
+                          message.sender.id === selectedMatch.otherUser.id
+                            ? "bg-accent"
+                            : "bg-primary text-primary-foreground"
+                        } rounded-lg p-3`}
+                      >
+                        <p>{message.content}</p>
+                      </div>
                     </div>
-                  </div>
-                )
-              ))}
-            </div>
+                  )
+                ))}
+              </div>
+            </ScrollArea>
 
             <form onSubmit={handleSendMessage} className="p-4 border-t">
               <div className="flex gap-2">
@@ -313,7 +317,7 @@ export default function Messages() {
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-muted-foreground">
-            メッセージを表示するには、左のリストからユーザーを選択してください
+            メッセージを表示するには、上のリストからユーザーを選択してください
           </div>
         )}
       </div>
