@@ -65,12 +65,14 @@ export default function Events() {
 
   const fetchComments = async (eventId: string) => {
     try {
+      console.log('Fetching comments for event:', eventId);
       const { data, error } = await supabase
         .from('event_comments')
         .select(`
           id,
           content,
           created_at,
+          event_id,
           user_id,
           user:profiles!user_id(
             first_name,
@@ -81,9 +83,15 @@ export default function Events() {
         .eq('event_id', eventId)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching comments:', error);
+        throw error;
+      }
+
+      console.log('Fetched comments:', data);
       setComments(data || []);
     } catch (error: any) {
+      console.error('Error in fetchComments:', error);
       toast({
         title: "コメントの取得に失敗しました",
         description: error.message,
@@ -99,6 +107,7 @@ export default function Events() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("認証されていません");
 
+      console.log('Submitting comment for event:', selectedEvent.id);
       const { error } = await supabase
         .from('event_comments')
         .insert({
@@ -107,8 +116,12 @@ export default function Events() {
           content: newComment.trim()
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error submitting comment:', error);
+        throw error;
+      }
 
+      console.log('Comment submitted successfully');
       await fetchComments(selectedEvent.id);
       setNewComment("");
       
@@ -116,6 +129,7 @@ export default function Events() {
         title: "コメントを投稿しました",
       });
     } catch (error: any) {
+      console.error('Error in handleSubmitComment:', error);
       toast({
         title: "コメントの投稿に失敗しました",
         description: error.message,
