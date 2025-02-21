@@ -382,7 +382,7 @@ export default function Events() {
 
             <div className="flex-1 min-h-0 flex flex-col gap-4 mt-4">
               <h3 className="font-semibold">コメント</h3>
-              <ScrollArea className="flex-1 min-h-0 border rounded-lg p-4">
+              <ScrollArea className="flex-1 min-h-0 border rounded-lg p-4 h-[300px]">
                 <div className="space-y-4">
                   {comments.map((comment) => (
                     <div key={comment.id} className="flex gap-3">
