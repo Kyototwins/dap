@@ -22,8 +22,8 @@ export function MessageChat({
   onSendMessage 
 }: MessageChatProps) {
   return (
-    <div className="flex flex-col h-full">
-      <div className="border-b">
+    <div className="h-full flex flex-col">
+      <div className="flex-none border-b">
         <div className="flex items-center gap-3 p-4">
           <Avatar>
             <AvatarImage
@@ -70,7 +70,7 @@ export function MessageChat({
         </div>
       </ScrollArea>
 
-      <div className="border-t p-4">
+      <div className="flex-none border-t p-4">
         <form onSubmit={onSendMessage}>
           <div className="flex gap-2">
             <Input
