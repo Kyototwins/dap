@@ -12,7 +12,6 @@ interface MatchListProps {
 export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListProps) {
   return (
     <div className="border-b p-4">
-      <h2 className="text-lg font-semibold mb-4">メッセージ</h2>
       <div className="overflow-x-auto">
         <div className="flex gap-2 pb-4">
           {matches.map((match) => (
