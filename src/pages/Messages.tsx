@@ -1,53 +1,10 @@
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/components/ui/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
-
-interface Profile {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  avatar_url: string | null;
-  about_me: string | null;
-  age: number | null;
-  gender: string | null;
-  ideal_date: string | null;
-  image_url_1: string | null;
-  image_url_2: string | null;
-  life_goal: string | null;
-  origin: string | null;
-  sexuality: string | null;
-  superpower: string | null;
-  university: string | null;
-  created_at: string | null;
-}
-
-interface Message {
-  id: string;
-  content: string;
-  created_at: string;
-  sender: Profile;
-  match_id: string;
-  sender_id: string;
-}
-
-interface Match {
-  id: string;
-  user1_id: string;
-  user2_id: string;
-  otherUser: Profile;
-  lastMessage?: {
-    content: string;
-    created_at: string;
-  };
-}
+import { MatchList } from "@/components/messages/MatchList";
+import { MessageChat } from "@/components/messages/MessageChat";
+import type { Match, Message } from "@/types/messages";
 
 export default function Messages() {
   const [matches, setMatches] = useState<Match[]>([]);
@@ -56,7 +13,6 @@ export default function Messages() {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMatches();
@@ -198,124 +154,28 @@ export default function Messages() {
     return <div className="p-6 text-center">読み込み中...</div>;
   }
 
+  const handleSelectMatch = (match: Match) => {
+    setSelectedMatch(match);
+    fetchMessages(match.id);
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-80px)]">
-      {/* マッチ一覧 - 横スクロール */}
-      <div className="border-b p-4">
-        <h2 className="text-lg font-semibold mb-4">メッセージ</h2>
-        <div className="overflow-x-auto">
-          <div className="flex gap-2 pb-4">
-            {matches.map((match) => (
-              <Card
-                key={match.id}
-                className={`p-4 cursor-pointer hover:bg-accent transition-colors flex-shrink-0 w-[200px] ${
-                  selectedMatch?.id === match.id ? "bg-accent" : ""
-                }`}
-                onClick={() => {
-                  setSelectedMatch(match);
-                  fetchMessages(match.id);
-                }}
-              >
-                <div className="flex flex-col items-center gap-3">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage
-                      src={match.otherUser.avatar_url || "/placeholder.svg"}
-                      alt={`${match.otherUser.first_name}のアバター`}
-                    />
-                    <AvatarFallback>
-                      {match.otherUser.first_name?.[0]}
-                      {match.otherUser.last_name?.[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="text-center w-full">
-                    <p className="font-medium truncate">
-                      {match.otherUser.first_name} {match.otherUser.last_name}
-                    </p>
-                    {match.lastMessage && (
-                      <p className="text-sm text-muted-foreground truncate mt-1">
-                        {match.lastMessage.content}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-            {matches.length === 0 && (
-              <p className="text-center text-muted-foreground py-4">
-                まだマッチしているユーザーがいません
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* メッセージ表示エリア */}
+      <MatchList 
+        matches={matches} 
+        selectedMatch={selectedMatch} 
+        onSelectMatch={handleSelectMatch}
+      />
+      
       <div className="flex-1 flex flex-col min-h-0">
         {selectedMatch ? (
-          <>
-            <div className="p-4 border-b">
-              <div className="flex items-center gap-3">
-                <Avatar>
-                  <AvatarImage
-                    src={selectedMatch.otherUser.avatar_url || "/placeholder.svg"}
-                    alt={`${selectedMatch.otherUser.first_name}のアバター`}
-                  />
-                  <AvatarFallback>
-                    {selectedMatch.otherUser.first_name?.[0]}
-                    {selectedMatch.otherUser.last_name?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium">
-                    {selectedMatch.otherUser.first_name} {selectedMatch.otherUser.last_name}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 min-h-0 flex flex-col">
-              <ScrollArea className="flex-1">
-                <div className="p-4 space-y-4">
-                  {messages.map((message) => (
-                    message.sender && (
-                      <div
-                        key={message.id}
-                        className={`flex ${
-                          message.sender.id === selectedMatch.otherUser.id
-                            ? "justify-start"
-                            : "justify-end"
-                        }`}
-                      >
-                        <div
-                          className={`max-w-[70%] ${
-                            message.sender.id === selectedMatch.otherUser.id
-                              ? "bg-accent"
-                              : "bg-primary text-primary-foreground"
-                          } rounded-lg p-3`}
-                        >
-                          <p>{message.content}</p>
-                        </div>
-                      </div>
-                    )
-                  ))}
-                </div>
-              </ScrollArea>
-
-              <form onSubmit={handleSendMessage} className="p-4 border-t mt-auto">
-                <div className="flex gap-2">
-                  <Input
-                    type="text"
-                    placeholder="メッセージを入力..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                  />
-                  <Button type="submit" disabled={!newMessage.trim()}>
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </>
+          <MessageChat
+            selectedMatch={selectedMatch}
+            messages={messages}
+            newMessage={newMessage}
+            onNewMessageChange={setNewMessage}
+            onSendMessage={handleSendMessage}
+          />
         ) : (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             メッセージを表示するには、上のリストからユーザーを選択してください
