@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -160,14 +159,14 @@ export default function Messages() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-80px)]">
+    <div className="h-[calc(100vh-80px)] flex flex-col overflow-hidden">
       <MatchList 
         matches={matches} 
         selectedMatch={selectedMatch} 
         onSelectMatch={handleSelectMatch}
       />
       
-      <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 min-h-0">
         {selectedMatch ? (
           <MessageChat
             selectedMatch={selectedMatch}

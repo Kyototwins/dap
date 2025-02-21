@@ -22,9 +22,9 @@ export function MessageChat({
   onSendMessage 
 }: MessageChatProps) {
   return (
-    <div className="flex-1 min-h-0 flex flex-col">
-      <div className="p-4 border-b">
-        <div className="flex items-center gap-3">
+    <div className="flex flex-col h-full">
+      <div className="border-b">
+        <div className="flex items-center gap-3 p-4">
           <Avatar>
             <AvatarImage
               src={selectedMatch.otherUser.avatar_url || "/placeholder.svg"}
@@ -43,35 +43,35 @@ export function MessageChat({
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 flex flex-col">
-        <ScrollArea className="flex-1">
-          <div className="p-4 space-y-4">
-            {messages.map((message) => (
-              message.sender && (
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-4">
+          {messages.map((message) => (
+            message.sender && (
+              <div
+                key={message.id}
+                className={`flex ${
+                  message.sender.id === selectedMatch.otherUser.id
+                    ? "justify-start"
+                    : "justify-end"
+                }`}
+              >
                 <div
-                  key={message.id}
-                  className={`flex ${
+                  className={`max-w-[70%] ${
                     message.sender.id === selectedMatch.otherUser.id
-                      ? "justify-start"
-                      : "justify-end"
-                  }`}
+                      ? "bg-accent"
+                      : "bg-primary text-primary-foreground"
+                  } rounded-lg p-3`}
                 >
-                  <div
-                    className={`max-w-[70%] ${
-                      message.sender.id === selectedMatch.otherUser.id
-                        ? "bg-accent"
-                        : "bg-primary text-primary-foreground"
-                    } rounded-lg p-3`}
-                  >
-                    <p>{message.content}</p>
-                  </div>
+                  <p>{message.content}</p>
                 </div>
-              )
-            ))}
-          </div>
-        </ScrollArea>
+              </div>
+            )
+          ))}
+        </div>
+      </ScrollArea>
 
-        <form onSubmit={onSendMessage} className="p-4 border-t mt-auto">
+      <div className="border-t p-4">
+        <form onSubmit={onSendMessage}>
           <div className="flex gap-2">
             <Input
               type="text"
