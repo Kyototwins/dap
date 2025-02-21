@@ -149,14 +149,14 @@ export default function Messages() {
     }
   };
 
-  if (loading) {
-    return <div className="p-6 text-center">読み込み中...</div>;
-  }
-
   const handleSelectMatch = (match: Match) => {
     setSelectedMatch(match);
     fetchMessages(match.id);
   };
+
+  if (loading) {
+    return <div className="p-6 text-center">読み込み中...</div>;
+  }
 
   return (
     <div className="fixed inset-0 pt-20 flex flex-col">

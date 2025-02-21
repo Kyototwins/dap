@@ -71,18 +71,16 @@ export function MessageChat({
       </ScrollArea>
 
       <div className="flex-none border-t p-4">
-        <form onSubmit={onSendMessage}>
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="メッセージを入力..."
-              value={newMessage}
-              onChange={(e) => onNewMessageChange(e.target.value)}
-            />
-            <Button type="submit" disabled={!newMessage.trim()}>
-              <Send className="w-4 h-4" />
-            </Button>
-          </div>
+        <form onSubmit={onSendMessage} className="flex gap-2">
+          <Input
+            type="text"
+            placeholder="メッセージを入力..."
+            value={newMessage}
+            onChange={(e) => onNewMessageChange(e.target.value)}
+          />
+          <Button type="submit" disabled={!newMessage.trim()}>
+            <Send className="w-4 h-4" />
+          </Button>
         </form>
       </div>
     </div>
