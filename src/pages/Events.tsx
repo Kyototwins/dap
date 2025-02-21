@@ -68,8 +68,11 @@ export default function Events() {
       const { data, error } = await supabase
         .from('event_comments')
         .select(`
-          *,
-          user:profiles(
+          id,
+          content,
+          created_at,
+          user_id,
+          user:profiles!user_id(
             first_name,
             last_name,
             avatar_url
@@ -106,7 +109,6 @@ export default function Events() {
 
       if (error) throw error;
 
-      // コメント投稿後に最新のコメントを取得
       await fetchComments(selectedEvent.id);
       setNewComment("");
       
