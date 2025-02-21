@@ -15,6 +15,7 @@ import Events from "./pages/Events";
 import CreateEvent from "./pages/CreateEvent";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
+import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +69,14 @@ const App = () => (
             element={
               <AppLayout>
                 <Profile />
+              </AppLayout>
+            }
+          />
+          <Route
+            path="/profile/:id"
+            element={
+              <AppLayout>
+                <UserProfile />
               </AppLayout>
             }
           />

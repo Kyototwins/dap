@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,14 +20,14 @@ interface ProfileFormData {
   sexuality: string;
   aboutMe: string;
   university: string;
-  hobbies?: string[];
-  languages?: string[];
-  learning_languages?: string[];
+  hobbies: string[];
+  languages: string[];
+  learning_languages: string[];
 }
 
 interface ProfileFormProps {
   formData: ProfileFormData;
-  onChange: (name: string, value: string) => void;
+  onChange: (name: string, value: string | string[]) => void;
   loading?: boolean;
 }
 
