@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Plus, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -68,7 +69,7 @@ export default function Events() {
         .from('event_comments')
         .select(`
           *,
-          user:profiles!user_id(
+          user:profiles(
             first_name,
             last_name,
             avatar_url
@@ -105,8 +106,9 @@ export default function Events() {
 
       if (error) throw error;
 
+      // コメント投稿後に最新のコメントを取得
+      await fetchComments(selectedEvent.id);
       setNewComment("");
-      fetchComments(selectedEvent.id);
       
       toast({
         title: "コメントを投稿しました",
@@ -387,6 +389,9 @@ export default function Events() {
                       </div>
                     </div>
                   ))}
+                  {comments.length === 0 && (
+                    <p className="text-center text-gray-500">まだコメントはありません</p>
+                  )}
                 </div>
               </ScrollArea>
 
