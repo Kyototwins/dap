@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -15,9 +14,23 @@ interface ImageUpload {
   uploading: boolean;
 }
 
+interface ProfileFormData {
+  firstName: string;
+  lastName: string;
+  age: string;
+  gender: string;
+  origin: string;
+  sexuality: string;
+  aboutMe: string;
+  university: string;
+  hobbies: string[];
+  languages: string[];
+  learning_languages: string[];
+}
+
 export default function ProfileSetup() {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProfileFormData>({
     firstName: "",
     lastName: "",
     age: "",
@@ -25,7 +38,10 @@ export default function ProfileSetup() {
     origin: "",
     sexuality: "",
     aboutMe: "",
-    university: "", // 追加
+    university: "",
+    hobbies: [],
+    languages: [],
+    learning_languages: []
   });
   const [additionalData, setAdditionalData] = useState({
     idealDate: "",
@@ -109,7 +125,7 @@ export default function ProfileSetup() {
           origin: formData.origin,
           sexuality: formData.sexuality,
           about_me: formData.aboutMe,
-          university: formData.university, // 追加
+          university: formData.university,
           avatar_url: avatarUrl,
           image_url_1: imageUrl1,
           image_url_2: imageUrl2,

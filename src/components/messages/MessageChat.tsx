@@ -23,7 +23,7 @@ export function MessageChat({
 }: MessageChatProps) {
   return (
     <div className="h-full flex flex-col">
-      <div className="flex-none border-b">
+      <div className="h-16 flex-none border-b">
         <div className="flex items-center gap-3 p-4">
           <Avatar>
             <AvatarImage
@@ -43,34 +43,36 @@ export function MessageChat({
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4">
-          {messages.map((message) => (
-            message.sender && (
-              <div
-                key={message.id}
-                className={`flex ${
-                  message.sender.id === selectedMatch.otherUser.id
-                    ? "justify-start"
-                    : "justify-end"
-                }`}
-              >
+      <div className="flex-1 min-h-0">
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-4">
+            {messages.map((message) => (
+              message.sender && (
                 <div
-                  className={`max-w-[70%] ${
+                  key={message.id}
+                  className={`flex ${
                     message.sender.id === selectedMatch.otherUser.id
-                      ? "bg-accent"
-                      : "bg-primary text-primary-foreground"
-                  } rounded-lg p-3`}
+                      ? "justify-start"
+                      : "justify-end"
+                  }`}
                 >
-                  <p>{message.content}</p>
+                  <div
+                    className={`max-w-[70%] ${
+                      message.sender.id === selectedMatch.otherUser.id
+                        ? "bg-accent"
+                        : "bg-primary text-primary-foreground"
+                    } rounded-lg p-3`}
+                  >
+                    <p>{message.content}</p>
+                  </div>
                 </div>
-              </div>
-            )
-          ))}
-        </div>
-      </ScrollArea>
+              )
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
 
-      <div className="flex-none border-t p-4 bg-background">
+      <div className="h-20 flex-none border-t p-4 bg-background">
         <form onSubmit={onSendMessage} className="flex gap-2">
           <Input
             type="text"

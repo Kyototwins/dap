@@ -162,7 +162,7 @@ export default function Messages() {
   return (
     <div className="fixed inset-0 pt-20">
       <div className="h-full flex flex-col">
-        <div className="flex-none">
+        <div className="h-24 flex-none">
           <MatchList 
             matches={matches} 
             selectedMatch={selectedMatch} 
@@ -170,7 +170,7 @@ export default function Messages() {
           />
         </div>
         
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 min-h-0">
           {selectedMatch ? (
             <MessageChat
               selectedMatch={selectedMatch}
