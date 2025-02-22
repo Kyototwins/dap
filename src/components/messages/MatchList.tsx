@@ -12,7 +12,7 @@ interface MatchListProps {
 
 export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListProps) {
   return (
-    <ScrollArea className="h-24 w-full" orientation="horizontal">
+    <ScrollArea className="h-24 w-full">
       <div className="flex gap-2 p-4">
         {matches.map((match) => (
           <Card
