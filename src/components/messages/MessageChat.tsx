@@ -22,7 +22,7 @@ export function MessageChat({
   onSendMessage 
 }: MessageChatProps) {
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-[90vh] flex flex-col">
       <div className="h-16 flex-none border-b">
         <div className="flex items-center gap-3 p-4">
           <Avatar>

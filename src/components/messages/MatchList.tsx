@@ -11,9 +11,9 @@ interface MatchListProps {
 
 export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListProps) {
   return (
-    <div className="border-b p-4">
+    <div className="h-[10vh] border-b p-4">
       <div className="overflow-x-auto">
-        <div className="flex gap-2 pb-4">
+        <div className="flex gap-2">
           {matches.map((match) => (
             <Card
               key={match.id}
@@ -22,8 +22,8 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
               }`}
               onClick={() => onSelectMatch(match)}
             >
-              <div className="flex flex-col items-center gap-3">
-                <Avatar className="h-12 w-12">
+              <div className="flex items-center gap-3">
+                <Avatar>
                   <AvatarImage
                     src={match.otherUser.avatar_url || "/placeholder.svg"}
                     alt={`${match.otherUser.first_name}のアバター`}
@@ -33,12 +33,12 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
                     {match.otherUser.last_name?.[0]}
                   </AvatarFallback>
                 </Avatar>
-                <div className="text-center w-full">
+                <div className="overflow-hidden">
                   <p className="font-medium truncate">
                     {match.otherUser.first_name} {match.otherUser.last_name}
                   </p>
                   {match.lastMessage && (
-                    <p className="text-sm text-muted-foreground truncate mt-1">
+                    <p className="text-sm text-muted-foreground truncate">
                       {match.lastMessage.content}
                     </p>
                   )}
