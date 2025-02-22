@@ -22,7 +22,7 @@ export function MessageChat({
   onSendMessage 
 }: MessageChatProps) {
   return (
-    <div className="h-[90vh] flex flex-col">
+    <div className="h-[calc(90vh-4rem)] flex flex-col relative">
       <div className="h-16 flex-none border-b">
         <div className="flex items-center gap-3 p-4">
           <Avatar>
@@ -43,7 +43,7 @@ export function MessageChat({
         </div>
       </div>
 
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 overflow-hidden mb-20">
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             {messages.map((message) => (
@@ -72,7 +72,7 @@ export function MessageChat({
         </ScrollArea>
       </div>
 
-      <div className="h-20 flex-none border-t p-4 bg-background">
+      <div className="h-20 border-t p-4 bg-background absolute bottom-0 left-0 right-0">
         <form onSubmit={onSendMessage} className="flex gap-2">
           <Input
             type="text"
