@@ -160,28 +160,29 @@ export default function Messages() {
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col h-screen overflow-hidden pt-14">
-      <div className="h-[10vh]">
+    <div className="fixed flex flex-col inset-0 pt-14 pb-16 overflow-hidden">
+      <div className="shrink-0 border-b">
         <MatchList 
           matches={matches} 
           selectedMatch={selectedMatch} 
           onSelectMatch={handleSelectMatch}
         />
       </div>
-      
-      {selectedMatch ? (
-        <MessageChat
-          selectedMatch={selectedMatch}
-          messages={messages}
-          newMessage={newMessage}
-          onNewMessageChange={setNewMessage}
-          onSendMessage={handleSendMessage}
-        />
-      ) : (
-        <div className="flex items-center justify-center flex-1 text-muted-foreground">
-          メッセージを表示するには、上のリストからユーザーを選択してください
-        </div>
-      )}
+      <div className="flex-1 relative">
+        {selectedMatch ? (
+          <MessageChat
+            selectedMatch={selectedMatch}
+            messages={messages}
+            newMessage={newMessage}
+            onNewMessageChange={setNewMessage}
+            onSendMessage={handleSendMessage}
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full text-muted-foreground">
+            メッセージを表示するには、上のリストからユーザーを選択してください
+          </div>
+        )}
+      </div>
     </div>
   );
 }

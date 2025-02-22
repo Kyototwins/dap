@@ -14,15 +14,15 @@ interface MessageChatProps {
   onSendMessage: (e: React.FormEvent) => void;
 }
 
-export function MessageChat({ 
-  selectedMatch, 
-  messages, 
-  newMessage, 
-  onNewMessageChange, 
-  onSendMessage 
+export function MessageChat({
+  selectedMatch,
+  messages,
+  newMessage,
+  onNewMessageChange,
+  onSendMessage,
 }: MessageChatProps) {
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="absolute inset-0 flex flex-col">
       <div className="h-16 flex-none border-b">
         <div className="flex items-center gap-3 p-4">
           <Avatar>
@@ -72,17 +72,19 @@ export function MessageChat({
         </ScrollArea>
       </div>
 
-      <div className="h-16 border-t p-4 bg-background">
-        <form onSubmit={onSendMessage} className="flex gap-2">
-          <Input
-            type="text"
-            placeholder="メッセージを入力..."
-            value={newMessage}
-            onChange={(e) => onNewMessageChange(e.target.value)}
-          />
-          <Button type="submit" disabled={!newMessage.trim()}>
-            <Send className="w-4 h-4" />
-          </Button>
+      <div className="h-16 flex-none border-t bg-background">
+        <form onSubmit={onSendMessage} className="h-full p-4">
+          <div className="flex gap-2 h-full">
+            <Input
+              type="text"
+              placeholder="メッセージを入力..."
+              value={newMessage}
+              onChange={(e) => onNewMessageChange(e.target.value)}
+            />
+            <Button type="submit" disabled={!newMessage.trim()}>
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
         </form>
       </div>
     </div>
