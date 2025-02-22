@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -159,7 +160,7 @@ export default function Messages() {
   }
 
   return (
-    <div className="flex flex-col h-screen pt-20">
+    <div className="flex flex-col h-screen">
       <MatchList 
         matches={matches} 
         selectedMatch={selectedMatch} 
