@@ -160,7 +160,7 @@ export default function Messages() {
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col h-screen overflow-hidden">
+    <div className="fixed inset-0 flex flex-col h-screen overflow-hidden pt-14">
       <div className="h-[10vh]">
         <MatchList 
           matches={matches} 
