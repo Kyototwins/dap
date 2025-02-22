@@ -1,7 +1,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import type { Match } from "@/types/messages";
 
 interface MatchListProps {
@@ -13,7 +13,7 @@ interface MatchListProps {
 export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListProps) {
   return (
     <div className="w-full h-24 overflow-hidden">
-      <ScrollArea className="w-full h-full" orientation="horizontal">
+      <ScrollArea className="w-full h-full">
         <div className="flex gap-2 p-4">
           {matches.map((match) => (
             <Card
@@ -53,6 +53,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
             </p>
           )}
         </div>
+        <ScrollBar orientation="horizontal" />
       </ScrollArea>
     </div>
   );
