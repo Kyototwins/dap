@@ -18,7 +18,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
           {matches.map((match) => (
             <Card
               key={match.id}
-              className={`shrink-0 p-3 cursor-pointer hover:bg-accent transition-colors w-[160px] ${
+              className={`shrink-0 p-3 cursor-pointer hover:bg-accent transition-colors w-[140px] ${
                 selectedMatch?.id === match.id ? "bg-accent" : ""
               }`}
               onClick={() => onSelectMatch(match)}
