@@ -13,18 +13,18 @@ interface MatchListProps {
 export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListProps) {
   return (
     <div className="w-full h-24 overflow-hidden">
-      <ScrollArea className="w-full h-full">
-        <div className="flex gap-2 p-4 min-h-0 overflow-x-auto overflow-y-hidden">
+      <ScrollArea className="w-full h-full whitespace-nowrap">
+        <div className="flex gap-2 p-4 overflow-y-hidden">
           {matches.map((match) => (
             <Card
               key={match.id}
-              className={`shrink-0 p-4 cursor-pointer hover:bg-accent transition-colors w-[200px] ${
+              className={`shrink-0 p-4 cursor-pointer hover:bg-accent transition-colors w-[160px] ${
                 selectedMatch?.id === match.id ? "bg-accent" : ""
               }`}
               onClick={() => onSelectMatch(match)}
             >
-              <div className="flex items-center gap-3">
-                <Avatar>
+              <div className="flex items-center gap-2">
+                <Avatar className="h-8 w-8">
                   <AvatarImage
                     src={match.otherUser.avatar_url || "/placeholder.svg"}
                     alt={`${match.otherUser.first_name}のアバター`}
@@ -35,11 +35,11 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
                   </AvatarFallback>
                 </Avatar>
                 <div className="overflow-hidden">
-                  <p className="font-medium truncate">
+                  <p className="font-medium truncate text-sm">
                     {match.otherUser.first_name} {match.otherUser.last_name}
                   </p>
                   {match.lastMessage && (
-                    <p className="text-sm text-muted-foreground truncate">
+                    <p className="text-xs text-muted-foreground truncate">
                       {match.lastMessage.content}
                     </p>
                   )}
