@@ -14,7 +14,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
   return (
     <div className="w-full h-24 overflow-hidden">
       <ScrollArea className="w-full h-full">
-        <div className="flex gap-2 p-4">
+        <div className="flex gap-2 p-4 min-h-0 overflow-x-auto overflow-y-hidden">
           {matches.map((match) => (
             <Card
               key={match.id}
