@@ -18,13 +18,13 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
           {matches.map((match) => (
             <Card
               key={match.id}
-              className={`shrink-0 p-4 cursor-pointer hover:bg-accent transition-colors w-[160px] ${
+              className={`shrink-0 p-3 cursor-pointer hover:bg-accent transition-colors w-[160px] ${
                 selectedMatch?.id === match.id ? "bg-accent" : ""
               }`}
               onClick={() => onSelectMatch(match)}
             >
               <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-7 w-7">
                   <AvatarImage
                     src={match.otherUser.avatar_url || "/placeholder.svg"}
                     alt={`${match.otherUser.first_name}のアバター`}
