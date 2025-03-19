@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, Camera, Edit2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -28,7 +27,6 @@ export default function Profile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
     loadProfile();
@@ -173,7 +171,7 @@ export default function Profile() {
       <div className="fixed bottom-24 right-4">
         <Button 
           size="lg"
-          onClick={() => navigate("/profile/setup")}
+          onClick={() => {/* TODO: プロフィール編集ページに遷移 */}}
         >
           プロフィールを編集
         </Button>
