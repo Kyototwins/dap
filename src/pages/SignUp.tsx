@@ -1,146 +1,23 @@
 
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { supabase, testSupabaseConnection, isOffline } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, WifiOff } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [connectionError, setConnectionError] = useState(false);
-  const [offline, setOffline] = useState(false);
-  const { toast } = useToast();
-  const navigate = useNavigate();
-
-  // オンライン状態の監視
-  useEffect(() => {
-    const handleOnlineStatusChange = () => {
-      setOffline(!navigator.onLine);
-    };
-
-    window.addEventListener('online', handleOnlineStatusChange);
-    window.addEventListener('offline', handleOnlineStatusChange);
-    setOffline(isOffline());
-
-    return () => {
-      window.removeEventListener('online', handleOnlineStatusChange);
-      window.removeEventListener('offline', handleOnlineStatusChange);
-    };
-  }, []);
-
-  // ページ読み込み時に接続テスト
-  useEffect(() => {
-    const checkConnection = async () => {
-      if (!offline) {
-        try {
-          const { success } = await testSupabaseConnection();
-          setConnectionError(!success);
-        } catch (error) {
-          setConnectionError(true);
-        }
-      }
-    };
-    checkConnection();
-  }, [offline]);
-
-  const testConnection = async () => {
-    if (offline) {
-      return false;
-    }
-    
-    try {
-      const { success } = await testSupabaseConnection();
-      if (!success) {
-        console.error("Supabase connection error");
-        setConnectionError(true);
-        return false;
-      }
-      setConnectionError(false);
-      return true;
-    } catch (error) {
-      console.error("Connection test failed:", error);
-      setConnectionError(true);
-      return false;
-    }
-  };
+  const { loading, connectionError, offline, handleSignUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      // オフライン状態のチェック
-      if (offline) {
-        throw new Error("インターネット接続がありません。ネットワーク接続を確認してください。");
-      }
-
-      // 接続テスト
-      const isConnected = await testConnection();
-      if (!isConnected) {
-        throw new Error("サーバーに接続できません。ネットワーク接続を確認してください。");
-      }
-
-      console.log("Attempting to sign up with:", { email, name });
-
-      // サインアップ処理
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name,
-          },
-        },
-      });
-
-      if (error) {
-        console.error("Signup error:", error);
-        throw error;
-      }
-
-      console.log("Signup successful, data:", data);
-
-      // メール送信成功のメッセージを表示
-      toast({
-        title: "確認メールを送信しました",
-        description: "メールに記載されているリンクをクリックして、登録を完了してください。",
-      });
-
-      // ログインページにリダイレクト
-      navigate("/login");
-
-    } catch (error: any) {
-      console.error("Signup failure:", error);
-      let errorMessage = "アカウントの作成に失敗しました。";
-      
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      if (errorMessage.includes("Failed to fetch") || errorMessage.includes("Network Error")) {
-        errorMessage = "サーバーへの接続に失敗しました。インターネット接続を確認してください。";
-      } else if (errorMessage.includes("User already registered")) {
-        errorMessage = "このメールアドレスは既に登録されています。ログインしてください。";
-      }
-      
-      toast({
-        title: "エラーが発生しました",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    await handleSignUp({ email, password, name });
   };
 
   return (
