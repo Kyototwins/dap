@@ -5,7 +5,7 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase, testSupabaseConnection, isOffline } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, WifiOff } from "lucide-react";
@@ -57,9 +57,9 @@ export default function SignUp() {
     }
     
     try {
-      const { success, error } = await testSupabaseConnection();
+      const { success } = await testSupabaseConnection();
       if (!success) {
-        console.error("Supabase connection error:", error);
+        console.error("Supabase connection error");
         setConnectionError(true);
         return false;
       }
@@ -88,8 +88,10 @@ export default function SignUp() {
         throw new Error("サーバーに接続できません。ネットワーク接続を確認してください。");
       }
 
+      console.log("Attempting to sign up with:", { email, name });
+
       // サインアップ処理
-      const signUpPromise = supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -98,18 +100,13 @@ export default function SignUp() {
           },
         },
       });
-      
-      // タイムアウト処理
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("登録処理がタイムアウトしました。後でもう一度お試しください。")), 15000);
-      });
-      
-      // どちらか早い方を採用
-      const { data, error } = await Promise.race([signUpPromise, timeoutPromise]) as any;
 
       if (error) {
+        console.error("Signup error:", error);
         throw error;
       }
+
+      console.log("Signup successful, data:", data);
 
       // メール送信成功のメッセージを表示
       toast({
@@ -121,6 +118,7 @@ export default function SignUp() {
       navigate("/login");
 
     } catch (error: any) {
+      console.error("Signup failure:", error);
       let errorMessage = "アカウントの作成に失敗しました。";
       
       if (error instanceof Error) {

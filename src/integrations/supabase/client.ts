@@ -13,26 +13,6 @@ export const supabase = createClient<Database>(
     auth: {
       autoRefreshToken: true,
       persistSession: true,
-    },
-    global: {
-      fetch: (...args) => {
-        // カスタムフェッチ関数でタイムアウトを設定
-        return new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => {
-            reject(new Error('リクエストがタイムアウトしました。ネットワーク接続を確認してください。'));
-          }, 10000); // 10秒タイムアウト
-
-          fetch(...args)
-            .then(response => {
-              clearTimeout(timeoutId);
-              resolve(response);
-            })
-            .catch(error => {
-              clearTimeout(timeoutId);
-              reject(error);
-            });
-        });
-      }
     }
   }
 );
@@ -40,15 +20,14 @@ export const supabase = createClient<Database>(
 // 接続テスト関数
 export const testSupabaseConnection = async () => {
   try {
-    const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('接続タイムアウト')), 5000)
-    );
+    const { data, error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
     
-    const connectionTest = supabase.from('profiles').select('count', { count: 'exact', head: true });
+    if (error) {
+      console.error('Supabase connection test failed:', error);
+      return { success: false, error };
+    }
     
-    // Promiseレースでタイムアウトを設定
-    const result = await Promise.race([connectionTest, timeout]);
-    return { success: !result.error, error: result.error };
+    return { success: true, error: null };
   } catch (error) {
     console.error('Supabase connection test failed:', error);
     return { 

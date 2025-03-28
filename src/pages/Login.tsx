@@ -5,7 +5,7 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase, testSupabaseConnection, isOffline } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, WifiOff } from "lucide-react";
@@ -56,9 +56,9 @@ export default function Login() {
     }
     
     try {
-      const { success, error } = await testSupabaseConnection();
+      const { success } = await testSupabaseConnection();
       if (!success) {
-        console.error("Supabase connection error:", error);
+        console.error("Supabase connection error");
         setConnectionError(true);
         return false;
       }
@@ -88,21 +88,21 @@ export default function Login() {
       }
 
       // ログイン処理
-      const loginPromise = supabase.auth.signInWithPassword({
+      console.log("Attempting to login with:", { email });
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      
-      // タイムアウト処理
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("ログイン処理がタイムアウトしました。後でもう一度お試しください。")), 15000);
-      });
-      
-      // どちらか早い方を採用
-      const { data: authData, error: authError } = await Promise.race([loginPromise, timeoutPromise]) as any;
 
       if (authError) {
+        console.error("Auth error:", authError);
         throw authError;
+      }
+      
+      console.log("Login successful, auth data:", authData);
+
+      if (!authData?.user) {
+        throw new Error("ユーザーデータを取得できませんでした。");
       }
 
       // プロフィール情報を取得
@@ -114,6 +114,7 @@ export default function Login() {
 
       if (profileError && profileError.code !== 'PGRST116') {
         // PGRST116はレコードが見つからないエラー
+        console.error("Profile fetch error:", profileError);
         throw profileError;
       }
 
@@ -133,6 +134,7 @@ export default function Login() {
       }
 
     } catch (error: any) {
+      console.error("Login error:", error);
       let errorMessage = "ログインに失敗しました。";
       
       if (error instanceof Error) {
