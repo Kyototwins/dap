@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Loader2, Camera, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -27,6 +28,7 @@ export default function Profile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadProfile();
@@ -37,7 +39,7 @@ export default function Profile() {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
       if (!user) {
-        window.location.href = "/login";
+        navigate("/login");
         return;
       }
 
@@ -58,6 +60,10 @@ export default function Profile() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditProfile = () => {
+    navigate("/profile/setup");
   };
 
   if (loading) {
@@ -130,7 +136,7 @@ export default function Profile() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <h2 className="text-lg font-semibold">基本情報</h2>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={handleEditProfile}>
             <Edit2 className="w-4 h-4" />
           </Button>
         </CardHeader>
@@ -171,7 +177,7 @@ export default function Profile() {
       <div className="fixed bottom-24 right-4">
         <Button 
           size="lg"
-          onClick={() => {/* TODO: プロフィール編集ページに遷移 */}}
+          onClick={handleEditProfile}
         >
           プロフィールを編集
         </Button>

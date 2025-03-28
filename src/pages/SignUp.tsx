@@ -6,21 +6,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, testSupabaseConnection } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [connectionError, setConnectionError] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const testConnection = async () => {
+    const { success, error } = await testSupabaseConnection();
+    if (!success) {
+      console.error("Supabase connection error:", error);
+      setConnectionError(true);
+      return false;
+    }
+    setConnectionError(false);
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // 接続テスト
+      const isConnected = await testConnection();
+      if (!isConnected) {
+        throw new Error("サーバーに接続できません。ネットワーク接続を確認してください。");
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -60,6 +80,14 @@ export default function SignUp() {
       title="アカウント作成"
       subtitle="大学生の国際交流コミュニティに参加しよう"
     >
+      {connectionError && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            サーバーに接続できません。ネットワーク接続を確認してください。
+          </AlertDescription>
+        </Alert>
+      )}
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="name">氏名</Label>

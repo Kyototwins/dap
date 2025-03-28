@@ -1,25 +1,53 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, testSupabaseConnection } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [connectionError, setConnectionError] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // ページ読み込み時に接続テスト
+  useEffect(() => {
+    const checkConnection = async () => {
+      await testConnection();
+    };
+    checkConnection();
+  }, []);
+
+  const testConnection = async () => {
+    const { success, error } = await testSupabaseConnection();
+    if (!success) {
+      console.error("Supabase connection error:", error);
+      setConnectionError(true);
+      return false;
+    }
+    setConnectionError(false);
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // 接続テスト
+      const isConnected = await testConnection();
+      if (!isConnected) {
+        throw new Error("サーバーに接続できません。ネットワーク接続を確認してください。");
+      }
+
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -36,7 +64,8 @@ export default function Login() {
         .eq('id', authData.user.id)
         .single();
 
-      if (profileError) {
+      if (profileError && profileError.code !== 'PGRST116') {
+        // PGRST116はレコードが見つからないエラー
         throw profileError;
       }
 
@@ -47,7 +76,7 @@ export default function Login() {
       });
 
       // プロフィールの設定状況に応じてリダイレクト
-      if (!profileData.first_name || !profileData.last_name) {
+      if (!profileData || !profileData.first_name || !profileData.last_name) {
         // プロフィール未設定の場合はプロフィール設定画面へ
         navigate("/profile/setup");
       } else {
@@ -71,6 +100,14 @@ export default function Login() {
       title="おかえりなさい"
       subtitle="国際交流を始めましょう"
     >
+      {connectionError && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            サーバーに接続できません。ネットワーク接続を確認してください。
+          </AlertDescription>
+        </Alert>
+      )}
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="email">大学メールアドレス</Label>
