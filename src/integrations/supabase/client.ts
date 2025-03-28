@@ -14,16 +14,51 @@ export const supabase = createClient<Database>(
       autoRefreshToken: true,
       persistSession: true,
     },
+    global: {
+      fetch: (...args) => {
+        // カスタムフェッチ関数でタイムアウトを設定
+        return new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => {
+            reject(new Error('リクエストがタイムアウトしました。ネットワーク接続を確認してください。'));
+          }, 10000); // 10秒タイムアウト
+
+          fetch(...args)
+            .then(response => {
+              clearTimeout(timeoutId);
+              resolve(response);
+            })
+            .catch(error => {
+              clearTimeout(timeoutId);
+              reject(error);
+            });
+        });
+      }
+    }
   }
 );
 
 // 接続テスト関数
 export const testSupabaseConnection = async () => {
   try {
-    const { error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
-    return { success: !error, error };
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('接続タイムアウト')), 5000)
+    );
+    
+    const connectionTest = supabase.from('profiles').select('count', { count: 'exact', head: true });
+    
+    // Promiseレースでタイムアウトを設定
+    const result = await Promise.race([connectionTest, timeout]);
+    return { success: !result.error, error: result.error };
   } catch (error) {
     console.error('Supabase connection test failed:', error);
-    return { success: false, error };
+    return { 
+      success: false, 
+      error: error instanceof Error ? error : new Error('不明なエラーが発生しました') 
+    };
   }
+};
+
+// オフライン状態かどうかを確認する関数
+export const isOffline = () => {
+  return !window.navigator.onLine;
 };
