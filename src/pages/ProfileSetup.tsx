@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ImageUpload } from "@/components/profile/ImageUpload";
-import { ProfileForm } from "@/components/profile/ProfileForm";
 import { AdditionalQuestions } from "@/components/profile/AdditionalQuestions";
+import { BasicInfoForm } from "@/components/profile/BasicInfoForm";
+import { LanguageSkillsInput } from "@/components/profile/LanguageSkillsInput";
+import { HobbiesInput } from "@/components/profile/HobbiesInput";
 
 interface ImageUpload {
   file: File | null;
@@ -209,11 +211,27 @@ export default function ProfileSetup() {
           />
         </div>
 
-        <ProfileForm
-          formData={formData}
-          onChange={handleChange}
-          loading={loading}
-        />
+        <div className="space-y-4">
+          <BasicInfoForm 
+            formData={formData}
+            onChange={handleChange}
+            loading={loading}
+          />
+          
+          <LanguageSkillsInput
+            languages={formData.languages}
+            languageLevels={formData.languageLevels}
+            learningLanguages={formData.learning_languages}
+            onChange={handleChange}
+            loading={loading}
+          />
+          
+          <HobbiesInput
+            hobbies={formData.hobbies}
+            onChange={handleChange}
+            loading={loading}
+          />
+        </div>
 
         <div className="border-t pt-6">
           <h3 className="text-lg font-medium mb-4">追加の質問</h3>
