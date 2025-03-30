@@ -1,54 +1,28 @@
 
 import { useEffect, useState } from "react";
-import { Plus, Send } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Avatar } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  image_url: string | null;
-  location: string;
-  date: string;
-  max_participants: number;
-  current_participants: number;
-  creator_id: string;
-  category: string;
-  creator?: {
-    first_name: string | null;
-    last_name: string | null;
-    avatar_url: string | null;
-  };
-}
-
-interface Comment {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  user: {
-    first_name: string | null;
-    last_name: string | null;
-    avatar_url: string | null;
-  };
-}
+import { EventCard, Event } from "@/components/events/EventCard";
+import { EventComment } from "@/components/events/EventComments";
+import { EventDetailsDialog } from "@/components/events/EventDetailsDialog";
+import { EventsHeader } from "@/components/events/EventsHeader";
+import { EventFilters, TimeFilter, CategoryFilter } from "@/components/events/EventFilters";
+import { isToday, isThisWeek, isThisMonth } from "@/lib/date-utils";
 
 export default function Events() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<EventComment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [participations, setParticipations] = useState<{[key: string]: boolean}>({});
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -56,6 +30,49 @@ export default function Events() {
     fetchEvents();
     fetchUserParticipations();
   }, []);
+
+  useEffect(() => {
+    // Apply filters to events
+    let result = [...events];
+    
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(event => 
+        event.title.toLowerCase().includes(query) ||
+        event.description.toLowerCase().includes(query) ||
+        event.location.toLowerCase().includes(query)
+      );
+    }
+    
+    // Apply time filter
+    if (timeFilter !== "all") {
+      result = result.filter(event => {
+        if (timeFilter === "today") return isToday(event.date);
+        if (timeFilter === "this-week") return isThisWeek(event.date);
+        if (timeFilter === "this-month") return isThisMonth(event.date);
+        return true;
+      });
+    }
+    
+    // Apply category filter
+    if (categoryFilter !== "all") {
+      const categoryMap: Record<CategoryFilter, string> = {
+        "all": "",
+        "language-exchange": "言語交換",
+        "cultural": "文化体験",
+        "academic": "学術",
+        "social": "交流会",
+        "tour": "ツアー"
+      };
+      
+      if (categoryMap[categoryFilter]) {
+        result = result.filter(event => event.category === categoryMap[categoryFilter]);
+      }
+    }
+    
+    setFilteredEvents(result);
+  }, [events, searchQuery, timeFilter, categoryFilter]);
 
   useEffect(() => {
     if (selectedEvent) {
@@ -201,6 +218,7 @@ export default function Events() {
 
       if (error) throw error;
       setEvents(data || []);
+      setFilteredEvents(data || []);
     } catch (error: any) {
       toast({
         title: "エラーが発生しました",
@@ -311,174 +329,67 @@ export default function Events() {
     }
   };
 
-  return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">イベント一覧</h1>
-        <Button size="sm" onClick={() => navigate("/events/new")}>
-          <Plus className="w-4 h-4 mr-2" />
-          イベントを作成
-        </Button>
+  const renderContent = () => {
+    if (loading) {
+      return <div className="text-center py-8">読み込み中...</div>;
+    }
+
+    if (filteredEvents.length === 0) {
+      return (
+        <div className="text-center py-8 space-y-4">
+          <p className="text-gray-500">
+            {searchQuery || timeFilter !== "all" || categoryFilter !== "all"
+              ? "条件に合うイベントが見つかりませんでした"
+              : "現在開催予定のイベントはありません"}
+          </p>
+          <Button onClick={() => navigate("/events/new")}>
+            <Plus className="w-4 h-4 mr-2" />
+            イベントを作成
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredEvents.map((event) => (
+          <EventCard
+            key={event.id}
+            event={event}
+            isParticipating={!!participations[event.id]}
+            onJoin={handleJoinEvent}
+            onCardClick={setSelectedEvent}
+          />
+        ))}
       </div>
+    );
+  };
 
-      {loading ? (
-        <div className="text-center py-8">読み込み中...</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
-            <Card 
-              key={event.id} 
-              className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => setSelectedEvent(event)}
-            >
-              <div className="relative aspect-video">
-                <img
-                  src={event.image_url || "/placeholder.svg"}
-                  alt={event.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <Avatar className="h-10 w-10">
-                    <img
-                      src={event.creator?.avatar_url || "/placeholder.svg"}
-                      alt={`${event.creator?.first_name}のアバター`}
-                    />
-                  </Avatar>
-                  <div>
-                    <h3 className="font-semibold">{event.title}</h3>
-                    <p className="text-sm text-gray-600">
-                      主催: {event.creator?.first_name} {event.creator?.last_name}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                  {event.description}
-                </p>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Badge variant="outline">{event.category}</Badge>
-                    <span className="text-gray-600">
-                      {new Date(event.date).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-gray-600">
-                      {event.location}
-                    </span>
-                    <span className="text-gray-600">
-                      参加者: {event.current_participants}/{event.max_participants}
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <Button
-                    className="w-full"
-                    disabled={event.current_participants >= event.max_participants || participations[event.id]}
-                    variant={participations[event.id] ? "secondary" : "default"}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleJoinEvent(event.id, event.title);
-                    }}
-                  >
-                    {participations[event.id] 
-                      ? "参加済み"
-                      : event.current_participants >= event.max_participants
-                        ? "満員です"
-                        : "参加する"}
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
+  return (
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      <EventsHeader
+        unreadNotifications={0}
+        onSearchChange={setSearchQuery}
+      />
+      
+      <EventFilters
+        timeFilter={timeFilter}
+        categoryFilter={categoryFilter}
+        onTimeFilterChange={setTimeFilter}
+        onCategoryFilterChange={setCategoryFilter}
+      />
 
-      {!loading && events.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          現在開催予定のイベントはありません
-        </div>
-      )}
+      {renderContent()}
 
-      <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
-        <DialogContent className="max-w-3xl h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>{selectedEvent?.title}</DialogTitle>
-          </DialogHeader>
-          
-          <div className="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden">
-            <div className="flex-shrink-0">
-              <img
-                src={selectedEvent?.image_url || "/placeholder.svg"}
-                alt={selectedEvent?.title}
-                className="w-full h-48 object-cover rounded-lg"
-              />
-              <p className="mt-4 text-gray-600">{selectedEvent?.description}</p>
-              <div className="mt-2 flex gap-2 flex-wrap">
-                <Badge variant="outline">{selectedEvent?.category}</Badge>
-                <span className="text-sm text-gray-600">
-                  {selectedEvent?.location}
-                </span>
-                <span className="text-sm text-gray-600">
-                  {selectedEvent && new Date(selectedEvent.date).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex-1 min-h-0 flex flex-col">
-              <h3 className="font-semibold mb-4">コメント</h3>
-              <div className="flex-1 min-h-0">
-                <ScrollArea className="h-full border rounded-lg">
-                  <div className="p-4 space-y-4">
-                    {comments.map((comment) => (
-                      <div key={comment.id} className="flex gap-3">
-                        <Avatar className="h-8 w-8 flex-shrink-0">
-                          <img
-                            src={comment.user?.avatar_url || "/placeholder.svg"}
-                            alt={`${comment.user?.first_name}のアバター`}
-                          />
-                        </Avatar>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-sm">
-                              {comment.user?.first_name} {comment.user?.last_name}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              {new Date(comment.created_at).toLocaleString()}
-                            </span>
-                          </div>
-                          <p className="text-sm mt-1">{comment.content}</p>
-                        </div>
-                      </div>
-                    ))}
-                    {comments.length === 0 && (
-                      <p className="text-center text-gray-500">まだコメントはありません</p>
-                    )}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              <div className="flex gap-2 items-start mt-4">
-                <Textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="コメントを入力..."
-                  className="flex-1"
-                  rows={2}
-                />
-                <Button
-                  onClick={handleSubmitComment}
-                  disabled={!newComment.trim()}
-                  size="icon"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <EventDetailsDialog
+        event={selectedEvent}
+        comments={comments}
+        newComment={newComment}
+        setNewComment={setNewComment}
+        onSubmitComment={handleSubmitComment}
+        open={!!selectedEvent}
+        onOpenChange={(open) => !open && setSelectedEvent(null)}
+      />
     </div>
   );
 }
