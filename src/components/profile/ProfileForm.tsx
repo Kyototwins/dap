@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
 
 interface ProfileFormData {
   firstName: string;
@@ -20,14 +21,17 @@ interface ProfileFormData {
   sexuality: string;
   aboutMe: string;
   university: string;
+  department: string;
+  year: string;
   hobbies: string[];
   languages: string[];
+  languageLevels: Record<string, number>;
   learning_languages: string[];
 }
 
 interface ProfileFormProps {
   formData: ProfileFormData;
-  onChange: (name: string, value: string | string[]) => void;
+  onChange: (name: string, value: string | string[] | Record<string, number>) => void;
   loading?: boolean;
 }
 
@@ -51,6 +55,38 @@ const LANGUAGE_OPTIONS = [
   "韓国語",
   "スペイン語",
   "フランス語"
+];
+
+const LANGUAGE_LEVELS = [
+  { value: 1, label: "初級" },
+  { value: 2, label: "中級" },
+  { value: 3, label: "上級" },
+  { value: 4, label: "ネイティブ" },
+];
+
+const DEPARTMENT_OPTIONS = [
+  "文学部",
+  "経済学部",
+  "法学部",
+  "理学部",
+  "工学部",
+  "医学部",
+  "教育学部",
+  "農学部",
+  "情報学部",
+  "国際関係学部",
+  "その他"
+];
+
+const YEAR_OPTIONS = [
+  "1年生",
+  "2年生",
+  "3年生",
+  "4年生",
+  "修士1年",
+  "修士2年",
+  "博士",
+  "その他"
 ];
 
 export function ProfileForm({ formData, onChange, loading }: ProfileFormProps) {
@@ -91,6 +127,44 @@ export function ProfileForm({ formData, onChange, loading }: ProfileFormProps) {
           required
           disabled={loading}
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="department">学部</Label>
+        <Select
+          value={formData.department}
+          onValueChange={(value) => onChange("department", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="学部を選択" />
+          </SelectTrigger>
+          <SelectContent>
+            {DEPARTMENT_OPTIONS.map((dept) => (
+              <SelectItem key={dept} value={dept}>
+                {dept}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="year">学年</Label>
+        <Select
+          value={formData.year}
+          onValueChange={(value) => onChange("year", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="学年を選択" />
+          </SelectTrigger>
+          <SelectContent>
+            {YEAR_OPTIONS.map((year) => (
+              <SelectItem key={year} value={year}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">
@@ -178,47 +252,69 @@ export function ProfileForm({ formData, onChange, loading }: ProfileFormProps) {
         />
       </div>
 
-      {/* 趣味タグ */}
-      <div className="space-y-2">
-        <Label>趣味・興味</Label>
-        <div className="flex flex-wrap gap-2">
-          {HOBBY_OPTIONS.map((hobby) => (
-            <Badge
-              key={hobby}
-              variant={formData.hobbies?.includes(hobby) ? "default" : "outline"}
-              className="cursor-pointer"
-              onClick={() => {
-                const newHobbies = formData.hobbies?.includes(hobby)
-                  ? formData.hobbies.filter(h => h !== hobby)
-                  : [...(formData.hobbies || []), hobby];
-                onChange("hobbies", newHobbies);
-              }}
-            >
-              {hobby}
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      {/* 言語 */}
-      <div className="space-y-2">
-        <Label>使用言語</Label>
-        <div className="flex flex-wrap gap-2">
-          {LANGUAGE_OPTIONS.map((lang) => (
-            <Badge
-              key={lang}
-              variant={formData.languages?.includes(lang) ? "default" : "outline"}
-              className="cursor-pointer"
-              onClick={() => {
-                const newLangs = formData.languages?.includes(lang)
-                  ? formData.languages.filter(l => l !== lang)
-                  : [...(formData.languages || []), lang];
+      {/* 言語スキル */}
+      <div className="space-y-4">
+        <Label>言語スキル</Label>
+        {formData.languages.map((lang) => (
+          <div key={lang} className="space-y-2 p-3 border rounded-md">
+            <div className="flex justify-between items-center">
+              <span className="font-medium">{lang}</span>
+              <Badge 
+                variant="outline" 
+                className="cursor-pointer"
+                onClick={() => {
+                  const newLangs = formData.languages.filter(l => l !== lang);
+                  onChange("languages", newLangs);
+                }}
+              >
+                削除
+              </Badge>
+            </div>
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>初級</span>
+                <span>中級</span>
+                <span>上級</span>
+                <span>ネイティブ</span>
+              </div>
+              <Slider
+                value={[formData.languageLevels[lang] || 1]}
+                min={1}
+                max={4}
+                step={1}
+                onValueChange={(value) => {
+                  const newLevels = { ...formData.languageLevels, [lang]: value[0] };
+                  onChange("languageLevels", newLevels);
+                }}
+              />
+              <div className="text-sm text-right text-muted-foreground">
+                {LANGUAGE_LEVELS.find(l => l.value === (formData.languageLevels[lang] || 1))?.label}
+              </div>
+            </div>
+          </div>
+        ))}
+        <div className="mt-2">
+          <Select
+            onValueChange={(value) => {
+              if (!formData.languages.includes(value)) {
+                const newLangs = [...formData.languages, value];
+                const newLevels = { ...formData.languageLevels, [value]: 1 };
                 onChange("languages", newLangs);
-              }}
-            >
-              {lang}
-            </Badge>
-          ))}
+                onChange("languageLevels", newLevels);
+              }
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="言語を追加" />
+            </SelectTrigger>
+            <SelectContent>
+              {LANGUAGE_OPTIONS.filter(lang => !formData.languages.includes(lang)).map((lang) => (
+                <SelectItem key={lang} value={lang}>
+                  {lang}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -238,6 +334,28 @@ export function ProfileForm({ formData, onChange, loading }: ProfileFormProps) {
               }}
             >
               {lang}
+            </Badge>
+          ))}
+        </div>
+      </div>
+
+      {/* 趣味タグ */}
+      <div className="space-y-2">
+        <Label>趣味・興味</Label>
+        <div className="flex flex-wrap gap-2">
+          {HOBBY_OPTIONS.map((hobby) => (
+            <Badge
+              key={hobby}
+              variant={formData.hobbies?.includes(hobby) ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => {
+                const newHobbies = formData.hobbies?.includes(hobby)
+                  ? formData.hobbies.filter(h => h !== hobby)
+                  : [...(formData.hobbies || []), hobby];
+                onChange("hobbies", newHobbies);
+              }}
+            >
+              {hobby}
             </Badge>
           ))}
         </div>

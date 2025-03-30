@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -23,8 +24,11 @@ interface ProfileFormData {
   sexuality: string;
   aboutMe: string;
   university: string;
+  department: string;
+  year: string;
   hobbies: string[];
   languages: string[];
+  languageLevels: Record<string, number>;
   learning_languages: string[];
 }
 
@@ -39,8 +43,11 @@ export default function ProfileSetup() {
     sexuality: "",
     aboutMe: "",
     university: "",
+    department: "",
+    year: "",
     hobbies: [],
     languages: [],
+    languageLevels: {},
     learning_languages: []
   });
   const [additionalData, setAdditionalData] = useState({
@@ -115,6 +122,12 @@ export default function ProfileSetup() {
         imageUrl2 = await uploadImage(images.image2.file, 'images');
       }
 
+      // Convert language levels to JSON string for storage
+      const languageLevelsJson = JSON.stringify(formData.languageLevels);
+      const hobbiesArray = formData.hobbies;
+      const languagesArray = formData.languages;
+      const learningLanguagesArray = formData.learning_languages;
+
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
@@ -126,12 +139,18 @@ export default function ProfileSetup() {
           sexuality: formData.sexuality,
           about_me: formData.aboutMe,
           university: formData.university,
+          department: formData.department,
+          year: formData.year,
           avatar_url: avatarUrl,
           image_url_1: imageUrl1,
           image_url_2: imageUrl2,
           ideal_date: additionalData.idealDate,
           life_goal: additionalData.lifeGoal,
           superpower: additionalData.superpower,
+          hobbies: hobbiesArray,
+          languages: languagesArray,
+          language_levels: languageLevelsJson,
+          learning_languages: learningLanguagesArray
         })
         .eq('id', user.id);
 
@@ -155,7 +174,7 @@ export default function ProfileSetup() {
     }
   };
 
-  const handleChange = (name: string, value: string) => {
+  const handleChange = (name: string, value: string | string[] | Record<string, number>) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
