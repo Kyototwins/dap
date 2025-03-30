@@ -73,6 +73,17 @@ export function UserCard({ profile }: UserCardProps) {
 
   const initials = `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}`;
 
+  // 言語レベルのラベルを取得する関数
+  const getLanguageLevelLabel = (level: number): string => {
+    switch (level) {
+      case 1: return "初級";
+      case 2: return "中級";
+      case 3: return "上級";
+      case 4: return "ネイティブ";
+      default: return "不明";
+    }
+  };
+
   return (
     <div className="relative overflow-hidden rounded-lg border bg-card shadow-sm hover:shadow-md transition-shadow">
       <div className="flex flex-col md:flex-row">
@@ -116,6 +127,29 @@ export function UserCard({ profile }: UserCardProps) {
             </p>
           )}
 
+          {/* 言語スキル表示セクション */}
+          {profile.languages && profile.languages.length > 0 && profile.language_levels && (
+            <div className="mb-3">
+              <h4 className="text-xs font-medium text-muted-foreground mb-1">言語スキル</h4>
+              <div className="flex flex-wrap gap-1 mb-2">
+                {profile.languages.slice(0, 3).map((lang) => (
+                  <Badge key={lang} className="bg-blue-50 text-blue-700 border border-blue-100">
+                    {lang}
+                    {typeof profile.language_levels === 'object' && profile.language_levels[lang] && (
+                      <span className="ml-1 text-xs opacity-75">
+                        ({getLanguageLevelLabel(profile.language_levels[lang])})
+                      </span>
+                    )}
+                  </Badge>
+                ))}
+                {profile.languages.length > 3 && (
+                  <Badge className="bg-gray-50 text-gray-600">+{profile.languages.length - 3}</Badge>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 学習中の言語表示セクション */}
           {profile.learning_languages && profile.learning_languages.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {profile.learning_languages.map((lang) => (
@@ -126,6 +160,7 @@ export function UserCard({ profile }: UserCardProps) {
             </div>
           )}
 
+          {/* 趣味表示セクション */}
           {profile.hobbies && profile.hobbies.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {profile.hobbies.slice(0, 3).map((hobby) => (

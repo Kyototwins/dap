@@ -1,10 +1,10 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, RefreshCw, Filter } from "lucide-react";
+import { Search, RefreshCw, Filter, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
 import { 
   Dialog, 
   DialogContent, 
@@ -22,6 +22,16 @@ import {
   SheetFooter,
   SheetTrigger
 } from "@/components/ui/sheet";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue 
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,13 +42,27 @@ import type { Profile } from "@/types/messages";
 
 // 言語オプション定義
 const LANGUAGE_OPTIONS = [
-  { value: "all", label: "すべて" },
-  { value: "japanese", label: "日本語学習者" },
-  { value: "english", label: "英語学習者" },
-  { value: "chinese", label: "中国語学習者" },
-  { value: "korean", label: "韓国語学習者" },
-  { value: "french", label: "フランス語学習者" },
-  { value: "nearby", label: "近くの大学" },
+  { value: "japanese", label: "日本語" },
+  { value: "english", label: "英語" },
+  { value: "chinese", label: "中国語" },
+  { value: "korean", label: "韓国語" },
+  { value: "french", label: "フランス語" },
+  { value: "spanish", label: "スペイン語" },
+];
+
+// 出身国オプション
+const COUNTRY_OPTIONS = [
+  { value: "japan", label: "日本" },
+  { value: "usa", label: "アメリカ" },
+  { value: "china", label: "中国" },
+  { value: "korea", label: "韓国" },
+  { value: "other", label: "その他" },
+];
+
+// 趣味オプション
+const HOBBY_OPTIONS = [
+  "旅行", "料理", "映画鑑賞", "読書", "音楽", "スポーツ", "アート", 
+  "写真", "ダンス", "ゲーム", "プログラミング", "語学"
 ];
 
 // ソートオプション定義
@@ -47,16 +71,36 @@ const SORT_OPTIONS = [
   { value: "active", label: "アクティブ順" },
 ];
 
+interface FilterState {
+  ageRange: [number, number];
+  speakingLanguages: string[];
+  learningLanguages: string[];
+  minLanguageLevel: number;
+  hobbies: string[];
+  countries: string[];
+  sortOption: string;
+}
+
 export default function Matches() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
   const [visibleProfiles, setVisibleProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [languageFilter, setLanguageFilter] = useState("all");
-  const [sortOption, setSortOption] = useState("recent");
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  
+  // フィルター状態
+  const [filters, setFilters] = useState<FilterState>({
+    ageRange: [18, 50],
+    speakingLanguages: [],
+    learningLanguages: [],
+    minLanguageLevel: 1,
+    hobbies: [],
+    countries: [],
+    sortOption: "recent"
+  });
+  
   const pageSize = 10;
   const pageRef = useRef(1);
   const navigate = useNavigate();
@@ -75,8 +119,15 @@ export default function Matches() {
         .neq("id", user.id);
 
       if (error) throw error;
-      setProfiles(data || []);
-      applyFilters(data || [], searchQuery, languageFilter);
+      
+      // Explicitly handle language_levels to match the Profile type
+      const typedProfiles = data?.map(profile => ({
+        ...profile,
+        language_levels: profile.language_levels as Record<string, number>
+      })) || [];
+      
+      setProfiles(typedProfiles);
+      applyFilters(typedProfiles, searchQuery, filters);
     } catch (error: any) {
       toast({
         title: "エラーが発生しました",
@@ -89,7 +140,7 @@ export default function Matches() {
   };
 
   // 検索とフィルタリングの適用
-  const applyFilters = (data: Profile[], query: string, language: string) => {
+  const applyFilters = (data: Profile[], query: string, filterState: FilterState) => {
     let result = [...data];
 
     // 検索クエリによるフィルタリング
@@ -106,39 +157,68 @@ export default function Matches() {
       });
     }
 
-    // 言語によるフィルタリング
-    if (language !== "all") {
-      if (language === "nearby") {
-        // 近くの大学のロジックは将来実装
-        // 今はダミーとして自分の大学と同じ大学のユーザーをフィルタリング
-        const myUniversity = "東京大学"; // 将来的にはログインユーザーの大学を取得
-        result = result.filter(profile => profile.university === myUniversity);
-      } else {
-        // 言語学習者フィルタリング
-        const languageMap: Record<string, string> = {
-          "japanese": "日本語",
-          "english": "英語",
-          "chinese": "中国語",
-          "korean": "韓国語",
-          "french": "フランス語"
-        };
+    // 年齢によるフィルタリング
+    result = result.filter(profile => {
+      if (!profile.age) return true;
+      return profile.age >= filterState.ageRange[0] && profile.age <= filterState.ageRange[1];
+    });
+
+    // 出身国によるフィルタリング
+    if (filterState.countries.length > 0) {
+      result = result.filter(profile => 
+        !profile.origin || filterState.countries.includes(profile.origin)
+      );
+    }
+
+    // 話せる言語によるフィルタリング
+    if (filterState.speakingLanguages.length > 0) {
+      result = result.filter(profile => {
+        if (!profile.languages || profile.languages.length === 0) return false;
         
-        const targetLanguage = languageMap[language];
-        result = result.filter(profile => 
-          profile.learning_languages?.includes(targetLanguage)
+        // 言語レベルの条件も考慮
+        return filterState.speakingLanguages.some(lang => {
+          const hasLanguage = profile.languages?.includes(lang);
+          if (!hasLanguage) return false;
+          
+          // 言語レベルの確認（languageLevelsがある場合）
+          if (profile.language_levels && typeof profile.language_levels === 'object') {
+            const level = profile.language_levels[lang];
+            return level >= filterState.minLanguageLevel;
+          }
+          return true;
+        });
+      });
+    }
+
+    // 学習中の言語によるフィルタリング
+    if (filterState.learningLanguages.length > 0) {
+      result = result.filter(profile => {
+        if (!profile.learning_languages || profile.learning_languages.length === 0) return false;
+        return filterState.learningLanguages.some(lang => 
+          profile.learning_languages?.includes(lang)
         );
-      }
+      });
+    }
+
+    // 趣味によるフィルタリング
+    if (filterState.hobbies.length > 0) {
+      result = result.filter(profile => {
+        if (!profile.hobbies || profile.hobbies.length === 0) return false;
+        return filterState.hobbies.some(hobby => 
+          profile.hobbies?.includes(hobby)
+        );
+      });
     }
 
     // ソートの適用
-    if (sortOption === "recent") {
+    if (filterState.sortOption === "recent") {
       // 最新登録順 (created_atが新しい順)
       result.sort((a, b) => {
         const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
         const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
         return dateB - dateA;
       });
-    } else if (sortOption === "active") {
+    } else if (filterState.sortOption === "active") {
       // アクティブ順のソートは将来実装
       // 現在はダミーとして名前でソート
       result.sort((a, b) => {
@@ -160,23 +240,98 @@ export default function Matches() {
 
   // フィルター変更時
   useEffect(() => {
-    applyFilters(profiles, searchQuery, languageFilter);
-  }, [searchQuery, languageFilter, sortOption]);
+    if (profiles.length > 0) {
+      applyFilters(profiles, searchQuery, filters);
+    }
+  }, [searchQuery, filters]);
 
   // 検索クエリ変更ハンドラ
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  // 言語フィルター変更ハンドラ
-  const handleLanguageFilterChange = (value: string) => {
-    setLanguageFilter(value);
+  // フィルター変更ハンドラ
+  const handleFilterChange = (key: keyof FilterState, value: any) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  // 言語選択トグルハンドラ
+  const toggleLanguage = (list: keyof FilterState, lang: string) => {
+    setFilters(prev => {
+      const currentList = [...prev[list] as string[]];
+      const index = currentList.indexOf(lang);
+      
+      if (index >= 0) {
+        currentList.splice(index, 1);
+      } else {
+        currentList.push(lang);
+      }
+      
+      return {
+        ...prev,
+        [list]: currentList
+      };
+    });
+  };
+
+  // 趣味選択トグルハンドラ
+  const toggleHobby = (hobby: string) => {
+    setFilters(prev => {
+      const currentHobbies = [...prev.hobbies];
+      const index = currentHobbies.indexOf(hobby);
+      
+      if (index >= 0) {
+        currentHobbies.splice(index, 1);
+      } else {
+        currentHobbies.push(hobby);
+      }
+      
+      return {
+        ...prev,
+        hobbies: currentHobbies
+      };
+    });
+  };
+
+  // 出身国選択トグルハンドラ
+  const toggleCountry = (country: string) => {
+    setFilters(prev => {
+      const currentCountries = [...prev.countries];
+      const index = currentCountries.indexOf(country);
+      
+      if (index >= 0) {
+        currentCountries.splice(index, 1);
+      } else {
+        currentCountries.push(country);
+      }
+      
+      return {
+        ...prev,
+        countries: currentCountries
+      };
+    });
   };
 
   // フィルター保存ハンドラ
   const handleSaveFilter = () => {
     setIsFilterSheetOpen(false);
     // フィルターは既に適用されているので追加の処理は不要
+  };
+
+  // フィルターリセットハンドラ
+  const handleResetFilter = () => {
+    setFilters({
+      ageRange: [18, 50],
+      speakingLanguages: [],
+      learningLanguages: [],
+      minLanguageLevel: 1,
+      hobbies: [],
+      countries: [],
+      sortOption: "recent"
+    });
   };
 
   // さらに表示ボタンのハンドラ
@@ -201,6 +356,18 @@ export default function Matches() {
     fetchProfiles();
   };
 
+  // 有効なフィルターの数を計算
+  const getActiveFilterCount = (): number => {
+    let count = 0;
+    if (filters.speakingLanguages.length > 0) count++;
+    if (filters.learningLanguages.length > 0) count++;
+    if (filters.hobbies.length > 0) count++;
+    if (filters.countries.length > 0) count++;
+    if (filters.ageRange[0] > 18 || filters.ageRange[1] < 50) count++;
+    if (filters.minLanguageLevel > 1) count++;
+    return count;
+  };
+
   return (
     <div className="py-6">
       <div className="flex items-center justify-between mb-6">
@@ -219,14 +386,19 @@ export default function Matches() {
           <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
             <SheetTrigger asChild>
               <Button 
-                size="icon" 
                 variant="outline" 
-                className="bg-white/70 backdrop-blur-sm border-amber-200"
+                className="bg-white/70 backdrop-blur-sm border-amber-200 flex gap-2 items-center"
               >
-                <Filter className="h-4 w-4 text-amber-600" />
+                <SlidersHorizontal className="h-4 w-4 text-amber-600" />
+                フィルター
+                {getActiveFilterCount() > 0 && (
+                  <Badge variant="secondary" className="ml-1 bg-amber-100 text-amber-800">
+                    {getActiveFilterCount()}
+                  </Badge>
+                )}
               </Button>
             </SheetTrigger>
-            <SheetContent className="sm:max-w-md">
+            <SheetContent className="sm:max-w-md overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>フィルター設定</SheetTitle>
                 <SheetDescription>
@@ -235,11 +407,12 @@ export default function Matches() {
               </SheetHeader>
               
               <div className="py-6 space-y-6">
+                {/* ソート設定 */}
                 <div className="space-y-2">
-                  <h3 className="text-sm font-medium">表示順</h3>
+                  <h3 className="text-sm font-medium border-b pb-2">表示順</h3>
                   <RadioGroup 
-                    value={sortOption} 
-                    onValueChange={setSortOption}
+                    value={filters.sortOption} 
+                    onValueChange={(value) => handleFilterChange("sortOption", value)}
                     className="space-y-1"
                   >
                     {SORT_OPTIONS.map(option => (
@@ -251,11 +424,150 @@ export default function Matches() {
                   </RadioGroup>
                 </div>
                 
-                {/* 将来的に他のフィルターオプションをここに追加 */}
+                {/* 年齢範囲 */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium border-b pb-2">年齢範囲</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>{filters.ageRange[0]}歳</span>
+                      <span>{filters.ageRange[1]}歳</span>
+                    </div>
+                    <Slider
+                      value={filters.ageRange}
+                      min={18}
+                      max={60}
+                      step={1}
+                      onValueChange={(value) => handleFilterChange("ageRange", value as [number, number])}
+                      className="my-4"
+                    />
+                  </div>
+                </div>
+                
+                {/* 言語関連フィルター */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-medium border-b pb-2">言語スキル</h3>
+                  
+                  {/* 話せる言語 */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-medium">話せる言語</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {LANGUAGE_OPTIONS.map(lang => (
+                        <Badge
+                          key={lang.value}
+                          variant={filters.speakingLanguages.includes(lang.label) ? "default" : "outline"}
+                          className={`cursor-pointer ${
+                            filters.speakingLanguages.includes(lang.label) 
+                              ? "bg-amber-500 text-white hover:bg-amber-600" 
+                              : "bg-white text-amber-800 hover:bg-amber-50"
+                          }`}
+                          onClick={() => toggleLanguage("speakingLanguages", lang.label)}
+                        >
+                          {lang.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* 言語レベル */}
+                  {filters.speakingLanguages.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-medium">最低言語レベル</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>初級</span>
+                          <span>中級</span>
+                          <span>上級</span>
+                          <span>ネイティブ</span>
+                        </div>
+                        <Slider
+                          value={[filters.minLanguageLevel]}
+                          min={1}
+                          max={4}
+                          step={1}
+                          onValueChange={(value) => handleFilterChange("minLanguageLevel", value[0])}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* 学習中の言語 */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-medium">学習中の言語</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {LANGUAGE_OPTIONS.map(lang => (
+                        <Badge
+                          key={lang.value}
+                          variant={filters.learningLanguages.includes(lang.label) ? "default" : "outline"}
+                          className={`cursor-pointer ${
+                            filters.learningLanguages.includes(lang.label) 
+                              ? "bg-amber-500 text-white hover:bg-amber-600" 
+                              : "bg-white text-amber-800 hover:bg-amber-50"
+                          }`}
+                          onClick={() => toggleLanguage("learningLanguages", lang.label)}
+                        >
+                          {lang.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 趣味 */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium border-b pb-2">趣味・興味</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {HOBBY_OPTIONS.map(hobby => (
+                      <Badge
+                        key={hobby}
+                        variant={filters.hobbies.includes(hobby) ? "default" : "outline"}
+                        className={`cursor-pointer ${
+                          filters.hobbies.includes(hobby) 
+                            ? "bg-amber-500 text-white hover:bg-amber-600" 
+                            : "bg-white text-amber-800 hover:bg-amber-50"
+                        }`}
+                        onClick={() => toggleHobby(hobby)}
+                      >
+                        {hobby}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* 出身国 */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium border-b pb-2">出身国</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {COUNTRY_OPTIONS.map(country => (
+                      <div key={country.value} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={country.value} 
+                          checked={filters.countries.includes(country.value)}
+                          onCheckedChange={() => toggleCountry(country.value)}
+                        />
+                        <label
+                          htmlFor={country.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {country.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
               
-              <SheetFooter>
-                <Button onClick={handleSaveFilter}>
+              <SheetFooter className="flex gap-2 pt-4 border-t">
+                <Button 
+                  variant="outline" 
+                  onClick={handleResetFilter}
+                  className="flex-1"
+                >
+                  リセット
+                </Button>
+                <Button 
+                  onClick={handleSaveFilter}
+                  className="flex-1 bg-amber-500 hover:bg-amber-600"
+                >
                   適用する
                 </Button>
               </SheetFooter>
@@ -275,27 +587,6 @@ export default function Matches() {
             className="pl-10 border-amber-200 focus-visible:ring-amber-500 bg-white/70 backdrop-blur-sm"
           />
         </div>
-        
-        <Tabs
-          defaultValue="all"
-          value={languageFilter}
-          onValueChange={handleLanguageFilterChange}
-          className="w-full"
-        >
-          <div className="border-b border-amber-100 overflow-x-auto pb-1">
-            <TabsList className="bg-transparent p-0 h-auto">
-              {LANGUAGE_OPTIONS.map(option => (
-                <TabsTrigger
-                  key={option.value}
-                  value={option.value}
-                  className="data-[state=active]:bg-amber-100/50 data-[state=active]:text-amber-900 rounded-full px-4 py-1.5 text-muted-foreground"
-                >
-                  {option.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
-        </Tabs>
       </div>
 
       {loading ? (
