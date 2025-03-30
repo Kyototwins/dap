@@ -19,7 +19,7 @@ export interface Profile {
   year: string | null;
   hobbies: string[] | null;
   languages: string[] | null;
-  language_levels: string | null | Record<string, number>;
+  language_levels: string | Record<string, number> | null;
   learning_languages: string[] | null;
   created_at: string | null;
 }
