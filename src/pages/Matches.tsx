@@ -1,11 +1,10 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, Filter, Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -119,6 +118,8 @@ export default function Matches() {
 
   return (
     <div className="py-6">
+      <h1 className="text-2xl font-bold text-amber-600 mb-6">マッチング</h1>
+      
       <div className="flex items-center gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -127,77 +128,96 @@ export default function Matches() {
             placeholder="ユーザーを検索..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 border-amber-200 focus-visible:ring-amber-500 bg-white/70 backdrop-blur-sm"
           />
         </div>
+        <Button 
+          size="icon" 
+          variant="outline" 
+          className="bg-white/70 backdrop-blur-sm border-amber-200"
+        >
+          <Filter className="h-4 w-4 text-amber-600" />
+        </Button>
       </div>
 
       {loading ? (
-        <div className="text-center py-8">読み込み中...</div>
+        <div className="text-center py-8">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-amber-600 border-r-transparent"></div>
+          <p className="mt-2 text-muted-foreground">読み込み中...</p>
+        </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-6">
           {filteredProfiles.map((profile) => (
             <Card 
               key={profile.id} 
-              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer glass-card"
               onClick={() => handleCardClick(profile.id)}
             >
-              <div className="aspect-[4/3] relative">
-                <img
-                  src={profile.avatar_url || "/placeholder.svg"}
-                  alt={`${profile.first_name}のプロフィール`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-semibold mb-1">
-                  {profile.first_name} {profile.last_name}
-                  {profile.age && <span className="text-base font-normal text-muted-foreground ml-2">{profile.age}歳</span>}
-                </h3>
-                
-                {profile.university && (
-                  <p className="text-muted-foreground text-sm mb-3">
-                    {profile.university}
-                  </p>
-                )}
-
-                {profile.about_me && (
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {profile.about_me}
-                  </p>
-                )}
-
-                {profile.hobbies && profile.hobbies.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {profile.hobbies.map((hobby) => (
-                      <Badge key={hobby} variant="secondary">
-                        {hobby}
-                      </Badge>
-                    ))}
+              <div className="flex flex-col md:flex-row">
+                <div className="aspect-square w-full md:w-1/3 relative overflow-hidden">
+                  <img
+                    src={profile.avatar_url || "/placeholder.svg"}
+                    alt={`${profile.first_name}のプロフィール`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-4 flex-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-xl font-semibold mb-1 text-amber-800">
+                        {profile.first_name} {profile.last_name}
+                        {profile.age && <span className="text-base font-normal text-muted-foreground ml-2">{profile.age}歳</span>}
+                      </h3>
+                      
+                      {profile.university && (
+                        <p className="text-muted-foreground text-sm mb-3">
+                          {profile.university}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                )}
 
-                {(profile.languages || profile.learning_languages) && (
-                  <div className="mb-4">
-                    {profile.languages && (
-                      <div className="text-sm mb-1">
-                        使用言語: {profile.languages.join(", ")}
-                      </div>
-                    )}
-                    {profile.learning_languages && (
-                      <div className="text-sm text-muted-foreground">
-                        学習中: {profile.learning_languages.join(", ")}
-                      </div>
-                    )}
-                  </div>
-                )}
+                  {profile.about_me && (
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      {profile.about_me}
+                    </p>
+                  )}
 
-                <Button 
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
-                  onClick={(e) => handleMatch(e, profile.id)}
-                >
-                  メッセージを送る
-                </Button>
+                  {profile.hobbies && profile.hobbies.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {profile.hobbies.map((hobby) => (
+                        <Badge key={hobby} variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
+                          {hobby}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  {(profile.languages || profile.learning_languages) && (
+                    <div className="mb-4">
+                      {profile.languages && (
+                        <div className="text-sm mb-1 flex items-center gap-1">
+                          <span className="font-medium text-gray-700">使用言語:</span> 
+                          <span className="text-gray-600">{profile.languages.join(", ")}</span>
+                        </div>
+                      )}
+                      {profile.learning_languages && (
+                        <div className="text-sm text-muted-foreground flex items-center gap-1">
+                          <span className="font-medium">学習中:</span> 
+                          <span>{profile.learning_languages.join(", ")}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <Button 
+                    className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white btn-hover-effect"
+                    onClick={(e) => handleMatch(e, profile.id)}
+                  >
+                    <Heart className="w-4 h-4 mr-2" />
+                    マッチング申請
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}
@@ -205,8 +225,12 @@ export default function Matches() {
       )}
 
       {!loading && filteredProfiles.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">
-          マッチするユーザーが見つかりませんでした
+        <div className="text-center py-8 glass-card p-6">
+          <div className="text-amber-600 mb-2">
+            <Search className="h-12 w-12 mx-auto opacity-50" />
+          </div>
+          <h3 className="text-lg font-medium mb-1">マッチするユーザーが見つかりませんでした</h3>
+          <p className="text-muted-foreground">検索条件を変更して再度お試しください</p>
         </div>
       )}
     </div>
