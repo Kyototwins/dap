@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,8 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { useCreateEvent } from "@/hooks/useCreateEvent";
 
 export function CreateEventForm() {
@@ -38,7 +35,7 @@ export function CreateEventForm() {
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-black/5 p-6 rounded-lg">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="title">タイトル</Label>
         <Input
@@ -47,7 +44,7 @@ export function CreateEventForm() {
           onChange={(e) =>
             setFormData({ ...formData, title: e.target.value })
           }
-          className="border-amber-600/20 focus-visible:ring-amber-600"
+          className="border-gray-300 focus-visible:ring-gray-500"
           required
         />
       </div>
@@ -60,7 +57,7 @@ export function CreateEventForm() {
           onChange={(e) =>
             setFormData({ ...formData, description: e.target.value })
           }
-          className="border-amber-600/20 focus-visible:ring-amber-600"
+          className="border-gray-300 focus-visible:ring-gray-500"
           required
         />
       </div>
@@ -83,7 +80,7 @@ export function CreateEventForm() {
           onChange={(e) =>
             setFormData({ ...formData, location: e.target.value })
           }
-          className="border-amber-600/20 focus-visible:ring-amber-600"
+          className="border-gray-300 focus-visible:ring-gray-500"
           required
         />
       </div>
@@ -97,7 +94,7 @@ export function CreateEventForm() {
           onChange={(e) =>
             setFormData({ ...formData, date: e.target.value })
           }
-          className="border-amber-600/20 focus-visible:ring-amber-600"
+          className="border-gray-300 focus-visible:ring-gray-500"
           required
         />
       </div>
@@ -111,7 +108,7 @@ export function CreateEventForm() {
           }
           required
         >
-          <SelectTrigger className="border-amber-600/20 focus-visible:ring-amber-600">
+          <SelectTrigger className="border-gray-300 focus-visible:ring-gray-500">
             <SelectValue placeholder="カテゴリーを選択" />
           </SelectTrigger>
           <SelectContent>
@@ -134,7 +131,7 @@ export function CreateEventForm() {
           onChange={(e) =>
             setFormData({ ...formData, max_participants: e.target.value })
           }
-          className="border-amber-600/20 focus-visible:ring-amber-600"
+          className="border-gray-300 focus-visible:ring-gray-500"
           required
         />
       </div>
@@ -144,14 +141,14 @@ export function CreateEventForm() {
           type="button"
           variant="outline"
           onClick={() => window.history.back()}
-          className="border-amber-600/20 hover:bg-amber-600/5"
+          className="border-gray-300 hover:bg-gray-50 flex-1"
         >
           キャンセル
         </Button>
         <Button 
           type="submit" 
           disabled={loading}
-          className="bg-amber-600 hover:bg-amber-700"
+          className="bg-black text-white hover:bg-gray-800 flex-1"
         >
           {loading ? "作成中..." : "作成する"}
         </Button>
