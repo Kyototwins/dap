@@ -5,10 +5,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { EventDetailsDialog } from "@/components/events/EventDetailsDialog";
 import { EventsHeader } from "@/components/events/EventsHeader";
 import { EventFilters } from "@/components/events/EventFilters";
-import { EventList } from "@/components/events/EventList";
+import { EventList, Event } from "@/components/events/EventList";
 import { useEvents } from "@/hooks/useEvents";
 import { joinEvent } from "@/services/eventService";
-import { Event } from "@/components/events/EventCard";
 
 export default function Events() {
   const navigate = useNavigate();
@@ -58,7 +57,7 @@ export default function Events() {
   const hasFilters = searchQuery !== "" || timeFilter !== "all" || categoryFilter !== "all";
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
+    <div className="max-w-md mx-auto px-4 py-4 space-y-4">
       <EventsHeader
         unreadNotifications={0}
         onSearchChange={setSearchQuery}
