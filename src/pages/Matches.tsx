@@ -1,40 +1,70 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Filter, Heart } from "lucide-react";
+import { Search, RefreshCw, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetDescription,
+  SheetFooter,
+  SheetTrigger
+} from "@/components/ui/sheet";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { UserCard } from "@/components/profile/UserCard";
+import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
+import { ProfileLoading } from "@/components/profile/ProfileLoading";
+import type { Profile } from "@/types/messages";
 
-interface Profile {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  age: number | null;
-  avatar_url: string | null;
-  about_me: string | null;
-  university: string | null;
-  hobbies?: string[];
-  ideologies?: string[];
-  languages?: string[];
-  learning_languages?: string[];
-}
+// 言語オプション定義
+const LANGUAGE_OPTIONS = [
+  { value: "all", label: "すべて" },
+  { value: "japanese", label: "日本語学習者" },
+  { value: "english", label: "英語学習者" },
+  { value: "chinese", label: "中国語学習者" },
+  { value: "korean", label: "韓国語学習者" },
+  { value: "french", label: "フランス語学習者" },
+  { value: "nearby", label: "近くの大学" },
+];
+
+// ソートオプション定義
+const SORT_OPTIONS = [
+  { value: "recent", label: "最新登録順" },
+  { value: "active", label: "アクティブ順" },
+];
 
 export default function Matches() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
+  const [visibleProfiles, setVisibleProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [languageFilter, setLanguageFilter] = useState("all");
+  const [sortOption, setSortOption] = useState("recent");
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const pageSize = 10;
+  const pageRef = useRef(1);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchProfiles();
-  }, []);
-
+  // プロフィールデータ取得
   const fetchProfiles = async () => {
+    setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("認証されていません");
@@ -46,6 +76,7 @@ export default function Matches() {
 
       if (error) throw error;
       setProfiles(data || []);
+      applyFilters(data || [], searchQuery, languageFilter);
     } catch (error: any) {
       toast({
         title: "エラーが発生しました",
@@ -57,181 +88,248 @@ export default function Matches() {
     }
   };
 
-  const handleMatch = async (event: React.MouseEvent, matchUserId: string) => {
-    event.stopPropagation(); // カード全体のクリックイベントが発火するのを防ぐ
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("認証されていません");
+  // 検索とフィルタリングの適用
+  const applyFilters = (data: Profile[], query: string, language: string) => {
+    let result = [...data];
 
-      const { data: existingMatch, error: matchError } = await supabase
-        .from("matches")
-        .select("*")
-        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
-        .or(`user1_id.eq.${matchUserId},user2_id.eq.${matchUserId}`);
-
-      if (matchError) throw matchError;
-
-      if (existingMatch && existingMatch.length > 0) {
-        toast({
-          title: "既にマッチしています",
-          description: "このユーザーとは既にマッチしています。",
-        });
-        return;
-      }
-
-      const { error: createError } = await supabase
-        .from("matches")
-        .insert([
-          {
-            user1_id: user.id,
-            user2_id: matchUserId,
-          },
-        ]);
-
-      if (createError) throw createError;
-
-      toast({
-        title: "マッチングリクエストを送信しました",
-        description: "相手がマッチングを承認すると、メッセージを送ることができます。",
-      });
-    } catch (error: any) {
-      toast({
-        title: "エラーが発生しました",
-        description: error.message,
-        variant: "destructive",
+    // 検索クエリによるフィルタリング
+    if (query) {
+      const searchLower = query.toLowerCase();
+      result = result.filter((profile) => {
+        return (
+          profile.first_name?.toLowerCase().includes(searchLower) ||
+          profile.last_name?.toLowerCase().includes(searchLower) ||
+          profile.about_me?.toLowerCase().includes(searchLower) ||
+          profile.university?.toLowerCase().includes(searchLower) ||
+          profile.department?.toLowerCase().includes(searchLower)
+        );
       });
     }
+
+    // 言語によるフィルタリング
+    if (language !== "all") {
+      if (language === "nearby") {
+        // 近くの大学のロジックは将来実装
+        // 今はダミーとして自分の大学と同じ大学のユーザーをフィルタリング
+        const myUniversity = "東京大学"; // 将来的にはログインユーザーの大学を取得
+        result = result.filter(profile => profile.university === myUniversity);
+      } else {
+        // 言語学習者フィルタリング
+        const languageMap: Record<string, string> = {
+          "japanese": "日本語",
+          "english": "英語",
+          "chinese": "中国語",
+          "korean": "韓国語",
+          "french": "フランス語"
+        };
+        
+        const targetLanguage = languageMap[language];
+        result = result.filter(profile => 
+          profile.learning_languages?.includes(targetLanguage)
+        );
+      }
+    }
+
+    // ソートの適用
+    if (sortOption === "recent") {
+      // 最新登録順 (created_atが新しい順)
+      result.sort((a, b) => {
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
+    } else if (sortOption === "active") {
+      // アクティブ順のソートは将来実装
+      // 現在はダミーとして名前でソート
+      result.sort((a, b) => {
+        const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
+        const nameB = `${b.first_name || ''} ${b.last_name || ''}`;
+        return nameA.localeCompare(nameB);
+      });
+    }
+
+    setFilteredProfiles(result);
+    pageRef.current = 1;
+    setVisibleProfiles(result.slice(0, pageSize));
   };
 
-  const handleCardClick = (profileId: string) => {
-    navigate(`/profile/${profileId}`);
+  // 初期ロード
+  useEffect(() => {
+    fetchProfiles();
+  }, []);
+
+  // フィルター変更時
+  useEffect(() => {
+    applyFilters(profiles, searchQuery, languageFilter);
+  }, [searchQuery, languageFilter, sortOption]);
+
+  // 検索クエリ変更ハンドラ
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
-  const filteredProfiles = profiles.filter((profile) => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      profile.first_name?.toLowerCase().includes(searchLower) ||
-      profile.last_name?.toLowerCase().includes(searchLower) ||
-      profile.about_me?.toLowerCase().includes(searchLower)
-    );
-  });
+  // 言語フィルター変更ハンドラ
+  const handleLanguageFilterChange = (value: string) => {
+    setLanguageFilter(value);
+  };
+
+  // フィルター保存ハンドラ
+  const handleSaveFilter = () => {
+    setIsFilterSheetOpen(false);
+    // フィルターは既に適用されているので追加の処理は不要
+  };
+
+  // さらに表示ボタンのハンドラ
+  const handleLoadMore = () => {
+    setLoadingMore(true);
+    const nextPage = pageRef.current + 1;
+    const start = (nextPage - 1) * pageSize;
+    const end = nextPage * pageSize;
+    
+    setTimeout(() => {
+      setVisibleProfiles(prev => [
+        ...prev, 
+        ...filteredProfiles.slice(start, end)
+      ]);
+      pageRef.current = nextPage;
+      setLoadingMore(false);
+    }, 500); // UIフィードバックのための短い遅延
+  };
+
+  // データ更新ハンドラ
+  const handleRefresh = () => {
+    fetchProfiles();
+  };
 
   return (
     <div className="py-6">
-      <h1 className="text-2xl font-bold text-amber-600 mb-6">マッチング</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-amber-600">マッチング</h1>
+        <div className="flex gap-2">
+          <Button 
+            size="icon" 
+            variant="outline"
+            onClick={handleRefresh}
+            className="bg-white/70 backdrop-blur-sm border-amber-200"
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 text-amber-600 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
+          
+          <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
+            <SheetTrigger asChild>
+              <Button 
+                size="icon" 
+                variant="outline" 
+                className="bg-white/70 backdrop-blur-sm border-amber-200"
+              >
+                <Filter className="h-4 w-4 text-amber-600" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="sm:max-w-md">
+              <SheetHeader>
+                <SheetTitle>フィルター設定</SheetTitle>
+                <SheetDescription>
+                  マッチング条件を設定してください
+                </SheetDescription>
+              </SheetHeader>
+              
+              <div className="py-6 space-y-6">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">表示順</h3>
+                  <RadioGroup 
+                    value={sortOption} 
+                    onValueChange={setSortOption}
+                    className="space-y-1"
+                  >
+                    {SORT_OPTIONS.map(option => (
+                      <div key={option.value} className="flex items-center space-x-2">
+                        <RadioGroupItem value={option.value} id={option.value} />
+                        <label htmlFor={option.value} className="text-sm">{option.label}</label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+                
+                {/* 将来的に他のフィルターオプションをここに追加 */}
+              </div>
+              
+              <SheetFooter>
+                <Button onClick={handleSaveFilter}>
+                  適用する
+                </Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
       
-      <div className="flex items-center gap-4 mb-6">
-        <div className="relative flex-1">
+      <div className="mb-6">
+        <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <Input
             type="text"
-            placeholder="ユーザーを検索..."
+            placeholder="名前、大学、自己紹介で検索..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
             className="pl-10 border-amber-200 focus-visible:ring-amber-500 bg-white/70 backdrop-blur-sm"
           />
         </div>
-        <Button 
-          size="icon" 
-          variant="outline" 
-          className="bg-white/70 backdrop-blur-sm border-amber-200"
+        
+        <Tabs
+          defaultValue="all"
+          value={languageFilter}
+          onValueChange={handleLanguageFilterChange}
+          className="w-full"
         >
-          <Filter className="h-4 w-4 text-amber-600" />
-        </Button>
+          <div className="border-b border-amber-100 overflow-x-auto pb-1">
+            <TabsList className="bg-transparent p-0 h-auto">
+              {LANGUAGE_OPTIONS.map(option => (
+                <TabsTrigger
+                  key={option.value}
+                  value={option.value}
+                  className="data-[state=active]:bg-amber-100/50 data-[state=active]:text-amber-900 rounded-full px-4 py-1.5 text-muted-foreground"
+                >
+                  {option.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
+        </Tabs>
       </div>
 
       {loading ? (
-        <div className="text-center py-8">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-amber-600 border-r-transparent"></div>
-          <p className="mt-2 text-muted-foreground">読み込み中...</p>
-        </div>
+        <ProfileLoading />
       ) : (
-        <div className="grid grid-cols-1 gap-6">
-          {filteredProfiles.map((profile) => (
-            <Card 
-              key={profile.id} 
-              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer glass-card"
-              onClick={() => handleCardClick(profile.id)}
-            >
-              <div className="flex flex-col md:flex-row">
-                <div className="aspect-square w-full md:w-1/3 relative overflow-hidden">
-                  <img
-                    src={profile.avatar_url || "/placeholder.svg"}
-                    alt={`${profile.first_name}のプロフィール`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-4 flex-1">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-xl font-semibold mb-1 text-amber-800">
-                        {profile.first_name} {profile.last_name}
-                        {profile.age && <span className="text-base font-normal text-muted-foreground ml-2">{profile.age}歳</span>}
-                      </h3>
-                      
-                      {profile.university && (
-                        <p className="text-muted-foreground text-sm mb-3">
-                          {profile.university}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {profile.about_me && (
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {profile.about_me}
-                    </p>
+        <>
+          {visibleProfiles.length > 0 ? (
+            <div className="grid gap-4 md:gap-6">
+              {visibleProfiles.map((profile) => (
+                <UserCard key={profile.id} profile={profile} />
+              ))}
+              
+              {visibleProfiles.length < filteredProfiles.length && (
+                <Button
+                  variant="outline"
+                  className="w-full py-6 mt-2 border-dashed border-amber-200 text-amber-600 hover:bg-amber-50"
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                >
+                  {loadingMore ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      読み込み中...
+                    </>
+                  ) : (
+                    <>さらに表示</>
                   )}
-
-                  {profile.hobbies && profile.hobbies.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {profile.hobbies.map((hobby) => (
-                        <Badge key={hobby} variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
-                          {hobby}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-
-                  {(profile.languages || profile.learning_languages) && (
-                    <div className="mb-4">
-                      {profile.languages && (
-                        <div className="text-sm mb-1 flex items-center gap-1">
-                          <span className="font-medium text-gray-700">使用言語:</span> 
-                          <span className="text-gray-600">{profile.languages.join(", ")}</span>
-                        </div>
-                      )}
-                      {profile.learning_languages && (
-                        <div className="text-sm text-muted-foreground flex items-center gap-1">
-                          <span className="font-medium">学習中:</span> 
-                          <span>{profile.learning_languages.join(", ")}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  <Button 
-                    className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white btn-hover-effect"
-                    onClick={(e) => handleMatch(e, profile.id)}
-                  >
-                    <Heart className="w-4 h-4 mr-2" />
-                    マッチング申請
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {!loading && filteredProfiles.length === 0 && (
-        <div className="text-center py-8 glass-card p-6">
-          <div className="text-amber-600 mb-2">
-            <Search className="h-12 w-12 mx-auto opacity-50" />
-          </div>
-          <h3 className="text-lg font-medium mb-1">マッチするユーザーが見つかりませんでした</h3>
-          <p className="text-muted-foreground">検索条件を変更して再度お試しください</p>
-        </div>
+                </Button>
+              )}
+            </div>
+          ) : (
+            <ProfileNotFound message="条件に一致するユーザーが見つかりませんでした" />
+          )}
+        </>
       )}
     </div>
   );
