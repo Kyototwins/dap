@@ -15,6 +15,12 @@ export interface Profile {
   sexuality: string | null;
   superpower: string | null;
   university: string | null;
+  department: string | null;
+  year: string | null;
+  hobbies: string[] | null;
+  languages: string[] | null;
+  language_levels: string | null;
+  learning_languages: string[] | null;
   created_at: string | null;
 }
 

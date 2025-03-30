@@ -405,54 +405,72 @@ export type Database = {
           age: number | null
           avatar_url: string | null
           created_at: string | null
+          department: string | null
           first_name: string | null
           gender: string | null
+          hobbies: string[] | null
           id: string
           ideal_date: string | null
           image_url_1: string | null
           image_url_2: string | null
+          language_levels: Json | null
+          languages: string[] | null
           last_name: string | null
+          learning_languages: string[] | null
           life_goal: string | null
           origin: string | null
           sexuality: string | null
           superpower: string | null
           university: string | null
+          year: string | null
         }
         Insert: {
           about_me?: string | null
           age?: number | null
           avatar_url?: string | null
           created_at?: string | null
+          department?: string | null
           first_name?: string | null
           gender?: string | null
+          hobbies?: string[] | null
           id: string
           ideal_date?: string | null
           image_url_1?: string | null
           image_url_2?: string | null
+          language_levels?: Json | null
+          languages?: string[] | null
           last_name?: string | null
+          learning_languages?: string[] | null
           life_goal?: string | null
           origin?: string | null
           sexuality?: string | null
           superpower?: string | null
           university?: string | null
+          year?: string | null
         }
         Update: {
           about_me?: string | null
           age?: number | null
           avatar_url?: string | null
           created_at?: string | null
+          department?: string | null
           first_name?: string | null
           gender?: string | null
+          hobbies?: string[] | null
           id?: string
           ideal_date?: string | null
           image_url_1?: string | null
           image_url_2?: string | null
+          language_levels?: Json | null
+          languages?: string[] | null
           last_name?: string | null
+          learning_languages?: string[] | null
           life_goal?: string | null
           origin?: string | null
           sexuality?: string | null
           superpower?: string | null
           university?: string | null
+          year?: string | null
         }
         Relationships: []
       }

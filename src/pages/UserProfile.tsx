@@ -9,31 +9,11 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
-
-interface Profile {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  age: number | null;
-  gender: string | null;
-  origin: string | null;
-  about_me: string | null;
-  avatar_url: string | null;
-  ideal_date: string | null;
-  life_goal: string | null;
-  superpower: string | null;
-  university: string | null;
-  department: string | null;
-  year: string | null;
-  hobbies: string[] | null;
-  languages: string[] | null;
-  language_levels: string | null;
-  learning_languages: string[] | null;
-}
+import { Profile as ProfileType } from "@/types/messages";
 
 export default function UserProfile() {
   const { id } = useParams();
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<ProfileType | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
