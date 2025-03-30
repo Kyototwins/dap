@@ -1,11 +1,10 @@
 
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { EventDetailsDialog } from "@/components/events/EventDetailsDialog";
 import { EventsHeader } from "@/components/events/EventsHeader";
 import { EventFilters } from "@/components/events/EventFilters";
-import { EventList, Event } from "@/components/events/EventList";
+import { EventList } from "@/components/events/EventList";
 import { useEvents } from "@/hooks/useEvents";
 import { joinEvent } from "@/services/eventService";
 

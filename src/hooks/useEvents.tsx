@@ -2,10 +2,11 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Event } from "@/components/events/EventCard";
-import { isToday, isThisWeek, isThisMonth } from "@/lib/date-utils";
-import { EventComment } from "@/components/events/EventComments";
+import { Event, EventComment } from "@/types/events";
 import { TimeFilter, CategoryFilter } from "@/components/events/EventFilters";
+import { filterEvents } from "@/utils/eventFilters";
+import { fetchEventComments, submitEventComment } from "@/services/eventCommentService";
+import { fetchEvents, fetchUserParticipations } from "@/services/eventDataService";
 
 export function useEvents() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -21,198 +22,33 @@ export function useEvents() {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchEvents();
-    fetchUserParticipations();
+    loadInitialData();
   }, []);
 
   useEffect(() => {
     // Apply filters to events
-    let result = [...events];
-    
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(event => 
-        event.title.toLowerCase().includes(query) ||
-        event.description.toLowerCase().includes(query) ||
-        event.location.toLowerCase().includes(query)
-      );
-    }
-    
-    // Apply time filter
-    if (timeFilter !== "all") {
-      result = result.filter(event => {
-        if (timeFilter === "today") return isToday(event.date);
-        if (timeFilter === "this-week") return isThisWeek(event.date);
-        if (timeFilter === "this-month") return isThisMonth(event.date);
-        return true;
-      });
-    }
-    
-    // Apply category filter
-    if (categoryFilter !== "all") {
-      const categoryMap: Record<CategoryFilter, string> = {
-        "all": "",
-        "language-exchange": "言語交換",
-        "cultural": "文化体験",
-        "academic": "学術",
-        "social": "交流会",
-        "tour": "ツアー"
-      };
-      
-      if (categoryMap[categoryFilter]) {
-        result = result.filter(event => event.category === categoryMap[categoryFilter]);
-      }
-    }
-    
-    setFilteredEvents(result);
+    const filtered = filterEvents(events, searchQuery, timeFilter, categoryFilter);
+    setFilteredEvents(filtered);
   }, [events, searchQuery, timeFilter, categoryFilter]);
 
   useEffect(() => {
     if (selectedEvent) {
-      fetchComments(selectedEvent.id);
-      
-      // リアルタイムサブスクリプションを設定
-      const channel = supabase
-        .channel('event-comments')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'event_comments',
-            filter: `event_id=eq.${selectedEvent.id}`
-          },
-          async (payload) => {
-            console.log('New comment received:', payload);
-            // 新しいコメントを取得
-            const { data, error } = await supabase
-              .from('event_comments')
-              .select(`
-                id,
-                content,
-                created_at,
-                event_id,
-                user_id,
-                user:profiles!event_comments_user_id_fkey(
-                  first_name,
-                  last_name,
-                  avatar_url
-                )
-              `)
-              .eq('id', payload.new.id)
-              .single();
-
-            if (error) {
-              console.error('Error fetching new comment:', error);
-              return;
-            }
-
-            if (data) {
-              setComments(prev => [...prev, data]);
-            }
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
+      loadEventComments(selectedEvent.id);
+      setupCommentSubscription(selectedEvent.id);
     }
   }, [selectedEvent]);
 
-  const fetchComments = async (eventId: string) => {
+  const loadInitialData = async () => {
     try {
-      console.log('Fetching comments for event:', eventId);
-      const { data, error } = await supabase
-        .from('event_comments')
-        .select(`
-          id,
-          content,
-          created_at,
-          event_id,
-          user_id,
-          user:profiles!event_comments_user_id_fkey(
-            first_name,
-            last_name,
-            avatar_url
-          )
-        `)
-        .eq('event_id', eventId)
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching comments:', error);
-        throw error;
-      }
-
-      console.log('Fetched comments:', data);
-      setComments(data || []);
-    } catch (error: any) {
-      console.error('Error in fetchComments:', error);
-      toast({
-        title: "コメントの取得に失敗しました",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleSubmitComment = async () => {
-    if (!selectedEvent || !newComment.trim()) return;
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("認証されていません");
-
-      console.log('Submitting comment for event:', selectedEvent.id);
-      const { error } = await supabase
-        .from('event_comments')
-        .insert({
-          event_id: selectedEvent.id,
-          user_id: user.id,
-          content: newComment.trim()
-        });
-
-      if (error) {
-        console.error('Error submitting comment:', error);
-        throw error;
-      }
-
-      console.log('Comment submitted successfully');
-      setNewComment("");
+      setLoading(true);
+      const [eventsData, participationsData] = await Promise.all([
+        fetchEvents(),
+        fetchUserParticipations()
+      ]);
       
-      toast({
-        title: "コメントを投稿しました",
-      });
-    } catch (error: any) {
-      console.error('Error in handleSubmitComment:', error);
-      toast({
-        title: "コメントの投稿に失敗しました",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const fetchEvents = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("events")
-        .select(`
-          *,
-          creator:profiles!creator_id(
-            first_name,
-            last_name,
-            avatar_url
-          )
-        `)
-        .eq("status", "active")
-        .order("date", { ascending: true });
-
-      if (error) throw error;
-      setEvents(data || []);
-      setFilteredEvents(data || []);
+      setEvents(eventsData);
+      setFilteredEvents(eventsData);
+      setParticipations(participationsData);
     } catch (error: any) {
       toast({
         title: "エラーが発生しました",
@@ -224,26 +60,105 @@ export function useEvents() {
     }
   };
 
-  const fetchUserParticipations = async () => {
+  const loadEventComments = async (eventId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from("event_participants")
-        .select("event_id")
-        .eq("user_id", user.id);
-
-      if (error) throw error;
-
-      const participationsMap = (data || []).reduce((acc: {[key: string]: boolean}, participation) => {
-        acc[participation.event_id] = true;
-        return acc;
-      }, {});
-
-      setParticipations(participationsMap);
+      const commentsData = await fetchEventComments(eventId);
+      setComments(commentsData);
     } catch (error: any) {
-      console.error("参加状況の取得に失敗しました:", error);
+      toast({
+        title: "コメントの取得に失敗しました",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const setupCommentSubscription = (eventId: string) => {
+    const channel = supabase
+      .channel('event-comments')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'event_comments',
+          filter: `event_id=eq.${eventId}`
+        },
+        async (payload) => {
+          console.log('New comment received:', payload);
+          // 新しいコメントを取得
+          const { data, error } = await supabase
+            .from('event_comments')
+            .select(`
+              id,
+              content,
+              created_at,
+              event_id,
+              user_id,
+              user:profiles!event_comments_user_id_fkey(
+                first_name,
+                last_name,
+                avatar_url
+              )
+            `)
+            .eq('id', payload.new.id)
+            .single();
+
+          if (error) {
+            console.error('Error fetching new comment:', error);
+            return;
+          }
+
+          if (data) {
+            setComments(prev => [...prev, data]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
+
+  const handleSubmitComment = async () => {
+    if (!selectedEvent || !newComment.trim()) return;
+
+    try {
+      await submitEventComment(selectedEvent.id, newComment);
+      setNewComment("");
+      
+      toast({
+        title: "コメントを投稿しました",
+      });
+    } catch (error: any) {
+      toast({
+        title: "コメントの投稿に失敗しました",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const refreshEvents = async () => {
+    try {
+      const eventsData = await fetchEvents();
+      setEvents(eventsData);
+    } catch (error: any) {
+      toast({
+        title: "イベントの更新に失敗しました",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const refreshParticipations = async () => {
+    try {
+      const participationsData = await fetchUserParticipations();
+      setParticipations(participationsData);
+    } catch (error: any) {
+      console.error("参加状況の更新に失敗しました:", error);
     }
   };
 
@@ -264,8 +179,7 @@ export function useEvents() {
     categoryFilter,
     setCategoryFilter,
     handleSubmitComment,
-    fetchComments,
-    fetchEvents,
-    fetchUserParticipations
+    fetchEvents: refreshEvents,
+    fetchUserParticipations: refreshParticipations
   };
 }

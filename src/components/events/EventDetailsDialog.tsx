@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatDate } from "@/lib/date-utils";
-import { Event } from "./EventList";
-import { EventComment, EventComments } from "./EventComments";
+import { Event, EventComment } from "@/types/events";
+import { EventComments } from "./EventComments";
 
 interface EventDetailsDialogProps {
   event: Event | null;

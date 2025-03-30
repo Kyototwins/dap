@@ -1,29 +1,9 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/date-utils";
-
-interface EventCreator {
-  first_name: string | null;
-  last_name: string | null;
-  avatar_url: string | null;
-}
-
-export interface Event {
-  id: string;
-  title: string;
-  description: string;
-  image_url: string | null;
-  location: string;
-  date: string;
-  max_participants: number;
-  current_participants: number;
-  creator_id: string;
-  category: string;
-  creator?: EventCreator;
-}
+import { Event } from "@/types/events";
 
 interface EventCardProps {
   event: Event;

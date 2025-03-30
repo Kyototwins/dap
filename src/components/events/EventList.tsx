@@ -1,26 +1,8 @@
-
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
-
-export interface Event {
-  id: string;
-  title: string;
-  description: string;
-  image_url: string | null;
-  location: string;
-  date: string;
-  max_participants: number;
-  current_participants: number;
-  creator_id: string;
-  category: string;
-  creator?: {
-    first_name: string | null;
-    last_name: string | null;
-    avatar_url: string | null;
-  };
-}
+import { Event } from "@/types/events";
 
 interface EventListProps {
   events: Event[];

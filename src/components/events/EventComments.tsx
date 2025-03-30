@@ -1,19 +1,7 @@
-
 import { Avatar } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDateTime } from "@/lib/date-utils";
-
-export interface EventComment {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  user: {
-    first_name: string | null;
-    last_name: string | null;
-    avatar_url: string | null;
-  };
-}
+import { EventComment } from "@/types/events";
 
 interface EventCommentsProps {
   comments: EventComment[];
