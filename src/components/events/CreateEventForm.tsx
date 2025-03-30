@@ -35,7 +35,7 @@ export function CreateEventForm() {
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-lg">
       <div className="space-y-2">
         <Label htmlFor="title">タイトル</Label>
         <Input
@@ -44,7 +44,7 @@ export function CreateEventForm() {
           onChange={(e) =>
             setFormData({ ...formData, title: e.target.value })
           }
-          className="border-gray-300 focus-visible:ring-gray-500"
+          className="border-gray-300 rounded-md focus-visible:ring-gray-500"
           required
         />
       </div>
@@ -57,7 +57,7 @@ export function CreateEventForm() {
           onChange={(e) =>
             setFormData({ ...formData, description: e.target.value })
           }
-          className="border-gray-300 focus-visible:ring-gray-500"
+          className="border-gray-300 rounded-md focus-visible:ring-gray-500 min-h-[120px]"
           required
         />
       </div>
@@ -80,7 +80,7 @@ export function CreateEventForm() {
           onChange={(e) =>
             setFormData({ ...formData, location: e.target.value })
           }
-          className="border-gray-300 focus-visible:ring-gray-500"
+          className="border-gray-300 rounded-md focus-visible:ring-gray-500"
           required
         />
       </div>
@@ -94,7 +94,7 @@ export function CreateEventForm() {
           onChange={(e) =>
             setFormData({ ...formData, date: e.target.value })
           }
-          className="border-gray-300 focus-visible:ring-gray-500"
+          className="border-gray-300 rounded-md focus-visible:ring-gray-500"
           required
         />
       </div>
@@ -108,7 +108,7 @@ export function CreateEventForm() {
           }
           required
         >
-          <SelectTrigger className="border-gray-300 focus-visible:ring-gray-500">
+          <SelectTrigger className="border-gray-300 rounded-md focus-visible:ring-gray-500">
             <SelectValue placeholder="カテゴリーを選択" />
           </SelectTrigger>
           <SelectContent>
@@ -131,24 +131,24 @@ export function CreateEventForm() {
           onChange={(e) =>
             setFormData({ ...formData, max_participants: e.target.value })
           }
-          className="border-gray-300 focus-visible:ring-gray-500"
+          className="border-gray-300 rounded-md focus-visible:ring-gray-500"
           required
         />
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex gap-4 pt-4">
         <Button
           type="button"
           variant="outline"
           onClick={() => window.history.back()}
-          className="border-gray-300 hover:bg-gray-50 flex-1"
+          className="border-gray-300 hover:bg-gray-50 flex-1 rounded-md"
         >
           キャンセル
         </Button>
         <Button 
           type="submit" 
           disabled={loading}
-          className="bg-black text-white hover:bg-gray-800 flex-1"
+          className="bg-black text-white hover:bg-gray-800 flex-1 rounded-md"
         >
           {loading ? "作成中..." : "作成する"}
         </Button>
