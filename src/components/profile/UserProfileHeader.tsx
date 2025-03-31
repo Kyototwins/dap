@@ -1,6 +1,7 @@
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Profile } from "@/types/messages";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 interface UserProfileHeaderProps {
   profile: Profile;
@@ -8,30 +9,29 @@ interface UserProfileHeaderProps {
 
 export function UserProfileHeader({ profile }: UserProfileHeaderProps) {
   return (
-    <>
-      {/* Profile avatar */}
-      <div className="relative -mt-16 px-4 mb-4">
-        <Avatar className="w-32 h-32 border-4 border-white shadow-md">
-          <AvatarImage
-            src={profile.avatar_url || "/placeholder.svg"}
-            alt="Profile"
-          />
-          <AvatarFallback className="text-2xl">
-            {profile.first_name?.[0]}
-            {profile.last_name?.[0]}
-          </AvatarFallback>
-        </Avatar>
+    <div className="relative -mt-16 flex flex-col items-center px-4 z-10 mb-6">
+      <Avatar className="w-32 h-32 border-4 border-white">
+        <AvatarImage
+          src={profile.avatar_url || "/placeholder.svg"}
+          alt={`${profile.first_name || ''} ${profile.last_name || ''}`}
+          onError={(e) => {
+            console.error("Avatar image load error:", e);
+            (e.target as HTMLImageElement).src = "/placeholder.svg";
+          }}
+        />
+        <AvatarFallback>
+          {profile.first_name?.[0]}
+          {profile.last_name?.[0]}
+        </AvatarFallback>
+      </Avatar>
+      <h1 className="mt-4 text-2xl font-bold">
+        {profile.first_name} {profile.last_name}
+      </h1>
+      <div className="mt-2 flex gap-2 flex-wrap justify-center">
+        {profile.age && <Badge variant="secondary">{profile.age}</Badge>}
+        {profile.gender && <Badge variant="secondary">{profile.gender}</Badge>}
+        {profile.origin && <Badge variant="secondary">{profile.origin}</Badge>}
       </div>
-      
-      {/* Profile info */}
-      <div className="px-4">
-        <h1 className="text-3xl font-bold mb-1">
-          {profile.first_name} {profile.last_name}
-        </h1>
-        <p className="text-gray-600 mb-4">
-          {profile.university ? `${profile.university}${profile.department ? `, ${profile.department}` : ''}` : ''}
-        </p>
-      </div>
-    </>
+    </div>
   );
 }

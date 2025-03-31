@@ -48,7 +48,11 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
               <img 
                 src={profile.image_url_2} 
                 alt="Additional photo" 
-                className="w-full object-cover h-auto"
+                className="w-full object-cover h-auto max-h-96"
+                onError={(e) => {
+                  console.error("Image load error:", e);
+                  (e.target as HTMLImageElement).src = "/placeholder.svg";
+                }}
               />
             </div>
           </CardContent>
