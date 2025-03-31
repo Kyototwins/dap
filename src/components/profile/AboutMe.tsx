@@ -21,7 +21,7 @@ export function AboutMe({ profile }: AboutMeProps) {
       <CardContent>
         <div className="relative pl-4">
           <div className="absolute left-0 top-0 h-full w-1 bg-doshisha-purple opacity-30"></div>
-          <p className="text-muted-foreground whitespace-pre-line italic relative pl-2">
+          <p className="text-muted-foreground whitespace-pre-wrap italic relative pl-2 break-words">
             <span className="absolute -left-4 text-doshisha-purple text-4xl opacity-50">&quot;</span>
             {profile.about_me}
             <span className="absolute -right-4 text-doshisha-purple text-4xl opacity-50">&quot;</span>
