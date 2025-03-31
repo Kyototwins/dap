@@ -23,15 +23,29 @@ export function useMatches() {
         .select(`
           *,
           user1:profiles!matches_user1_id_fkey (id, first_name, last_name, avatar_url, about_me, age, gender, ideal_date, image_url_1, image_url_2, life_goal, origin, sexuality, superpower, university, created_at),
-          user2:profiles!matches_user2_id_fkey (id, first_name, last_name, avatar_url, about_me, age, gender, ideal_date, image_url_1, image_url_2, life_goal, origin, sexuality, superpower, university, created_at),
-          messages (content, created_at)
+          user2:profiles!matches_user2_id_fkey (id, first_name, last_name, avatar_url, about_me, age, gender, ideal_date, image_url_1, image_url_2, life_goal, origin, sexuality, superpower, university, created_at)
         `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      const processedMatches = matchesData.map((match) => {
+      // Get latest message for each match
+      const processedMatches = await Promise.all(matchesData.map(async (match) => {
         const otherUser = match.user1_id === user.id ? match.user2 : match.user1;
+        
+        // Fetch the most recent message for this match
+        const { data: latestMessages, error: messagesError } = await supabase
+          .from("messages")
+          .select("content, created_at")
+          .eq("match_id", match.id)
+          .order("created_at", { ascending: false })
+          .limit(1);
+          
+        if (messagesError) {
+          console.error("Error fetching messages:", messagesError);
+        }
+        
+        const lastMessage = latestMessages && latestMessages.length > 0 ? latestMessages[0] : null;
         
         return {
           ...match,
@@ -45,9 +59,9 @@ export function useMatches() {
             superpower: otherUser.superpower || '',
             learning_languages: [],
           },
-          lastMessage: match.messages[0],
+          lastMessage: lastMessage,
         };
-      });
+      }));
 
       // Sort matches by the last message's created_at timestamp (most recent first)
       const sortedMatches = processedMatches.sort((a, b) => {

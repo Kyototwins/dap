@@ -1,10 +1,10 @@
-
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import type { Match } from "@/types/messages";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
+import { ja } from "date-fns/locale";
 
 interface MatchListProps {
   matches: Match[];
@@ -13,21 +13,31 @@ interface MatchListProps {
 }
 
 export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListProps) {
-  // Format the time relative to now (like "2 hours ago", "just now", etc.)
-  const formatTimeAgo = (timestamp: string) => {
+  // Format the message timestamp in a human-readable way
+  const formatMessageTime = (timestamp: string) => {
     if (!timestamp) return "";
     
-    const date = new Date(timestamp);
+    const messageDate = new Date(timestamp);
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    const diffInDays = Math.floor((now.getTime() - messageDate.getTime()) / (1000 * 60 * 60 * 24));
     
-    if (diffInMinutes < 1) return "just now";
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    // If message is from today, show time (e.g., "14:30")
+    if (diffInDays === 0) {
+      return format(messageDate, "HH:mm");
+    }
     
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
+    // If message is from yesterday, show "昨日"
+    if (diffInDays === 1) {
+      return "昨日";
+    }
     
-    return format(date, "MMM d");
+    // If message is from this week, show day of week (e.g., "月")
+    if (diffInDays < 7) {
+      return format(messageDate, "E", { locale: ja });
+    }
+    
+    // Otherwise show date (e.g., "4/10")
+    return format(messageDate, "M/d");
   };
 
   return (
@@ -69,8 +79,8 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
                       {match.otherUser.first_name} {match.otherUser.last_name}
                     </p>
                     {match.lastMessage && (
-                      <span className="text-xs text-muted-foreground">
-                        {formatTimeAgo(match.lastMessage.created_at)}
+                      <span className="text-xs text-muted-foreground whitespace-nowrap ml-1">
+                        {formatMessageTime(match.lastMessage.created_at)}
                       </span>
                     )}
                   </div>
@@ -81,7 +91,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
                       </p>
                     ) : (
                       <p className="text-sm text-muted-foreground italic">
-                        No messages yet
+                        まだメッセージがありません
                       </p>
                     )}
                   </div>
