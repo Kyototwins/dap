@@ -47,7 +47,8 @@ export const sendMatchMessage = async (
     console.error("Error sending message:", error.message);
     return { 
       success: false,
-      error: error.message
+      error: error.message,
+      messageData: undefined
     };
   }
 };

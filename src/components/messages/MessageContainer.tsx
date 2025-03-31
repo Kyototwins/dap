@@ -48,7 +48,7 @@ export function MessageContainer({
     const result = await sendMessage(e, selectedMatch, currentUser);
     
     // If we have the current user and message was sent successfully, we can add it to the UI immediately
-    if (result && result.success && currentUser && selectedMatch && result.messageData) {
+    if (result.success && result.messageData && currentUser && selectedMatch) {
       const tempMessage: Message = {
         id: result.messageData.id || `temp-${Date.now()}`,
         content: result.messageData.content,

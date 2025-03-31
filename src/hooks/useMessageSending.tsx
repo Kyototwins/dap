@@ -4,16 +4,31 @@ import { useToast } from "@/components/ui/use-toast";
 import { validateMessage, sendMatchMessage, getCurrentUser } from "@/utils/messageSendingUtils";
 import type { Match } from "@/types/messages";
 
+// Define a type for the result of sending a message
+type SendMessageResult = {
+  success: boolean;
+  messageData?: {
+    id: string;
+    content: string;
+    created_at: string;
+    match_id: string;
+    sender_id: string;
+  };
+  error?: string;
+};
+
 export function useMessageSending() {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const { toast } = useToast();
 
-  const sendMessage = async (e: React.FormEvent, selectedMatch: Match | null, currentUser?: any) => {
+  const sendMessage = async (e: React.FormEvent, selectedMatch: Match | null, currentUser?: any): Promise<SendMessageResult> => {
     e.preventDefault();
     
     // Return early if validation fails
-    if (!validateMessage(newMessage, selectedMatch)) return false;
+    if (!validateMessage(newMessage, selectedMatch)) {
+      return { success: false };
+    }
     
     try {
       setSending(true);
@@ -26,7 +41,7 @@ export function useMessageSending() {
           description: "メッセージを送信するにはログインしてください。",
           variant: "destructive",
         });
-        return false;
+        return { success: false };
       }
       
       // Extract message content before clearing input
