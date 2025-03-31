@@ -56,7 +56,7 @@ export default function Events() {
   const hasFilters = searchQuery !== "" || timeFilter !== "all" || categoryFilter !== "all";
 
   return (
-    <div className="max-w-md mx-auto px-4 py-4 space-y-4">
+    <div className="max-w-md mx-auto py-4 space-y-4">
       <EventsHeader
         unreadNotifications={0}
         onSearchChange={setSearchQuery}

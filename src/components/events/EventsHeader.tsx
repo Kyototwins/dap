@@ -1,6 +1,5 @@
 
 import { Bell, Search } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 interface EventsHeaderProps {
   unreadNotifications?: number;
@@ -8,12 +7,9 @@ interface EventsHeaderProps {
 }
 
 export function EventsHeader({ unreadNotifications = 0, onSearchChange }: EventsHeaderProps) {
-  const navigate = useNavigate();
-
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold">イベント</h1>
+      <div className="flex justify-end items-center">
         <button className="relative p-2">
           <Bell className="h-5 w-5 text-gray-700" />
           {unreadNotifications > 0 && (

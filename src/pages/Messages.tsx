@@ -4,7 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { MatchList } from "@/components/messages/MatchList";
 import { MessageChat } from "@/components/messages/MessageChat";
-import type { Match, Message } from "@/types/messages";
+import type { Match, Message, Profile } from "@/types/messages";
 
 export default function Messages() {
   const [matches, setMatches] = useState<Match[]>([]);
@@ -39,7 +39,7 @@ export default function Messages() {
               created_at: payload.new.created_at,
               match_id: payload.new.match_id,
               sender_id: payload.new.sender_id,
-              sender: senderData
+              sender: senderData as Profile
             };
             setMessages(prev => [...prev, newMessage]);
           }
@@ -69,11 +69,25 @@ export default function Messages() {
 
       if (error) throw error;
 
-      const processedMatches = matchesData.map((match) => ({
-        ...match,
-        otherUser: match.user1_id === user.id ? match.user2 : match.user1,
-        lastMessage: match.messages[0],
-      }));
+      const processedMatches = matchesData.map((match) => {
+        const otherUser = match.user1_id === user.id ? match.user2 : match.user1;
+        // Ensure otherUser conforms to Profile type by adding missing properties
+        const completeOtherUser: Profile = {
+          ...otherUser,
+          department: otherUser.department || '',
+          year: otherUser.year || '',
+          hobbies: otherUser.hobbies || [],
+          languages: otherUser.languages || [],
+          language_levels: otherUser.language_levels || {},
+          superpower: otherUser.superpower || '',
+        };
+        
+        return {
+          ...match,
+          otherUser: completeOtherUser,
+          lastMessage: match.messages[0],
+        };
+      });
 
       setMatches(processedMatches);
       setLoading(false);
@@ -102,14 +116,27 @@ export default function Messages() {
       
       const validMessages = (data || [])
         .filter(message => message.sender)
-        .map(message => ({
-          id: message.id,
-          content: message.content,
-          created_at: message.created_at,
-          match_id: message.match_id,
-          sender_id: message.sender_id,
-          sender: message.sender
-        }));
+        .map(message => {
+          // Ensure sender conforms to Profile type
+          const completeSender: Profile = {
+            ...message.sender,
+            department: message.sender.department || '',
+            year: message.sender.year || '',
+            hobbies: message.sender.hobbies || [],
+            languages: message.sender.languages || [],
+            language_levels: message.sender.language_levels || {},
+            superpower: message.sender.superpower || '',
+          };
+          
+          return {
+            id: message.id,
+            content: message.content,
+            created_at: message.created_at,
+            match_id: message.match_id,
+            sender_id: message.sender_id,
+            sender: completeSender
+          };
+        });
 
       setMessages(validMessages);
     } catch (error: any) {

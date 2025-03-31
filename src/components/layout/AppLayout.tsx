@@ -18,12 +18,23 @@ export function AppLayout({ children }: LayoutProps) {
     { icon: User, label: "プロフィール", path: "/profile" },
   ];
 
+  // Get the title based on current path
+  const getPageTitle = () => {
+    const currentPath = location.pathname;
+    if (currentPath.startsWith("/matches")) return "マッチング";
+    if (currentPath.startsWith("/messages")) return "メッセージ";
+    if (currentPath.startsWith("/events/new")) return "イベントを作成";
+    if (currentPath.startsWith("/events")) return "イベント";
+    if (currentPath.startsWith("/profile")) return "プロフィール";
+    return "";
+  };
+
   return (
     <div className="min-h-screen pb-16">
       {/* ヘッダー */}
       <header className="fixed top-0 right-0 left-0 z-50 bg-white/80 backdrop-blur-md border-b border-amber-600/10 shadow-sm">
         <div className="container max-w-lg mx-auto px-4 h-16 flex items-center">
-          <div className="flex-1" />
+          <h1 className="text-xl font-semibold">{getPageTitle()}</h1>
         </div>
       </header>
 

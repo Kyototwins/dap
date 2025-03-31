@@ -24,8 +24,7 @@ export default function Matches() {
 
   return (
     <div className="py-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-amber-600">マッチング</h1>
+      <div className="flex items-center justify-end mb-6">
         <div className="flex gap-2">
           <Button 
             size="icon" 
