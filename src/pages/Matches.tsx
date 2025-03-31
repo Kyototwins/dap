@@ -59,7 +59,11 @@ export default function Matches() {
       </div>
 
       <div className="flex gap-2 mb-4 overflow-x-auto pb-2 no-scrollbar">
-        <Button size="sm" variant="secondary" className="rounded-full bg-dap-blue text-white hover:bg-blue-700 whitespace-nowrap">
+        <Button 
+          size="sm" 
+          variant="secondary" 
+          className="rounded-full bg-doshisha-purple text-white hover:bg-doshisha-darkPurple whitespace-nowrap"
+        >
           All
         </Button>
         <Button size="sm" variant="outline" className="rounded-full border-gray-200 whitespace-nowrap">

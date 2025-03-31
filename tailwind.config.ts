@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -54,8 +53,8 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         doshisha: {
-          purple: "#6E59A5",  // Secondary Purple from the provided color palette
-          lightPurple: "#9B87F5",  // Primary Purple
+          purple: "#6E59A5",      // Secondary Purple
+          lightPurple: "#9B87F5", // Primary Purple
           darkPurple: "#1A1F2C",  // Dark Purple
           softPurple: "#E5DEFF",  // Soft Purple
         },
