@@ -122,7 +122,7 @@ export function UserCard({ profile }: UserCardProps) {
           </div>
 
           {profile.about_me && (
-            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+            <p className="text-sm text-muted-foreground mb-4 line-clamp-2 break-words whitespace-pre-wrap">
               {profile.about_me}
             </p>
           )}
