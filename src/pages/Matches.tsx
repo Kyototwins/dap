@@ -5,6 +5,13 @@ import { useProfileFilter } from "@/hooks/useProfileFilter";
 import { SearchBar } from "@/components/matches/SearchBar";
 import { FilterSheet } from "@/components/matches/FilterSheet";
 import { ProfilesList } from "@/components/matches/ProfilesList";
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselPrevious, 
+  CarouselNext 
+} from "@/components/ui/carousel";
 
 export default function Matches() {
   const {
@@ -58,23 +65,53 @@ export default function Matches() {
         </div>
       </div>
 
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-2 no-scrollbar">
-        <Button 
-          size="sm" 
-          variant="secondary" 
-          className="rounded-full bg-doshisha-purple text-white hover:bg-doshisha-darkPurple whitespace-nowrap"
+      <div className="relative mb-6">
+        <Carousel
+          opts={{
+            align: "start",
+            loop: false,
+          }}
+          className="w-full"
         >
-          All
-        </Button>
-        <Button size="sm" variant="outline" className="rounded-full border-gray-200 whitespace-nowrap">
-          Recommended
-        </Button>
-        <Button size="sm" variant="outline" className="rounded-full border-gray-200 whitespace-nowrap">
-          Language Match
-        </Button>
-        <Button size="sm" variant="outline" className="rounded-full border-gray-200 whitespace-nowrap">
-          Shared Interests
-        </Button>
+          <CarouselContent className="ml-1">
+            <CarouselItem className="basis-auto pl-1">
+              <Button 
+                size="sm" 
+                variant="secondary" 
+                className="rounded-full bg-doshisha-purple text-white hover:bg-doshisha-darkPurple whitespace-nowrap"
+              >
+                All
+              </Button>
+            </CarouselItem>
+            <CarouselItem className="basis-auto pl-1">
+              <Button size="sm" variant="outline" className="rounded-full border-gray-200 whitespace-nowrap">
+                Recommended
+              </Button>
+            </CarouselItem>
+            <CarouselItem className="basis-auto pl-1">
+              <Button size="sm" variant="outline" className="rounded-full border-gray-200 whitespace-nowrap">
+                Language Match
+              </Button>
+            </CarouselItem>
+            <CarouselItem className="basis-auto pl-1">
+              <Button size="sm" variant="outline" className="rounded-full border-gray-200 whitespace-nowrap">
+                Shared Interests
+              </Button>
+            </CarouselItem>
+            <CarouselItem className="basis-auto pl-1">
+              <Button size="sm" variant="outline" className="rounded-full border-gray-200 whitespace-nowrap">
+                Recently Active
+              </Button>
+            </CarouselItem>
+            <CarouselItem className="basis-auto pl-1">
+              <Button size="sm" variant="outline" className="rounded-full border-gray-200 whitespace-nowrap">
+                New Users
+              </Button>
+            </CarouselItem>
+          </CarouselContent>
+          <CarouselPrevious className="left-0 bg-white/80 backdrop-blur-sm hover:bg-white" />
+          <CarouselNext className="right-0 bg-white/80 backdrop-blur-sm hover:bg-white" />
+        </Carousel>
       </div>
 
       <ProfilesList 
