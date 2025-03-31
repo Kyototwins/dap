@@ -27,6 +27,25 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [unreadCount, setUnreadCount] = useState(0);
   const { toast } = useToast();
 
+  // Helper function to convert string type to NotificationType enum
+  const convertToNotificationType = (typeString: string): NotificationType => {
+    switch (typeString) {
+      case 'new_match':
+        return NotificationType.NEW_MATCH;
+      case 'new_message':
+        return NotificationType.NEW_MESSAGE;
+      case 'new_event':
+        return NotificationType.NEW_EVENT;
+      case 'event_join':
+        return NotificationType.EVENT_JOIN;
+      case 'event_comment':
+        return NotificationType.EVENT_COMMENT;
+      default:
+        console.warn(`Unknown notification type: ${typeString}`);
+        return NotificationType.NEW_MATCH; // Default fallback
+    }
+  };
+
   const fetchNotifications = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -41,7 +60,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       if (error) throw error;
 
-      setNotifications(data || []);
+      // Convert string types to NotificationType enum
+      const typedNotifications: Notification[] = (data || []).map(notification => ({
+        ...notification,
+        type: convertToNotificationType(notification.type)
+      }));
+
+      setNotifications(typedNotifications);
       setUnreadCount((data || []).filter(n => !n.read).length);
     } catch (error: any) {
       console.error('Error fetching notifications:', error.message);
@@ -115,14 +140,21 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }, 
         payload => {
           if (payload.new) {
+            const newNotification = payload.new as any;
+            // Convert string type to NotificationType enum for the new notification
+            const typedNotification: Notification = {
+              ...newNotification,
+              type: convertToNotificationType(newNotification.type)
+            };
+            
             // Add new notification to state
-            setNotifications(prev => [payload.new as Notification, ...prev]);
+            setNotifications(prev => [typedNotification, ...prev]);
             setUnreadCount(prev => prev + 1);
             
             // Show toast for new notification
             toast({
-              title: getNotificationTitle(payload.new.type as NotificationType),
-              description: payload.new.content,
+              title: getNotificationTitle(typedNotification.type),
+              description: typedNotification.content,
               variant: "default",
             });
           }
