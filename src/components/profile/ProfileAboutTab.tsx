@@ -10,7 +10,7 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
     <>
       <div className="dap-card p-6 mb-6">
         <h2 className="text-xl font-bold mb-4">About Me</h2>
-        <p className="text-gray-700 whitespace-pre-line">
+        <p className="text-gray-700 whitespace-pre-wrap break-words">
           {profile.about_me || "自己紹介文が設定されていません。"}
         </p>
       </div>
