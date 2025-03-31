@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,9 +11,9 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 248 53% 58%; // Converted from #6E59A5
+    --primary: 248 53% 58%; /* Converted from #6E59A5 */
     --primary-foreground: 0 0% 98%;
-    --secondary: 248 30% 70%; // Lighter shade
+    --secondary: 248 30% 70%; /* Lighter shade */
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
@@ -93,7 +94,7 @@
   }
   
   .dap-button-primary {
-    @apply bg-dap-blue text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors;
+    @apply bg-doshisha-purple text-white px-4 py-2 rounded-md font-medium hover:bg-doshisha-darkPurple transition-colors;
   }
   
   .dap-button-secondary {
