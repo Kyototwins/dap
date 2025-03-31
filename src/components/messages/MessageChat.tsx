@@ -105,8 +105,8 @@ export function MessageChat({
       </div>
 
       {/* Messages - using fixed height and ScrollArea to contain scrolling */}
-      <ScrollArea className="flex-1">
-        <div className="py-4 px-4 space-y-6">
+      <ScrollArea className="flex-1 px-4">
+        <div className="py-4 space-y-6">
           {messageGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="space-y-4">
               <div className="text-center">
