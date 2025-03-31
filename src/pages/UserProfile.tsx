@@ -70,7 +70,7 @@ export default function UserProfile() {
     );
   }
 
-  if (!profile) {
+  if (!profile || !id) {
     return (
       <div className="p-6 text-center">
         <p className="text-muted-foreground">プロフィールが見つかりません</p>
@@ -90,6 +90,7 @@ export default function UserProfile() {
       <div className="px-4">
         <UserProfileActions 
           isCurrentUser={isCurrentUser}
+          profileId={id}
           onMessageClick={handleMessage}
           onEditProfileClick={handleEditProfile}
         />
