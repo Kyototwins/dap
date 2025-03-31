@@ -77,10 +77,10 @@ export function MessageChat({
       <div className="flex items-center justify-between p-3 border-b">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden">
-            <ArrowLeft className="h-6 w-6" />
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           
-          <Avatar className="h-10 w-10">
+          <Avatar className="h-9 w-9">
             <AvatarImage
               src={selectedMatch.otherUser.avatar_url || "/placeholder.svg"}
               alt={`${selectedMatch.otherUser.first_name}のアバター`}
@@ -92,7 +92,7 @@ export function MessageChat({
           </Avatar>
           
           <div>
-            <p className="font-semibold">
+            <p className="font-medium text-sm">
               {selectedMatch.otherUser.first_name} {selectedMatch.otherUser.last_name}
             </p>
             <p className="text-xs text-gray-500">Online</p>
@@ -104,7 +104,7 @@ export function MessageChat({
         </Button>
       </div>
 
-      {/* Messages - using fixed height and ScrollArea to contain scrolling */}
+      {/* Messages */}
       <ScrollArea className="flex-1 px-4">
         <div className="py-4 space-y-6">
           {messageGroups.map((group, groupIndex) => (
@@ -127,7 +127,7 @@ export function MessageChat({
                       className={`${
                         message.sender.id === selectedMatch.otherUser.id
                           ? "bg-gray-100 text-gray-800"
-                          : "bg-blue-500 text-white"
+                          : "bg-dap-blue text-white"
                       } rounded-2xl px-4 py-2`}
                     >
                       <p className="break-words">{message.content}</p>
@@ -153,14 +153,14 @@ export function MessageChat({
       <div className="border-t p-3">
         <form onSubmit={onSendMessage} className="flex items-center gap-2">
           <Button type="button" variant="ghost" size="icon" className="rounded-full">
-            <Image className="h-6 w-6 text-gray-500" />
+            <Image className="h-5 w-5 text-gray-500" />
           </Button>
           
           <div className="flex-1 relative">
             <input
               type="text"
               placeholder="Type a message..."
-              className="w-full border-gray-200 rounded-full py-3 px-4 pr-10 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full bg-gray-50 border-0 rounded-full py-3 px-4 pr-10 focus:outline-none focus:ring-1 focus:ring-dap-blue"
               value={newMessage}
               onChange={(e) => onNewMessageChange(e.target.value)}
             />
@@ -173,7 +173,7 @@ export function MessageChat({
             type="submit" 
             disabled={!newMessage.trim()} 
             size="icon"
-            className="bg-blue-600 text-white rounded-full hover:bg-blue-700"
+            className="bg-dap-blue text-white rounded-full hover:bg-blue-700"
           >
             <Send className="h-5 w-5" />
           </Button>

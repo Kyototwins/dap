@@ -28,7 +28,7 @@ export function MessageContainer({
   };
 
   return (
-    <div className="flex flex-1 overflow-hidden">
+    <div className="flex flex-1 overflow-hidden border rounded-lg shadow-sm">
       <ChatList 
         matches={matches}
         selectedMatch={selectedMatch}

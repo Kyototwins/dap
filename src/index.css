@@ -6,25 +6,25 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 43 96% 56%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 43 96% 56%;
-    --accent-foreground: 240 5.9% 10%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 43 96% 56%;
-    --input: 43 96% 56%;
-    --ring: 43 96% 56%;
-    --radius: 1rem;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221 83% 53%;
+    --radius: 0.75rem;
   }
 
   * {
@@ -41,7 +41,7 @@
   }
 
   .glass-card {
-    @apply glass border border-amber-600/20 shadow-lg;
+    @apply glass border border-gray-200 shadow-sm;
   }
 
   /* Transition utilities */
@@ -75,21 +75,46 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;  /* Chrome, Safari and Opera */
   }
+  
+  /* DAP specific styles */
+  .dap-card {
+    @apply rounded-lg bg-white shadow-sm border border-gray-100;
+  }
+  
+  .dap-tag {
+    @apply px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800;
+  }
+  
+  .dap-tag-blue {
+    @apply px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
+  }
+  
+  .dap-tag-primary {
+    @apply px-3 py-1 rounded-full text-xs font-medium bg-black text-white;
+  }
+  
+  .dap-button-primary {
+    @apply bg-dap-blue text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors;
+  }
+  
+  .dap-button-secondary {
+    @apply bg-white text-gray-800 px-4 py-2 rounded-md font-medium border border-gray-200 hover:bg-gray-50 transition-colors;
+  }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-secondary;
+  @apply bg-gray-100;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-amber-600 bg-opacity-50 rounded-full;
+  @apply bg-gray-300 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-opacity-70;
+  @apply bg-gray-400;
 }
