@@ -65,7 +65,7 @@ export function EventList({
         <h2 className="font-bold text-lg">イベント一覧</h2>
         <Button 
           onClick={() => navigate("/events/new")} 
-          className="bg-amber-500 hover:bg-amber-600"
+          className="bg-doshisha-purple hover:bg-doshisha-darkPurple"
           size="sm"
         >
           <Plus className="w-4 h-4 mr-1" />
