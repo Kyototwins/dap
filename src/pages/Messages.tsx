@@ -12,6 +12,7 @@ export default function Messages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showMobileChat, setShowMobileChat] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -52,6 +53,13 @@ export default function Messages() {
     };
   }, [selectedMatch]);
 
+  useEffect(() => {
+    // Show the chat view on mobile when a match is selected
+    if (selectedMatch) {
+      setShowMobileChat(true);
+    }
+  }, [selectedMatch]);
+
   const fetchMatches = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -72,18 +80,21 @@ export default function Messages() {
       const processedMatches = matchesData.map((match) => {
         const otherUser = match.user1_id === user.id ? match.user2 : match.user1;
         
+        // Ensure all fields are populated with default values to avoid type errors
+        const completeOtherUser: Profile = {
+          ...otherUser,
+          department: otherUser.department || '',
+          year: otherUser.year || '',
+          hobbies: otherUser.hobbies || [],
+          languages: otherUser.languages || [],
+          language_levels: otherUser.language_levels || {},
+          superpower: otherUser.superpower || '',
+          learning_languages: otherUser.learning_languages || [],
+        };
+        
         return {
           ...match,
-          otherUser: {
-            ...otherUser,
-            department: otherUser.department || '',
-            year: otherUser.year || '',
-            hobbies: otherUser.hobbies || [],
-            languages: otherUser.languages || [],
-            language_levels: otherUser.language_levels || {},
-            superpower: otherUser.superpower || '',
-            learning_languages: otherUser.learning_languages || [],
-          },
+          otherUser: completeOtherUser,
           lastMessage: match.messages[0],
         };
       });
@@ -182,33 +193,43 @@ export default function Messages() {
     fetchMessages(match.id);
   };
 
+  const handleBackToList = () => {
+    setShowMobileChat(false);
+  };
+
   if (loading) {
     return <div className="p-6 text-center">読み込み中...</div>;
   }
 
   return (
-    <div className="fixed flex flex-col inset-0 pt-14 pb-16 overflow-hidden">
-      <div className="shrink-0 border-b">
-        <MatchList 
-          matches={matches} 
-          selectedMatch={selectedMatch} 
-          onSelectMatch={handleSelectMatch}
-        />
-      </div>
-      <div className="flex-1 relative">
-        {selectedMatch ? (
-          <MessageChat
-            selectedMatch={selectedMatch}
-            messages={messages}
-            newMessage={newMessage}
-            onNewMessageChange={setNewMessage}
-            onSendMessage={handleSendMessage}
+    <div className="flex flex-col h-[calc(100vh-8rem)]">
+      <div className="flex flex-1 overflow-hidden">
+        {/* Chat list for larger screens, or when chat isn't shown on mobile */}
+        <div className={`${showMobileChat ? 'hidden md:block' : 'w-full'} md:w-1/3 border-r`}>
+          <MatchList 
+            matches={matches} 
+            selectedMatch={selectedMatch} 
+            onSelectMatch={handleSelectMatch}
           />
-        ) : (
-          <div className="flex items-center justify-center h-full text-muted-foreground">
-            メッセージを表示するには、上のリストからユーザーを選択してください
-          </div>
-        )}
+        </div>
+        
+        {/* Chat window */}
+        <div className={`${!showMobileChat ? 'hidden md:block' : 'w-full'} md:w-2/3`}>
+          {selectedMatch ? (
+            <MessageChat
+              selectedMatch={selectedMatch}
+              messages={messages}
+              newMessage={newMessage}
+              onNewMessageChange={setNewMessage}
+              onSendMessage={handleSendMessage}
+              onBack={handleBackToList}
+            />
+          ) : (
+            <div className="h-full flex items-center justify-center text-gray-500">
+              <p>メッセージを表示するには、左のリストからユーザーを選択してください</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
