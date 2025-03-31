@@ -30,8 +30,10 @@ export function AppLayout({ children }: LayoutProps) {
     return "";
   };
 
+  const isMessagesPage = location.pathname === "/messages";
+
   return (
-    <div className="min-h-screen pb-16">
+    <div className={`min-h-screen ${isMessagesPage ? 'h-screen flex flex-col' : 'pb-16'}`}>
       {/* ヘッダー */}
       <header className="fixed top-0 right-0 left-0 z-50 bg-white/80 backdrop-blur-md border-b border-amber-600/10 shadow-sm">
         <div className="container max-w-lg mx-auto px-4 h-16 flex items-center justify-between">
@@ -41,7 +43,7 @@ export function AppLayout({ children }: LayoutProps) {
       </header>
 
       {/* メインコンテンツ */}
-      <main className="container max-w-lg mx-auto px-4 pt-20 pb-4 animate-fade-up">
+      <main className={`container max-w-lg mx-auto px-4 pt-20 animate-fade-up ${isMessagesPage ? 'flex-1 flex flex-col pb-0' : 'pb-4'}`}>
         {children}
       </main>
 
