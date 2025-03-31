@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Profile } from "@/types/messages";
 import { Card, CardContent } from "@/components/ui/card";
@@ -37,6 +38,22 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
           </p>
         </CardContent>
       </Card>
+
+      {/* Additional Photo */}
+      {profile.image_url_2 && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="font-medium text-lg mb-4">Photo</h3>
+            <div className="overflow-hidden rounded-lg">
+              <img 
+                src={profile.image_url_2} 
+                alt="Additional photo" 
+                className="w-full object-cover h-auto"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Basic Information */}
       <Card>
