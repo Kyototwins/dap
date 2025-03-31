@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile as ProfileType } from "@/types/messages";
-import { MessageSquare, Edit } from "lucide-react";
+import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ProfileLoading } from "@/components/profile/ProfileLoading";
@@ -75,10 +74,6 @@ export default function Profile() {
     navigate("/profile/setup");
   };
 
-  const handleMessage = () => {
-    navigate("/messages");
-  };
-
   if (loading) {
     return <ProfileLoading />;
   }
@@ -129,23 +124,14 @@ export default function Profile() {
         </h1>
         <p className="text-gray-600 mb-4">{universityText}</p>
         
-        {/* アクションボタン */}
-        <div className="flex gap-3 mb-6">
-          <Button 
-            onClick={handleMessage}
-            variant="outline"
-            className="flex-1 gap-2 border-gray-200"
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>メッセージ</span>
-          </Button>
-          
+        {/* アクションボタン - メッセージボタンを削除してプロフィール編集ボタンのみにする */}
+        <div className="flex mb-6">
           <Button 
             onClick={handleEditProfile}
-            className="flex-1 gap-2 bg-dap-blue hover:bg-blue-700"
+            className="flex-1 gap-2 bg-doshisha-purple hover:bg-doshisha-darkPurple"
           >
             <Edit className="w-4 h-4" />
-            <span>編集</span>
+            <span>プロフィールを編集</span>
           </Button>
         </div>
         
@@ -156,7 +142,7 @@ export default function Profile() {
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-dap-blue" 
+              className="h-full bg-doshisha-purple" 
               style={{ width: `${completion}%` }}
             />
           </div>
@@ -167,19 +153,19 @@ export default function Profile() {
           <TabsList className="w-full bg-transparent border-b border-gray-200 rounded-none p-0 mb-6">
             <TabsTrigger 
               value="about" 
-              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-dap-blue data-[state=active]:text-dap-blue rounded-none"
+              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-doshisha-purple data-[state=active]:text-doshisha-purple rounded-none"
             >
               About
             </TabsTrigger>
             <TabsTrigger 
               value="connections" 
-              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-dap-blue data-[state=active]:text-dap-blue rounded-none"
+              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-doshisha-purple data-[state=active]:text-doshisha-purple rounded-none"
             >
               Connections
             </TabsTrigger>
             <TabsTrigger 
               value="events" 
-              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-dap-blue data-[state=active]:text-dap-blue rounded-none"
+              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-doshisha-purple data-[state=active]:text-doshisha-purple rounded-none"
             >
               Events
             </TabsTrigger>
