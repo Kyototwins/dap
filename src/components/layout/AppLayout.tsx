@@ -19,7 +19,6 @@ export function AppLayout({ children }: LayoutProps) {
     { icon: User, label: "プロフィール", path: "/profile" },
   ];
 
-  // Get the title based on current path
   const getPageTitle = () => {
     const currentPath = location.pathname;
     if (currentPath.startsWith("/matches")) return "マッチング";
@@ -32,10 +31,9 @@ export function AppLayout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen pb-16">
-      {/* ヘッダー */}
       <header className="fixed top-0 right-0 left-0 z-50 bg-white border-b border-gray-200">
         <div className="container max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-dap-blue">DAP</h1>
+          <h1 className="text-2xl font-bold text-doshisha-purple">DAP</h1>
           <div className="flex items-center gap-2">
             <NotificationBell />
             <button className="p-2">
@@ -45,12 +43,10 @@ export function AppLayout({ children }: LayoutProps) {
         </div>
       </header>
 
-      {/* メインコンテンツ */}
       <main className="container max-w-lg mx-auto px-4 pt-16 pb-4">
         {children}
       </main>
 
-      {/* ナビゲーション */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
         <div className="container max-w-lg mx-auto">
           <div className="flex justify-around items-center h-16">
@@ -60,13 +56,13 @@ export function AppLayout({ children }: LayoutProps) {
                 onClick={() => navigate(item.path)}
                 className={cn(
                   "flex flex-col items-center justify-center w-full h-full gap-1",
-                  "text-gray-500 hover:text-dap-blue transition-colors",
-                  location.pathname === item.path && "text-dap-blue font-medium"
+                  "text-gray-500 hover:text-doshisha-purple transition-colors",
+                  location.pathname === item.path && "text-doshisha-purple font-medium"
                 )}
               >
                 <item.icon className={cn(
                   "w-5 h-5",
-                  location.pathname === item.path && "text-dap-blue"
+                  location.pathname === item.path && "text-doshisha-purple"
                 )} />
                 <span className="text-xs">{item.label}</span>
               </button>

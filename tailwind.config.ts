@@ -53,11 +53,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        dap: {
-          blue: "#2563eb",
-          lightBlue: "#3b82f6",
-          gray: "#f3f4f6",
-          darkGray: "#6b7280",
+        doshisha: {
+          purple: "#6E59A5",  // Secondary Purple from the provided color palette
+          lightPurple: "#9B87F5",  // Primary Purple
+          darkPurple: "#1A1F2C",  // Dark Purple
+          softPurple: "#E5DEFF",  // Soft Purple
         },
       },
       borderRadius: {
