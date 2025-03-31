@@ -1,4 +1,5 @@
 
+import { useEffect, useRef, useMemo } from "react";
 import { ArrowLeft, MoreVertical, Image, Smile, Send } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -23,13 +24,22 @@ export function MessageChat({
   onSendMessage,
   onBack,
 }: MessageChatProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    // Scroll to bottom when messages change
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   const formatMessageTime = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
     return format(date, "HH:mm");
   };
 
-  const groupMessagesByDate = () => {
+  const messageGroups = useMemo(() => {
     const groups: { date: string; messages: Message[] }[] = [];
     
     messages.forEach((message) => {
@@ -46,7 +56,7 @@ export function MessageChat({
     });
     
     return groups;
-  };
+  }, [messages]);
 
   const formatDisplayDate = (dateStr: string) => {
     const messageDate = new Date(dateStr);
