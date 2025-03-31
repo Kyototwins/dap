@@ -56,30 +56,7 @@ export function MessageContainer({
         created_at: result.messageData.created_at || new Date().toISOString(),
         match_id: result.messageData.match_id,
         sender_id: currentUser.id,
-        sender: {
-          id: currentUser.id,
-          first_name: currentUser.profile?.first_name,
-          last_name: currentUser.profile?.last_name,
-          avatar_url: currentUser.profile?.avatar_url,
-          about_me: currentUser.profile?.about_me,
-          age: currentUser.profile?.age,
-          gender: currentUser.profile?.gender,
-          ideal_date: currentUser.profile?.ideal_date,
-          image_url_1: currentUser.profile?.image_url_1,
-          image_url_2: currentUser.profile?.image_url_2,
-          life_goal: currentUser.profile?.life_goal,
-          origin: currentUser.profile?.origin,
-          sexuality: currentUser.profile?.sexuality,
-          superpower: currentUser.profile?.superpower || '',
-          university: currentUser.profile?.university,
-          department: currentUser.profile?.department || '',
-          year: currentUser.profile?.year || '',
-          hobbies: currentUser.profile?.hobbies || [],
-          languages: currentUser.profile?.languages || [],
-          language_levels: currentUser.profile?.language_levels as Record<string, number> || {},
-          learning_languages: currentUser.profile?.learning_languages || [],
-          created_at: currentUser.profile?.created_at
-        }
+        sender: currentUser.profile
       };
       
       // Add the message to our local state immediately
