@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { ArrowLeft, MoreVertical, Image, Smile, Send } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -92,11 +92,7 @@ export function MessageChat({
                 >
                   <div className="flex flex-col max-w-[75%]">
                     <div
-                      className={`${
-                        message.sender.id === selectedMatch.otherUser.id
-                          ? "bg-gray-100 text-gray-800"
-                          : "bg-dap-blue text-white"
-                      } rounded-2xl px-4 py-2`}
+                      className="bg-gray-100 text-gray-800 rounded-2xl px-4 py-2"
                     >
                       <p className="break-words">{message.content}</p>
                     </div>
