@@ -2,13 +2,13 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import type { Match } from "@/types/messages";
+import type { Match, Message } from "@/types/messages";
 
 export function useMessageSending() {
   const [newMessage, setNewMessage] = useState("");
   const { toast } = useToast();
 
-  const sendMessage = async (e: React.FormEvent, selectedMatch: Match | null) => {
+  const sendMessage = async (e: React.FormEvent, selectedMatch: Match | null, currentUser?: any) => {
     e.preventDefault();
     if (!selectedMatch || !newMessage.trim()) return false;
 
@@ -16,17 +16,23 @@ export function useMessageSending() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("認証されていません");
 
-      const { error } = await supabase
+      // For immediate UI update we can return the content right away
+      const messageContent = newMessage.trim();
+      
+      const { error, data } = await supabase
         .from("messages")
         .insert([
           {
             match_id: selectedMatch.id,
             sender_id: user.id,
-            content: newMessage.trim(),
+            content: messageContent,
           },
-        ]);
+        ])
+        .select();
 
       if (error) throw error;
+      
+      console.log("Message sent successfully:", data);
       setNewMessage("");
       return true;
     } catch (error: any) {

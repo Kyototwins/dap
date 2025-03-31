@@ -22,6 +22,9 @@ export function useMessages() {
         schema: 'public',
         table: 'messages'
       }, async payload => {
+        // For debugging
+        console.log("New message received:", payload.new);
+        
         if (payload.new && selectedMatch?.id === payload.new.match_id) {
           // Get sender information
           const { data: senderData } = await supabase
@@ -31,6 +34,7 @@ export function useMessages() {
             .single();
           
           if (senderData) {
+            console.log("Sender data found:", senderData);
             const newMessage: Message = {
               id: payload.new.id,
               content: payload.new.content,
@@ -134,6 +138,8 @@ export function useMessages() {
 
       if (error) throw error;
       
+      console.log("Fetched messages:", data);
+      
       const validMessages = (data || [])
         .filter(message => message.sender)
         .map(message => {
@@ -145,13 +151,13 @@ export function useMessages() {
             sender_id: message.sender_id,
             sender: {
               ...message.sender,
-              department: '',
-              year: '',
-              hobbies: [],
-              languages: [],
-              language_levels: {},
+              department: message.sender.department || '',
+              year: message.sender.year || '',
+              hobbies: message.sender.hobbies || [],
+              languages: message.sender.languages || [],
+              language_levels: message.sender.language_levels as Record<string, number> || {},
               superpower: message.sender.superpower || '',
-              learning_languages: [],
+              learning_languages: message.sender.learning_languages || [],
             }
           };
         });
