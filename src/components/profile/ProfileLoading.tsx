@@ -1,10 +1,15 @@
 
-import { Loader2 } from "lucide-react";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 
 export function ProfileLoading() {
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <Loader2 className="w-6 h-6 animate-spin" />
-    </div>
+    <AuthLayout
+      title="プロフィール設定"
+      subtitle="読み込み中..."
+    >
+      <div className="flex justify-center items-center p-8">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    </AuthLayout>
   );
 }

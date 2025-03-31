@@ -2,52 +2,89 @@
 import { BasicInfoForm } from "@/components/profile/BasicInfoForm";
 import { LanguageSkillsInput } from "@/components/profile/LanguageSkillsInput";
 import { HobbiesInput } from "@/components/profile/HobbiesInput";
-
-interface ProfileFormData {
-  firstName: string;
-  lastName: string;
-  age: string;
-  gender: string;
-  origin: string;
-  sexuality: string;
-  aboutMe: string;
-  university: string;
-  department: string;
-  year: string;
-  hobbies: string[];
-  languages: string[];
-  languageLevels: Record<string, number>;
-  learning_languages: string[];
-}
+import { AdditionalQuestions } from "@/components/profile/AdditionalQuestions";
+import { ImageUpload } from "@/components/profile/ImageUpload";
+import { Button } from "@/components/ui/button";
+import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
 
 interface ProfileFormProps {
   formData: ProfileFormData;
+  additionalData: AdditionalDataType;
+  images: ImageUploadState;
   onChange: (name: string, value: string | string[] | Record<string, number>) => void;
-  loading?: boolean;
+  onAdditionalChange: (name: string, value: string) => void;
+  onImageChange: (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2') => void;
+  onSubmit: (e: React.FormEvent) => void;
+  loading: boolean;
 }
 
-export function ProfileForm({ formData, onChange, loading }: ProfileFormProps) {
+export function ProfileForm({ 
+  formData, 
+  additionalData, 
+  images, 
+  onChange, 
+  onAdditionalChange, 
+  onImageChange, 
+  onSubmit, 
+  loading 
+}: ProfileFormProps) {
   return (
-    <>
-      <BasicInfoForm 
-        formData={formData}
-        onChange={onChange}
-        loading={loading}
-      />
-      
-      <LanguageSkillsInput
-        languages={formData.languages}
-        languageLevels={formData.languageLevels}
-        learningLanguages={formData.learning_languages}
-        onChange={onChange}
-        loading={loading}
-      />
-      
-      <HobbiesInput
-        hobbies={formData.hobbies}
-        onChange={onChange}
-        loading={loading}
-      />
-    </>
+    <form onSubmit={onSubmit} className="space-y-6">
+      <div className="space-y-4">
+        <ImageUpload
+          label="プロフィール写真（アイコンとして使用されます）"
+          image={images.avatar}
+          onChange={(e) => onImageChange(e, 'avatar')}
+          loading={loading}
+        />
+        <ImageUpload
+          label="追加の写真 1"
+          image={images.image1}
+          onChange={(e) => onImageChange(e, 'image1')}
+          loading={loading}
+        />
+        <ImageUpload
+          label="追加の写真 2"
+          image={images.image2}
+          onChange={(e) => onImageChange(e, 'image2')}
+          loading={loading}
+        />
+      </div>
+
+      <div className="space-y-4">
+        <BasicInfoForm 
+          formData={formData}
+          onChange={onChange}
+          loading={loading}
+        />
+        
+        <LanguageSkillsInput
+          languages={formData.languages}
+          languageLevels={formData.languageLevels}
+          learningLanguages={formData.learning_languages}
+          onChange={onChange}
+          loading={loading}
+        />
+        
+        <HobbiesInput
+          hobbies={formData.hobbies}
+          onChange={onChange}
+          loading={loading}
+        />
+      </div>
+
+      <div className="border-t pt-6">
+        <h3 className="text-lg font-medium mb-4">追加の質問</h3>
+        <AdditionalQuestions
+          data={additionalData}
+          onChange={onAdditionalChange}
+          loading={loading}
+        />
+      </div>
+
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "保存中..." : "プロフィールを保存"}
+      </Button>
+    </form>
   );
 }
