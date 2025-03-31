@@ -10,22 +10,26 @@ export function useMessages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-
+  
+  // Set up realtime subscription whenever the component mounts
   useEffect(() => {
     fetchMatches();
     
-    // Real-time message subscription
+    // Set up a realtime subscription independent of selectedMatch
     const messagesSubscription = supabase
-      .channel('messages')
+      .channel('messages-channel')
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'messages'
       }, async payload => {
-        // For debugging
         console.log("New message received:", payload.new);
         
-        if (payload.new && selectedMatch?.id === payload.new.match_id) {
+        // Only process if relevant to the selected match or sender
+        if (payload.new && 
+            (selectedMatch?.id === payload.new.match_id || 
+             payload.new.sender_id === (await supabase.auth.getUser()).data.user?.id)) {
+          
           // Get sender information
           const { data: senderData } = await supabase
             .from('profiles')
@@ -66,7 +70,17 @@ export function useMessages() {
                 created_at: senderData.created_at
               }
             };
-            setMessages(prev => [...prev, newMessage]);
+            
+            // Add message if it's for the selected match
+            if (selectedMatch?.id === payload.new.match_id) {
+              setMessages(prev => {
+                // Avoid duplicate messages
+                if (prev.some(msg => msg.id === newMessage.id)) {
+                  return prev;
+                }
+                return [...prev, newMessage];
+              });
+            }
           }
         }
       })

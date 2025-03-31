@@ -34,14 +34,19 @@ export function useMessageSending() {
       
       console.log("Message sent successfully:", data);
       setNewMessage("");
-      return true;
+      
+      // Return both success status and the sent message data
+      return {
+        success: true,
+        messageData: data?.[0]
+      };
     } catch (error: any) {
       toast({
         title: "メッセージの送信に失敗しました",
         description: error.message,
         variant: "destructive",
       });
-      return false;
+      return { success: false };
     }
   };
 

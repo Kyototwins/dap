@@ -45,28 +45,20 @@ export function MessageContainer({
   }, []);
 
   const handleSendMessage = async (e: React.FormEvent) => {
-    const success = await sendMessage(e, selectedMatch, currentUser);
+    const result = await sendMessage(e, selectedMatch, currentUser);
     
     // If we have the current user and message was sent successfully, we can add it to the UI immediately
-    // Note: The realtime subscription should handle this too, but this gives immediate feedback
-    if (success && currentUser && selectedMatch) {
+    if (result?.success && currentUser && selectedMatch && result.messageData) {
       const tempMessage: Message = {
-        id: `temp-${Date.now()}`,
-        content: newMessage,
-        created_at: new Date().toISOString(),
+        id: result.messageData.id || `temp-${Date.now()}`,
+        content: result.messageData.content,
+        created_at: result.messageData.created_at || new Date().toISOString(),
         match_id: selectedMatch.id,
         sender_id: currentUser.id,
         sender: currentUser.profile
       };
       
-      // Only add to UI if not already added by realtime subscription
-      setMessages(prev => {
-        if (!prev.some(msg => msg.content === newMessage && 
-                          Date.now() - new Date(msg.created_at).getTime() < 2000)) {
-          return [...prev, tempMessage];
-        }
-        return prev;
-      });
+      setMessages(prev => [...prev, tempMessage]);
     }
   };
 
