@@ -17,7 +17,7 @@ export default function UserProfile() {
   const [isCurrentUser, setIsCurrentUser] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const authOperations = useAuth();
 
   useEffect(() => {
     loadProfile();
@@ -26,6 +26,7 @@ export default function UserProfile() {
   const loadProfile = async () => {
     try {
       // Check if this is the current user's profile
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (user && id === user.id) {
         setIsCurrentUser(true);
       }
@@ -240,18 +241,10 @@ export default function UserProfile() {
                       <div className="font-medium">{profile.department}</div>
                     </div>
                   )}
-                  {profile.major && (
-                    <div>
-                      <div className="text-gray-500">Major</div>
-                      <div className="font-medium">{profile.major}</div>
-                    </div>
-                  )}
-                  {profile.year && (
-                    <div>
-                      <div className="text-gray-500">Year</div>
-                      <div className="font-medium">{profile.year}</div>
-                    </div>
-                  )}
+                  <div>
+                    <div className="text-gray-500">Year</div>
+                    <div className="font-medium">{profile.year}</div>
+                  </div>
                 </div>
               </div>
             )}
