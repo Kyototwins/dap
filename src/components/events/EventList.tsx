@@ -1,3 +1,4 @@
+
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -50,7 +51,7 @@ export function EventList({
             : "現在開催予定のイベントはありません"}
         </p>
         <div className="flex justify-center">
-          <Button onClick={() => navigate("/events/new")} className="bg-amber-500 hover:bg-amber-600">
+          <Button onClick={() => navigate("/events/new")} className="bg-doshisha-purple hover:bg-doshisha-darkPurple">
             <Plus className="w-4 h-4 mr-2" />
             作成
           </Button>
@@ -133,7 +134,7 @@ function EventCard({ event, isParticipating, onJoin, onCardClick }: {
             size="sm"
             className={isParticipating 
               ? "bg-gray-200 hover:bg-gray-300 text-gray-700" 
-              : "bg-amber-500 hover:bg-amber-600"}
+              : "bg-doshisha-purple hover:bg-doshisha-darkPurple text-white"}
             onClick={(e) => {
               e.stopPropagation();
               if (!isParticipating) onJoin(event.id, event.title);

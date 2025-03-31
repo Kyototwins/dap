@@ -88,7 +88,7 @@ export function EventDetailsDialog({
                 onClick={onSubmitComment}
                 disabled={!newComment.trim()}
                 size="icon"
-                className="bg-amber-500 hover:bg-amber-600 h-10 w-10"
+                className="bg-doshisha-purple hover:bg-doshisha-darkPurple h-10 w-10"
               >
                 <Send className="h-4 w-4" />
               </Button>

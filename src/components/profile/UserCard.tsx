@@ -102,7 +102,7 @@ export function UserCard({ profile }: UserCardProps) {
         <div className="p-4 flex-1">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="text-xl font-semibold mb-1 text-amber-800">
+              <h3 className="text-xl font-semibold mb-1 text-doshisha-darkPurple">
                 {profile.first_name} {profile.last_name}
                 {profile.age && <span className="text-base font-normal text-muted-foreground ml-2">{profile.age}歳</span>}
               </h3>
@@ -153,7 +153,7 @@ export function UserCard({ profile }: UserCardProps) {
           {profile.learning_languages && profile.learning_languages.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {profile.learning_languages.map((lang) => (
-                <Badge key={lang} variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
+                <Badge key={lang} variant="outline" className="bg-doshisha-softPurple text-doshisha-darkPurple border-doshisha-purple">
                   {lang}学習中
                 </Badge>
               ))}
@@ -164,12 +164,12 @@ export function UserCard({ profile }: UserCardProps) {
           {profile.hobbies && profile.hobbies.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {profile.hobbies.slice(0, 3).map((hobby) => (
-                <Badge key={hobby} className="bg-amber-100/50 text-amber-700 hover:bg-amber-100">
+                <Badge key={hobby} className="bg-doshisha-softPurple/50 text-doshisha-darkPurple hover:bg-doshisha-softPurple">
                   {hobby}
                 </Badge>
               ))}
               {profile.hobbies.length > 3 && (
-                <Badge className="bg-amber-50 text-amber-700">+{profile.hobbies.length - 3}</Badge>
+                <Badge className="bg-doshisha-softPurple text-doshisha-darkPurple">+{profile.hobbies.length - 3}</Badge>
               )}
             </div>
           )}
@@ -184,7 +184,7 @@ export function UserCard({ profile }: UserCardProps) {
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
             <Button 
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+              className="bg-gradient-to-r from-doshisha-purple to-doshisha-lightPurple hover:from-doshisha-darkPurple hover:to-doshisha-purple text-white"
               onClick={handleMatch}
               disabled={isLoading}
             >

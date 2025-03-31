@@ -143,12 +143,12 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
       <SheetTrigger asChild>
         <Button 
           variant="outline" 
-          className="bg-white/70 backdrop-blur-sm border-amber-200 flex gap-2 items-center"
+          className="bg-white/70 backdrop-blur-sm border-doshisha-softPurple flex gap-2 items-center"
         >
-          <SlidersHorizontal className="h-4 w-4 text-amber-600" />
+          <SlidersHorizontal className="h-4 w-4 text-doshisha-purple" />
           フィルター
           {getActiveFilterCount() > 0 && (
-            <Badge variant="secondary" className="ml-1 bg-amber-100 text-amber-800">
+            <Badge variant="secondary" className="ml-1 bg-doshisha-softPurple text-doshisha-darkPurple">
               {getActiveFilterCount()}
             </Badge>
           )}
@@ -213,8 +213,8 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
                     variant={filters.speakingLanguages.includes(lang.label) ? "default" : "outline"}
                     className={`cursor-pointer ${
                       filters.speakingLanguages.includes(lang.label) 
-                        ? "bg-amber-500 text-white hover:bg-amber-600" 
-                        : "bg-white text-amber-800 hover:bg-amber-50"
+                        ? "bg-doshisha-purple text-white hover:bg-doshisha-darkPurple" 
+                        : "bg-white text-doshisha-darkPurple hover:bg-doshisha-softPurple"
                     }`}
                     onClick={() => toggleLanguage("speakingLanguages", lang.label)}
                   >
@@ -256,8 +256,8 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
                     variant={filters.learningLanguages.includes(lang.label) ? "default" : "outline"}
                     className={`cursor-pointer ${
                       filters.learningLanguages.includes(lang.label) 
-                        ? "bg-amber-500 text-white hover:bg-amber-600" 
-                        : "bg-white text-amber-800 hover:bg-amber-50"
+                        ? "bg-doshisha-purple text-white hover:bg-doshisha-darkPurple" 
+                        : "bg-white text-doshisha-darkPurple hover:bg-doshisha-softPurple"
                     }`}
                     onClick={() => toggleLanguage("learningLanguages", lang.label)}
                   >
@@ -278,8 +278,8 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
                   variant={filters.hobbies.includes(hobby) ? "default" : "outline"}
                   className={`cursor-pointer ${
                     filters.hobbies.includes(hobby) 
-                      ? "bg-amber-500 text-white hover:bg-amber-600" 
-                      : "bg-white text-amber-800 hover:bg-amber-50"
+                      ? "bg-doshisha-purple text-white hover:bg-doshisha-darkPurple" 
+                      : "bg-white text-doshisha-darkPurple hover:bg-doshisha-softPurple"
                   }`}
                   onClick={() => toggleHobby(hobby)}
                 >
@@ -322,7 +322,7 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
           </Button>
           <Button 
             onClick={handleSaveFilter}
-            className="flex-1 bg-amber-500 hover:bg-amber-600"
+            className="flex-1 bg-doshisha-purple hover:bg-doshisha-darkPurple"
           >
             適用する
           </Button>

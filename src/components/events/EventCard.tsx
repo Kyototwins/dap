@@ -1,3 +1,4 @@
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -61,7 +62,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
         </div>
         <div className="mt-4">
           <Button
-            className="w-full"
+            className={`w-full ${isParticipating ? "bg-gray-200 hover:bg-gray-300 text-gray-700" : "bg-doshisha-purple hover:bg-doshisha-darkPurple"}`}
             disabled={event.current_participants >= event.max_participants || isParticipating}
             variant={isParticipating ? "secondary" : "default"}
             onClick={(e) => {
