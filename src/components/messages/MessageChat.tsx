@@ -119,7 +119,9 @@ export function MessageChat({
                 <div
                   key={message.id}
                   className={`flex ${
-                    message.sender.id === selectedMatch.otherUser.id ? "justify-start" : "justify-end"
+                    message.sender.id === selectedMatch.otherUser.id 
+                      ? "justify-start" 
+                      : "justify-end"
                   }`}
                 >
                   <div className="flex flex-col max-w-[75%]">
