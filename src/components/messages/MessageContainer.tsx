@@ -48,7 +48,7 @@ export function MessageContainer({
     const result = await sendMessage(e, selectedMatch, currentUser);
     
     // If we have the current user and message was sent successfully, we can add it to the UI immediately
-    if (result?.success && currentUser && selectedMatch && result.messageData) {
+    if (result && result.success && currentUser && selectedMatch && result.messageData) {
       const tempMessage: Message = {
         id: result.messageData.id || `temp-${Date.now()}`,
         content: result.messageData.content,
@@ -58,7 +58,14 @@ export function MessageContainer({
         sender: currentUser.profile
       };
       
-      setMessages(prev => [...prev, tempMessage]);
+      // Add the message to our local state immediately
+      setMessages(prevMessages => {
+        // Check if this message already exists to avoid duplicates
+        if (prevMessages.some(msg => msg.id === tempMessage.id)) {
+          return prevMessages;
+        }
+        return [...prevMessages, tempMessage];
+      });
     }
   };
 

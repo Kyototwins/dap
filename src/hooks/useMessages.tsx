@@ -25,10 +25,12 @@ export function useMessages() {
       }, async payload => {
         console.log("New message received:", payload.new);
         
-        // Only process if relevant to the selected match or sender
+        // Get current user for comparison
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        // Only process if relevant to the selected match 
         if (payload.new && 
-            (selectedMatch?.id === payload.new.match_id || 
-             payload.new.sender_id === (await supabase.auth.getUser()).data.user?.id)) {
+            (selectedMatch?.id === payload.new.match_id)) {
           
           // Get sender information
           const { data: senderData } = await supabase
@@ -72,15 +74,13 @@ export function useMessages() {
             };
             
             // Add message if it's for the selected match
-            if (selectedMatch?.id === payload.new.match_id) {
-              setMessages(prev => {
-                // Avoid duplicate messages
-                if (prev.some(msg => msg.id === newMessage.id)) {
-                  return prev;
-                }
-                return [...prev, newMessage];
-              });
-            }
+            setMessages(prev => {
+              // Avoid duplicate messages
+              if (prev.some(msg => msg.id === newMessage.id)) {
+                return prev;
+              }
+              return [...prev, newMessage];
+            });
           }
         }
       })
