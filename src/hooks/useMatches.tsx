@@ -49,7 +49,14 @@ export function useMatches() {
         };
       });
 
-      setMatches(processedMatches);
+      // Sort matches by the last message's created_at timestamp (most recent first)
+      const sortedMatches = processedMatches.sort((a, b) => {
+        const timeA = a.lastMessage?.created_at ? new Date(a.lastMessage.created_at).getTime() : 0;
+        const timeB = b.lastMessage?.created_at ? new Date(b.lastMessage.created_at).getTime() : 0;
+        return timeB - timeA; // Most recent first
+      });
+
+      setMatches(sortedMatches);
       setLoading(false);
     } catch (error: any) {
       toast({

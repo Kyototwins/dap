@@ -43,16 +43,26 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
               onClick={() => onSelectMatch(match)}
             >
               <div className="flex items-center gap-3">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage
-                    src={match.otherUser.avatar_url || "/placeholder.svg"}
-                    alt={`${match.otherUser.first_name}のアバター`}
-                  />
-                  <AvatarFallback>
-                    {match.otherUser.first_name?.[0]}
-                    {match.otherUser.last_name?.[0]}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage
+                      src={match.otherUser.avatar_url || "/placeholder.svg"}
+                      alt={`${match.otherUser.first_name}のアバター`}
+                    />
+                    <AvatarFallback>
+                      {match.otherUser.first_name?.[0]}
+                      {match.otherUser.last_name?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  {/* Unread badge - would be dynamic in a real app */}
+                  {Math.random() > 0.7 && (
+                    <Badge className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-blue-500">
+                      <span className="text-xs">1</span>
+                    </Badge>
+                  )}
+                </div>
+                
                 <div className="flex-1 overflow-hidden">
                   <div className="flex justify-between items-center mb-1">
                     <p className="font-medium text-base truncate">
@@ -64,7 +74,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div>
                     {match.lastMessage ? (
                       <p className="text-sm text-muted-foreground truncate">
                         {match.lastMessage.content}
@@ -73,12 +83,6 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
                       <p className="text-sm text-muted-foreground italic">
                         No messages yet
                       </p>
-                    )}
-                    {/* Unread badge - would be dynamic in a real app */}
-                    {Math.random() > 0.7 && (
-                      <Badge className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-blue-500">
-                        <span className="text-xs">1</span>
-                      </Badge>
                     )}
                   </div>
                 </div>
