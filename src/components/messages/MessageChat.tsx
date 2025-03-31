@@ -4,8 +4,8 @@ import { ArrowLeft, MoreVertical, Image, Smile, Send } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { format } from "date-fns";
 import type { Match, Message } from "@/types/messages";
+import { formatMessageTime, groupMessagesByDate, formatDisplayDate } from "@/lib/message-date-utils";
 
 interface MessageChatProps {
   selectedMatch: Match;
@@ -33,43 +33,9 @@ export function MessageChat({
     }
   }, [messages]);
 
-  const formatMessageTime = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return format(date, "HH:mm");
-  };
-
   const messageGroups = useMemo(() => {
-    const groups: { date: string; messages: Message[] }[] = [];
-    
-    messages.forEach((message) => {
-      const messageDate = new Date(message.created_at);
-      const dateStr = format(messageDate, "yyyy/MM/dd");
-      
-      const existingGroup = groups.find((group) => group.date === dateStr);
-      
-      if (existingGroup) {
-        existingGroup.messages.push(message);
-      } else {
-        groups.push({ date: dateStr, messages: [message] });
-      }
-    });
-    
-    return groups;
+    return groupMessagesByDate(messages);
   }, [messages]);
-
-  const formatDisplayDate = (dateStr: string) => {
-    const messageDate = new Date(dateStr);
-    const today = new Date();
-    
-    if (messageDate.toDateString() === today.toDateString()) {
-      return "Today";
-    } else if (messageDate.toDateString() === new Date(today.setDate(today.getDate() - 1)).toDateString()) {
-      return "Yesterday";
-    } else {
-      return format(messageDate, "MMM d, yyyy");
-    }
-  };
 
   return (
     <div className="flex flex-col h-full">
@@ -105,7 +71,7 @@ export function MessageChat({
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 px-4">
+      <ScrollArea className="flex-1 px-4" ref={scrollRef}>
         <div className="py-4 space-y-6">
           {messageGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="space-y-4">
