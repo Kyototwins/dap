@@ -4,7 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { MatchList } from "@/components/messages/MatchList";
 import { MessageChat } from "@/components/messages/MessageChat";
-import type { Match, Message, Profile } from "@/types/messages";
+import type { Match, Message } from "@/types/messages";
 
 export default function Messages() {
   const [matches, setMatches] = useState<Match[]>([]);
@@ -40,7 +40,30 @@ export default function Messages() {
               created_at: payload.new.created_at,
               match_id: payload.new.match_id,
               sender_id: payload.new.sender_id,
-              sender: senderData as Profile
+              sender: {
+                id: senderData.id,
+                first_name: senderData.first_name,
+                last_name: senderData.last_name,
+                avatar_url: senderData.avatar_url,
+                about_me: senderData.about_me,
+                age: senderData.age,
+                gender: senderData.gender,
+                ideal_date: senderData.ideal_date,
+                image_url_1: senderData.image_url_1,
+                image_url_2: senderData.image_url_2,
+                life_goal: senderData.life_goal,
+                origin: senderData.origin,
+                sexuality: senderData.sexuality,
+                superpower: senderData.superpower,
+                university: senderData.university,
+                department: senderData.department || '',
+                year: senderData.year || '',
+                hobbies: senderData.hobbies || [],
+                languages: senderData.languages || [],
+                language_levels: senderData.language_levels || {},
+                learning_languages: senderData.learning_languages || [],
+                created_at: senderData.created_at
+              }
             };
             setMessages(prev => [...prev, newMessage]);
           }
@@ -80,21 +103,18 @@ export default function Messages() {
       const processedMatches = matchesData.map((match) => {
         const otherUser = match.user1_id === user.id ? match.user2 : match.user1;
         
-        // Ensure all fields are populated with default values to avoid type errors
-        const completeOtherUser: Profile = {
-          ...otherUser,
-          department: otherUser.department || '',
-          year: otherUser.year || '',
-          hobbies: otherUser.hobbies || [],
-          languages: otherUser.languages || [],
-          language_levels: otherUser.language_levels || {},
-          superpower: otherUser.superpower || '',
-          learning_languages: otherUser.learning_languages || [],
-        };
-        
         return {
           ...match,
-          otherUser: completeOtherUser,
+          otherUser: {
+            ...otherUser,
+            department: '',
+            year: '',
+            hobbies: [],
+            languages: [],
+            language_levels: {},
+            superpower: otherUser.superpower || '',
+            learning_languages: [],
+          },
           lastMessage: match.messages[0],
         };
       });
@@ -127,25 +147,22 @@ export default function Messages() {
       const validMessages = (data || [])
         .filter(message => message.sender)
         .map(message => {
-          // Ensure sender conforms to Profile type
-          const completeSender: Profile = {
-            ...message.sender,
-            department: message.sender.department || '',
-            year: message.sender.year || '',
-            hobbies: message.sender.hobbies || [],
-            languages: message.sender.languages || [],
-            language_levels: message.sender.language_levels || {},
-            superpower: message.sender.superpower || '',
-            learning_languages: message.sender.learning_languages || [],
-          };
-          
           return {
             id: message.id,
             content: message.content,
             created_at: message.created_at,
             match_id: message.match_id,
             sender_id: message.sender_id,
-            sender: completeSender
+            sender: {
+              ...message.sender,
+              department: '',
+              year: '',
+              hobbies: [],
+              languages: [],
+              language_levels: {},
+              superpower: message.sender.superpower || '',
+              learning_languages: [],
+            }
           };
         });
 
@@ -202,10 +219,10 @@ export default function Messages() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)]">
+    <div className="flex flex-col h-[calc(100vh-8rem)] overflow-hidden">
       <div className="flex flex-1 overflow-hidden">
         {/* Chat list for larger screens, or when chat isn't shown on mobile */}
-        <div className={`${showMobileChat ? 'hidden md:block' : 'w-full'} md:w-1/3 border-r`}>
+        <div className={`${showMobileChat ? 'hidden md:block' : 'w-full'} md:w-1/3 border-r overflow-hidden`}>
           <MatchList 
             matches={matches} 
             selectedMatch={selectedMatch} 
@@ -214,7 +231,7 @@ export default function Messages() {
         </div>
         
         {/* Chat window */}
-        <div className={`${!showMobileChat ? 'hidden md:block' : 'w-full'} md:w-2/3`}>
+        <div className={`${!showMobileChat ? 'hidden md:block' : 'w-full'} md:w-2/3 overflow-hidden`}>
           {selectedMatch ? (
             <MessageChat
               selectedMatch={selectedMatch}

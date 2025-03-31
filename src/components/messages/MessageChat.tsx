@@ -26,7 +26,7 @@ export function MessageChat({
   const formatMessageTime = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return format(date, "yyyy/MM/dd, HH:mm a");
+    return format(date, "HH:mm");
   };
 
   const groupMessagesByDate = () => {
@@ -47,8 +47,6 @@ export function MessageChat({
     
     return groups;
   };
-
-  const messageGroups = groupMessagesByDate();
 
   const formatDisplayDate = (dateStr: string) => {
     const messageDate = new Date(dateStr);
@@ -96,9 +94,9 @@ export function MessageChat({
         </Button>
       </div>
 
-      {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-6">
+      {/* Messages - using fixed height and ScrollArea to contain scrolling */}
+      <ScrollArea className="flex-1 px-4">
+        <div className="py-4 space-y-6">
           {messageGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="space-y-4">
               <div className="text-center">
@@ -125,7 +123,7 @@ export function MessageChat({
                       <p className="break-words">{message.content}</p>
                     </div>
                     <span className="text-xs text-gray-500 mt-1 px-2">
-                      {format(new Date(message.created_at), "HH:mm a")}
+                      {formatMessageTime(message.created_at)}
                     </span>
                   </div>
                 </div>
