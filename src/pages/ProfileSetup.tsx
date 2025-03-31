@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { AdditionalQuestions } from "@/components/profile/AdditionalQuestions";
 import { BasicInfoForm } from "@/components/profile/BasicInfoForm";
 import { LanguageSkillsInput } from "@/components/profile/LanguageSkillsInput";
 import { HobbiesInput } from "@/components/profile/HobbiesInput";
+import { Profile } from "@/types/messages";
 
 interface ImageUpload {
   file: File | null;
@@ -36,6 +37,7 @@ interface ProfileFormData {
 
 export default function ProfileSetup() {
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [formData, setFormData] = useState<ProfileFormData>({
     firstName: "",
     lastName: "",
@@ -69,6 +71,97 @@ export default function ProfileSetup() {
 
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Fetch user profile data when component mounts
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+        if (!user) {
+          navigate("/login");
+          return;
+        }
+
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        if (profile) {
+          // Parse language levels JSON if it's stored as a string
+          let languageLevels = {};
+          if (profile.language_levels) {
+            try {
+              languageLevels = typeof profile.language_levels === 'string' 
+                ? JSON.parse(profile.language_levels) 
+                : profile.language_levels;
+            } catch (e) {
+              console.error("Error parsing language levels:", e);
+            }
+          }
+
+          // Set form data with existing profile information
+          setFormData({
+            firstName: profile.first_name || "",
+            lastName: profile.last_name || "",
+            age: profile.age ? profile.age.toString() : "",
+            gender: profile.gender || "",
+            origin: profile.origin || "",
+            sexuality: profile.sexuality || "",
+            aboutMe: profile.about_me || "",
+            university: profile.university || "",
+            department: profile.department || "",
+            year: profile.year || "",
+            hobbies: profile.hobbies || [],
+            languages: profile.languages || [],
+            languageLevels: languageLevels,
+            learning_languages: profile.learning_languages || []
+          });
+
+          // Set additional data
+          setAdditionalData({
+            idealDate: profile.ideal_date || "",
+            lifeGoal: profile.life_goal || "",
+            superpower: profile.superpower || "",
+          });
+
+          // Set image previews
+          setImages({
+            avatar: { 
+              file: null, 
+              preview: profile.avatar_url || "", 
+              uploading: false 
+            },
+            image1: { 
+              file: null, 
+              preview: profile.image_url_1 || "", 
+              uploading: false 
+            },
+            image2: { 
+              file: null, 
+              preview: profile.image_url_2 || "", 
+              uploading: false 
+            },
+          });
+        }
+      } catch (error: any) {
+        console.error("Error fetching profile:", error);
+        toast({
+          title: "エラーが発生しました",
+          description: error.message || "プロフィール情報の取得に失敗しました。",
+          variant: "destructive",
+        });
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [navigate, toast]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2') => {
     const file = e.target.files?.[0];
@@ -183,6 +276,19 @@ export default function ProfileSetup() {
   const handleAdditionalChange = (name: string, value: string) => {
     setAdditionalData(prev => ({ ...prev, [name]: value }));
   };
+
+  if (initialLoading) {
+    return (
+      <AuthLayout
+        title="プロフィール設定"
+        subtitle="読み込み中..."
+      >
+        <div className="flex justify-center items-center p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </AuthLayout>
+    );
+  }
 
   return (
     <AuthLayout
