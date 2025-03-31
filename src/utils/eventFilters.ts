@@ -33,18 +33,7 @@ export function filterEvents(
   
   // Apply category filter
   if (categoryFilter !== "all") {
-    const categoryMap: Record<CategoryFilter, string> = {
-      "all": "",
-      "language-exchange": "言語交換",
-      "cultural": "文化体験",
-      "academic": "学術",
-      "social": "交流会",
-      "tour": "ツアー"
-    };
-    
-    if (categoryMap[categoryFilter]) {
-      result = result.filter(event => event.category === categoryMap[categoryFilter]);
-    }
+    result = result.filter(event => event.category === categoryFilter);
   }
   
   return result;

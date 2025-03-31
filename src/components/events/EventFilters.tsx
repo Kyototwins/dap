@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 export type TimeFilter = 'all' | 'today' | 'this-week' | 'this-month';
-export type CategoryFilter = 'all' | 'language-exchange' | 'cultural' | 'academic' | 'social' | 'tour';
+export type CategoryFilter = 'all' | 'スポーツ' | '勉強会' | '食事会' | 'カラオケ' | '観光' | 'その他';
 
 interface EventFiltersProps {
   timeFilter: TimeFilter;
@@ -54,34 +54,40 @@ export function EventFilters({
           すべて
         </FilterButton>
         <FilterButton 
-          active={categoryFilter === 'language-exchange'} 
-          onClick={() => onCategoryFilterChange('language-exchange')}
+          active={categoryFilter === 'スポーツ'} 
+          onClick={() => onCategoryFilterChange('スポーツ')}
         >
-          言語交換
+          スポーツ
         </FilterButton>
         <FilterButton 
-          active={categoryFilter === 'cultural'} 
-          onClick={() => onCategoryFilterChange('cultural')}
+          active={categoryFilter === '勉強会'} 
+          onClick={() => onCategoryFilterChange('勉強会')}
         >
-          文化体験
+          勉強会
         </FilterButton>
         <FilterButton 
-          active={categoryFilter === 'academic'} 
-          onClick={() => onCategoryFilterChange('academic')}
+          active={categoryFilter === '食事会'} 
+          onClick={() => onCategoryFilterChange('食事会')}
         >
-          学術
+          食事会
         </FilterButton>
         <FilterButton 
-          active={categoryFilter === 'social'} 
-          onClick={() => onCategoryFilterChange('social')}
+          active={categoryFilter === 'カラオケ'} 
+          onClick={() => onCategoryFilterChange('カラオケ')}
         >
-          交流会
+          カラオケ
         </FilterButton>
         <FilterButton 
-          active={categoryFilter === 'tour'} 
-          onClick={() => onCategoryFilterChange('tour')}
+          active={categoryFilter === '観光'} 
+          onClick={() => onCategoryFilterChange('観光')}
         >
-          ツアー
+          観光
+        </FilterButton>
+        <FilterButton 
+          active={categoryFilter === 'その他'} 
+          onClick={() => onCategoryFilterChange('その他')}
+        >
+          その他
         </FilterButton>
       </div>
     </div>
