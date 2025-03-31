@@ -49,13 +49,37 @@ export function MessageContainer({
     
     // If we have the current user and message was sent successfully, we can add it to the UI immediately
     if (result.success && result.messageData && currentUser && selectedMatch) {
+      // Create a proper Message object with all required fields
       const tempMessage: Message = {
-        id: result.messageData.id || `temp-${Date.now()}`,
+        id: result.messageData.id,
         content: result.messageData.content,
         created_at: result.messageData.created_at || new Date().toISOString(),
-        match_id: selectedMatch.id,
+        match_id: result.messageData.match_id,
         sender_id: currentUser.id,
-        sender: currentUser.profile
+        sender: {
+          id: currentUser.id,
+          first_name: currentUser.profile?.first_name,
+          last_name: currentUser.profile?.last_name,
+          avatar_url: currentUser.profile?.avatar_url,
+          about_me: currentUser.profile?.about_me,
+          age: currentUser.profile?.age,
+          gender: currentUser.profile?.gender,
+          ideal_date: currentUser.profile?.ideal_date,
+          image_url_1: currentUser.profile?.image_url_1,
+          image_url_2: currentUser.profile?.image_url_2,
+          life_goal: currentUser.profile?.life_goal,
+          origin: currentUser.profile?.origin,
+          sexuality: currentUser.profile?.sexuality,
+          superpower: currentUser.profile?.superpower || '',
+          university: currentUser.profile?.university,
+          department: currentUser.profile?.department || '',
+          year: currentUser.profile?.year || '',
+          hobbies: currentUser.profile?.hobbies || [],
+          languages: currentUser.profile?.languages || [],
+          language_levels: currentUser.profile?.language_levels as Record<string, number> || {},
+          learning_languages: currentUser.profile?.learning_languages || [],
+          created_at: currentUser.profile?.created_at
+        }
       };
       
       // Add the message to our local state immediately
@@ -66,6 +90,9 @@ export function MessageContainer({
         }
         return [...prevMessages, tempMessage];
       });
+      
+      // Log for debugging
+      console.log("Message added to UI:", tempMessage);
     }
   };
 
