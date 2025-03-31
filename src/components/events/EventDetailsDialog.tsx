@@ -36,13 +36,13 @@ export function EventDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md h-[80vh] flex flex-col p-0 overflow-hidden">
+      <DialogContent className="max-w-md max-h-[95vh] h-[95vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="p-4 border-b">
           <DialogTitle className="text-lg">{event.title}</DialogTitle>
         </DialogHeader>
         
         <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-          <div className="p-4 space-y-4 overflow-y-auto flex-shrink-0">
+          <div className="p-4 space-y-4 overflow-y-auto flex-1">
             {event.image_url && (
               <img
                 src={event.image_url}
