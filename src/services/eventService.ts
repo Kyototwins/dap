@@ -1,6 +1,5 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 
 export async function createMessageGroup(eventId: string, eventTitle: string) {
   const { data: { user } } = await supabase.auth.getUser();
@@ -55,7 +54,7 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
 
   if (updateError) throw updateError;
 
-  await createMessageGroup(eventId, eventTitle);
+  // Removed the call to createMessageGroup
 
   return true;
 }
