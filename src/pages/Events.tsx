@@ -42,7 +42,7 @@ export default function Events() {
       
       toast({
         title: "イベントに参加しました",
-        description: "イベントに参加登録が完了しました。グループメッセージにも参加しました。",
+        description: "イベントに参加登録が完了しました。",
       });
     } catch (error: any) {
       toast({
