@@ -5,6 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
 import { useProfileImageUpload } from "./useProfileImageUpload";
+import { updateUserProfile } from "@/services/profileService";
 
 export function useProfileSubmission() {
   const [loading, setLoading] = useState(false);
@@ -30,6 +31,7 @@ export function useProfileSubmission() {
       let imageUrl1 = images.image1.preview;
       let imageUrl2 = images.image2.preview;
 
+      // Upload any new images
       if (images.avatar.file) {
         avatarUrl = await uploadImage(images.avatar.file, 'avatars');
       }
@@ -40,39 +42,15 @@ export function useProfileSubmission() {
         imageUrl2 = await uploadImage(images.image2.file, 'images');
       }
 
-      // Convert language levels to JSON string for storage
-      const languageLevelsJson = JSON.stringify(formData.languageLevels);
-      const hobbiesArray = formData.hobbies;
-      const languagesArray = formData.languages;
-      const learningLanguagesArray = formData.learning_languages;
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          age: parseInt(formData.age),
-          gender: formData.gender,
-          origin: formData.origin,
-          sexuality: formData.sexuality,
-          about_me: formData.aboutMe,
-          university: formData.university,
-          department: formData.department,
-          year: formData.year,
-          avatar_url: avatarUrl,
-          image_url_1: imageUrl1,
-          image_url_2: imageUrl2,
-          ideal_date: additionalData.idealDate,
-          life_goal: additionalData.lifeGoal,
-          superpower: additionalData.superpower,
-          hobbies: hobbiesArray,
-          languages: languagesArray,
-          language_levels: languageLevelsJson,
-          learning_languages: learningLanguagesArray
-        })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
+      // Use the new profile service to update the user profile
+      await updateUserProfile(
+        user.id,
+        formData,
+        additionalData,
+        avatarUrl,
+        imageUrl1,
+        imageUrl2
+      );
 
       toast({
         title: "プロフィールを保存しました",

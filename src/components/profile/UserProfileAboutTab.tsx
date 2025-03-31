@@ -43,16 +43,24 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
               <div key={index} className="space-y-2">
                 <div className="flex justify-between items-center">
                   <div className="font-medium">{lang}</div>
-                  <div className={`px-4 py-1 rounded-full text-sm ${
-                    index === 0 ? "bg-blue-100 text-blue-800" : 
-                    index === 1 ? "bg-green-100 text-green-800" : 
-                    "bg-yellow-100 text-yellow-800"
-                  }`}>
-                    {index === 0 ? "Native" : index === 1 ? "Fluent" : "Learning"}
+                  <div className="px-4 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                    {languageLevelText(languageLevels[lang] || 1)}
                   </div>
                 </div>
                 <Progress value={(languageLevels[lang] || 1) * 25} className="h-2" />
               </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Learning Languages */}
+      {profile.learning_languages && profile.learning_languages.length > 0 && (
+        <div className="dap-card p-6 mt-6">
+          <h2 className="text-xl font-bold mb-4">Learning Languages</h2>
+          <div className="flex flex-wrap gap-2">
+            {profile.learning_languages.map((lang, index) => (
+              <Badge key={index} variant="outline">{lang}</Badge>
             ))}
           </div>
         </div>
@@ -69,6 +77,25 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
           </div>
         </div>
       )}
+      
+      {/* Additional Questions */}
+      <div className="dap-card p-6 mt-6">
+        <h2 className="text-xl font-bold mb-4">More About Me</h2>
+        <div className="space-y-4">
+          <div>
+            <div className="text-gray-500 font-medium mb-1">理想のデート</div>
+            <div>{profile.ideal_date || "未設定"}</div>
+          </div>
+          <div>
+            <div className="text-gray-500 font-medium mb-1">人生の目標</div>
+            <div>{profile.life_goal || "未設定"}</div>
+          </div>
+          <div>
+            <div className="text-gray-500 font-medium mb-1">欲しい超能力</div>
+            <div>{profile.superpower || "未設定"}</div>
+          </div>
+        </div>
+      </div>
       
       {/* Academic Info */}
       {profile.university && (

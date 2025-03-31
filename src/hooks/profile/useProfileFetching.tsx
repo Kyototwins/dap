@@ -4,13 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
+import { fetchUserProfile } from "@/services/profileService";
 
 export function useProfileFetching() {
   const [initialLoading, setInitialLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const fetchUserProfile = async (
+  const fetchProfile = async (
     setFormData: (data: ProfileFormData) => void,
     setAdditionalData: (data: AdditionalDataType) => void,
     setImages: (data: ImageUploadState) => void
@@ -23,13 +24,7 @@ export function useProfileFetching() {
         return;
       }
 
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) throw profileError;
+      const profile = await fetchUserProfile(user.id);
 
       if (profile) {
         // Parse language levels JSON if it's stored as a string
@@ -103,6 +98,6 @@ export function useProfileFetching() {
   return {
     initialLoading,
     setInitialLoading,
-    fetchUserProfile
+    fetchUserProfile: fetchProfile
   };
 }
