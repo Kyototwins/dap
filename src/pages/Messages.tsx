@@ -18,7 +18,7 @@ export default function Messages() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-10rem)] overflow-hidden">
       <MessageContainer
         matches={matches}
         selectedMatch={selectedMatch}
