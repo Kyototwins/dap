@@ -42,4 +42,5 @@ export interface Match {
     content: string;
     created_at: string;
   };
+  unreadCount: number;
 }

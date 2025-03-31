@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -65,10 +66,10 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
                     </AvatarFallback>
                   </Avatar>
                   
-                  {/* Unread badge - would be dynamic in a real app */}
-                  {Math.random() > 0.7 && (
+                  {/* Only show unread badge if there are unread messages */}
+                  {match.unreadCount > 0 && (
                     <Badge className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-blue-500">
-                      <span className="text-xs">1</span>
+                      <span className="text-xs">{match.unreadCount}</span>
                     </Badge>
                   )}
                 </div>

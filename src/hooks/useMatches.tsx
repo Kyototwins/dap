@@ -29,14 +29,14 @@ export function useMatches() {
 
       if (error) throw error;
 
-      // Get latest message for each match
+      // Get latest message and unread count for each match
       const processedMatches = await Promise.all(matchesData.map(async (match) => {
         const otherUser = match.user1_id === user.id ? match.user2 : match.user1;
         
         // Fetch the most recent message for this match
         const { data: latestMessages, error: messagesError } = await supabase
           .from("messages")
-          .select("content, created_at")
+          .select("content, created_at, sender_id")
           .eq("match_id", match.id)
           .order("created_at", { ascending: false })
           .limit(1);
@@ -46,6 +46,17 @@ export function useMatches() {
         }
         
         const lastMessage = latestMessages && latestMessages.length > 0 ? latestMessages[0] : null;
+        
+        // Count unread messages (messages from the other user that the current user hasn't read)
+        // For now we'll just check if the latest message is from the other user
+        // In a real app, you'd track read status in the database
+        let unreadCount = 0;
+        if (lastMessage && lastMessage.sender_id === otherUser.id) {
+          // This is a simplified version - in a real app, you would have a proper "read" status in the database
+          // Here we're just assuming the latest message from the other user might be unread
+          // You can replace this with actual read tracking logic
+          unreadCount = 1;
+        }
         
         return {
           ...match,
@@ -60,6 +71,7 @@ export function useMatches() {
             learning_languages: [],
           },
           lastMessage: lastMessage,
+          unreadCount: unreadCount
         };
       }));
 
