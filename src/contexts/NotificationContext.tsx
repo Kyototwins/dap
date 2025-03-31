@@ -104,7 +104,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     fetchNotifications();
 
     // Subscribe to new notifications
-    const notificationsSubscription = supabase
+    const channel = supabase
       .channel('notifications')
       .on('postgres_changes', 
         { 
@@ -131,7 +131,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       .subscribe();
 
     return () => {
-      notificationsSubscription.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, []);
 
