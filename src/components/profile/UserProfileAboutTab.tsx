@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Profile } from "@/types/messages";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,7 +32,9 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
       <Card>
         <CardContent className="p-6">
           <h3 className="font-medium text-lg mb-4">About</h3>
-          <p className="text-gray-700 whitespace-pre-wrap">{profile.about_me}</p>
+          <p className="text-gray-700 whitespace-pre-wrap break-words leading-relaxed">
+            {profile.about_me || "自己紹介文が設定されていません。"}
+          </p>
         </CardContent>
       </Card>
 
