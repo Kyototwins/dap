@@ -1,139 +1,183 @@
 
+import { useEffect, useState } from "react";
 import { Profile } from "@/types/messages";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
+import { fetchUserStats, UserStats } from "@/services/profileStatsService";
 
 interface UserProfileAboutTabProps {
   profile: Profile;
 }
 
 export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
-  const languageLevels = profile.language_levels 
-    ? typeof profile.language_levels === 'string'
-      ? JSON.parse(profile.language_levels as string) 
-      : profile.language_levels
-    : {};
+  const [stats, setStats] = useState<UserStats>({
+    connectionsCount: 0,
+    eventsCount: 0
+  });
+  const [loading, setLoading] = useState(true);
 
-  const languageLevelText = (level: number) => {
-    const levels = [
-      { value: 1, label: "初級" },
-      { value: 2, label: "中級" },
-      { value: 3, label: "上級" },
-      { value: 4, label: "ネイティブ" },
-    ];
-    return levels.find(l => l.value === level)?.label || "初級";
-  };
+  useEffect(() => {
+    const loadStats = async () => {
+      if (profile.id) {
+        const userStats = await fetchUserStats(profile.id);
+        setStats(userStats);
+      }
+      setLoading(false);
+    };
+    
+    loadStats();
+  }, [profile.id]);
 
   return (
-    <>
-      {/* About Me */}
-      <div className="dap-card p-6">
-        <h2 className="text-xl font-bold mb-4">About Me</h2>
-        <p className="text-gray-700 whitespace-pre-wrap break-words">
-          {profile.about_me || "自己紹介文が設定されていません。"}
-        </p>
-      </div>
-      
-      {/* Languages */}
-      {profile.languages && profile.languages.length > 0 && (
-        <div className="dap-card p-6 mt-6">
-          <h2 className="text-xl font-bold mb-4">Languages</h2>
-          <div className="space-y-4">
-            {profile.languages.map((lang, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <div className="font-medium">{lang}</div>
-                  <div className="px-4 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                    {languageLevelText(languageLevels[lang] || 1)}
-                  </div>
-                </div>
-                <Progress value={(languageLevels[lang] || 1) * 25} className="h-2" />
-              </div>
-            ))}
+    <div className="space-y-6">
+      {/* Stats */}
+      <Card>
+        <CardContent className="p-6">
+          <h3 className="font-medium text-lg mb-4">Stats</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">CONNECTIONS</p>
+              <p className="text-2xl font-semibold text-doshisha-purple">
+                {loading ? "..." : stats.connectionsCount}
+              </p>
+            </div>
+            <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">EVENTS</p>
+              <p className="text-2xl font-semibold text-doshisha-purple">
+                {loading ? "..." : stats.eventsCount}
+              </p>
+            </div>
           </div>
-        </div>
-      )}
-      
-      {/* Learning Languages */}
-      {profile.learning_languages && profile.learning_languages.length > 0 && (
-        <div className="dap-card p-6 mt-6">
-          <h2 className="text-xl font-bold mb-4">Learning Languages</h2>
-          <div className="flex flex-wrap gap-2">
-            {profile.learning_languages.map((lang, index) => (
-              <Badge key={index} variant="outline">{lang}</Badge>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {/* Interests/Hobbies */}
-      {profile.hobbies && profile.hobbies.length > 0 && (
-        <div className="dap-card p-6 mt-6">
-          <h2 className="text-xl font-bold mb-4">Interests</h2>
-          <div className="flex flex-wrap gap-2">
-            {profile.hobbies.map((hobby, index) => (
-              <Badge key={index} variant="secondary">{hobby}</Badge>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {/* Additional Questions */}
-      <div className="dap-card p-6 mt-6">
-        <h2 className="text-xl font-bold mb-4">More About Me</h2>
-        <div className="space-y-4">
-          <div>
-            <div className="text-gray-500 font-medium mb-1">理想のデート</div>
-            <div>{profile.ideal_date || "未設定"}</div>
-          </div>
-          <div>
-            <div className="text-gray-500 font-medium mb-1">人生の目標</div>
-            <div>{profile.life_goal || "未設定"}</div>
-          </div>
-          <div>
-            <div className="text-gray-500 font-medium mb-1">欲しい超能力</div>
-            <div>{profile.superpower || "未設定"}</div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Academic Info */}
-      {profile.university && (
-        <div className="dap-card p-6 mt-6">
-          <h2 className="text-xl font-bold mb-4">Academic Info</h2>
-          <div className="space-y-4">
-            <div>
-              <div className="text-gray-500">University</div>
-              <div className="font-medium">{profile.university}</div>
+        </CardContent>
+      </Card>
+
+      {/* Basic Information */}
+      <Card>
+        <CardContent className="p-6">
+          <h3 className="font-medium text-lg mb-4">Basic Information</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between">
+              <span className="text-gray-500">Age</span>
+              <span>{profile.age}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Gender</span>
+              <span>{profile.gender}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">From</span>
+              <span>{profile.origin}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">University</span>
+              <span>{profile.university}</span>
             </div>
             {profile.department && (
-              <div>
-                <div className="text-gray-500">Faculty</div>
-                <div className="font-medium">{profile.department}</div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Department</span>
+                <span>{profile.department}</span>
               </div>
             )}
-            <div>
-              <div className="text-gray-500">Year</div>
-              <div className="font-medium">{profile.year}</div>
+            {profile.year && (
+              <div className="flex justify-between">
+                <span className="text-gray-500">Year</span>
+                <span>{profile.year}</span>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* About */}
+      <Card>
+        <CardContent className="p-6">
+          <h3 className="font-medium text-lg mb-4">About</h3>
+          <p className="text-gray-700 whitespace-pre-wrap">{profile.about_me}</p>
+        </CardContent>
+      </Card>
+
+      {/* Languages */}
+      {profile.languages && profile.languages.length > 0 && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="font-medium text-lg mb-4">Languages I Speak</h3>
+            <div className="flex flex-wrap gap-2">
+              {profile.languages.map((language, index) => (
+                <span 
+                  key={index}
+                  className="px-3 py-1 bg-doshisha-lightPurple/20 text-doshisha-purple rounded-full text-sm"
+                >
+                  {language}
+                </span>
+              ))}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
-      
-      {/* Stats */}
-      <div className="dap-card p-6 mt-6">
-        <h2 className="text-xl font-bold mb-4">Stats</h2>
-        <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <div className="text-3xl font-bold text-doshisha-purple">27</div>
-            <div className="text-gray-500">Connections</div>
+
+      {/* Learning Languages */}
+      {profile.learning_languages && profile.learning_languages.length > 0 && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="font-medium text-lg mb-4">Languages I'm Learning</h3>
+            <div className="flex flex-wrap gap-2">
+              {profile.learning_languages.map((language, index) => (
+                <span 
+                  key={index}
+                  className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm"
+                >
+                  {language}
+                </span>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Hobbies */}
+      {profile.hobbies && profile.hobbies.length > 0 && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="font-medium text-lg mb-4">Hobbies & Interests</h3>
+            <div className="flex flex-wrap gap-2">
+              {profile.hobbies.map((hobby, index) => (
+                <span 
+                  key={index}
+                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                >
+                  {hobby}
+                </span>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Fun Questions */}
+      <Card>
+        <CardContent className="p-6">
+          <h3 className="font-medium text-lg mb-4">Fun Questions</h3>
+          <div className="space-y-4">
+            {profile.ideal_date && (
+              <div>
+                <p className="text-gray-500 text-sm mb-1">My ideal date would be...</p>
+                <p className="text-gray-700">{profile.ideal_date}</p>
+              </div>
+            )}
+            {profile.life_goal && (
+              <div>
+                <p className="text-gray-500 text-sm mb-1">My life goal is...</p>
+                <p className="text-gray-700">{profile.life_goal}</p>
+              </div>
+            )}
+            {profile.superpower && (
+              <div>
+                <p className="text-gray-500 text-sm mb-1">If I had one superpower, it would be...</p>
+                <p className="text-gray-700">{profile.superpower}</p>
+              </div>
+            )}
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <div className="text-3xl font-bold text-doshisha-purple">12</div>
-            <div className="text-gray-500">Events</div>
-          </div>
-        </div>
-      </div>
-    </>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
