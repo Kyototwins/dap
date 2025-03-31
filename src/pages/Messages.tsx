@@ -71,20 +71,19 @@ export default function Messages() {
 
       const processedMatches = matchesData.map((match) => {
         const otherUser = match.user1_id === user.id ? match.user2 : match.user1;
-        // Ensure otherUser conforms to Profile type by adding missing properties
-        const completeOtherUser: Profile = {
-          ...otherUser,
-          department: otherUser.department || '',
-          year: otherUser.year || '',
-          hobbies: otherUser.hobbies || [],
-          languages: otherUser.languages || [],
-          language_levels: otherUser.language_levels || {},
-          superpower: otherUser.superpower || '',
-        };
         
         return {
           ...match,
-          otherUser: completeOtherUser,
+          otherUser: {
+            ...otherUser,
+            department: otherUser.department || '',
+            year: otherUser.year || '',
+            hobbies: otherUser.hobbies || [],
+            languages: otherUser.languages || [],
+            language_levels: otherUser.language_levels || {},
+            superpower: otherUser.superpower || '',
+            learning_languages: otherUser.learning_languages || [],
+          },
           lastMessage: match.messages[0],
         };
       });
@@ -126,6 +125,7 @@ export default function Messages() {
             languages: message.sender.languages || [],
             language_levels: message.sender.language_levels || {},
             superpower: message.sender.superpower || '',
+            learning_languages: message.sender.learning_languages || [],
           };
           
           return {

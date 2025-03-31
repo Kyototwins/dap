@@ -2,6 +2,7 @@
 import { MessageSquare, User, Search, Plus } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -33,8 +34,9 @@ export function AppLayout({ children }: LayoutProps) {
     <div className="min-h-screen pb-16">
       {/* ヘッダー */}
       <header className="fixed top-0 right-0 left-0 z-50 bg-white/80 backdrop-blur-md border-b border-amber-600/10 shadow-sm">
-        <div className="container max-w-lg mx-auto px-4 h-16 flex items-center">
+        <div className="container max-w-lg mx-auto px-4 h-16 flex items-center justify-between">
           <h1 className="text-xl font-semibold">{getPageTitle()}</h1>
+          <NotificationBell />
         </div>
       </header>
 
