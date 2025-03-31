@@ -24,6 +24,13 @@ export default function Matches() {
 
   return (
     <div className="py-6">
+      <div className="mb-6">
+        <SearchBar 
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+        />
+      </div>
+      
       <div className="flex items-center justify-end mb-6">
         <div className="flex gap-2">
           <Button 
@@ -43,13 +50,6 @@ export default function Matches() {
             setIsOpen={setIsFilterSheetOpen}
           />
         </div>
-      </div>
-      
-      <div className="mb-6">
-        <SearchBar 
-          searchQuery={searchQuery}
-          onSearchChange={handleSearchChange}
-        />
       </div>
 
       <ProfilesList 
