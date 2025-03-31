@@ -51,13 +51,13 @@ export function useMessages() {
                 life_goal: senderData.life_goal,
                 origin: senderData.origin,
                 sexuality: senderData.sexuality,
-                superpower: senderData.superpower,
+                superpower: senderData.superpower || '',
                 university: senderData.university,
                 department: senderData.department || '',
                 year: senderData.year || '',
                 hobbies: senderData.hobbies || [],
                 languages: senderData.languages || [],
-                language_levels: senderData.language_levels || {},
+                language_levels: senderData.language_levels as Record<string, number> || {},
                 learning_languages: senderData.learning_languages || [],
                 created_at: senderData.created_at
               }
