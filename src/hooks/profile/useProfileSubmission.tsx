@@ -29,7 +29,6 @@ export function useProfileSubmission() {
 
       let avatarUrl = images.avatar.preview;
       let imageUrl1 = images.image1.preview;
-      let imageUrl2 = images.image2?.preview || '';
 
       // Upload any new images
       if (images.avatar.file) {
@@ -38,18 +37,15 @@ export function useProfileSubmission() {
       if (images.image1.file) {
         imageUrl1 = await uploadImage(images.image1.file, 'images');
       }
-      if (images.image2?.file) {
-        imageUrl2 = await uploadImage(images.image2.file, 'images');
-      }
 
       // Use the new profile service to update the user profile
+      // Fix: Remove the extra argument (imageUrl2)
       await updateUserProfile(
         user.id,
         formData,
         additionalData,
         avatarUrl,
-        imageUrl1,
-        imageUrl2
+        imageUrl1
       );
 
       toast({

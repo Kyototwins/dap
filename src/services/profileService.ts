@@ -31,8 +31,8 @@ export async function updateUserProfile(
       ideal_date: additionalData.idealDate,
       life_goal: additionalData.lifeGoal,
       superpower: additionalData.superpower,
-      worst_nightmare: additionalData.worstNightmare,
-      friend_activity: additionalData.friendActivity,
+      worst_nightmare: additionalData.worstNightmare, // Use snake_case for database fields
+      friend_activity: additionalData.friendActivity, // Use snake_case for database fields
       hobbies: formData.hobbies,
       languages: formData.languages,
       language_levels: languageLevelsJson,

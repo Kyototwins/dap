@@ -54,16 +54,18 @@ export function useProfileFetching() {
           hobbies: profile.hobbies || [],
           languages: profile.languages || [],
           languageLevels: languageLevels,
-          learning_languages: profile.learning_languages || []
+          learning_languages: profile.learning_languages || [],
+          photoComment: profile.photo_comment || ""
         });
 
-        // Set additional data
+        // Set additional data - map database fields to our frontend model
+        // Using the field names that actually exist in the database
         setAdditionalData({
           idealDate: profile.ideal_date || "",
           lifeGoal: profile.life_goal || "",
           superpower: profile.superpower || "",
-          worstNightmare: profile.worstNightmare || "",
-          friendActivity: profile.friendActivity || ""
+          worstNightmare: profile.worst_nightmare || "", // Changed from worstNightmare to worst_nightmare
+          friendActivity: profile.friend_activity || ""  // Changed from friendActivity to friend_activity
         });
 
         // Set image previews
@@ -76,11 +78,6 @@ export function useProfileFetching() {
           image1: { 
             file: null, 
             preview: profile.image_url_1 || "", 
-            uploading: false 
-          },
-          image2: { 
-            file: null, 
-            preview: profile.image_url_2 || "", 
             uploading: false 
           }
         });
