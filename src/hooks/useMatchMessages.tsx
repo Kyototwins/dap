@@ -26,6 +26,30 @@ export function useMatchMessages() {
       const validMessages = (data || [])
         .filter(message => message.sender)
         .map(message => {
+          // Process language_levels to ensure it's the correct type
+          let processedLanguageLevels: Record<string, number> = {};
+          if (message.sender.language_levels) {
+            // If it's a string, try to parse it
+            if (typeof message.sender.language_levels === 'string') {
+              try {
+                processedLanguageLevels = JSON.parse(message.sender.language_levels);
+              } catch (e) {
+                console.error("Error parsing language_levels:", e);
+              }
+            } 
+            // If it's already an object, cast it to the right type
+            else if (typeof message.sender.language_levels === 'object') {
+              // Convert any non-number values to numbers where possible
+              Object.entries(message.sender.language_levels).forEach(([key, value]) => {
+                if (typeof value === 'number') {
+                  processedLanguageLevels[key] = value;
+                } else if (typeof value === 'string' && !isNaN(Number(value))) {
+                  processedLanguageLevels[key] = Number(value);
+                }
+              });
+            }
+          }
+
           return {
             id: message.id,
             content: message.content,
@@ -38,7 +62,7 @@ export function useMatchMessages() {
               year: message.sender.year || '',
               hobbies: message.sender.hobbies || [],
               languages: message.sender.languages || [],
-              language_levels: message.sender.language_levels as Record<string, number> || {},
+              language_levels: processedLanguageLevels,
               superpower: message.sender.superpower || '',
               learning_languages: message.sender.learning_languages || [],
               photo_comment: message.sender.photo_comment || null,

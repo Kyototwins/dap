@@ -41,6 +41,30 @@ export function useMessageSending(
           .single();
           
         if (profileData) {
+          // Process language_levels to ensure it's the correct type
+          let processedLanguageLevels: Record<string, number> = {};
+          if (profileData.language_levels) {
+            // If it's a string, try to parse it
+            if (typeof profileData.language_levels === 'string') {
+              try {
+                processedLanguageLevels = JSON.parse(profileData.language_levels);
+              } catch (e) {
+                console.error("Error parsing language_levels:", e);
+              }
+            } 
+            // If it's already an object, cast it to the right type
+            else if (typeof profileData.language_levels === 'object') {
+              // Convert any non-number values to numbers where possible
+              Object.entries(profileData.language_levels).forEach(([key, value]) => {
+                if (typeof value === 'number') {
+                  processedLanguageLevels[key] = value;
+                } else if (typeof value === 'string' && !isNaN(Number(value))) {
+                  processedLanguageLevels[key] = Number(value);
+                }
+              });
+            }
+          }
+          
           // Create a proper Message object
           const tempMessage: Message = {
             id: result.messageData.id,
@@ -68,7 +92,7 @@ export function useMessageSending(
               year: profileData.year || '',
               hobbies: profileData.hobbies || [],
               languages: profileData.languages || [],
-              language_levels: profileData.language_levels as Record<string, number> || {},
+              language_levels: processedLanguageLevels,
               learning_languages: profileData.learning_languages || [],
               created_at: profileData.created_at,
               photo_comment: profileData.photo_comment || null,

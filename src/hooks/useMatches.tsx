@@ -53,6 +53,30 @@ export function useMatches() {
           unreadCount = 1;
         }
         
+        // Process language_levels to ensure it's the correct type
+        let processedLanguageLevels: Record<string, number> = {};
+        if (otherUser.language_levels) {
+          // If it's a string, try to parse it
+          if (typeof otherUser.language_levels === 'string') {
+            try {
+              processedLanguageLevels = JSON.parse(otherUser.language_levels);
+            } catch (e) {
+              console.error("Error parsing language_levels:", e);
+            }
+          } 
+          // If it's already an object, cast it to the right type
+          else if (typeof otherUser.language_levels === 'object') {
+            // Convert any non-number values to numbers where possible
+            Object.entries(otherUser.language_levels).forEach(([key, value]) => {
+              if (typeof value === 'number') {
+                processedLanguageLevels[key] = value;
+              } else if (typeof value === 'string' && !isNaN(Number(value))) {
+                processedLanguageLevels[key] = Number(value);
+              }
+            });
+          }
+        }
+        
         return {
           ...match,
           otherUser: {
@@ -61,7 +85,7 @@ export function useMatches() {
             year: otherUser.year || '',
             hobbies: otherUser.hobbies || [],
             languages: otherUser.languages || [],
-            language_levels: otherUser.language_levels || {},
+            language_levels: processedLanguageLevels,
             superpower: otherUser.superpower || '',
             learning_languages: otherUser.learning_languages || [],
             photo_comment: otherUser.photo_comment || null,
@@ -69,9 +93,12 @@ export function useMatches() {
             friend_activity: otherUser.friend_activity || null,
             best_quality: otherUser.best_quality || null
           },
-          lastMessage: lastMessage,
+          lastMessage: lastMessage ? {
+            content: lastMessage.content,
+            created_at: lastMessage.created_at
+          } : undefined,
           unreadCount: unreadCount
-        };
+        } as Match;  // Explicitly cast to Match type
       }));
 
       // Sort matches by the last message's created_at timestamp (most recent first)

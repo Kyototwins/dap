@@ -37,6 +37,31 @@ export function useMessageSubscription(
           
           if (senderData) {
             console.log("Sender data found:", senderData);
+            
+            // Process language_levels to ensure it's the correct type
+            let processedLanguageLevels: Record<string, number> = {};
+            if (senderData.language_levels) {
+              // If it's a string, try to parse it
+              if (typeof senderData.language_levels === 'string') {
+                try {
+                  processedLanguageLevels = JSON.parse(senderData.language_levels);
+                } catch (e) {
+                  console.error("Error parsing language_levels:", e);
+                }
+              } 
+              // If it's already an object, cast it to the right type
+              else if (typeof senderData.language_levels === 'object') {
+                // Convert any non-number values to numbers where possible
+                Object.entries(senderData.language_levels).forEach(([key, value]) => {
+                  if (typeof value === 'number') {
+                    processedLanguageLevels[key] = value;
+                  } else if (typeof value === 'string' && !isNaN(Number(value))) {
+                    processedLanguageLevels[key] = Number(value);
+                  }
+                });
+              }
+            }
+            
             const newMessage: Message = {
               id: payload.new.id,
               content: payload.new.content,
@@ -63,7 +88,7 @@ export function useMessageSubscription(
                 year: senderData.year || '',
                 hobbies: senderData.hobbies || [],
                 languages: senderData.languages || [],
-                language_levels: senderData.language_levels as Record<string, number> || {},
+                language_levels: processedLanguageLevels,
                 learning_languages: senderData.learning_languages || [],
                 created_at: senderData.created_at,
                 photo_comment: senderData.photo_comment || null,
