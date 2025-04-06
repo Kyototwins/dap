@@ -29,9 +29,11 @@ export interface AdditionalDataType {
   superpower: string;
   worstNightmare: string;
   friendActivity: string;
+  bestQuality: string;
 }
 
 export interface ImageUploadState {
   avatar: ImageUpload;
   image1: ImageUpload;
+  image2: ImageUpload;
 }

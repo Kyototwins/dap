@@ -14,7 +14,7 @@ interface ProfileFormProps {
   images: ImageUploadState;
   onChange: (name: string, value: string | string[] | Record<string, number>) => void;
   onAdditionalChange: (name: string, value: string) => void;
-  onImageChange: (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1') => void;
+  onImageChange: (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2') => void;
   onPhotoCommentChange: (comment: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   loading: boolean;
@@ -35,15 +35,21 @@ export function ProfileForm({
     <form onSubmit={onSubmit} className="space-y-6">
       <div className="space-y-4">
         <ImageUpload
-          label="プロフィール写真（アイコンとして使用されます）"
+          label="Profile Picture (used as avatar)"
           image={images.avatar}
           onChange={(e) => onImageChange(e, 'avatar')}
           loading={loading}
         />
         <ImageUpload
-          label="Additional photo"
+          label="Cover Image"
           image={images.image1}
           onChange={(e) => onImageChange(e, 'image1')}
+          loading={loading}
+        />
+        <ImageUpload
+          label="Additional Photo"
+          image={images.image2}
+          onChange={(e) => onImageChange(e, 'image2')}
           loading={loading}
         />
         <ProfilePhotoCaption 

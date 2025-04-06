@@ -31,11 +31,13 @@ export default function ProfileSetup() {
     superpower: "",
     worstNightmare: "",
     friendActivity: "",
+    bestQuality: "",
   });
   
   const [images, setImages] = useState<ImageUploadState>({
     avatar: { file: null, preview: "", uploading: false },
     image1: { file: null, preview: "", uploading: false },
+    image2: { file: null, preview: "", uploading: false },
   });
 
   const { 
@@ -50,7 +52,7 @@ export default function ProfileSetup() {
     fetchUserProfile(setFormData, setAdditionalData, setImages);
   }, []);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1') => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2') => {
     const file = e.target.files?.[0];
     if (file) {
       const preview = URL.createObjectURL(file);

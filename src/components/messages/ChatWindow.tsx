@@ -7,9 +7,7 @@ import { Button } from "@/components/ui/button";
 interface ChatWindowProps {
   match: Match | null;
   messages: Message[];
-  newMessage: string;
-  onNewMessageChange: (value: string) => void;
-  onSendMessage: (e: React.FormEvent) => void;
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   onBack: () => void;
   showMobileChat: boolean;
 }
@@ -17,9 +15,7 @@ interface ChatWindowProps {
 export function ChatWindow({
   match,
   messages,
-  newMessage,
-  onNewMessageChange,
-  onSendMessage,
+  setMessages,
   onBack,
   showMobileChat
 }: ChatWindowProps) {
@@ -49,28 +45,13 @@ export function ChatWindow({
             <MessageChat
               match={match}
               messages={messages}
-              setMessages={() => {}} // We'll handle updates at the parent level
+              setMessages={setMessages}
             />
-          </div>
-          
-          <div className="p-3 border-t">
-            <form onSubmit={onSendMessage} className="flex gap-2">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => onNewMessageChange(e.target.value)}
-                className="flex-1 p-2 border rounded"
-                placeholder="Type a message..."
-              />
-              <Button type="submit" disabled={!newMessage.trim()}>
-                Send
-              </Button>
-            </form>
           </div>
         </div>
       ) : (
         <div className="h-full flex items-center justify-center text-gray-500">
-          <p>メッセージを表示するには、左のリストからユーザーを選択してください</p>
+          <p>Select a user from the list to view messages</p>
         </div>
       )}
     </div>

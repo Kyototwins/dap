@@ -32,6 +32,7 @@ interface ProfileData {
   photo_comment: string | null;
   worst_nightmare: string | null;
   friend_activity: string | null;
+  best_quality: string | null;
 }
 
 export function useProfileFetching() {
@@ -99,7 +100,8 @@ export function useProfileFetching() {
           lifeGoal: profile.life_goal || "",
           superpower: profile.superpower || "",
           worstNightmare: profile.worst_nightmare || "", 
-          friendActivity: profile.friend_activity || ""  
+          friendActivity: profile.friend_activity || "",
+          bestQuality: profile.best_quality || ""
         });
 
         // Set image previews
@@ -113,14 +115,19 @@ export function useProfileFetching() {
             file: null, 
             preview: profile.image_url_1 || "", 
             uploading: false 
+          },
+          image2: { 
+            file: null, 
+            preview: profile.image_url_2 || "", 
+            uploading: false 
           }
         });
       }
     } catch (error: any) {
       console.error("Error fetching profile:", error);
       toast({
-        title: "エラーが発生しました",
-        description: error.message || "プロフィール情報の取得に失敗しました。",
+        title: "Error",
+        description: error.message || "Failed to fetch profile information.",
         variant: "destructive",
       });
     } finally {

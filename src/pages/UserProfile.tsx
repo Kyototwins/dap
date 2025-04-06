@@ -4,14 +4,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile as ProfileType } from "@/types/messages";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { UserProfileCover } from "@/components/profile/UserProfileCover";
 import { UserProfileHeader } from "@/components/profile/UserProfileHeader";
 import { UserProfileActions } from "@/components/profile/UserProfileActions";
 import { UserProfileProgress } from "@/components/profile/UserProfileProgress";
 import { UserProfileAboutTab } from "@/components/profile/UserProfileAboutTab";
-import { EmptyTabContent } from "@/components/profile/EmptyTabContent";
 
 export default function UserProfile() {
   const { id } = useParams();
@@ -44,7 +42,7 @@ export default function UserProfile() {
       setProfile(data as ProfileType);
     } catch (error: any) {
       toast({
-        title: "エラーが発生しました",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -73,7 +71,7 @@ export default function UserProfile() {
   if (!profile || !id) {
     return (
       <div className="p-6 text-center">
-        <p className="text-muted-foreground">プロフィールが見つかりません</p>
+        <p className="text-muted-foreground">Profile not found</p>
       </div>
     );
   }
@@ -100,41 +98,11 @@ export default function UserProfile() {
           <UserProfileProgress progress={90} />
         )}
         
-        {/* Tabs */}
-        <Tabs defaultValue="about" className="w-full">
-          <TabsList className="w-full bg-transparent border-b border-gray-200 rounded-none p-0 mb-6">
-            <TabsTrigger 
-              value="about" 
-              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-doshisha-purple data-[state=active]:text-doshisha-purple rounded-none"
-            >
-              About
-            </TabsTrigger>
-            <TabsTrigger 
-              value="connections" 
-              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-doshisha-purple data-[state=active]:text-doshisha-purple rounded-none"
-            >
-              Connections
-            </TabsTrigger>
-            <TabsTrigger 
-              value="events" 
-              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-doshisha-purple data-[state=active]:text-doshisha-purple rounded-none"
-            >
-              Events
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="about" className="mt-0 space-y-6">
-            <UserProfileAboutTab profile={profile} />
-          </TabsContent>
-          
-          <TabsContent value="connections">
-            <EmptyTabContent message="No connections yet" />
-          </TabsContent>
-          
-          <TabsContent value="events">
-            <EmptyTabContent message="No events yet" />
-          </TabsContent>
-        </Tabs>
+        {/* About section - only showing the About tab now */}
+        <div className="mt-6">
+          <h2 className="text-xl font-bold mb-4">About</h2>
+          <UserProfileAboutTab profile={profile} />
+        </div>
       </div>
     </div>
   );

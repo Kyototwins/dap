@@ -25,10 +25,11 @@ export function useProfileSubmission() {
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
-      if (!user) throw new Error("ユーザーが見つかりません");
+      if (!user) throw new Error("User not found");
 
       let avatarUrl = images.avatar.preview;
       let imageUrl1 = images.image1.preview;
+      let imageUrl2 = images.image2.preview;
 
       // Upload any new images
       if (images.avatar.file) {
@@ -37,28 +38,30 @@ export function useProfileSubmission() {
       if (images.image1.file) {
         imageUrl1 = await uploadImage(images.image1.file, 'images');
       }
+      if (images.image2.file) {
+        imageUrl2 = await uploadImage(images.image2.file, 'images');
+      }
 
-      // Use the new profile service to update the user profile
-      // Fix: Remove the extra argument (imageUrl2)
       await updateUserProfile(
         user.id,
         formData,
         additionalData,
         avatarUrl,
-        imageUrl1
+        imageUrl1,
+        imageUrl2
       );
 
       toast({
-        title: "プロフィールを保存しました",
-        description: "マッチング画面に移動します",
+        title: "Profile saved",
+        description: "Redirecting to matches",
       });
 
       navigate("/matches");
 
     } catch (error: any) {
       toast({
-        title: "エラーが発生しました",
-        description: error.message || "プロフィールの保存に失敗しました。",
+        title: "Error",
+        description: error.message || "Failed to save profile.",
         variant: "destructive",
       });
     } finally {

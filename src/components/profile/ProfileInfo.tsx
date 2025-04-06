@@ -15,10 +15,10 @@ interface ProfileInfoProps {
 
 export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoProps) {
   const universitySuffix = profile.university ? 
-    profile.department ? `、${profile.department}` : "" : "";
+    profile.department ? `, ${profile.department}` : "" : "";
   
   const universityText = profile.university ? 
-    `${profile.university}${universitySuffix}` : "大学情報未設定";
+    `${profile.university}${universitySuffix}` : "University info not set";
 
   return (
     <div className="pb-6">
@@ -53,14 +53,14 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
             className="flex-1 gap-2 bg-doshisha-purple hover:bg-doshisha-darkPurple"
           >
             <Edit className="w-4 h-4" />
-            <span>プロフィールを編集</span>
+            <span>Edit Profile</span>
           </Button>
         </div>
         
         {/* Profile completion */}
         <div className="mb-6">
           <div className="flex justify-between mb-2">
-            <span className="text-sm text-gray-600">プロフィール完成度: {completion}%</span>
+            <span className="text-sm text-gray-600">Profile completion: {completion}%</span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div 
@@ -70,45 +70,11 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
           </div>
         </div>
         
-        {/* Tabs */}
-        <Tabs defaultValue="about" className="w-full">
-          <TabsList className="w-full bg-transparent border-b border-gray-200 rounded-none p-0 mb-6">
-            <TabsTrigger 
-              value="about" 
-              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-doshisha-purple data-[state=active]:text-doshisha-purple rounded-none"
-            >
-              About
-            </TabsTrigger>
-            <TabsTrigger 
-              value="connections" 
-              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-doshisha-purple data-[state=active]:text-doshisha-purple rounded-none"
-            >
-              Connections
-            </TabsTrigger>
-            <TabsTrigger 
-              value="events" 
-              className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-doshisha-purple data-[state=active]:text-doshisha-purple rounded-none"
-            >
-              Events
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="about" className="mt-0">
-            <ProfileAboutTab profile={profile} />
-          </TabsContent>
-          
-          <TabsContent value="connections">
-            <div className="text-center py-8 text-gray-500">
-              No connections yet
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="events">
-            <div className="text-center py-8 text-gray-500">
-              No events yet
-            </div>
-          </TabsContent>
-        </Tabs>
+        {/* Show only About tab */}
+        <div className="w-full">
+          <h2 className="text-xl font-bold mb-4">About</h2>
+          <ProfileAboutTab profile={profile} />
+        </div>
       </div>
     </div>
   );

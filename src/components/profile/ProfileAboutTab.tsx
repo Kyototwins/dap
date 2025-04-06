@@ -2,6 +2,7 @@
 import { Profile } from "@/types/messages";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ProfileAboutTabProps {
   profile: Profile;
@@ -16,26 +17,44 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
 
   const languageLevelText = (level: number) => {
     const levels = [
-      { value: 1, label: "初級" },
-      { value: 2, label: "中級" },
-      { value: 3, label: "上級" },
-      { value: 4, label: "ネイティブ" },
+      { value: 1, label: "Beginner" },
+      { value: 2, label: "Intermediate" },
+      { value: 3, label: "Advanced" },
+      { value: 4, label: "Native" },
     ];
-    return levels.find(l => l.value === level)?.label || "初級";
+    return levels.find(l => l.value === level)?.label || "Beginner";
   };
 
   return (
-    <>
-      <div className="dap-card p-6 mb-6">
+    <div className="space-y-6">
+      {/* About Me */}
+      <div className="p-6 border rounded-lg mb-6">
         <h2 className="text-xl font-bold mb-4">About Me</h2>
         <p className="text-gray-700 whitespace-pre-wrap break-words">
-          {profile.about_me || "自己紹介文が設定されていません。"}
+          {profile.about_me || "No introduction provided yet."}
         </p>
       </div>
       
+      {/* Additional Photo */}
+      {profile.image_url_2 && (
+        <div className="p-6 border rounded-lg mb-6">
+          <h2 className="text-xl font-bold mb-4">Photo</h2>
+          <div className="overflow-hidden rounded-lg">
+            <img 
+              src={profile.image_url_2} 
+              alt="Additional Photo" 
+              className="w-full h-auto max-h-96 object-contain"
+            />
+            {profile.photo_comment && (
+              <p className="mt-3 text-gray-600 italic">{profile.photo_comment}</p>
+            )}
+          </div>
+        </div>
+      )}
+      
       {/* Languages */}
       {profile.languages && profile.languages.length > 0 && (
-        <div className="dap-card p-6 mb-6">
+        <div className="p-6 border rounded-lg mb-6">
           <h2 className="text-xl font-bold mb-4">Languages</h2>
           <div className="space-y-4">
             {profile.languages.map((language, index) => (
@@ -55,7 +74,7 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
       
       {/* Learning Languages */}
       {profile.learning_languages && profile.learning_languages.length > 0 && (
-        <div className="dap-card p-6 mb-6">
+        <div className="p-6 border rounded-lg mb-6">
           <h2 className="text-xl font-bold mb-4">Learning Languages</h2>
           <div className="flex flex-wrap gap-2">
             {profile.learning_languages.map((lang, index) => (
@@ -67,34 +86,60 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
       
       {/* Hobbies/Interests */}
       {profile.hobbies && profile.hobbies.length > 0 && (
-        <div className="dap-card p-6 mb-6">
+        <div className="p-6 border rounded-lg mb-6">
           <h2 className="text-xl font-bold mb-4">Interests</h2>
           <div className="flex flex-wrap gap-2">
             {profile.hobbies.map((hobby, index) => (
-              <span key={index} className="dap-tag">{hobby}</span>
+              <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                {hobby}
+              </span>
             ))}
           </div>
         </div>
       )}
       
       {/* Additional Questions */}
-      <div className="dap-card p-6 mb-6">
+      <div className="p-6 border rounded-lg mb-6">
         <h2 className="text-xl font-bold mb-4">More About Me</h2>
         <div className="space-y-4">
-          <div>
-            <h3 className="text-gray-500 font-medium mb-1">理想のデート</h3>
-            <p>{profile.ideal_date || "未設定"}</p>
-          </div>
-          <div>
-            <h3 className="text-gray-500 font-medium mb-1">人生の目標</h3>
-            <p>{profile.life_goal || "未設定"}</p>
-          </div>
-          <div>
-            <h3 className="text-gray-500 font-medium mb-1">欲しい超能力</h3>
-            <p>{profile.superpower || "未設定"}</p>
-          </div>
+          {profile.best_quality && (
+            <div>
+              <h3 className="text-gray-500 font-medium mb-1">My best quality is...</h3>
+              <p>{profile.best_quality}</p>
+            </div>
+          )}
+          {profile.ideal_date && (
+            <div>
+              <h3 className="text-gray-500 font-medium mb-1">My ideal date...</h3>
+              <p>{profile.ideal_date}</p>
+            </div>
+          )}
+          {profile.life_goal && (
+            <div>
+              <h3 className="text-gray-500 font-medium mb-1">My life goal...</h3>
+              <p>{profile.life_goal}</p>
+            </div>
+          )}
+          {profile.superpower && (
+            <div>
+              <h3 className="text-gray-500 font-medium mb-1">If I could have a superpower...</h3>
+              <p>{profile.superpower}</p>
+            </div>
+          )}
+          {profile.worst_nightmare && (
+            <div>
+              <h3 className="text-gray-500 font-medium mb-1">My worst nightmare is...</h3>
+              <p>{profile.worst_nightmare}</p>
+            </div>
+          )}
+          {profile.friend_activity && (
+            <div>
+              <h3 className="text-gray-500 font-medium mb-1">If we become friends, I want to do...</h3>
+              <p>{profile.friend_activity}</p>
+            </div>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

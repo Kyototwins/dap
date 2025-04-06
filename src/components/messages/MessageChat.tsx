@@ -29,13 +29,16 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     }
   };
 
+  const checkIsCurrentUser = (senderId: string): boolean => {
+    const { data } = supabase.auth.getUser() as any;
+    return senderId === data?.user?.id;
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => {
-          // Get current user synchronously
-          const { data } = supabase.auth.getUser() as any;
-          const isCurrentUser = message.sender_id === data?.user?.id;
+          const isCurrentUser = checkIsCurrentUser(message.sender_id);
 
           return (
             <div

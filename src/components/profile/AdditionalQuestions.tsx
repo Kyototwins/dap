@@ -1,12 +1,7 @@
 
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+  Label 
+} from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 interface AdditionalQuestionsData {
@@ -15,6 +10,7 @@ interface AdditionalQuestionsData {
   superpower: string;
   worstNightmare: string;
   friendActivity: string;
+  bestQuality: string;
 }
 
 interface AdditionalQuestionsProps {
@@ -27,28 +23,7 @@ export function AdditionalQuestions({ data, onChange, loading }: AdditionalQuest
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>What makes you most impatient?</Label>
-        <Select
-          value={data.idealDate}
-          onValueChange={(value) => onChange("idealDate", value)}
-          disabled={loading}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Choose what makes you impatient" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="waiting">Waiting in line</SelectItem>
-            <SelectItem value="traffic">Traffic</SelectItem>
-            <SelectItem value="slowInternet">Slow internet</SelectItem>
-            <SelectItem value="latePeople">People being late</SelectItem>
-            <SelectItem value="indecisiveness">Indecisiveness</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label>What's your worst nightmare?</Label>
+        <Label>My worst nightmare is...</Label>
         <Textarea
           placeholder="Tell us about your worst nightmare..."
           value={data.worstNightmare || ""}
@@ -59,7 +34,7 @@ export function AdditionalQuestions({ data, onChange, loading }: AdditionalQuest
       </div>
 
       <div className="space-y-2">
-        <Label>If you could be friends with me, what would you want to do together?</Label>
+        <Label>If we become friends, I want to do...</Label>
         <Textarea
           placeholder="What would you like us to do together as friends?"
           value={data.friendActivity || ""}
@@ -70,23 +45,25 @@ export function AdditionalQuestions({ data, onChange, loading }: AdditionalQuest
       </div>
 
       <div className="space-y-2">
-        <Label>If you could have a superpower, what would it be?</Label>
-        <Select
-          value={data.superpower}
-          onValueChange={(value) => onChange("superpower", value)}
+        <Label>My best quality is...</Label>
+        <Textarea
+          placeholder="Tell us about your best quality..."
+          value={data.bestQuality || ""}
+          onChange={(e) => onChange("bestQuality", e.target.value)}
+          className="min-h-[80px]"
           disabled={loading}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Choose your superpower" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="teleportation">Teleportation</SelectItem>
-            <SelectItem value="invisibility">Invisibility</SelectItem>
-            <SelectItem value="mindreading">Mind Reading</SelectItem>
-            <SelectItem value="timetravel">Time Travel</SelectItem>
-            <SelectItem value="flying">Flying</SelectItem>
-          </SelectContent>
-        </Select>
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>If you could have a superpower, what would it be?</Label>
+        <Textarea
+          placeholder="Tell us about your desired superpower..."
+          value={data.superpower || ""}
+          onChange={(e) => onChange("superpower", e.target.value)}
+          className="min-h-[80px]"
+          disabled={loading}
+        />
       </div>
     </div>
   );

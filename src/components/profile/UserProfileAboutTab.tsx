@@ -34,7 +34,7 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
         <CardContent className="p-6">
           <h3 className="font-medium text-lg mb-4">About</h3>
           <p className="text-gray-700 whitespace-pre-wrap break-words leading-relaxed">
-            {profile.about_me || "自己紹介文が設定されていません。"}
+            {profile.about_me || "No introduction provided yet."}
           </p>
         </CardContent>
       </Card>
@@ -54,6 +54,9 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
                   (e.target as HTMLImageElement).src = "/placeholder.svg";
                 }}
               />
+              {profile.photo_comment && (
+                <p className="mt-3 text-gray-600 italic">{profile.photo_comment}</p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -156,30 +159,48 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
       {/* Fun Questions */}
       <Card>
         <CardContent className="p-6">
-          <h3 className="font-medium text-lg mb-4">Fun Questions</h3>
+          <h3 className="font-medium text-lg mb-4">More About Me</h3>
           <div className="space-y-4">
+            {profile.best_quality && (
+              <div>
+                <p className="text-gray-500 text-sm mb-1">My best quality is...</p>
+                <p className="text-gray-700">{profile.best_quality}</p>
+              </div>
+            )}
             {profile.ideal_date && (
               <div>
-                <p className="text-gray-500 text-sm mb-1">My ideal date would be...</p>
+                <p className="text-gray-500 text-sm mb-1">My ideal date...</p>
                 <p className="text-gray-700">{profile.ideal_date}</p>
               </div>
             )}
             {profile.life_goal && (
               <div>
-                <p className="text-gray-500 text-sm mb-1">My life goal is...</p>
+                <p className="text-gray-500 text-sm mb-1">My life goal...</p>
                 <p className="text-gray-700">{profile.life_goal}</p>
               </div>
             )}
             {profile.superpower && (
               <div>
-                <p className="text-gray-500 text-sm mb-1">If I had one superpower, it would be...</p>
+                <p className="text-gray-500 text-sm mb-1">If I could have one superpower...</p>
                 <p className="text-gray-700">{profile.superpower}</p>
+              </div>
+            )}
+            {profile.worst_nightmare && (
+              <div>
+                <p className="text-gray-500 text-sm mb-1">My worst nightmare is...</p>
+                <p className="text-gray-700">{profile.worst_nightmare}</p>
+              </div>
+            )}
+            {profile.friend_activity && (
+              <div>
+                <p className="text-gray-500 text-sm mb-1">If we become friends, I want to do...</p>
+                <p className="text-gray-700">{profile.friend_activity}</p>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Stats */}
       <Card>
         <CardContent className="p-6">
