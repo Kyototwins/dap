@@ -62,6 +62,8 @@ export function useProfileFetching() {
           idealDate: profile.ideal_date || "",
           lifeGoal: profile.life_goal || "",
           superpower: profile.superpower || "",
+          worstNightmare: profile.worstNightmare || "",
+          friendActivity: profile.friendActivity || ""
         });
 
         // Set image previews
@@ -80,7 +82,7 @@ export function useProfileFetching() {
             file: null, 
             preview: profile.image_url_2 || "", 
             uploading: false 
-          },
+          }
         });
       }
     } catch (error: any) {

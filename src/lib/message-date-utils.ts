@@ -11,6 +11,24 @@ export function formatMessageTime(dateString: string): string {
 }
 
 /**
+ * Format timestamp for display in messages (more detailed format)
+ */
+export function formatMessageTimestamp(dateString: string): string {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  
+  // Today's date for comparison
+  const today = new Date();
+  const isToday = date.toDateString() === today.toDateString();
+  
+  if (isToday) {
+    return format(date, "HH:mm");
+  } else {
+    return format(date, "MMM d, HH:mm");
+  }
+}
+
+/**
  * Group messages by date for display in chat
  */
 export function groupMessagesByDate(messages: any[]): { date: string; messages: any[] }[] {

@@ -33,8 +33,9 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => {
-          const { data: authData } = supabase.auth.getUser();
-          const isCurrentUser = message.sender_id === authData.user?.id;
+          // Get current user synchronously
+          const { data } = supabase.auth.getUser() as any;
+          const isCurrentUser = message.sender_id === data?.user?.id;
 
           return (
             <div

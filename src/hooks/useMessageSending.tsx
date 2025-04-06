@@ -2,7 +2,6 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Message, Match } from "@/types/messages";
-import { formatMessageTimestamp } from "@/lib/message-date-utils";
 
 export function useMessageSending(
   match: Match | null,
@@ -42,7 +41,18 @@ export function useMessageSending(
       if (error) throw error;
       
       if (data && data.length > 0) {
-        setMessages(prev => [...prev, data[0]]);
+        const newMsg = {
+          ...data[0],
+          sender: data[0].sender
+        };
+        
+        setMessages(prev => {
+          if (prev.some(msg => msg.id === newMsg.id)) {
+            return prev;
+          }
+          return [...prev, newMsg as Message];
+        });
+        
         setNewMessage("");
         scrollToBottom();
       }

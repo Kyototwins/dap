@@ -5,6 +5,7 @@ import { useMobileChat } from "@/hooks/useMobileChat";
 import { ChatList } from "@/components/messages/ChatList";
 import { ChatWindow } from "@/components/messages/ChatWindow";
 import { supabase } from "@/integrations/supabase/client";
+import { sendMatchMessage } from "@/utils/messageSendingUtils";
 import type { Match, Message } from "@/types/messages";
 
 interface MessageContainerProps {
@@ -22,7 +23,7 @@ export function MessageContainer({
   onSelectMatch,
   setMessages,
 }: MessageContainerProps) {
-  const { newMessage, setNewMessage, sendMessage } = useMessageSending();
+  const { newMessage, setNewMessage, handleSendMessage } = useMessageSending(selectedMatch, messages, setMessages);
   const { showMobileChat, handleBackToList } = useMobileChat(selectedMatch);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
@@ -44,32 +45,43 @@ export function MessageContainer({
     fetchCurrentUser();
   }, []);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    const result = await sendMessage(e, selectedMatch, currentUser);
+  const handleSendMsg = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedMatch || !newMessage.trim() || !currentUser) return;
     
-    // If we have the current user and message was sent successfully, we can add it to the UI immediately
-    if (result.success && result.messageData && currentUser && selectedMatch) {
-      // Create a proper Message object with all required fields
-      const tempMessage: Message = {
-        id: result.messageData.id,
-        content: result.messageData.content,
-        created_at: result.messageData.created_at || new Date().toISOString(),
-        match_id: result.messageData.match_id,
-        sender_id: currentUser.id,
-        sender: currentUser.profile
-      };
+    try {
+      // Use the utility function to send the message
+      const result = await sendMatchMessage(
+        selectedMatch.id,
+        currentUser.id,
+        newMessage.trim()
+      );
       
-      // Add the message to our local state immediately
-      setMessages(prevMessages => {
-        // Check if this message already exists to avoid duplicates
-        if (prevMessages.some(msg => msg.id === tempMessage.id)) {
-          return prevMessages;
-        }
-        return [...prevMessages, tempMessage];
-      });
-      
-      // Log for debugging
-      console.log("Message added to UI:", tempMessage);
+      if (result.success && result.messageData) {
+        // Create a proper Message object
+        const tempMessage: Message = {
+          id: result.messageData.id,
+          content: result.messageData.content,
+          created_at: result.messageData.created_at || new Date().toISOString(),
+          match_id: result.messageData.match_id,
+          sender_id: currentUser.id,
+          sender: currentUser.profile
+        };
+        
+        // Add the message to our local state
+        setMessages(prevMessages => {
+          // Check if this message already exists to avoid duplicates
+          if (prevMessages.some(msg => msg.id === tempMessage.id)) {
+            return prevMessages;
+          }
+          return [...prevMessages, tempMessage];
+        });
+        
+        // Reset the input
+        setNewMessage("");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
     }
   };
 
@@ -83,11 +95,11 @@ export function MessageContainer({
       />
       
       <ChatWindow
-        selectedMatch={selectedMatch}
+        match={selectedMatch}
         messages={messages}
         newMessage={newMessage}
         onNewMessageChange={setNewMessage}
-        onSendMessage={handleSendMessage}
+        onSendMessage={handleSendMsg}
         onBack={handleBackToList}
         showMobileChat={showMobileChat}
       />
