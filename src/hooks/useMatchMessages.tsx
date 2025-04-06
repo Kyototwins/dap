@@ -41,6 +41,10 @@ export function useMatchMessages() {
               language_levels: message.sender.language_levels as Record<string, number> || {},
               superpower: message.sender.superpower || '',
               learning_languages: message.sender.learning_languages || [],
+              photo_comment: message.sender.photo_comment || null,
+              worst_nightmare: message.sender.worst_nightmare || null,
+              friend_activity: message.sender.friend_activity || null,
+              best_quality: message.sender.best_quality || null,
             }
           };
         });
@@ -49,7 +53,7 @@ export function useMatchMessages() {
       return validMessages;
     } catch (error: any) {
       toast({
-        title: "エラーが発生しました",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });

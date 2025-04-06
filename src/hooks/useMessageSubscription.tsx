@@ -65,7 +65,11 @@ export function useMessageSubscription(
                 languages: senderData.languages || [],
                 language_levels: senderData.language_levels as Record<string, number> || {},
                 learning_languages: senderData.learning_languages || [],
-                created_at: senderData.created_at
+                created_at: senderData.created_at,
+                photo_comment: senderData.photo_comment || null,
+                worst_nightmare: senderData.worst_nightmare || null,
+                friend_activity: senderData.friend_activity || null,
+                best_quality: senderData.best_quality || null
               }
             };
             

@@ -48,7 +48,34 @@ export function useMessageSending(
             created_at: result.messageData.created_at || new Date().toISOString(),
             match_id: result.messageData.match_id,
             sender_id: authData.user.id,
-            sender: profileData
+            sender: {
+              id: profileData.id,
+              first_name: profileData.first_name,
+              last_name: profileData.last_name,
+              avatar_url: profileData.avatar_url,
+              about_me: profileData.about_me,
+              age: profileData.age,
+              gender: profileData.gender,
+              ideal_date: profileData.ideal_date,
+              image_url_1: profileData.image_url_1,
+              image_url_2: profileData.image_url_2,
+              life_goal: profileData.life_goal,
+              origin: profileData.origin,
+              sexuality: profileData.sexuality,
+              superpower: profileData.superpower || '',
+              university: profileData.university,
+              department: profileData.department || '',
+              year: profileData.year || '',
+              hobbies: profileData.hobbies || [],
+              languages: profileData.languages || [],
+              language_levels: profileData.language_levels as Record<string, number> || {},
+              learning_languages: profileData.learning_languages || [],
+              created_at: profileData.created_at,
+              photo_comment: profileData.photo_comment || null,
+              worst_nightmare: profileData.worst_nightmare || null,
+              friend_activity: profileData.friend_activity || null,
+              best_quality: profileData.best_quality || null
+            }
           };
           
           // Add the message to our local state

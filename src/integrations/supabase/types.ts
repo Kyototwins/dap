@@ -434,6 +434,7 @@ export type Database = {
           about_me: string | null
           age: number | null
           avatar_url: string | null
+          best_quality: string | null
           created_at: string | null
           department: string | null
           first_name: string | null
@@ -461,6 +462,7 @@ export type Database = {
           about_me?: string | null
           age?: number | null
           avatar_url?: string | null
+          best_quality?: string | null
           created_at?: string | null
           department?: string | null
           first_name?: string | null
@@ -488,6 +490,7 @@ export type Database = {
           about_me?: string | null
           age?: number | null
           avatar_url?: string | null
+          best_quality?: string | null
           created_at?: string | null
           department?: string | null
           first_name?: string | null

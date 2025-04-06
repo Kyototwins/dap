@@ -16,7 +16,7 @@ export function useMatches() {
   const fetchMatches = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("認証されていません");
+      if (!user) throw new Error("Not authenticated");
 
       const { data: matchesData, error } = await supabase
         .from("matches")
@@ -47,14 +47,9 @@ export function useMatches() {
         
         const lastMessage = latestMessages && latestMessages.length > 0 ? latestMessages[0] : null;
         
-        // Count unread messages (messages from the other user that the current user hasn't read)
-        // For now we'll just check if the latest message is from the other user
-        // In a real app, you'd track read status in the database
+        // Count unread messages
         let unreadCount = 0;
         if (lastMessage && lastMessage.sender_id === otherUser.id) {
-          // This is a simplified version - in a real app, you would have a proper "read" status in the database
-          // Here we're just assuming the latest message from the other user might be unread
-          // You can replace this with actual read tracking logic
           unreadCount = 1;
         }
         
@@ -62,13 +57,17 @@ export function useMatches() {
           ...match,
           otherUser: {
             ...otherUser,
-            department: '',
-            year: '',
-            hobbies: [],
-            languages: [],
-            language_levels: {},
+            department: otherUser.department || '',
+            year: otherUser.year || '',
+            hobbies: otherUser.hobbies || [],
+            languages: otherUser.languages || [],
+            language_levels: otherUser.language_levels || {},
             superpower: otherUser.superpower || '',
-            learning_languages: [],
+            learning_languages: otherUser.learning_languages || [],
+            photo_comment: otherUser.photo_comment || null,
+            worst_nightmare: otherUser.worst_nightmare || null,
+            friend_activity: otherUser.friend_activity || null,
+            best_quality: otherUser.best_quality || null
           },
           lastMessage: lastMessage,
           unreadCount: unreadCount
@@ -86,7 +85,7 @@ export function useMatches() {
       setLoading(false);
     } catch (error: any) {
       toast({
-        title: "エラーが発生しました",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
