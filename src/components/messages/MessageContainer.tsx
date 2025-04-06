@@ -5,7 +5,6 @@ import { useMobileChat } from "@/hooks/useMobileChat";
 import { ChatList } from "@/components/messages/ChatList";
 import { ChatWindow } from "@/components/messages/ChatWindow";
 import { supabase } from "@/integrations/supabase/client";
-import { sendMatchMessage } from "@/utils/messageSendingUtils";
 import type { Match, Message } from "@/types/messages";
 
 interface MessageContainerProps {
@@ -51,35 +50,10 @@ export function MessageContainer({
     
     try {
       // Use the utility function to send the message
-      const result = await sendMatchMessage(
-        selectedMatch.id,
-        currentUser.id,
-        newMessage.trim()
-      );
+      const result = await handleSendMessage();
       
-      if (result.success && result.messageData) {
-        // Create a proper Message object
-        const tempMessage: Message = {
-          id: result.messageData.id,
-          content: result.messageData.content,
-          created_at: result.messageData.created_at || new Date().toISOString(),
-          match_id: result.messageData.match_id,
-          sender_id: currentUser.id,
-          sender: currentUser.profile
-        };
-        
-        // Add the message to our local state
-        setMessages(prevMessages => {
-          // Check if this message already exists to avoid duplicates
-          if (prevMessages.some(msg => msg.id === tempMessage.id)) {
-            return prevMessages;
-          }
-          return [...prevMessages, tempMessage];
-        });
-        
-        // Reset the input
-        setNewMessage("");
-      }
+      // Reset the input
+      setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -97,9 +71,7 @@ export function MessageContainer({
       <ChatWindow
         match={selectedMatch}
         messages={messages}
-        newMessage={newMessage}
-        onNewMessageChange={setNewMessage}
-        onSendMessage={handleSendMsg}
+        setMessages={setMessages}
         onBack={handleBackToList}
         showMobileChat={showMobileChat}
       />

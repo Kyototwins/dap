@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Message, Match } from "@/types/messages";
+import { sendMatchMessage } from "@/utils/messageSendingUtils";
 
 export function useMessageSending(
   match: Match | null,
@@ -22,43 +23,54 @@ export function useMessageSending(
   };
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !match || sending) return;
+    if (!newMessage.trim() || !match || sending) return false;
 
     setSending(true);
     try {
       const { data: authData } = await supabase.auth.getUser();
       if (!authData.user) throw new Error("Not authenticated");
       
-      const { data, error } = await supabase
-        .from('messages')
-        .insert({
-          match_id: match.id,
-          sender_id: authData.user.id,
-          content: newMessage.trim()
-        })
-        .select('*, sender:profiles(*)');
+      const result = await sendMatchMessage(match.id, authData.user.id, newMessage.trim());
       
-      if (error) throw error;
-      
-      if (data && data.length > 0) {
-        const newMsg = {
-          ...data[0],
-          sender: data[0].sender
-        };
+      if (result.success && result.messageData) {
+        // Get sender profile data
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", authData.user.id)
+          .single();
+          
+        if (profileData) {
+          // Create a proper Message object
+          const tempMessage: Message = {
+            id: result.messageData.id,
+            content: result.messageData.content,
+            created_at: result.messageData.created_at || new Date().toISOString(),
+            match_id: result.messageData.match_id,
+            sender_id: authData.user.id,
+            sender: profileData
+          };
+          
+          // Add the message to our local state
+          setMessages(prevMessages => {
+            // Check if this message already exists to avoid duplicates
+            if (prevMessages.some(msg => msg.id === tempMessage.id)) {
+              return prevMessages;
+            }
+            return [...prevMessages, tempMessage];
+          });
+        }
         
-        setMessages(prev => {
-          if (prev.some(msg => msg.id === newMsg.id)) {
-            return prev;
-          }
-          return [...prev, newMsg as Message];
-        });
-        
+        // Reset the input
         setNewMessage("");
         scrollToBottom();
+        return true;
       }
       
+      return false;
     } catch (error) {
       console.error("Error sending message:", error);
+      return false;
     } finally {
       setSending(false);
     }
