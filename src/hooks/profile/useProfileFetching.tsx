@@ -59,13 +59,12 @@ export function useProfileFetching() {
         });
 
         // Set additional data - map database fields to our frontend model
-        // Using the field names that actually exist in the database
         setAdditionalData({
           idealDate: profile.ideal_date || "",
           lifeGoal: profile.life_goal || "",
           superpower: profile.superpower || "",
-          worstNightmare: profile.worst_nightmare || "", // Changed from worstNightmare to worst_nightmare
-          friendActivity: profile.friend_activity || ""  // Changed from friendActivity to friend_activity
+          worstNightmare: profile.worst_nightmare || "", 
+          friendActivity: profile.friend_activity || ""  
         });
 
         // Set image previews
