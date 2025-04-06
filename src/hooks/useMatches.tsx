@@ -22,8 +22,8 @@ export function useMatches() {
         .from("matches")
         .select(`
           *,
-          user1:profiles!matches_user1_id_fkey (id, first_name, last_name, avatar_url, about_me, age, gender, ideal_date, image_url_1, image_url_2, life_goal, origin, sexuality, superpower, university, created_at),
-          user2:profiles!matches_user2_id_fkey (id, first_name, last_name, avatar_url, about_me, age, gender, ideal_date, image_url_1, image_url_2, life_goal, origin, sexuality, superpower, university, created_at)
+          user1:profiles!matches_user1_id_fkey (*),
+          user2:profiles!matches_user2_id_fkey (*)
         `)
         .order("created_at", { ascending: false });
 

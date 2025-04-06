@@ -1,4 +1,3 @@
-
 export interface Profile {
   id: string;
   first_name: string | null;
@@ -22,7 +21,6 @@ export interface Profile {
   language_levels: string | Record<string, number> | null;
   learning_languages: string[] | null;
   created_at: string | null;
-  // Required fields that were missing
   photo_comment: string | null;
   worst_nightmare: string | null;
   friend_activity: string | null;
