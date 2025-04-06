@@ -4,7 +4,35 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
-import { fetchUserProfile } from "@/services/profileService";
+
+// Define a type for the profile data from the database
+interface ProfileData {
+  id: string;
+  created_at: string;
+  first_name: string | null;
+  last_name: string | null;
+  age: number | null;
+  gender: string | null;
+  origin: string | null;
+  sexuality: string | null;
+  about_me: string | null;
+  university: string | null;
+  department: string | null;
+  year: string | null;
+  hobbies: string[] | null;
+  languages: string[] | null;
+  language_levels: Record<string, number> | string | null;
+  learning_languages: string[] | null;
+  avatar_url: string | null;
+  image_url_1: string | null;
+  image_url_2: string | null;
+  ideal_date: string | null;
+  life_goal: string | null;
+  superpower: string | null;
+  photo_comment: string | null;
+  worst_nightmare: string | null;
+  friend_activity: string | null;
+}
 
 export function useProfileFetching() {
   const [initialLoading, setInitialLoading] = useState(true);
@@ -24,7 +52,14 @@ export function useProfileFetching() {
         return;
       }
 
-      const profile = await fetchUserProfile(user.id);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      const profile = data as ProfileData;
 
       if (profile) {
         // Parse language levels JSON if it's stored as a string
