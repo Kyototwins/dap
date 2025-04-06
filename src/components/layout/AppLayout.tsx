@@ -1,8 +1,9 @@
 
-import { MessageSquare, User, Search, Calendar, Menu } from "lucide-react";
+import { MessageSquare, User, Search, Calendar } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { LanguageToggle } from "@/components/layout/LanguageToggle";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,19 +14,19 @@ export function AppLayout({ children }: LayoutProps) {
   const location = useLocation();
 
   const navItems = [
-    { icon: Search, label: "マッチング", path: "/matches" },
-    { icon: MessageSquare, label: "メッセージ", path: "/messages" },
-    { icon: Calendar, label: "イベント", path: "/events" },
-    { icon: User, label: "プロフィール", path: "/profile" },
+    { icon: Search, label: "Matching", path: "/matches" },
+    { icon: MessageSquare, label: "Messages", path: "/messages" },
+    { icon: Calendar, label: "Events", path: "/events" },
+    { icon: User, label: "Profile", path: "/profile" },
   ];
 
   const getPageTitle = () => {
     const currentPath = location.pathname;
-    if (currentPath.startsWith("/matches")) return "マッチング";
-    if (currentPath.startsWith("/messages")) return "メッセージ";
-    if (currentPath.startsWith("/events/new")) return "イベントを作成";
-    if (currentPath.startsWith("/events")) return "イベント";
-    if (currentPath.startsWith("/profile")) return "プロフィール";
+    if (currentPath.startsWith("/matches")) return "Matching";
+    if (currentPath.startsWith("/messages")) return "Messages";
+    if (currentPath.startsWith("/events/new")) return "Create Event";
+    if (currentPath.startsWith("/events")) return "Events";
+    if (currentPath.startsWith("/profile")) return "Profile";
     return "DAP";
   };
 
@@ -35,10 +36,8 @@ export function AppLayout({ children }: LayoutProps) {
         <div className="container max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-doshisha-purple">DAP</h1>
           <div className="flex items-center gap-2">
+            <LanguageToggle />
             <NotificationBell />
-            <button className="p-2">
-              <Menu className="w-6 h-6" />
-            </button>
           </div>
         </div>
       </header>

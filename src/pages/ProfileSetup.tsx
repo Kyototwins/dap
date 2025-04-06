@@ -21,19 +21,21 @@ export default function ProfileSetup() {
     hobbies: [],
     languages: [],
     languageLevels: {},
-    learning_languages: []
+    learning_languages: [],
+    photoComment: "",
   });
   
   const [additionalData, setAdditionalData] = useState<AdditionalDataType>({
     idealDate: "",
     lifeGoal: "",
     superpower: "",
+    worstNightmare: "",
+    friendActivity: "",
   });
   
   const [images, setImages] = useState<ImageUploadState>({
     avatar: { file: null, preview: "", uploading: false },
     image1: { file: null, preview: "", uploading: false },
-    image2: { file: null, preview: "", uploading: false },
   });
 
   const { 
@@ -48,7 +50,7 @@ export default function ProfileSetup() {
     fetchUserProfile(setFormData, setAdditionalData, setImages);
   }, []);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2') => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1') => {
     const file = e.target.files?.[0];
     if (file) {
       const preview = URL.createObjectURL(file);
@@ -61,6 +63,10 @@ export default function ProfileSetup() {
 
   const handleChange = (name: string, value: string | string[] | Record<string, number>) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhotoCommentChange = (comment: string) => {
+    setFormData(prev => ({ ...prev, photoComment: comment }));
   };
 
   const handleAdditionalChange = (name: string, value: string) => {
@@ -77,8 +83,8 @@ export default function ProfileSetup() {
 
   return (
     <AuthLayout
-      title="プロフィール設定"
-      subtitle="あなたのことを教えてください"
+      title="Profile Setup"
+      subtitle="Tell us about yourself"
     >
       <ProfileForm
         formData={formData}
@@ -87,6 +93,7 @@ export default function ProfileSetup() {
         onChange={handleChange}
         onAdditionalChange={handleAdditionalChange}
         onImageChange={handleImageChange}
+        onPhotoCommentChange={handlePhotoCommentChange}
         onSubmit={handleFormSubmit}
         loading={loading}
       />

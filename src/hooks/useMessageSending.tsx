@@ -1,74 +1,54 @@
 
-import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { validateMessage, sendMatchMessage, getCurrentUser } from "@/utils/messageSendingUtils";
-import type { Match } from "@/types/messages";
+import { useState, useRef, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Message, Match } from "@/types/messages";
+import { formatMessageTimestamp } from "@/lib/message-date-utils";
 
-// Define a type for the result of sending a message
-type SendMessageResult = {
-  success: boolean;
-  messageData?: {
-    id: string;
-    content: string;
-    created_at: string;
-    match_id: string;
-    sender_id: string;
-  };
-  error?: string;
-};
-
-export function useMessageSending() {
+export function useMessageSending(
+  match: Match | null,
+  messages: Message[],
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+) {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
-  const { toast } = useToast();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const sendMessage = async (e: React.FormEvent, selectedMatch: Match | null, currentUser?: any): Promise<SendMessageResult> => {
-    e.preventDefault();
-    
-    // Return early if validation fails
-    if (!validateMessage(newMessage, selectedMatch)) {
-      return { success: false };
-    }
-    
+  // Scroll to bottom on messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !match || sending) return;
+
+    setSending(true);
     try {
-      setSending(true);
+      const { data: authData } = await supabase.auth.getUser();
+      if (!authData.user) throw new Error("Not authenticated");
       
-      // Get current user if not provided
-      const user = currentUser || await getCurrentUser();
-      if (!user) {
-        toast({
-          title: "認証されていません",
-          description: "メッセージを送信するにはログインしてください。",
-          variant: "destructive",
-        });
-        return { success: false };
+      const { data, error } = await supabase
+        .from('messages')
+        .insert({
+          match_id: match.id,
+          sender_id: authData.user.id,
+          content: newMessage.trim()
+        })
+        .select('*, sender:profiles(*)');
+      
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        setMessages(prev => [...prev, data[0]]);
+        setNewMessage("");
+        scrollToBottom();
       }
       
-      // Extract message content before clearing input
-      const messageContent = newMessage.trim();
-      
-      // Send the message
-      const result = await sendMatchMessage(
-        selectedMatch!.id,
-        user.id,
-        messageContent
-      );
-      
-      if (!result.success) {
-        throw new Error(result.error || "メッセージの送信に失敗しました");
-      }
-      
-      // Clear the input on successful send
-      setNewMessage("");
-      
-      return result;
-    } catch (error: any) {
-      toast({
-        title: "メッセージの送信に失敗しました",
-        description: error.message,
-        variant: "destructive",
-      });
-      return { success: false };
+    } catch (error) {
+      console.error("Error sending message:", error);
     } finally {
       setSending(false);
     }
@@ -77,7 +57,9 @@ export function useMessageSending() {
   return {
     newMessage,
     setNewMessage,
-    sendMessage,
-    sending
+    sending,
+    handleSendMessage,
+    messagesEndRef,
+    scrollToBottom
   };
 }

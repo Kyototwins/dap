@@ -1,145 +1,90 @@
 
-import React, { useEffect, useRef, useMemo } from "react";
-import { ArrowLeft, MoreVertical, Image, Smile, Send } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Send } from "lucide-react";
+import { Match, Message } from "@/types/messages";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import type { Match, Message } from "@/types/messages";
-import { formatMessageTime, groupMessagesByDate, formatDisplayDate } from "@/lib/message-date-utils";
+import { Input } from "@/components/ui/input";
+import { useMessageSending } from "@/hooks/useMessageSending";
+import { formatMessageTimestamp } from "@/lib/message-date-utils";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MessageChatProps {
-  selectedMatch: Match;
+  match: Match;
   messages: Message[];
-  newMessage: string;
-  onNewMessageChange: (value: string) => void;
-  onSendMessage: (e: React.FormEvent) => void;
-  onBack: () => void;
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
 
-export function MessageChat({
-  selectedMatch,
-  messages,
-  newMessage,
-  onNewMessageChange,
-  onSendMessage,
-  onBack,
-}: MessageChatProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    // Scroll to bottom when messages change
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+export function MessageChat({ match, messages, setMessages }: MessageChatProps) {
+  const { 
+    newMessage, 
+    setNewMessage, 
+    sending, 
+    handleSendMessage,
+    messagesEndRef
+  } = useMessageSending(match, messages, setMessages);
 
-  const messageGroups = useMemo(() => {
-    return groupMessagesByDate(messages);
-  }, [messages]);
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          
-          <Avatar className="h-9 w-9">
-            <AvatarImage
-              src={selectedMatch.otherUser.avatar_url || "/placeholder.svg"}
-              alt={`${selectedMatch.otherUser.first_name}のアバター`}
-            />
-            <AvatarFallback>
-              {selectedMatch.otherUser.first_name?.[0]}
-              {selectedMatch.otherUser.last_name?.[0]}
-            </AvatarFallback>
-          </Avatar>
-          
-          <div>
-            <p className="font-medium text-sm">
-              {selectedMatch.otherUser.first_name} {selectedMatch.otherUser.last_name}
-            </p>
-            <p className="text-xs text-gray-500">Online</p>
-          </div>
-        </div>
-        
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <MoreVertical className="h-5 w-5" />
-        </Button>
-      </div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => {
+          const { data: authData } = supabase.auth.getUser();
+          const isCurrentUser = message.sender_id === authData.user?.id;
 
-      {/* Messages */}
-      <ScrollArea className="flex-1 px-4" ref={scrollRef}>
-        <div className="py-4 space-y-6">
-          {messageGroups.map((group, groupIndex) => (
-            <div key={groupIndex} className="space-y-4">
-              <div className="text-center">
-                <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
-                  {formatDisplayDate(group.date)}
-                </span>
-              </div>
-              
-              {group.messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${
-                    message.sender.id === selectedMatch.otherUser.id 
-                      ? "justify-start" 
-                      : "justify-end"
+          return (
+            <div
+              key={message.id}
+              className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-[75%] p-3 rounded-lg ${
+                  isCurrentUser
+                    ? 'bg-primary text-primary-foreground rounded-br-none'
+                    : 'bg-muted rounded-bl-none'
+                }`}
+              >
+                <p className="break-words">{message.content}</p>
+                <span
+                  className={`text-xs block mt-1 ${
+                    isCurrentUser ? 'text-primary-foreground/70' : 'text-muted-foreground'
                   }`}
                 >
-                  <div className="flex flex-col max-w-[75%]">
-                    <div
-                      className="bg-gray-100 text-gray-800 rounded-2xl px-4 py-2"
-                    >
-                      <p className="break-words">{message.content}</p>
-                    </div>
-                    <span className="text-xs text-gray-500 mt-1 px-2">
-                      {formatMessageTime(message.created_at)}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                  {formatMessageTimestamp(message.created_at)}
+                </span>
+              </div>
             </div>
-          ))}
-          
-          {messages.length === 0 && (
-            <div className="h-full flex items-center justify-center">
-              <p className="text-gray-500">No messages yet. Start the conversation!</p>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
+          );
+        })}
+        <div ref={messagesEndRef} />
+      </div>
 
-      {/* Message Input */}
-      <div className="border-t p-3">
-        <form onSubmit={onSendMessage} className="flex items-center gap-2">
-          <Button type="button" variant="ghost" size="icon" className="rounded-full">
-            <Image className="h-5 w-5 text-gray-500" />
-          </Button>
-          
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              placeholder="Type a message..."
-              className="w-full bg-gray-50 border-0 rounded-full py-3 px-4 pr-10 focus:outline-none focus:ring-1 focus:ring-dap-blue"
-              value={newMessage}
-              onChange={(e) => onNewMessageChange(e.target.value)}
-            />
-            <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full">
-              <Smile className="h-5 w-5 text-gray-500" />
-            </Button>
-          </div>
-          
-          <Button 
-            type="submit" 
-            disabled={!newMessage.trim()} 
+      <div className="p-4 border-t">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSendMessage();
+          }}
+          className="flex items-center gap-2"
+        >
+          <Input
+            placeholder="Type a message..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            disabled={sending}
+            className="flex-1"
+          />
+          <Button
+            type="submit"
             size="icon"
-            className="bg-dap-blue text-white rounded-full hover:bg-blue-700"
+            disabled={!newMessage.trim() || sending}
           >
-            <Send className="h-5 w-5" />
+            <Send className="h-4 w-4" />
           </Button>
         </form>
       </div>

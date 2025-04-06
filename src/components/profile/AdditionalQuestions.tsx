@@ -13,6 +13,8 @@ interface AdditionalQuestionsData {
   idealDate: string;
   lifeGoal: string;
   superpower: string;
+  worstNightmare: string;
+  friendActivity: string;
 }
 
 interface AdditionalQuestionsProps {
@@ -25,52 +27,64 @@ export function AdditionalQuestions({ data, onChange, loading }: AdditionalQuest
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>理想のデートは？</Label>
+        <Label>What makes you most impatient?</Label>
         <Select
           value={data.idealDate}
           onValueChange={(value) => onChange("idealDate", value)}
           disabled={loading}
         >
           <SelectTrigger>
-            <SelectValue placeholder="理想のデートを選択" />
+            <SelectValue placeholder="Choose what makes you impatient" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="dinner">レストランでディナー</SelectItem>
-            <SelectItem value="cafe">カフェでゆっくり</SelectItem>
-            <SelectItem value="activity">アクティビティを楽しむ</SelectItem>
-            <SelectItem value="nature">自然の中でピクニック</SelectItem>
-            <SelectItem value="other">その他</SelectItem>
+            <SelectItem value="waiting">Waiting in line</SelectItem>
+            <SelectItem value="traffic">Traffic</SelectItem>
+            <SelectItem value="slowInternet">Slow internet</SelectItem>
+            <SelectItem value="latePeople">People being late</SelectItem>
+            <SelectItem value="indecisiveness">Indecisiveness</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-2">
-        <Label>人生の目標は？</Label>
+        <Label>What's your worst nightmare?</Label>
         <Textarea
-          placeholder="あなたの人生の目標について教えてください"
-          value={data.lifeGoal}
-          onChange={(e) => onChange("lifeGoal", e.target.value)}
+          placeholder="Tell us about your worst nightmare..."
+          value={data.worstNightmare || ""}
+          onChange={(e) => onChange("worstNightmare", e.target.value)}
           className="min-h-[80px]"
           disabled={loading}
         />
       </div>
 
       <div className="space-y-2">
-        <Label>もし超能力が使えるとしたら？</Label>
+        <Label>If you could be friends with me, what would you want to do together?</Label>
+        <Textarea
+          placeholder="What would you like us to do together as friends?"
+          value={data.friendActivity || ""}
+          onChange={(e) => onChange("friendActivity", e.target.value)}
+          className="min-h-[80px]"
+          disabled={loading}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>If you could have a superpower, what would it be?</Label>
         <Select
           value={data.superpower}
           onValueChange={(value) => onChange("superpower", value)}
           disabled={loading}
         >
           <SelectTrigger>
-            <SelectValue placeholder="超能力を選択" />
+            <SelectValue placeholder="Choose your superpower" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="teleportation">瞬間移動</SelectItem>
-            <SelectItem value="invisibility">透明化</SelectItem>
-            <SelectItem value="mindreading">読心術</SelectItem>
-            <SelectItem value="timetravel">時間旅行</SelectItem>
-            <SelectItem value="flying">空を飛ぶ</SelectItem>
+            <SelectItem value="teleportation">Teleportation</SelectItem>
+            <SelectItem value="invisibility">Invisibility</SelectItem>
+            <SelectItem value="mindreading">Mind Reading</SelectItem>
+            <SelectItem value="timetravel">Time Travel</SelectItem>
+            <SelectItem value="flying">Flying</SelectItem>
           </SelectContent>
         </Select>
       </div>

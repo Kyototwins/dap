@@ -6,6 +6,7 @@ import { AdditionalQuestions } from "@/components/profile/AdditionalQuestions";
 import { ImageUpload } from "@/components/profile/ImageUpload";
 import { Button } from "@/components/ui/button";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
+import { ProfilePhotoCaption } from "./ProfilePhotoCaption";
 
 interface ProfileFormProps {
   formData: ProfileFormData;
@@ -13,7 +14,8 @@ interface ProfileFormProps {
   images: ImageUploadState;
   onChange: (name: string, value: string | string[] | Record<string, number>) => void;
   onAdditionalChange: (name: string, value: string) => void;
-  onImageChange: (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2') => void;
+  onImageChange: (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1') => void;
+  onPhotoCommentChange: (comment: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   loading: boolean;
 }
@@ -23,8 +25,9 @@ export function ProfileForm({
   additionalData, 
   images, 
   onChange, 
-  onAdditionalChange, 
-  onImageChange, 
+  onAdditionalChange,
+  onImageChange,
+  onPhotoCommentChange,
   onSubmit, 
   loading 
 }: ProfileFormProps) {
@@ -38,15 +41,14 @@ export function ProfileForm({
           loading={loading}
         />
         <ImageUpload
-          label="追加の写真 1"
+          label="Additional photo"
           image={images.image1}
           onChange={(e) => onImageChange(e, 'image1')}
           loading={loading}
         />
-        <ImageUpload
-          label="追加の写真 2"
-          image={images.image2}
-          onChange={(e) => onImageChange(e, 'image2')}
+        <ProfilePhotoCaption 
+          caption={formData.photoComment || ''} 
+          onChange={onPhotoCommentChange}
           loading={loading}
         />
       </div>
@@ -74,7 +76,7 @@ export function ProfileForm({
       </div>
 
       <div className="border-t pt-6">
-        <h3 className="text-lg font-medium mb-4">追加の質問</h3>
+        <h3 className="text-lg font-medium mb-4">Additional Questions</h3>
         <AdditionalQuestions
           data={additionalData}
           onChange={onAdditionalChange}
@@ -83,7 +85,7 @@ export function ProfileForm({
       </div>
 
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "保存中..." : "プロフィールを保存"}
+        {loading ? "Saving..." : "Save Profile"}
       </Button>
     </form>
   );

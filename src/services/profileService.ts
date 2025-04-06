@@ -7,8 +7,7 @@ export async function updateUserProfile(
   formData: ProfileFormData,
   additionalData: AdditionalDataType,
   avatarUrl: string | null,
-  imageUrl1: string | null,
-  imageUrl2: string | null
+  imageUrl1: string | null
 ) {
   // Convert language levels to JSON string for storage
   const languageLevelsJson = JSON.stringify(formData.languageLevels);
@@ -28,10 +27,12 @@ export async function updateUserProfile(
       year: formData.year,
       avatar_url: avatarUrl,
       image_url_1: imageUrl1,
-      image_url_2: imageUrl2,
+      photo_comment: formData.photoComment,
       ideal_date: additionalData.idealDate,
       life_goal: additionalData.lifeGoal,
       superpower: additionalData.superpower,
+      worst_nightmare: additionalData.worstNightmare,
+      friend_activity: additionalData.friendActivity,
       hobbies: formData.hobbies,
       languages: formData.languages,
       language_levels: languageLevelsJson,

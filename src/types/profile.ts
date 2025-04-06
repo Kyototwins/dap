@@ -20,16 +20,18 @@ export interface ProfileFormData {
   languages: string[];
   languageLevels: Record<string, number>;
   learning_languages: string[];
+  photoComment?: string;
 }
 
 export interface AdditionalDataType {
   idealDate: string;
   lifeGoal: string;
   superpower: string;
+  worstNightmare: string;
+  friendActivity: string;
 }
 
 export interface ImageUploadState {
   avatar: ImageUpload;
   image1: ImageUpload;
-  image2: ImageUpload;
 }
