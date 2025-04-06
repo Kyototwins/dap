@@ -52,9 +52,8 @@ export function useMessageSending(
                 console.error("Error parsing language_levels:", e);
               }
             } 
-            // If it's already an object, cast it to the right type
+            // If it's already an object, safely convert it
             else if (typeof profileData.language_levels === 'object') {
-              // Convert any non-number values to numbers where possible
               Object.entries(profileData.language_levels).forEach(([key, value]) => {
                 if (typeof value === 'number') {
                   processedLanguageLevels[key] = value;

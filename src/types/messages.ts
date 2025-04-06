@@ -1,3 +1,14 @@
+
+export interface FilterState {
+  ageRange: [number, number];
+  speakingLanguages: string[];
+  learningLanguages: string[];
+  minLanguageLevel: number;
+  hobbies: string[];
+  countries: string[];
+  sortOption: string;
+}
+
 export interface Profile {
   id: string;
   first_name: string | null;
@@ -18,7 +29,7 @@ export interface Profile {
   year: string | null;
   hobbies: string[] | null;
   languages: string[] | null;
-  language_levels: string | Record<string, number> | null;
+  language_levels: Record<string, number> | null;
   learning_languages: string[] | null;
   created_at: string | null;
   photo_comment: string | null;

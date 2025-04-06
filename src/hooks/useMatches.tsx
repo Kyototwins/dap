@@ -64,9 +64,8 @@ export function useMatches() {
               console.error("Error parsing language_levels:", e);
             }
           } 
-          // If it's already an object, cast it to the right type
+          // If it's already an object, safely convert it to Record<string, number>
           else if (typeof otherUser.language_levels === 'object') {
-            // Convert any non-number values to numbers where possible
             Object.entries(otherUser.language_levels).forEach(([key, value]) => {
               if (typeof value === 'number') {
                 processedLanguageLevels[key] = value;
@@ -78,9 +77,24 @@ export function useMatches() {
         }
         
         return {
-          ...match,
+          id: match.id,
+          user1_id: match.user1_id,
+          user2_id: match.user2_id,
           otherUser: {
-            ...otherUser,
+            id: otherUser.id,
+            first_name: otherUser.first_name,
+            last_name: otherUser.last_name,
+            avatar_url: otherUser.avatar_url,
+            about_me: otherUser.about_me,
+            age: otherUser.age,
+            gender: otherUser.gender,
+            ideal_date: otherUser.ideal_date,
+            image_url_1: otherUser.image_url_1,
+            image_url_2: otherUser.image_url_2,
+            life_goal: otherUser.life_goal,
+            origin: otherUser.origin,
+            sexuality: otherUser.sexuality,
+            university: otherUser.university,
             department: otherUser.department || '',
             year: otherUser.year || '',
             hobbies: otherUser.hobbies || [],
@@ -88,6 +102,7 @@ export function useMatches() {
             language_levels: processedLanguageLevels,
             superpower: otherUser.superpower || '',
             learning_languages: otherUser.learning_languages || [],
+            created_at: otherUser.created_at,
             photo_comment: otherUser.photo_comment || null,
             worst_nightmare: otherUser.worst_nightmare || null,
             friend_activity: otherUser.friend_activity || null,
@@ -98,7 +113,7 @@ export function useMatches() {
             created_at: lastMessage.created_at
           } : undefined,
           unreadCount: unreadCount
-        } as Match;  // Explicitly cast to Match type
+        } as Match;
       }));
 
       // Sort matches by the last message's created_at timestamp (most recent first)

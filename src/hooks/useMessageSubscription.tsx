@@ -49,9 +49,8 @@ export function useMessageSubscription(
                   console.error("Error parsing language_levels:", e);
                 }
               } 
-              // If it's already an object, cast it to the right type
+              // If it's already an object, safely convert it
               else if (typeof senderData.language_levels === 'object') {
-                // Convert any non-number values to numbers where possible
                 Object.entries(senderData.language_levels).forEach(([key, value]) => {
                   if (typeof value === 'number') {
                     processedLanguageLevels[key] = value;

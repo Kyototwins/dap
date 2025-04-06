@@ -37,9 +37,8 @@ export function useMatchMessages() {
                 console.error("Error parsing language_levels:", e);
               }
             } 
-            // If it's already an object, cast it to the right type
+            // If it's already an object, safely convert it
             else if (typeof message.sender.language_levels === 'object') {
-              // Convert any non-number values to numbers where possible
               Object.entries(message.sender.language_levels).forEach(([key, value]) => {
                 if (typeof value === 'number') {
                   processedLanguageLevels[key] = value;
@@ -57,7 +56,20 @@ export function useMatchMessages() {
             match_id: message.match_id,
             sender_id: message.sender_id,
             sender: {
-              ...message.sender,
+              id: message.sender.id,
+              first_name: message.sender.first_name,
+              last_name: message.sender.last_name,
+              avatar_url: message.sender.avatar_url,
+              about_me: message.sender.about_me,
+              age: message.sender.age,
+              gender: message.sender.gender,
+              ideal_date: message.sender.ideal_date,
+              image_url_1: message.sender.image_url_1,
+              image_url_2: message.sender.image_url_2,
+              life_goal: message.sender.life_goal,
+              origin: message.sender.origin,
+              sexuality: message.sender.sexuality,
+              university: message.sender.university,
               department: message.sender.department || '',
               year: message.sender.year || '',
               hobbies: message.sender.hobbies || [],
@@ -65,6 +77,7 @@ export function useMatchMessages() {
               language_levels: processedLanguageLevels,
               superpower: message.sender.superpower || '',
               learning_languages: message.sender.learning_languages || [],
+              created_at: message.sender.created_at,
               photo_comment: message.sender.photo_comment || null,
               worst_nightmare: message.sender.worst_nightmare || null,
               friend_activity: message.sender.friend_activity || null,
