@@ -437,6 +437,7 @@ export type Database = {
           created_at: string | null
           department: string | null
           first_name: string | null
+          friend_activity: string | null
           gender: string | null
           hobbies: string[] | null
           id: string
@@ -449,9 +450,11 @@ export type Database = {
           learning_languages: string[] | null
           life_goal: string | null
           origin: string | null
+          photo_comment: string | null
           sexuality: string | null
           superpower: string | null
           university: string | null
+          worst_nightmare: string | null
           year: string | null
         }
         Insert: {
@@ -461,6 +464,7 @@ export type Database = {
           created_at?: string | null
           department?: string | null
           first_name?: string | null
+          friend_activity?: string | null
           gender?: string | null
           hobbies?: string[] | null
           id: string
@@ -473,9 +477,11 @@ export type Database = {
           learning_languages?: string[] | null
           life_goal?: string | null
           origin?: string | null
+          photo_comment?: string | null
           sexuality?: string | null
           superpower?: string | null
           university?: string | null
+          worst_nightmare?: string | null
           year?: string | null
         }
         Update: {
@@ -485,6 +491,7 @@ export type Database = {
           created_at?: string | null
           department?: string | null
           first_name?: string | null
+          friend_activity?: string | null
           gender?: string | null
           hobbies?: string[] | null
           id?: string
@@ -497,9 +504,11 @@ export type Database = {
           learning_languages?: string[] | null
           life_goal?: string | null
           origin?: string | null
+          photo_comment?: string | null
           sexuality?: string | null
           superpower?: string | null
           university?: string | null
+          worst_nightmare?: string | null
           year?: string | null
         }
         Relationships: []
