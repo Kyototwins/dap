@@ -29,8 +29,8 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     }
   };
 
-  const checkIsCurrentUser = (senderId: string): boolean => {
-    const { data } = supabase.auth.getUser() as any;
+  const checkIsCurrentUser = async (senderId: string): Promise<boolean> => {
+    const { data } = await supabase.auth.getUser();
     return senderId === data?.user?.id;
   };
 
@@ -38,7 +38,8 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => {
-          const isCurrentUser = checkIsCurrentUser(message.sender_id);
+          // ここで送信者が現在のユーザーかどうかを判定
+          const isCurrentUser = message.sender_id === supabase.auth.getUser()?.data?.user?.id;
 
           return (
             <div

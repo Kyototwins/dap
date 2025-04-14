@@ -4,6 +4,7 @@ import { useMatches } from "@/hooks/useMatches";
 import { useMatchMessages } from "@/hooks/useMatchMessages";
 import { useMessageSubscription } from "@/hooks/useMessageSubscription";
 import type { Match } from "@/types/messages";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useMessages() {
   const { matches, loading } = useMatches();
