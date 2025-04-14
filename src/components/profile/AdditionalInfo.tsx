@@ -7,7 +7,7 @@ interface AdditionalInfoProps {
 }
 
 export function AdditionalInfo({ profile }: AdditionalInfoProps) {
-  if (!profile.ideal_date && !profile.life_goal && !profile.superpower) {
+  if (!profile.life_goal && !profile.superpower) {
     return null;
   }
 
@@ -17,12 +17,6 @@ export function AdditionalInfo({ profile }: AdditionalInfoProps) {
         <h2 className="text-lg font-semibold">その他の情報</h2>
       </CardHeader>
       <CardContent className="space-y-4">
-        {profile.ideal_date && (
-          <div>
-            <h3 className="font-medium mb-2">理想のデート</h3>
-            <p className="text-muted-foreground">{profile.ideal_date}</p>
-          </div>
-        )}
         {profile.life_goal && (
           <div>
             <h3 className="font-medium mb-2">人生の目標</h3>

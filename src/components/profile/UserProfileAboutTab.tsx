@@ -39,11 +39,10 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
         </CardContent>
       </Card>
 
-      {/* Additional Photo */}
+      {/* Additional Photo - 題名を削除 */}
       {profile.image_url_2 && (
         <Card>
           <CardContent className="p-6">
-            <h3 className="font-medium text-lg mb-4">Photo</h3>
             <div className="overflow-hidden rounded-lg">
               <img 
                 src={profile.image_url_2} 
@@ -156,7 +155,7 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
         </Card>
       )}
 
-      {/* Fun Questions */}
+      {/* Fun Questions - ideal dateを削除 */}
       <Card>
         <CardContent className="p-6">
           <h3 className="font-medium text-lg mb-4">More About Me</h3>
@@ -165,12 +164,6 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
               <div>
                 <p className="text-gray-500 text-sm mb-1">My best quality is...</p>
                 <p className="text-gray-700">{profile.best_quality}</p>
-              </div>
-            )}
-            {profile.ideal_date && (
-              <div>
-                <p className="text-gray-500 text-sm mb-1">My ideal date...</p>
-                <p className="text-gray-700">{profile.ideal_date}</p>
               </div>
             )}
             {profile.life_goal && (

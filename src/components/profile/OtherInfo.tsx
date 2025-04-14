@@ -20,10 +20,6 @@ export function OtherInfo({ profile, onEditClick }: OtherInfoProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <h3 className="font-medium mb-2">理想のデート</h3>
-          <p className="text-muted-foreground">{profile.ideal_date || "未設定"}</p>
-        </div>
-        <div>
           <h3 className="font-medium mb-2">人生の目標</h3>
           <p className="text-muted-foreground">{profile.life_goal || "未設定"}</p>
         </div>
