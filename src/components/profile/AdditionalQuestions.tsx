@@ -5,7 +5,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 interface AdditionalQuestionsData {
-  idealDate: string;
   lifeGoal: string;
   superpower: string;
   worstNightmare: string;
@@ -61,6 +60,17 @@ export function AdditionalQuestions({ data, onChange, loading }: AdditionalQuest
           placeholder="Tell us about your desired superpower..."
           value={data.superpower || ""}
           onChange={(e) => onChange("superpower", e.target.value)}
+          className="min-h-[80px]"
+          disabled={loading}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>My life goal...</Label>
+        <Textarea
+          placeholder="Tell us about your life goal..."
+          value={data.lifeGoal || ""}
+          onChange={(e) => onChange("lifeGoal", e.target.value)}
           className="min-h-[80px]"
           disabled={loading}
         />
