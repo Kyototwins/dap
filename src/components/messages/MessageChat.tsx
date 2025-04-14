@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useMessageSending } from "@/hooks/useMessageSending";
 import { formatMessageTimestamp } from "@/lib/message-date-utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
 
 interface MessageChatProps {
   match: Match;
@@ -21,6 +22,17 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     handleSendMessage,
     messagesEndRef
   } = useMessageSending(match, messages, setMessages);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // Get current user ID when component mounts
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setCurrentUserId(data?.user?.id || null);
+    };
+    
+    getCurrentUser();
+  }, []);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -29,17 +41,12 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     }
   };
 
-  const checkIsCurrentUser = async (senderId: string): Promise<boolean> => {
-    const { data } = await supabase.auth.getUser();
-    return senderId === data?.user?.id;
-  };
-
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => {
-          // ここで送信者が現在のユーザーかどうかを判定
-          const isCurrentUser = message.sender_id === supabase.auth.getUser()?.data?.user?.id;
+          // Compare message sender ID with current user ID
+          const isCurrentUser = message.sender_id === currentUserId;
 
           return (
             <div
