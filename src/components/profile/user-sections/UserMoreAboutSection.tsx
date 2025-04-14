@@ -7,13 +7,14 @@ interface UserMoreAboutSectionProps {
 }
 
 export function UserMoreAboutSection({ profile }: UserMoreAboutSectionProps) {
-  const hasAnyInfo = profile.best_quality || 
-                    profile.life_goal || 
-                    profile.superpower || 
-                    profile.worst_nightmare || 
-                    profile.friend_activity;
+  // Check if any of the additional fields exist
+  const hasAdditionalInfo = profile.life_goal || 
+                           profile.superpower || 
+                           profile.worst_nightmare || 
+                           profile.friend_activity || 
+                           profile.best_quality;
   
-  if (!hasAnyInfo) return null;
+  if (!hasAdditionalInfo) return null;
   
   return (
     <Card>
@@ -22,32 +23,32 @@ export function UserMoreAboutSection({ profile }: UserMoreAboutSectionProps) {
         <div className="space-y-4">
           {profile.best_quality && (
             <div>
-              <p className="text-gray-500 text-sm mb-1">My best quality is...</p>
-              <p className="text-gray-700">{profile.best_quality}</p>
+              <h4 className="text-gray-500 font-medium mb-1">My best quality is...</h4>
+              <p>{profile.best_quality}</p>
             </div>
           )}
           {profile.life_goal && (
             <div>
-              <p className="text-gray-500 text-sm mb-1">My life goal...</p>
-              <p className="text-gray-700">{profile.life_goal}</p>
+              <h4 className="text-gray-500 font-medium mb-1">My life goal...</h4>
+              <p>{profile.life_goal}</p>
             </div>
           )}
           {profile.superpower && (
             <div>
-              <p className="text-gray-500 text-sm mb-1">If I could have one superpower...</p>
-              <p className="text-gray-700">{profile.superpower}</p>
+              <h4 className="text-gray-500 font-medium mb-1">If I could have a superpower...</h4>
+              <p>{profile.superpower}</p>
             </div>
           )}
           {profile.worst_nightmare && (
             <div>
-              <p className="text-gray-500 text-sm mb-1">My worst nightmare is...</p>
-              <p className="text-gray-700">{profile.worst_nightmare}</p>
+              <h4 className="text-gray-500 font-medium mb-1">My worst nightmare is...</h4>
+              <p>{profile.worst_nightmare}</p>
             </div>
           )}
           {profile.friend_activity && (
             <div>
-              <p className="text-gray-500 text-sm mb-1">If we become friends, I want to do...</p>
-              <p className="text-gray-700">{profile.friend_activity}</p>
+              <h4 className="text-gray-500 font-medium mb-1">If we become friends, I want to do...</h4>
+              <p>{profile.friend_activity}</p>
             </div>
           )}
         </div>

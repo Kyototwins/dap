@@ -38,7 +38,6 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
       {/* Additional Photo */}
       {profile.image_url_2 && (
         <div className="p-6 border rounded-lg mb-6">
-          <h2 className="text-xl font-bold mb-4">Photo</h2>
           <div className="overflow-hidden rounded-lg">
             <img 
               src={profile.image_url_2} 
@@ -106,12 +105,6 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
             <div>
               <h3 className="text-gray-500 font-medium mb-1">My best quality is...</h3>
               <p>{profile.best_quality}</p>
-            </div>
-          )}
-          {profile.ideal_date && (
-            <div>
-              <h3 className="text-gray-500 font-medium mb-1">My ideal date...</h3>
-              <p>{profile.ideal_date}</p>
             </div>
           )}
           {profile.life_goal && (
