@@ -87,6 +87,15 @@ export default {
         "fade-up": "fade-up 0.5s ease-out",
         "fade-down": "fade-down 0.5s ease-out",
       },
+      utilities: {
+        '.no-scrollbar': {
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+        },
+        '.no-scrollbar::-webkit-scrollbar': {
+          'display': 'none'
+        }
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],

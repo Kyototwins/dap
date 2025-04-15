@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,6 +34,17 @@
     @apply bg-background text-foreground overflow-x-hidden;
   }
 
+  /* Hide scrollbar for all elements */
+  * {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  /* WebKit browsers (Chrome, Safari) */
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  
   /* Hide scrollbar but keep functionality */
   .no-scrollbar {
     -ms-overflow-style: none;
@@ -71,19 +81,15 @@
   }
 }
 
-/* Custom scrollbar */
+/* Remove any remaining custom scrollbar styles */
 ::-webkit-scrollbar {
-  width: 6px;
+  display: none;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-white;
+  display: none;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-[#7f1184] rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-black;
+  display: none;
 }
