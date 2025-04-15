@@ -16,10 +16,10 @@ body {
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em rgba(37, 99, 235, 0.6));
+  filter: drop-shadow(0 0 2em #7f1184);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em rgba(97, 218, 251, 0.6));
+  filter: drop-shadow(0 0 2em #7f1184);
 }
 
 @keyframes logo-spin {
@@ -39,14 +39,14 @@ body {
 
 .card {
   padding: 2em;
-  background: rgba(255, 255, 255, 1);
+  background: #ffffff;
   border-radius: 0.75rem;
-  border: 1px solid rgba(229, 231, 235, 1);
+  border: 1px solid #000000;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .read-the-docs {
-  color: #888;
+  color: #000000;
 }
 
 /* Animation for fade-in effect */
@@ -63,15 +63,15 @@ body {
 
 /* DAP specific card effect */
 .dap-glass-card {
-  background: rgba(255, 255, 255, 1);
+  background: #ffffff;
   border-radius: 0.75rem;
-  border: 1px solid rgba(229, 231, 235, 1);
+  border: 1px solid #000000;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
 
 .dap-glass-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 /* Button hover effect */
@@ -81,7 +81,7 @@ body {
 
 .btn-hover-effect:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Loading spinner */
@@ -89,8 +89,8 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 3px solid rgba(59, 130, 246, 0.1);
-  border-top-color: #3b82f6;
+  border: 3px solid rgba(127, 17, 132, 0.1);
+  border-top-color: #7f1184;
   animation: spinner 1s ease-in-out infinite;
 }
 
