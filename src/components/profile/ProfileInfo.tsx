@@ -1,4 +1,3 @@
-
 import { Edit } from "lucide-react";
 import { Profile } from "@/types/messages";
 import { Button } from "@/components/ui/button";
@@ -50,7 +49,7 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
         <div className="flex mb-6">
           <Button 
             onClick={onEditProfile}
-            className="flex-1 gap-2 bg-doshisha-purple hover:bg-doshisha-darkPurple"
+            className="flex-1 gap-2 bg-[#7f1184]"
           >
             <Edit className="w-4 h-4" />
             <span>Edit Profile</span>
@@ -64,7 +63,7 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-doshisha-purple" 
+              className="h-full bg-[#7f1184]" 
               style={{ width: `${completion}%` }}
             />
           </div>
@@ -72,7 +71,6 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
         
         {/* Show only About tab */}
         <div className="w-full">
-          <h2 className="text-xl font-bold mb-4">About</h2>
           <ProfileAboutTab profile={profile} />
         </div>
       </div>

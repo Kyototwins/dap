@@ -1,4 +1,3 @@
-
 import { Profile } from "@/types/messages";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -28,7 +27,7 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
   return (
     <div className="space-y-6">
       {/* About Me */}
-      <div className="p-6 border rounded-lg mb-6">
+      <div className="p-6 border border-gray-200 rounded-lg mb-6">
         <h2 className="text-xl font-bold mb-4">About Me</h2>
         <p className="text-gray-700 whitespace-pre-wrap break-words">
           {profile.about_me || "No introduction provided yet."}
@@ -37,7 +36,7 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
       
       {/* Additional Photo */}
       {profile.image_url_2 && (
-        <div className="p-6 border rounded-lg mb-6">
+        <div className="p-6 border border-gray-200 rounded-lg mb-6">
           <div className="overflow-hidden rounded-lg">
             <img 
               src={profile.image_url_2} 
@@ -53,7 +52,7 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
       
       {/* Languages */}
       {profile.languages && profile.languages.length > 0 && (
-        <div className="p-6 border rounded-lg mb-6">
+        <div className="p-6 border border-gray-200 rounded-lg mb-6">
           <h2 className="text-xl font-bold mb-4">Languages</h2>
           <div className="space-y-4">
             {profile.languages.map((language, index) => (
@@ -73,7 +72,7 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
       
       {/* Learning Languages */}
       {profile.learning_languages && profile.learning_languages.length > 0 && (
-        <div className="p-6 border rounded-lg mb-6">
+        <div className="p-6 border border-gray-200 rounded-lg mb-6">
           <h2 className="text-xl font-bold mb-4">Learning Languages</h2>
           <div className="flex flex-wrap gap-2">
             {profile.learning_languages.map((lang, index) => (
@@ -85,7 +84,7 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
       
       {/* Hobbies/Interests */}
       {profile.hobbies && profile.hobbies.length > 0 && (
-        <div className="p-6 border rounded-lg mb-6">
+        <div className="p-6 border border-gray-200 rounded-lg mb-6">
           <h2 className="text-xl font-bold mb-4">Interests</h2>
           <div className="flex flex-wrap gap-2">
             {profile.hobbies.map((hobby, index) => (
@@ -98,7 +97,7 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
       )}
       
       {/* Additional Questions */}
-      <div className="p-6 border rounded-lg mb-6">
+      <div className="p-6 border border-gray-200 rounded-lg mb-6">
         <h2 className="text-xl font-bold mb-4">More About Me</h2>
         <div className="space-y-4">
           {profile.best_quality && (
