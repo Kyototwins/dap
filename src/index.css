@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -58,7 +57,7 @@
   
   /* DAP specific styles */
   .dap-card {
-    @apply rounded-lg bg-white shadow-sm border border-black;
+    @apply rounded-lg bg-white shadow-sm border border-[#8E9196]; /* Use light gray border */
   }
   
   .dap-tag {
