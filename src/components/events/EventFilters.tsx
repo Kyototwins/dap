@@ -105,7 +105,7 @@ function FilterButton({ children, active, onClick }: FilterButtonProps) {
     <button
       className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
         active 
-          ? "bg-doshisha-purple text-white" 
+          ? "bg-[#7f1184] text-white" 
           : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
       }`}
       onClick={onClick}

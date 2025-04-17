@@ -67,7 +67,7 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                className="pl-10 bg-white/70 backdrop-blur-sm border-amber-200 focus-visible:ring-amber-500"
+                className="pl-10 bg-white/70 backdrop-blur-sm border-gray-200 focus-visible:ring-[#7f1184]"
               />
             </div>
           </div>
@@ -83,14 +83,14 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
-                className="pl-10 bg-white/70 backdrop-blur-sm border-amber-200 focus-visible:ring-amber-500"
+                className="pl-10 bg-white/70 backdrop-blur-sm border-gray-200 focus-visible:ring-[#7f1184]"
               />
             </div>
           </div>
           
           <Button 
             type="submit" 
-            className="w-full transition-all duration-200 shadow-md hover:shadow-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700" 
+            className="w-full transition-all duration-200 shadow-md hover:shadow-lg bg-[#7f1184] hover:bg-[#671073]" 
             disabled={loading || offline || connectionError}
           >
             {loading ? "処理中..." : "ログイン"}
@@ -101,7 +101,7 @@ export default function Login() {
           <span className="text-muted-foreground text-sm">アカウントをお持ちでない方は </span>
           <Link
             to="/signup"
-            className="text-amber-600 font-medium hover:underline hover-lift inline-block transition-all"
+            className="text-[#7f1184] font-medium hover:underline hover-lift inline-block transition-all"
           >
             新規登録
           </Link>

@@ -1,8 +1,8 @@
+
 import { Edit } from "lucide-react";
 import { Profile } from "@/types/messages";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileAboutTab } from "./ProfileAboutTab";
 import { ProfileCover } from "./ProfileCover";
 
@@ -49,7 +49,7 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
         <div className="flex mb-6">
           <Button 
             onClick={onEditProfile}
-            className="flex-1 gap-2 bg-[#7f1184]"
+            className="flex-1 gap-2 bg-[#7f1184] hover:bg-[#671073]"
           >
             <Edit className="w-4 h-4" />
             <span>Edit Profile</span>
@@ -69,7 +69,7 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
           </div>
         </div>
         
-        {/* Show only About tab */}
+        {/* Show profile content without "About" heading */}
         <div className="w-full">
           <ProfileAboutTab profile={profile} />
         </div>

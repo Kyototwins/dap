@@ -11,7 +11,7 @@ export function UserProfileProgress({ progress }: UserProfileProgressProps) {
       </div>
       <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
         <div 
-          className="h-full bg-doshisha-purple" 
+          className="h-full bg-[#7f1184]" 
           style={{ width: `${progress}%` }}
         />
       </div>
