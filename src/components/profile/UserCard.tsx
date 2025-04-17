@@ -85,7 +85,7 @@ export function UserCard({ profile }: UserCardProps) {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-lg border bg-card shadow-sm hover:shadow-md transition-shadow">
+    <div className="relative overflow-hidden rounded-xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow">
       <div className="flex flex-col md:flex-row">
         <div className="aspect-square w-full md:w-1/3 relative overflow-hidden">
           <Avatar className="w-full h-full rounded-none">
@@ -133,7 +133,7 @@ export function UserCard({ profile }: UserCardProps) {
               <h4 className="text-xs font-medium text-muted-foreground mb-1">言語スキル</h4>
               <div className="flex flex-wrap gap-1 mb-2">
                 {profile.languages.slice(0, 3).map((lang) => (
-                  <Badge key={lang} className="bg-blue-50 text-blue-700 border border-blue-100">
+                  <Badge key={lang} variant="language">
                     {lang}
                     {typeof profile.language_levels === 'object' && profile.language_levels[lang] && (
                       <span className="ml-1 text-xs opacity-75">
@@ -143,7 +143,7 @@ export function UserCard({ profile }: UserCardProps) {
                   </Badge>
                 ))}
                 {profile.languages.length > 3 && (
-                  <Badge className="bg-gray-50 text-gray-600">+{profile.languages.length - 3}</Badge>
+                  <Badge variant="secondary">+{profile.languages.length - 3}</Badge>
                 )}
               </div>
             </div>
@@ -153,7 +153,7 @@ export function UserCard({ profile }: UserCardProps) {
           {profile.learning_languages && profile.learning_languages.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {profile.learning_languages.map((lang) => (
-                <Badge key={lang} variant="outline" className="bg-doshisha-softPurple text-doshisha-darkPurple border-doshisha-purple">
+                <Badge key={lang} variant="language">
                   {lang}学習中
                 </Badge>
               ))}
@@ -164,12 +164,12 @@ export function UserCard({ profile }: UserCardProps) {
           {profile.hobbies && profile.hobbies.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {profile.hobbies.slice(0, 3).map((hobby) => (
-                <Badge key={hobby} className="bg-doshisha-softPurple/50 text-doshisha-darkPurple hover:bg-doshisha-softPurple">
+                <Badge key={hobby} variant="secondary">
                   {hobby}
                 </Badge>
               ))}
               {profile.hobbies.length > 3 && (
-                <Badge className="bg-doshisha-softPurple text-doshisha-darkPurple">+{profile.hobbies.length - 3}</Badge>
+                <Badge variant="secondary">+{profile.hobbies.length - 3}</Badge>
               )}
             </div>
           )}
@@ -177,19 +177,19 @@ export function UserCard({ profile }: UserCardProps) {
           <div className="flex gap-2 mt-2">
             <Button 
               variant="outline" 
-              className="flex-1"
+              className="flex-1 rounded-xl"
               onClick={handleViewProfile}
             >
-              詳細
+              View Profile
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
             <Button 
-              className="bg-gradient-to-r from-doshisha-purple to-doshisha-lightPurple hover:from-doshisha-darkPurple hover:to-doshisha-purple text-white"
+              className="flex-1 rounded-xl bg-[#3b82f6] hover:bg-[#2563eb]"
               onClick={handleMatch}
               disabled={isLoading}
             >
               <Heart className="w-4 h-4 mr-2" />
-              いいね
+              Connect
             </Button>
           </div>
         </div>

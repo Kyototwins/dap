@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -20,7 +21,7 @@
     --accent-foreground: #ffffff;
     --destructive: #7f1184;
     --destructive-foreground: #ffffff;
-    --border: #8E9196;
+    --border: #e4e4e7;
     --input: #000000;
     --ring: #7f1184;
     --radius: 0.75rem;
@@ -57,27 +58,27 @@
   
   /* DAP specific styles */
   .dap-card {
-    @apply rounded-lg bg-white shadow-sm border border-[#8E9196]; /* Use light gray border */
+    @apply rounded-xl bg-white shadow-sm border border-[#e4e4e7]; /* Lighter gray border */
   }
   
   .dap-tag {
-    @apply px-3 py-1 rounded-full text-xs font-medium bg-white text-black border border-black;
+    @apply px-3 py-1 rounded-full text-xs font-medium bg-[#f1f5f9] text-black border-none;
   }
   
   .dap-tag-blue {
-    @apply px-3 py-1 rounded-full text-xs font-medium bg-[#7f1184] text-white;
+    @apply px-3 py-1 rounded-full text-xs font-medium bg-[#e0f2fe] text-[#0369a1] border-none;
   }
   
   .dap-tag-primary {
-    @apply px-3 py-1 rounded-full text-xs font-medium bg-black text-white;
+    @apply px-3 py-1 rounded-full text-xs font-medium bg-black text-white border-none;
   }
   
   .dap-button-primary {
-    @apply bg-[#7f1184] text-white px-4 py-2 rounded-md font-medium hover:bg-black transition-colors;
+    @apply bg-[#7f1184] text-white px-4 py-2 rounded-xl font-medium hover:bg-[#671073] transition-colors;
   }
   
   .dap-button-secondary {
-    @apply bg-white text-black px-4 py-2 rounded-md font-medium border border-black hover:bg-black hover:text-white transition-colors;
+    @apply bg-white text-black px-4 py-2 rounded-xl font-medium border border-[#e4e4e7] hover:bg-black hover:text-white transition-colors;
   }
 }
 

@@ -16,7 +16,7 @@ interface EventCardProps {
 export function EventCard({ event, isParticipating, onJoin, onCardClick }: EventCardProps) {
   return (
     <Card 
-      className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+      className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow rounded-xl border-[#e4e4e7]"
       onClick={() => onCardClick(event)}
     >
       <div className="relative aspect-video">
@@ -46,7 +46,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
         </p>
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm">
-            <Badge variant="outline">{event.category}</Badge>
+            <Badge variant="language">{event.category}</Badge>
             <span className="text-gray-600">
               {formatDate(event.date)}
             </span>
@@ -62,9 +62,8 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
         </div>
         <div className="mt-4">
           <Button
-            className={`w-full ${isParticipating ? "bg-gray-200 hover:bg-gray-300 text-gray-700" : "bg-doshisha-purple hover:bg-doshisha-darkPurple"}`}
+            className={`w-full rounded-xl ${isParticipating ? "bg-gray-200 hover:bg-gray-300 text-gray-700" : "bg-[#3b82f6] hover:bg-[#2563eb] text-white"}`}
             disabled={event.current_participants >= event.max_participants || isParticipating}
-            variant={isParticipating ? "secondary" : "default"}
             onClick={(e) => {
               e.stopPropagation();
               onJoin(event.id, event.title);

@@ -11,7 +11,7 @@ export function EditProfileButton({ onClick }: EditProfileButtonProps) {
       <Button 
         size="lg"
         onClick={onClick}
-        className="bg-[#7f1184] hover:bg-[#671073] shadow-lg"
+        className="bg-[#7f1184] hover:bg-[#671073] shadow-lg rounded-xl"
       >
         プロフィールを編集
       </Button>

@@ -74,16 +74,16 @@ export function UserProfileActions({
       <Button 
         onClick={onMessageClick}
         variant="outline"
-        className="flex-1 gap-2 border-gray-200"
+        className="flex-1 gap-2 rounded-xl border-[#e4e4e7]"
       >
         <MessageSquare className="w-4 h-4" />
-        <span>メッセージ</span>
+        <span>View Profile</span>
       </Button>
       
       {isCurrentUser ? (
         <Button 
           onClick={onEditProfileClick}
-          className="flex-1 gap-2 bg-doshisha-purple hover:bg-doshisha-darkPurple"
+          className="flex-1 gap-2 bg-[#7f1184] hover:bg-[#671073] rounded-xl"
         >
           <Edit className="w-4 h-4" />
           <span>編集</span>
@@ -92,10 +92,10 @@ export function UserProfileActions({
         <Button 
           onClick={handleMatch}
           disabled={isLoading}
-          className="flex-1 gap-2 bg-gradient-to-r from-doshisha-purple to-doshisha-lightPurple hover:from-doshisha-darkPurple hover:to-doshisha-purple text-white"
+          className="flex-1 gap-2 bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded-xl"
         >
           <Heart className="w-4 h-4 mr-2" />
-          いいね
+          Connect
         </Button>
       )}
     </div>
