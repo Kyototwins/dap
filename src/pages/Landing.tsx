@@ -17,9 +17,6 @@ export default function Landing() {
       {/* Header */}
       <header className="flex justify-between items-center p-4 bg-white">
         <div className="text-[#7f1184] text-3xl font-bold">DAP</div>
-        <button className="p-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-        </button>
       </header>
 
       {/* Hero Section */}
@@ -39,14 +36,14 @@ export default function Landing() {
             className="bg-[#7f1184] hover:bg-[#671073] text-white w-full py-6 text-lg"
             onClick={() => navigate("/signup")}
           >
-            Get Started
+            Create Account
           </Button>
           <Button
             variant="outline"
             className="bg-transparent text-foreground border-border hover:bg-gray-100 w-full py-6 text-lg"
-            onClick={() => navigate("/learn-more")}
+            onClick={() => navigate("/login")}
           >
-            Learn More
+            Login
           </Button>
         </div>
       </section>
@@ -77,10 +74,7 @@ export default function Landing() {
 
       {/* How It Works */}
       <section className="px-6 py-16">
-        <h2 className="text-3xl font-bold text-center mb-4">How DAP Works</h2>
-        <p className="text-gray-600 text-center mb-12 max-w-lg mx-auto">
-          Our platform makes it easy to build meaningful connections with students from around the world.
-        </p>
+        <h2 className="text-3xl font-bold text-center mb-12">How DAP Works</h2>
         
         <div className="space-y-8">
           {/* Step 1 */}

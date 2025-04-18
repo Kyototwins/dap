@@ -25,6 +25,7 @@ export function useMatches() {
           user1:profiles!matches_user1_id_fkey (*),
           user2:profiles!matches_user2_id_fkey (*)
         `)
+        .or(`status.eq.accepted,user1_id.eq.${user.id}`)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -78,6 +79,7 @@ export function useMatches() {
         
         return {
           id: match.id,
+          status: match.status || 'accepted',
           user1_id: match.user1_id,
           user2_id: match.user2_id,
           otherUser: {

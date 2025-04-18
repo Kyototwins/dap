@@ -47,6 +47,7 @@ export function UserCard({ profile }: UserCardProps) {
           {
             user1_id: user.id,
             user2_id: profile.id,
+            status: "pending"
           },
         ]);
 
@@ -184,7 +185,7 @@ export function UserCard({ profile }: UserCardProps) {
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
             <Button 
-              className="flex-1 rounded-xl bg-[#3b82f6] hover:bg-[#2563eb]"
+              className="flex-1 rounded-xl bg-[#7f1184] hover:bg-[#671073]"
               onClick={handleMatch}
               disabled={isLoading}
             >

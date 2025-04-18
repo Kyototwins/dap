@@ -49,6 +49,7 @@ export function UserProfileActions({
           {
             user1_id: user.id,
             user2_id: profileId,
+            status: "pending"
           },
         ]);
 
@@ -92,7 +93,7 @@ export function UserProfileActions({
         <Button 
           onClick={handleMatch}
           disabled={isLoading}
-          className="flex-1 gap-2 bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded-xl"
+          className="flex-1 gap-2 bg-[#7f1184] hover:bg-[#671073] text-white rounded-xl"
         >
           <Heart className="w-4 h-4 mr-2" />
           Connect
