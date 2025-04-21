@@ -35,6 +35,7 @@ export function useLikesReceived() {
       if (matchError) throw matchError;
       
       if (pendingMatches && pendingMatches.length > 0) {
+        // Fix for TS2589: Type instantiation is excessively deep and possibly infinite
         const profiles = pendingMatches.map(match => {
           const profile = match.user1;
           

@@ -43,3 +43,12 @@ export interface Profile {
   friend_activity: string | null;
   best_quality: string | null;
 }
+
+export interface Message {
+  id: string;
+  content: string;
+  created_at: string;
+  match_id: string;
+  sender_id: string;
+  sender: Profile;
+}
