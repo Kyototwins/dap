@@ -27,7 +27,7 @@ export function ProfilesList({
   }
 
   if (visibleProfiles.length === 0) {
-    return <ProfileNotFound message="条件に一致するユーザーが見つかりませんでした" />;
+    return <ProfileNotFound message="No users matched your search." />;
   }
 
   return (
@@ -46,10 +46,10 @@ export function ProfilesList({
           {loadingMore ? (
             <>
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              読み込み中...
+              Loading...
             </>
           ) : (
-            <>さらに表示</>
+            <>Show More</>
           )}
         </Button>
       )}
