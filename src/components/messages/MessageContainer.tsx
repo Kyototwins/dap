@@ -1,11 +1,10 @@
 
 import { useEffect, useState } from "react";
-import { useMessageSending } from "@/hooks/useMessageSending";
-import { useMobileChat } from "@/hooks/useMobileChat";
 import { ChatList } from "@/components/messages/ChatList";
 import { ChatWindow } from "@/components/messages/ChatWindow";
-import { supabase } from "@/integrations/supabase/client";
+import { useMobileChat } from "@/hooks/useMobileChat";
 import type { Match, Message } from "@/types/messages";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MessageContainerProps {
   matches: Match[];
@@ -22,7 +21,6 @@ export function MessageContainer({
   onSelectMatch,
   setMessages,
 }: MessageContainerProps) {
-  const { newMessage, setNewMessage, handleSendMessage } = useMessageSending(selectedMatch, messages, setMessages);
   const { showMobileChat, handleBackToList } = useMobileChat(selectedMatch);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
@@ -43,21 +41,6 @@ export function MessageContainer({
     
     fetchCurrentUser();
   }, []);
-
-  const handleSendMsg = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedMatch || !newMessage.trim() || !currentUser) return;
-    
-    try {
-      // Use the utility function to send the message
-      const result = await handleSendMessage();
-      
-      // Reset the input
-      setNewMessage("");
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-  };
 
   return (
     <div className="flex flex-1 overflow-hidden border rounded-lg shadow-sm">

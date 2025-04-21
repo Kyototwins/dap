@@ -1,4 +1,5 @@
 
+import { useEffect } from "react";
 import { useMessages } from "@/hooks/useMessages";
 import { MessageContainer } from "@/components/messages/MessageContainer";
 
@@ -10,7 +11,22 @@ export default function Messages() {
     loading,
     handleSelectMatch,
     setMessages,
+    fetchMatches
   } = useMessages();
+  
+  // 定期的にマッチリストを更新
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchMatches();
+    }, 30000); // 30秒ごとに更新
+    
+    return () => clearInterval(interval);
+  }, [fetchMatches]);
+  
+  // 初回ロード時にもマッチリストを更新
+  useEffect(() => {
+    fetchMatches();
+  }, []);
 
   if (loading) {
     return <div className="p-6 text-center">読み込み中...</div>;
