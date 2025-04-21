@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -49,10 +48,9 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* How It Works - moved right after buttons */}
       <section className="px-6 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">How DAP Works</h2>
-
         <div className="space-y-8">
           {/* Step 1 */}
           <div className="bg-white rounded-xl p-6 border border-border shadow-sm">
@@ -66,7 +64,6 @@ export default function Landing() {
               Share your language skills, interests, and what you're looking for in a language exchange partner.
             </p>
           </div>
-
           {/* Step 2 */}
           <div className="bg-white rounded-xl p-6 border border-border shadow-sm">
             <div className="flex justify-center mb-4">
@@ -79,7 +76,6 @@ export default function Landing() {
               Discover students with complementary language skills and shared interests from universities worldwide.
             </p>
           </div>
-
           {/* Step 3 */}
           <div className="bg-white rounded-xl p-6 border border-border shadow-sm">
             <div className="flex justify-center mb-4">
@@ -119,4 +115,3 @@ export default function Landing() {
     </div>
   );
 }
-
