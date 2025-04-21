@@ -30,7 +30,7 @@ export function DeleteAccountButton() {
         throw new Error("Failed to retrieve account information.");
       }
 
-      // 各テーブルからデータ削除
+      // Delete data from various tables
       await supabase.from('notifications').delete().eq('user_id', user.id);
       await supabase.from('matches').delete().eq('user1_id', user.id);
       await supabase.from('matches').delete().eq('user2_id', user.id);
@@ -41,26 +41,18 @@ export function DeleteAccountButton() {
       await supabase.from('offered_experiences').delete().eq('user_id', user.id);
       await supabase.from('message_group_members').delete().eq('user_id', user.id);
 
-      // プロフィール削除（最後）
+      // Delete profile (last)
       await supabase.from('profiles').delete().eq('id', user.id);
 
-      // service_role_keyは環境変数や安全な方法で取得する必要があるため、暫定的にwindow.prompt
-      // 本番では絶対にフロントエンドに埋め込まないでください
-      // 開発・検証のみでご利用ください
-      const serviceRole = window.prompt("service_roleキーを入力してください(開発用途)")?.trim();
-      if (!serviceRole) {
-        throw new Error("管理用キー（service_role）が必要です。");
-      }
-
-      // Edge Functionでauth.usersを削除
+      // Call Edge Function to delete auth.users entry
       const fnRes = await fetch("https://yxacicvkyusnykivbmtg.functions.supabase.co/delete-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: user.id, service_role_key: serviceRole }),
+        body: JSON.stringify({ user_id: user.id }),
       });
       const res = await fnRes.json();
       if (!fnRes.ok || !res.success) {
-        throw new Error("auth.usersの削除に失敗しました: " + (res.error || ""));
+        throw new Error("Failed to delete account: " + (res.error ? JSON.stringify(res.error) : ""));
       }
 
       toast({

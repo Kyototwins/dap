@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { user_id, service_role_key } = await req.json()
+    const { user_id } = await req.json()
 
     if (!user_id) {
       return new Response(JSON.stringify({ error: "Missing 'user_id'" }), {
@@ -20,25 +20,29 @@ serve(async (req) => {
         headers: corsHeaders,
       })
     }
-    if (!service_role_key) {
-      return new Response(JSON.stringify({ error: "Missing 'service_role_key'" }), {
-        status: 401,
+
+    // Get the service role key from Deno environment
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+    if (!serviceRoleKey) {
+      return new Response(JSON.stringify({ error: "Service role key not configured" }), {
+        status: 500,
         headers: corsHeaders,
       })
     }
 
-    // Supabase Admin APIでユーザー削除
+    // Supabase Admin API to delete user
     const { default: fetch } = await import('node-fetch');
     const res = await fetch(
       `https://yxacicvkyusnykivbmtg.supabase.co/auth/v1/admin/users/${user_id}`,
       {
         method: "DELETE",
         headers: {
-          apiKey: service_role_key,
-          Authorization: `Bearer ${service_role_key}`,
+          apiKey: serviceRoleKey,
+          Authorization: `Bearer ${serviceRoleKey}`,
         },
       }
     )
+    
     if (!res.ok) {
       const errorData = await res.json()
       return new Response(JSON.stringify({ error: errorData }), {
