@@ -35,7 +35,7 @@ export function useMatches() {
       if (error) throw error;
 
       // Get latest message and unread count for each match
-      const processedMatches = await Promise.all(matchesData.map(async (match) => {
+      const processedMatches = await Promise.all((matchesData || []).map(async (match) => {
         const otherUser = match.user1_id === user.id ? match.user2 : match.user1;
         
         // Fetch the most recent message for this match
