@@ -26,7 +26,7 @@ export function useLikesReceived() {
         .from("matches")
         .select(`
           user1_id,
-          user1:profiles!matches_user1_id_fkey (*)
+          user1:profiles!matches_user1_id_fkey (id, first_name, last_name, avatar_url, about_me, age, gender, university, department, year, hobbies, languages, language_levels, superpower, learning_languages, origin, sexuality, ideal_date, life_goal, image_url_1, image_url_2, created_at, photo_comment, worst_nightmare, friend_activity, best_quality)
         `)
         .eq("user2_id", user.id)
         .eq("status", "pending")
@@ -35,7 +35,7 @@ export function useLikesReceived() {
       if (matchError) throw matchError;
       
       if (pendingMatches && pendingMatches.length > 0) {
-        // Fix for TS2589: Type instantiation is excessively deep and possibly infinite
+        // Transform the data to avoid deep type instantiation issues
         const profiles = pendingMatches.map(match => {
           const profile = match.user1;
           
@@ -64,7 +64,10 @@ export function useLikesReceived() {
           
           return {
             ...profile,
-            language_levels: processedLanguageLevels
+            language_levels: processedLanguageLevels,
+            hobbies: profile.hobbies || [],
+            languages: profile.languages || [],
+            learning_languages: profile.learning_languages || []
           } as Profile;
         });
         
