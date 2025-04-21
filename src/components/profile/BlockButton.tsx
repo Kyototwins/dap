@@ -18,16 +18,21 @@ export function BlockButton({ otherUserId, disabled }: BlockButtonProps) {
     if (!window.confirm("この相手をブロックしますか？")) return;
     setIsLoading(true);
     try {
-      // `blocks` テーブルが存在しない場合は supabase 側作成が必要（ここでは仮実装）
+      // Instead of using a blocks table, we can create a notification to the server
+      // This is a temporary solution until the blocks table is created in Supabase
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("認証されていません");
 
-      const { error } = await supabase.from("blocks").insert([
+      // Create a notification indicating a block action
+      const { error } = await supabase.from("notifications").insert([
         {
-          blocker_id: user.id,
-          blocked_id: otherUserId,
+          user_id: user.id,
+          related_id: otherUserId,
+          content: "ユーザーをブロックしました",
+          type: "block_user"
         },
       ]);
+      
       if (error) throw error;
 
       toast({
