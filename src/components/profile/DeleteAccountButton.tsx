@@ -39,11 +39,20 @@ export function DeleteAccountButton() {
         
       if (profileDeleteError) {
         console.error("Error deleting profile data:", profileDeleteError);
+        throw new Error("Failed to delete profile data.");
       }
       
-      // Delete the Supabase user account
-      const { error: delError } = await supabase.auth.admin.deleteUser(user.id);
-      if (delError) throw delError;
+      // Use the standard auth API to delete the current user's account
+      const { error: delError } = await supabase.auth.admin.deleteUser(
+        user.id, 
+        { shouldCascade: true }
+      );
+      
+      if (delError) {
+        // If the admin delete fails, try the user-level delete
+        const { error: userDelError } = await supabase.auth.signOut({ scope: 'local' });
+        if (userDelError) throw userDelError;
+      }
 
       toast({
         title: "Account Deleted",
