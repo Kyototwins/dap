@@ -18,10 +18,20 @@ export default function SignUp() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!name || !email || !password) {
       toast({
         title: "Input Error",
         description: "Please fill in all fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+    // 大学メールアドレスかチェック
+    if (!email.endsWith("@university.edu")) {
+      toast({
+        title: "Email Requirement",
+        description: "Please use your university email address (ending with @university.edu).",
         variant: "destructive",
       });
       return;
