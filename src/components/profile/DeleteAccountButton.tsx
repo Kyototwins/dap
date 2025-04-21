@@ -31,7 +31,7 @@ export function DeleteAccountButton() {
         throw new Error("Failed to retrieve account information.");
       }
 
-      // Delete user data from profiles table first
+      // Delete user data from profiles table
       const { error: profileDeleteError } = await supabase
         .from('profiles')
         .delete()
@@ -42,6 +42,35 @@ export function DeleteAccountButton() {
         throw new Error("Failed to delete profile data.");
       }
       
+      // Delete any related data from other tables (add as needed)
+      // Examples based on your database schema:
+      
+      // Delete from notifications
+      await supabase.from('notifications').delete().eq('user_id', user.id);
+      
+      // Delete from matches (as user1 or user2)
+      await supabase.from('matches').delete().eq('user1_id', user.id);
+      await supabase.from('matches').delete().eq('user2_id', user.id);
+      
+      // Delete from messages
+      await supabase.from('messages').delete().eq('sender_id', user.id);
+      
+      // Delete from events where user is creator
+      await supabase.from('events').delete().eq('creator_id', user.id);
+      
+      // Delete from event_participants
+      await supabase.from('event_participants').delete().eq('user_id', user.id);
+      
+      // Delete from event_comments
+      await supabase.from('event_comments').delete().eq('user_id', user.id);
+      
+      // Delete from offered_experiences
+      await supabase.from('offered_experiences').delete().eq('user_id', user.id);
+      
+      // Delete from message_group_members
+      await supabase.from('message_group_members').delete().eq('user_id', user.id);
+      
+      // Handle user auth deletion
       try {
         // Try the admin delete first (this will likely fail on client side)
         const { error: delError } = await supabase.auth.admin.deleteUser(user.id);
