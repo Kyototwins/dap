@@ -6,12 +6,12 @@ interface DapLogoProps {
   style?: React.CSSProperties;
 }
 
-// ※ 基本サイズ: 横220px/縦88pxに拡大し、左寄せのため余白なしに調整
+// 画像を幅180px・高さ72pxに縮小し、左寄せで余白なしに調整
 export const DapLogo: React.FC<DapLogoProps> = ({ className = "", style }) => (
   <img
     src="/lovable-uploads/78b54ef9-c522-4028-bca2-1864dd1be91f.png"
     alt="DAP Logo"
-    style={{ width: 220, height: 88, objectFit: "contain", ...style }}
+    style={{ width: 180, height: 72, objectFit: "contain", ...style }}
     className={className + " ml-0"}
     draggable={false}
   />
