@@ -42,13 +42,12 @@ export function DeleteAccountButton() {
         throw new Error("Failed to delete profile data.");
       }
       
-      // Use the standard auth API to delete the current user's account
-      const { error: delError } = await supabase.auth.admin.deleteUser(
-        user.id, 
-        { shouldCascade: true }
-      );
-      
-      if (delError) {
+      try {
+        // Try the admin delete first (this will likely fail on client side)
+        const { error: delError } = await supabase.auth.admin.deleteUser(user.id);
+        if (delError) throw delError;
+      } catch (adminError) {
+        console.log("Admin delete failed, trying user-level signout");
         // If the admin delete fails, try the user-level delete
         const { error: userDelError } = await supabase.auth.signOut({ scope: 'local' });
         if (userDelError) throw userDelError;
