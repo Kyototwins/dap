@@ -15,14 +15,15 @@ export function useLikesReceived() {
     fetchLikes();
   }, []);
 
+  // 新規LIKEしたユーザーIDを保持
+  const prevLikeIdsRef = useState<string[]>([]);
+
   const fetchLikes = async () => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
-      
-      // Get all pending match requests where current user is user2_id
-      // Using explicit field selection rather than (*) to prevent excessive type depth
+
       const { data: pendingMatches, error: matchError } = await supabase
         .from("matches")
         .select(`
@@ -41,27 +42,22 @@ export function useLikesReceived() {
         .eq("user2_id", user.id)
         .eq("status", "pending")
         .order("created_at", { ascending: false });
-      
+
       if (matchError) throw matchError;
-      
+
       if (pendingMatches && pendingMatches.length > 0) {
-        // Transform the data to avoid deep type instantiation issues
         const profiles = pendingMatches.map(match => {
           const profile = match.user1;
-          
-          // Process language_levels to ensure it's the correct type
+
           let processedLanguageLevels: Record<string, number> = {};
           if (profile.language_levels) {
-            // If it's a string, try to parse it
             if (typeof profile.language_levels === 'string') {
               try {
                 processedLanguageLevels = JSON.parse(profile.language_levels);
               } catch (e) {
                 console.error("Error parsing language_levels:", e);
               }
-            } 
-            // If it's already an object, safely convert it to Record<string, number>
-            else if (typeof profile.language_levels === 'object') {
+            } else if (typeof profile.language_levels === 'object') {
               Object.entries(profile.language_levels).forEach(([key, value]) => {
                 if (typeof value === 'number') {
                   processedLanguageLevels[key] = value;
@@ -71,7 +67,7 @@ export function useLikesReceived() {
               });
             }
           }
-          
+
           return {
             ...profile,
             language_levels: processedLanguageLevels,
@@ -80,7 +76,27 @@ export function useLikesReceived() {
             learning_languages: profile.learning_languages || []
           } as Profile;
         });
-        
+
+        // 新規LIKE検知し通知追加（初回はスキップ）
+        const prevIds = prevLikeIdsRef[0];
+        const currIds = profiles.map(x => x.id);
+        const newLikeIds = currIds.filter((id) => !prevIds.includes(id));
+        if (prevIds.length > 0 && newLikeIds.length > 0) {
+          // 通知を追加
+          for (const id of newLikeIds) {
+            const newProfile = profiles.find(x => x.id === id);
+            if (newProfile) {
+              await supabase.from("notifications").insert([{
+                user_id: user.id,
+                type: "new_match",
+                content: `${newProfile.first_name}さんがあなたと友達になりたがっています！`,
+                related_id: newProfile.id // 相手のプロフィールIDへジャンプ用
+              }]);
+            }
+          }
+        }
+        prevLikeIdsRef[1](currIds);
+
         setLikedProfiles(profiles);
       } else {
         setLikedProfiles([]);
@@ -98,9 +114,8 @@ export function useLikesReceived() {
 
   const loadMoreLikes = () => {
     if (loadingMoreLikes || visibleCount >= likedProfiles.length) return;
-    
+
     setLoadingMoreLikes(true);
-    // Simulate loading more items
     setTimeout(() => {
       setVisibleCount(prev => prev + 10);
       setLoadingMoreLikes(false);

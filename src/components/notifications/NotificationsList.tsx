@@ -22,21 +22,23 @@ export function NotificationsList({ onClose }: NotificationsListProps) {
 
     // Navigate based on type
     if (notification.related_id) {
-      switch (notification.type) {
-        case NotificationType.NEW_MATCH:
-          navigate("/matches");
-          break;
-        case NotificationType.NEW_MESSAGE:
-          navigate("/messages");
-          break;
-        case NotificationType.NEW_EVENT:
-        case NotificationType.EVENT_JOIN:
-        case NotificationType.EVENT_COMMENT:
-          navigate("/events");
-          break;
+      // 新しいLIKE通知の場合はそのユーザーのプロフィールへ
+      if (notification.type === NotificationType.NEW_MATCH) {
+        navigate(`/profile/${notification.related_id}`);
+      } else {
+        switch (notification.type) {
+          case NotificationType.NEW_MESSAGE:
+            navigate("/messages");
+            break;
+          case NotificationType.NEW_EVENT:
+          case NotificationType.EVENT_JOIN:
+          case NotificationType.EVENT_COMMENT:
+            navigate("/events");
+            break;
+        }
       }
     }
-    
+
     onClose();
   };
 
