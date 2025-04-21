@@ -3,7 +3,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
-export function useUserMatchStatus({ id }: { id: string }) {
+interface UseUserMatchStatusProps {
+  id: string;
+  onMatched?: () => void;
+}
+
+export function useUserMatchStatus({ id, onMatched }: UseUserMatchStatusProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isMatched, setIsMatched] = useState(false);
   const { toast } = useToast();
@@ -60,6 +65,7 @@ export function useUserMatchStatus({ id }: { id: string }) {
           description: "このユーザーとは既にマッチしています。",
         });
         setIsMatched(true);
+        if (onMatched) onMatched();
         return;
       }
 
@@ -79,6 +85,7 @@ export function useUserMatchStatus({ id }: { id: string }) {
         description: "相手がマッチングを承認すると、メッセージを送ることができます。",
       });
       setIsMatched(true);
+      if (onMatched) onMatched();
     } catch (error: any) {
       toast({
         title: "エラーが発生しました",

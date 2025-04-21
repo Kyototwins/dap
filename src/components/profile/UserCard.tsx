@@ -12,10 +12,17 @@ interface UserCardProps {
 
 export function UserCard({ profile }: UserCardProps) {
   const navigate = useNavigate();
-  const { isLoading, isMatched, handleMatch } = useUserMatchStatus(profile);
+  const { isLoading, isMatched, handleMatch } = useUserMatchStatus({
+    id: profile.id,
+    onMatched: () => navigate(`/messages?user=${profile.id}`),
+  });
 
   const handleViewProfile = () => {
     navigate(`/profile/${profile.id}`);
+  };
+
+  const handleMessage = () => {
+    navigate(`/messages?user=${profile.id}`);
   };
 
   const initials = `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}`;
@@ -118,11 +125,9 @@ export function UserCard({ profile }: UserCardProps) {
           <UserCardButtons
             isMatched={isMatched}
             isLoading={isLoading}
-            onMatch={(e) => {
-              e.stopPropagation();
-              handleMatch(profile);
-            }}
+            onMatch={() => handleMatch({ id: profile.id })}
             onView={handleViewProfile}
+            onMessage={handleMessage}
           />
         </div>
       </div>

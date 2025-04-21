@@ -6,8 +6,9 @@ import type { Profile } from "@/types/messages";
 interface UserCardButtonsProps {
   isMatched: boolean;
   isLoading: boolean;
-  onMatch: (e: React.MouseEvent) => void;
+  onMatch: () => void;
   onView: () => void;
+  onMessage?: () => void;
 }
 
 export function UserCardButtons({
@@ -15,6 +16,7 @@ export function UserCardButtons({
   isLoading,
   onMatch,
   onView,
+  onMessage,
 }: UserCardButtonsProps) {
   return (
     <div className="flex gap-2 mt-2">
@@ -31,7 +33,11 @@ export function UserCardButtons({
           className="flex-1 rounded-xl bg-[#7f1184] hover:bg-[#671073] text-white"
           onClick={(e) => {
             e.stopPropagation();
-            onView();
+            if (onMessage) {
+              onMessage();
+            } else {
+              onView();
+            }
           }}
         >
           <MessageSquare className="w-4 h-4 mr-2" />

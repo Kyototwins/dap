@@ -17,10 +17,13 @@ export function UserProfileActions({
   onEditProfileClick,
 }: UserProfileActionsProps) {
   const navigate = useNavigate();
-  const { isMatched, isLoading, handleMatch } = useUserMatchStatus({ id: profileId });
+  // onMatched: マッチ後にメッセージ画面へ遷移
+  const { isMatched, isLoading, handleMatch } = useUserMatchStatus({
+    id: profileId,
+    onMatched: () => navigate(`/messages?user=${profileId}`),
+  });
 
   const handleMessage = () => {
-    // /messages?user={profileId} などに遷移し、選択済状態で開く
     navigate(`/messages?user=${profileId}`);
   };
 
