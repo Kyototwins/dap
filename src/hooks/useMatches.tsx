@@ -21,7 +21,11 @@ export function useMatches() {
       const { data: matchesData, error } = await supabase
         .from("matches")
         .select(`
-          *,
+          id,
+          user1_id,
+          user2_id,
+          status,
+          created_at,
           user1:profiles!matches_user1_id_fkey (*),
           user2:profiles!matches_user2_id_fkey (*)
         `)
@@ -79,7 +83,7 @@ export function useMatches() {
         
         return {
           id: match.id,
-          status: match.status || 'accepted', // Fix: Adding the status property with default
+          status: match.status || 'accepted', // Ensure status is defined
           user1_id: match.user1_id,
           user2_id: match.user2_id,
           otherUser: {

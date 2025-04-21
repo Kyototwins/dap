@@ -26,7 +26,10 @@ export function useLikesReceived() {
       const { data: pendingMatches, error: matchError } = await supabase
         .from("matches")
         .select(`
+          id,
           user1_id,
+          user2_id,
+          status,
           user1:profiles!matches_user1_id_fkey (
             id, first_name, last_name, avatar_url, about_me, age, gender, university, 
             department, year, hobbies, languages, language_levels, superpower, 
