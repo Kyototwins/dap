@@ -12,50 +12,79 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Delete user function called")
     const { user_id } = await req.json()
 
     if (!user_id) {
-      return new Response(JSON.stringify({ error: "Missing 'user_id'" }), {
+      return new Response(JSON.stringify({ success: false, error: "Missing 'user_id'" }), {
         status: 400,
-        headers: corsHeaders,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       })
     }
 
     // Get the service role key from Deno environment
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
     if (!serviceRoleKey) {
-      return new Response(JSON.stringify({ error: "Service role key not configured" }), {
+      return new Response(JSON.stringify({ success: false, error: "Service role key not configured" }), {
         status: 500,
-        headers: corsHeaders,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       })
     }
 
+    console.log(`Attempting to delete user with ID: ${user_id}`)
+    
     // Supabase Admin API to delete user
-    // Using native fetch instead of node-fetch which was causing the error
     const res = await fetch(
       `https://yxacicvkyusnykivbmtg.supabase.co/auth/v1/admin/users/${user_id}`,
       {
         method: "DELETE",
         headers: {
-          apiKey: serviceRoleKey,
-          Authorization: `Bearer ${serviceRoleKey}`,
+          "apiKey": serviceRoleKey,
+          "Authorization": `Bearer ${serviceRoleKey}`,
+          "Content-Type": "application/json"
         },
       }
     )
     
+    const responseStatus = res.status
+    const responseBody = await res.text()
+    console.log(`Supabase delete user response - Status: ${responseStatus}, Body: ${responseBody}`)
+    
+    // Try to parse the response body as JSON
+    let responseData
+    try {
+      responseData = JSON.parse(responseBody)
+    } catch {
+      responseData = { message: responseBody }
+    }
+    
     if (!res.ok) {
-      const errorData = await res.json()
-      return new Response(JSON.stringify({ error: errorData }), {
-        status: 500,
-        headers: corsHeaders,
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: responseData,
+        statusCode: res.status,
+        statusText: res.statusText
+      }), {
+        status: res.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       })
     }
 
-    return new Response(JSON.stringify({ success: true }), { headers: corsHeaders })
+    return new Response(JSON.stringify({ success: true }), { 
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    })
   } catch (err) {
+    console.error("Error in delete-user function:", err)
     return new Response(
-      JSON.stringify({ error: err.message || 'Unknown error' }),
-      { status: 500, headers: corsHeaders }
+      JSON.stringify({ 
+        success: false, 
+        error: err.message || 'Unknown error',
+        stack: err.stack
+      }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      }
     )
   }
 }, { port: 3000 })

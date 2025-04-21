@@ -31,39 +31,87 @@ export function DeleteAccountButton() {
         throw new Error("Failed to retrieve account information.");
       }
 
-      // WARNING: Order matters for foreign key constraints
-      // Delete relational data in proper order
+      console.log("Starting account deletion process for user:", user.id);
       
-      // First delete data that references matches
+      // DELETE IN CORRECT ORDER TO SATISFY FOREIGN KEY CONSTRAINTS
+      
+      // 1. Delete messages first as they reference matches
+      console.log("Deleting user messages...");
       await supabase.from('messages').delete().eq('sender_id', user.id);
       
-      // Delete event-related data
+      // 2. Delete event-related data
+      console.log("Deleting event comments...");
       await supabase.from('event_comments').delete().eq('user_id', user.id);
+      
+      console.log("Deleting event participants...");
       await supabase.from('event_participants').delete().eq('user_id', user.id);
+      
+      console.log("Deleting events...");
       await supabase.from('events').delete().eq('creator_id', user.id);
       
-      // Delete message groups and notifications
+      // 3. Delete other user-related data
+      console.log("Deleting message group members...");
       await supabase.from('message_group_members').delete().eq('user_id', user.id);
+      
+      console.log("Deleting notifications...");
       await supabase.from('notifications').delete().eq('user_id', user.id);
       
-      // Delete offered_experiences
+      console.log("Deleting offered experiences...");
       await supabase.from('offered_experiences').delete().eq('user_id', user.id);
       
-      // Delete matches where user is either user1 or user2
-      // These need to be deleted after messages are deleted
+      // 4. CRITICAL: We must remove all references to this user in matches BEFORE deleting the user
+      // Get all matches referencing this user
+      const { data: matchesAsUser1 } = await supabase
+        .from('matches')
+        .select('id')
+        .eq('user1_id', user.id);
+        
+      const { data: matchesAsUser2 } = await supabase
+        .from('matches')
+        .select('id')
+        .eq('user2_id', user.id);
+        
+      // Get all match IDs
+      const matchIds = [
+        ...(matchesAsUser1 || []).map(match => match.id),
+        ...(matchesAsUser2 || []).map(match => match.id)
+      ];
+      
+      // Delete all messages related to those match IDs
+      if (matchIds.length > 0) {
+        console.log(`Deleting messages for ${matchIds.length} matches...`);
+        await supabase.from('messages').delete().in('match_id', matchIds);
+      }
+      
+      // Now delete the matches themselves
+      console.log("Deleting matches as user1...");
       await supabase.from('matches').delete().eq('user1_id', user.id);
+      
+      console.log("Deleting matches as user2...");
       await supabase.from('matches').delete().eq('user2_id', user.id);
       
-      // Delete profile (last)
-      await supabase.from('profiles').delete().eq('id', user.id);
+      // 5. Finally delete profile
+      console.log("Deleting profile...");
+      const { error: profileDeleteError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', user.id);
+        
+      if (profileDeleteError) {
+        throw new Error(`Failed to delete profile: ${profileDeleteError.message}`);
+      }
 
-      // Call Edge Function to delete auth.users entry
+      // 6. Call Edge Function to delete auth.users entry
+      console.log("Calling edge function to delete user authentication...");
       const fnRes = await fetch("https://yxacicvkyusnykivbmtg.functions.supabase.co/delete-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user.id }),
       });
+      
       const res = await fnRes.json();
+      console.log("Edge function response:", res);
+      
       if (!fnRes.ok || !res.success) {
         throw new Error("Failed to delete account: " + (res.error ? JSON.stringify(res.error) : ""));
       }
@@ -78,7 +126,7 @@ export function DeleteAccountButton() {
       console.error("Account deletion error:", error);
       toast({
         title: "Deletion Failed",
-        description: error.message,
+        description: error.message || "An unknown error occurred while deleting your account.",
         variant: "destructive",
       });
     } finally {
