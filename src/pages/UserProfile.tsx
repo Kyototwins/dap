@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -10,6 +9,7 @@ import { UserProfileHeader } from "@/components/profile/UserProfileHeader";
 import { UserProfileActions } from "@/components/profile/UserProfileActions";
 import { UserProfileProgress } from "@/components/profile/UserProfileProgress";
 import { UserProfileAboutTab } from "@/components/profile/UserProfileAboutTab";
+import { useUserMatchStatus } from "@/components/profile/hooks/useUserMatchStatus";
 
 export default function UserProfile() {
   const { id } = useParams();
@@ -78,27 +78,17 @@ export default function UserProfile() {
 
   return (
     <div className="pb-6">
-      {/* Header image */}
       <UserProfileCover imageUrl={profile.image_url_1} />
-      
-      {/* Profile avatar and basic info */}
       <UserProfileHeader profile={profile} />
-      
-      {/* Action buttons */}
       <div className="px-4">
-        <UserProfileActions 
+        <UserProfileActions
           isCurrentUser={isCurrentUser}
           profileId={id}
-          onMessageClick={handleMessage}
           onEditProfileClick={handleEditProfile}
         />
-        
-        {/* Profile completion progress - only show for current user */}
         {isCurrentUser && (
           <UserProfileProgress progress={90} />
         )}
-        
-        {/* About section - only showing the About tab now */}
         <div className="mt-6">
           <h2 className="text-xl font-bold mb-4">About</h2>
           <UserProfileAboutTab profile={profile} />
