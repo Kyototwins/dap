@@ -22,11 +22,18 @@ export function useLikesReceived() {
       if (!user) throw new Error("Not authenticated");
       
       // Get all pending match requests where current user is user2_id
+      // Using explicit field selection rather than (*) to prevent excessive type depth
       const { data: pendingMatches, error: matchError } = await supabase
         .from("matches")
         .select(`
           user1_id,
-          user1:profiles!matches_user1_id_fkey (id, first_name, last_name, avatar_url, about_me, age, gender, university, department, year, hobbies, languages, language_levels, superpower, learning_languages, origin, sexuality, ideal_date, life_goal, image_url_1, image_url_2, created_at, photo_comment, worst_nightmare, friend_activity, best_quality)
+          user1:profiles!matches_user1_id_fkey (
+            id, first_name, last_name, avatar_url, about_me, age, gender, university, 
+            department, year, hobbies, languages, language_levels, superpower, 
+            learning_languages, origin, sexuality, ideal_date, life_goal, 
+            image_url_1, image_url_2, created_at, photo_comment, worst_nightmare, 
+            friend_activity, best_quality
+          )
         `)
         .eq("user2_id", user.id)
         .eq("status", "pending")

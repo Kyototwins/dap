@@ -79,7 +79,7 @@ export function useMatches() {
         
         return {
           id: match.id,
-          status: match.status || 'accepted',
+          status: match.status || 'accepted', // Fix: Adding the status property with default
           user1_id: match.user1_id,
           user2_id: match.user2_id,
           otherUser: {
