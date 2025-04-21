@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -7,6 +6,7 @@ import { Profile as ProfileType } from "@/types/messages";
 import { ProfileLoading } from "@/components/profile/ProfileLoading";
 import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
+import { DeleteAccountButton } from "./DeleteAccountButton";
 
 export function ProfileContainer() {
   const [profile, setProfile] = useState<ProfileType | null>(null);
@@ -81,10 +81,13 @@ export function ProfileContainer() {
   }
 
   return (
-    <ProfileInfo 
-      profile={profile} 
-      completion={completion} 
-      onEditProfile={handleEditProfile} 
-    />
+    <div>
+      <ProfileInfo 
+        profile={profile} 
+        completion={completion} 
+        onEditProfile={handleEditProfile} 
+      />
+      <DeleteAccountButton />
+    </div>
   );
 }
