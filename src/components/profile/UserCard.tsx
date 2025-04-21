@@ -1,7 +1,7 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Heart, ChevronRight } from "lucide-react";
+import { Heart, ChevronRight, MessageSquare } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,8 +15,45 @@ interface UserCardProps {
 
 export function UserCard({ profile }: UserCardProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isMatched, setIsMatched] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    checkIfMatched();
+  }, []);
+
+  const checkIfMatched = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setIsMatched(false);
+        return;
+      }
+
+      // Check if already matched with this profile
+      const { data: existingMatch, error } = await supabase
+        .from("matches")
+        .select("*")
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
+        .or(`user1_id.eq.${profile.id},user2_id.eq.${profile.id}`);
+
+      if (error) {
+        console.error("Error checking match status:", error);
+        setIsMatched(false);
+        return;
+      }
+
+      if (existingMatch && existingMatch.length > 0) {
+        setIsMatched(true);
+      } else {
+        setIsMatched(false);
+      }
+    } catch (error) {
+      console.error("Error in match check:", error);
+      setIsMatched(false);
+    }
+  };
 
   const handleMatch = async (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -38,6 +75,7 @@ export function UserCard({ profile }: UserCardProps) {
           title: "既にマッチしています",
           description: "このユーザーとは既にマッチしています。",
         });
+        setIsMatched(true);
         return;
       }
 
@@ -57,6 +95,8 @@ export function UserCard({ profile }: UserCardProps) {
         title: "マッチングリクエストを送信しました",
         description: "相手がマッチングを承認すると、メッセージを送ることができます。",
       });
+
+      setIsMatched(true);
     } catch (error: any) {
       toast({
         title: "エラーが発生しました",
@@ -184,17 +224,32 @@ export function UserCard({ profile }: UserCardProps) {
               View Profile
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
-            <Button 
-              className="flex-1 rounded-xl bg-[#7f1184] hover:bg-[#671073]"
-              onClick={handleMatch}
-              disabled={isLoading}
-            >
-              <Heart className="w-4 h-4 mr-2" />
-              Connect
-            </Button>
+            {isMatched ? (
+              <Button 
+                className="flex-1 rounded-xl bg-[#7f1184] hover:bg-[#671073] text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Direct to chat or profile view on message click
+                  handleViewProfile();
+                }}
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Message
+              </Button>
+            ) : (
+              <Button 
+                className="flex-1 rounded-xl bg-[#7f1184] hover:bg-[#671073]"
+                onClick={handleMatch}
+                disabled={isLoading}
+              >
+                <Heart className="w-4 h-4 mr-2" />
+                Connect
+              </Button>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
+
