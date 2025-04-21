@@ -18,6 +18,22 @@ interface EventDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const categoryTranslationMap: Record<string, string> = {
+  'スポーツ': 'Sports',
+  '勉強': 'Study',
+  '食事': 'Meal',
+  'カラオケ': 'Karaoke',
+  '観光': 'Sightseeing',
+  'その他': 'Other',
+  // fallback if category is already English or others
+  'Sports': 'Sports',
+  'Study': 'Study',
+  'Meal': 'Meal',
+  'Karaoke': 'Karaoke',
+  'Sightseeing': 'Sightseeing',
+  'Other': 'Other',
+};
+
 export function EventDetailsDialog({
   event,
   comments,
@@ -33,6 +49,8 @@ export function EventDetailsDialog({
     const date = new Date(dateString);
     return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
+
+  const displayCategory = categoryTranslationMap[event.category] || event.category;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -59,7 +77,7 @@ export function EventDetailsDialog({
               </div>
               
               <Badge variant="outline" className="bg-gray-100">
-                {event.category}
+                {displayCategory}
               </Badge>
               
               <div className="text-sm text-gray-600">
@@ -99,3 +117,4 @@ export function EventDetailsDialog({
     </Dialog>
   );
 }
+
