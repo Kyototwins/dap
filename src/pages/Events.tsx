@@ -33,7 +33,7 @@ export default function Events() {
   const handleJoinEvent = async (eventId: string, eventTitle: string) => {
     try {
       const eventToJoin = filteredEvents.find(e => e.id === eventId);
-      if (!eventToJoin) throw new Error("イベントが見つかりません");
+      if (!eventToJoin) throw new Error("Event not found");
 
       await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
       
@@ -41,12 +41,12 @@ export default function Events() {
       await fetchEvents();
       
       toast({
-        title: "イベントに参加しました",
-        description: "イベントに参加登録が完了しました。",
+        title: "Joined event",
+        description: "You have successfully joined the event.",
       });
     } catch (error: any) {
       toast({
-        title: "エラーが発生しました",
+        title: "Error occurred",
         description: error.message,
         variant: "destructive",
       });

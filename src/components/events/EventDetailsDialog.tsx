@@ -31,7 +31,7 @@ export function EventDetailsDialog({
   
   const formatEventDate = (dateString: string) => {
     const date = new Date(dateString);
-    return `${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+    return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
 
   return (
@@ -63,7 +63,7 @@ export function EventDetailsDialog({
               </Badge>
               
               <div className="text-sm text-gray-600">
-                参加者: {event.current_participants}/{event.max_participants}
+                Participants: {event.current_participants}/{event.max_participants}
               </div>
             </div>
             
@@ -71,7 +71,7 @@ export function EventDetailsDialog({
           </div>
 
           <div className="flex-1 min-h-0 flex flex-col bg-gray-50 p-4">
-            <h3 className="font-medium mb-3">コメント</h3>
+            <h3 className="font-medium mb-3">Comments</h3>
             <div className="flex-1 min-h-0 overflow-y-auto mb-4">
               <EventComments comments={comments} />
             </div>
@@ -80,7 +80,7 @@ export function EventDetailsDialog({
               <Textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="コメントを入力..."
+                placeholder="Enter a comment..."
                 className="flex-1 min-h-[60px] max-h-[120px] resize-none bg-white"
                 rows={2}
               />

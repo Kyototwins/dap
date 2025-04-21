@@ -47,13 +47,13 @@ export function EventList({
       <div className="text-center py-8 space-y-4">
         <p className="text-gray-500">
           {hasFilters
-            ? "条件に合うイベントが見つかりませんでした"
-            : "現在開催予定のイベントはありません"}
+            ? "No events found for these filters"
+            : "No upcoming events"}
         </p>
         <div className="flex justify-center">
           <Button onClick={() => navigate("/events/new")} className="bg-doshisha-purple hover:bg-doshisha-darkPurple">
             <Plus className="w-4 h-4 mr-2" />
-            作成
+            Create
           </Button>
         </div>
       </div>
@@ -63,14 +63,14 @@ export function EventList({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-2">
-        <h2 className="font-bold text-lg">イベント一覧</h2>
+        <h2 className="font-bold text-lg">Events</h2>
         <Button 
           onClick={() => navigate("/events/new")} 
           className="bg-doshisha-purple hover:bg-doshisha-darkPurple"
           size="sm"
         >
           <Plus className="w-4 h-4 mr-1" />
-          作成
+          Create
         </Button>
       </div>
       {events.map((event) => (
@@ -94,7 +94,7 @@ function EventCard({ event, isParticipating, onJoin, onCardClick }: {
 }) {
   const formatEventDate = (dateString: string) => {
     const date = new Date(dateString);
-    return `${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+    return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
 
   return (
@@ -142,10 +142,10 @@ function EventCard({ event, isParticipating, onJoin, onCardClick }: {
             disabled={isParticipating || event.current_participants >= event.max_participants}
           >
             {isParticipating 
-              ? "参加済み"
+              ? "Joined"
               : event.current_participants >= event.max_participants
-                ? "満員"
-                : "参加する"}
+                ? "Full"
+                : "Join"}
           </Button>
         </div>
       </div>

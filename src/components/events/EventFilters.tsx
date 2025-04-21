@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 export type TimeFilter = 'all' | 'today' | 'this-week' | 'this-month';
-export type CategoryFilter = 'all' | 'スポーツ' | '勉強会' | '食事会' | 'カラオケ' | '観光' | 'その他';
+export type CategoryFilter = 'all' | 'Sports' | 'Study' | 'Meal' | 'Karaoke' | 'Sightseeing' | 'Other';
 
 interface EventFiltersProps {
   timeFilter: TimeFilter;
@@ -24,25 +24,25 @@ export function EventFilters({
           active={timeFilter === 'all'} 
           onClick={() => onTimeFilterChange('all')}
         >
-          すべて
+          All
         </FilterButton>
         <FilterButton 
           active={timeFilter === 'today'} 
           onClick={() => onTimeFilterChange('today')}
         >
-          今日
+          Today
         </FilterButton>
         <FilterButton 
           active={timeFilter === 'this-week'} 
           onClick={() => onTimeFilterChange('this-week')}
         >
-          今週
+          This Week
         </FilterButton>
         <FilterButton 
           active={timeFilter === 'this-month'} 
           onClick={() => onTimeFilterChange('this-month')}
         >
-          今月
+          This Month
         </FilterButton>
       </div>
       
@@ -51,43 +51,43 @@ export function EventFilters({
           active={categoryFilter === 'all'} 
           onClick={() => onCategoryFilterChange('all')}
         >
-          すべて
+          All
         </FilterButton>
         <FilterButton 
-          active={categoryFilter === 'スポーツ'} 
-          onClick={() => onCategoryFilterChange('スポーツ')}
+          active={categoryFilter === 'Sports'} 
+          onClick={() => onCategoryFilterChange('Sports')}
         >
-          スポーツ
+          Sports
         </FilterButton>
         <FilterButton 
-          active={categoryFilter === '勉強会'} 
-          onClick={() => onCategoryFilterChange('勉強会')}
+          active={categoryFilter === 'Study'} 
+          onClick={() => onCategoryFilterChange('Study')}
         >
-          勉強会
+          Study
         </FilterButton>
         <FilterButton 
-          active={categoryFilter === '食事会'} 
-          onClick={() => onCategoryFilterChange('食事会')}
+          active={categoryFilter === 'Meal'} 
+          onClick={() => onCategoryFilterChange('Meal')}
         >
-          食事会
+          Meal
         </FilterButton>
         <FilterButton 
-          active={categoryFilter === 'カラオケ'} 
-          onClick={() => onCategoryFilterChange('カラオケ')}
+          active={categoryFilter === 'Karaoke'} 
+          onClick={() => onCategoryFilterChange('Karaoke')}
         >
-          カラオケ
+          Karaoke
         </FilterButton>
         <FilterButton 
-          active={categoryFilter === '観光'} 
-          onClick={() => onCategoryFilterChange('観光')}
+          active={categoryFilter === 'Sightseeing'} 
+          onClick={() => onCategoryFilterChange('Sightseeing')}
         >
-          観光
+          Sightseeing
         </FilterButton>
         <FilterButton 
-          active={categoryFilter === 'その他'} 
-          onClick={() => onCategoryFilterChange('その他')}
+          active={categoryFilter === 'Other'} 
+          onClick={() => onCategoryFilterChange('Other')}
         >
-          その他
+          Other
         </FilterButton>
       </div>
     </div>
