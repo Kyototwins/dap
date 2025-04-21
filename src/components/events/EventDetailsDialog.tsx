@@ -64,6 +64,7 @@ export function EventDetailsDialog({
             <DialogTitle className="text-lg">{event.title}</DialogTitle>
           </DialogHeader>
           <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+            {/* イベント基本情報 */}
             <div className="p-4 space-y-4 overflow-y-auto flex-shrink-0">
               {event.image_url && (
                 <img
@@ -87,16 +88,18 @@ export function EventDetailsDialog({
                 </div>
               </div>
             </div>
-            {/* イベント説明 */}
-            <div className="px-4 pb-2">
+            
+            {/* イベント説明 - 変更：スクロールなく全体を表示 */}
+            <div className="px-4 pb-4">
               <div className="font-semibold text-gray-700 mb-1">Description</div>
               <div
-                className="text-gray-700 text-sm bg-gray-100 rounded p-3 max-h-32 overflow-y-auto"
+                className="text-gray-700 text-sm bg-gray-100 rounded p-3"
                 style={{ whiteSpace: "pre-wrap" }}
               >
                 {event.description}
               </div>
             </div>
+            
             {/* コメントセクション */}
             <div className="flex-1 min-h-0 flex flex-col bg-gray-50 p-4 pt-2">
               <div className="flex items-center mb-3 justify-between">

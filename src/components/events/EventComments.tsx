@@ -1,3 +1,4 @@
+
 import { Avatar } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDateTime } from "@/lib/date-utils";
@@ -16,7 +17,7 @@ export function EventComments({ comments }: EventCommentsProps) {
             <Avatar className="h-8 w-8 flex-shrink-0">
               <img
                 src={comment.user?.avatar_url || "/placeholder.svg"}
-                alt={`${comment.user?.first_name}のアバター`}
+                alt={`${comment.user?.first_name}'s avatar`}
               />
             </Avatar>
             <div className="flex-1">
@@ -33,7 +34,7 @@ export function EventComments({ comments }: EventCommentsProps) {
           </div>
         ))}
         {comments.length === 0 && (
-          <p className="text-center text-gray-500">まだコメントはありません</p>
+          <p className="text-center text-gray-500">No comments yet</p>
         )}
       </div>
     </ScrollArea>
