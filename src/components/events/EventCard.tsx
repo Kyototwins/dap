@@ -6,6 +6,21 @@ import { Avatar } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/date-utils";
 import { Event } from "@/types/events";
 
+const categoryTranslationMap: Record<string, string> = {
+  'スポーツ': 'Sports',
+  '勉強': 'Study',
+  '食事': 'Meal',
+  'カラオケ': 'Karaoke',
+  '観光': 'Sightseeing',
+  'その他': 'Other',
+  'Sports': 'Sports',
+  'Study': 'Study',
+  'Meal': 'Meal',
+  'Karaoke': 'Karaoke',
+  'Sightseeing': 'Sightseeing',
+  'Other': 'Other',
+};
+
 interface EventCardProps {
   event: Event;
   isParticipating: boolean;
@@ -14,6 +29,8 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, isParticipating, onJoin, onCardClick }: EventCardProps) {
+  const displayCategory = categoryTranslationMap[event.category] || event.category;
+
   return (
     <Card 
       className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow rounded-xl border-[#e4e4e7]"
@@ -46,7 +63,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
         </p>
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm">
-            <Badge variant="language">{event.category}</Badge>
+            <Badge variant="language">{displayCategory}</Badge>
             <span className="text-gray-600">
               {formatDate(event.date)}
             </span>
@@ -80,3 +97,4 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
     </Card>
   );
 }
+
