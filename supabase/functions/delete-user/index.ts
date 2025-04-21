@@ -31,7 +31,7 @@ serve(async (req) => {
     }
 
     // Supabase Admin API to delete user
-    const { default: fetch } = await import('node-fetch');
+    // Using native fetch instead of node-fetch which was causing the error
     const res = await fetch(
       `https://yxacicvkyusnykivbmtg.supabase.co/auth/v1/admin/users/${user_id}`,
       {
