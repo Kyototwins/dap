@@ -24,6 +24,11 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
   } = useMessageSending(match, messages, setMessages);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
+  // Log messages for debugging
+  useEffect(() => {
+    console.log(`MessageChat render: ${messages.length} messages available`);
+  }, [messages]);
+
   // Get current user ID when component mounts
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -44,34 +49,40 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => {
-          // Compare message sender ID with current user ID
-          const isCurrentUser = message.sender_id === currentUserId;
+        {messages.length === 0 ? (
+          <p className="text-center text-muted-foreground py-4">
+            まだメッセージがありません。会話を始めましょう！
+          </p>
+        ) : (
+          messages.map((message) => {
+            // Compare message sender ID with current user ID
+            const isCurrentUser = message.sender_id === currentUserId;
 
-          return (
-            <div
-              key={message.id}
-              className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-            >
+            return (
               <div
-                className={`max-w-[75%] p-3 rounded-lg ${
-                  isCurrentUser
-                    ? 'bg-primary text-primary-foreground rounded-br-none'
-                    : 'bg-muted rounded-bl-none'
-                }`}
+                key={message.id}
+                className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
               >
-                <p className="break-words">{message.content}</p>
-                <span
-                  className={`text-xs block mt-1 ${
-                    isCurrentUser ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                <div
+                  className={`max-w-[75%] p-3 rounded-lg ${
+                    isCurrentUser
+                      ? 'bg-primary text-primary-foreground rounded-br-none'
+                      : 'bg-muted rounded-bl-none'
                   }`}
                 >
-                  {formatMessageTimestamp(message.created_at)}
-                </span>
+                  <p className="break-words">{message.content}</p>
+                  <span
+                    className={`text-xs block mt-1 ${
+                      isCurrentUser ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                    }`}
+                  >
+                    {formatMessageTimestamp(message.created_at)}
+                  </span>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
         <div ref={messagesEndRef} />
       </div>
 

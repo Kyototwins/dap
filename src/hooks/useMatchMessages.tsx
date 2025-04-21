@@ -10,6 +10,7 @@ export function useMatchMessages() {
 
   const fetchMessages = async (matchId: string) => {
     try {
+      console.log(`Fetching messages for match: ${matchId}`);
       const { data, error } = await supabase
         .from("messages")
         .select(`
@@ -19,7 +20,12 @@ export function useMatchMessages() {
         .eq("match_id", matchId)
         .order("created_at", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching messages:", error);
+        throw error;
+      }
+      
+      console.log(`Received ${data?.length || 0} messages from database`);
       
       const validMessages = (data || [])
         .filter(message => message.sender)
@@ -84,9 +90,11 @@ export function useMatchMessages() {
           };
         });
 
+      console.log(`Processed ${validMessages.length} valid messages`);
       setMessages(validMessages);
       return validMessages;
     } catch (error: any) {
+      console.error("Error in fetchMessages:", error);
       toast({
         title: "Error",
         description: error.message,

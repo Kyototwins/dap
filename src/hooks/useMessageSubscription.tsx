@@ -7,33 +7,39 @@ export function useMessageSubscription(
   selectedMatch: Match | null, 
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
 ) {
-  // Set up realtime subscription when the component mounts
+  // Set up realtime subscription when the component mounts or when selectedMatch changes
   useEffect(() => {
     if (!selectedMatch) return;
     
+    console.log(`Setting up message subscription for match: ${selectedMatch.id}`);
+    
     // Set up a realtime subscription for the selected match
     const messagesSubscription = supabase
-      .channel('messages-channel')
+      .channel(`messages-channel-${selectedMatch.id}`) // Use unique channel name with match ID
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
-        table: 'messages'
+        table: 'messages',
+        filter: `match_id=eq.${selectedMatch.id}` // Only listen for this specific match
       }, async payload => {
         console.log("New message received:", payload.new);
         
         // Get current user for comparison
         const { data: { user } } = await supabase.auth.getUser();
         
-        // Only process if relevant to the selected match 
-        if (payload.new && 
-            (selectedMatch?.id === payload.new.match_id)) {
-          
+        // Only process if relevant to the selected match
+        if (payload.new) {
           // Get sender information
-          const { data: senderData } = await supabase
+          const { data: senderData, error: senderError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', payload.new.sender_id)
             .single();
+          
+          if (senderError) {
+            console.error("Error fetching sender data:", senderError);
+            return;
+          }
           
           if (senderData) {
             console.log("Sender data found:", senderData);
@@ -97,6 +103,8 @@ export function useMessageSubscription(
               }
             };
             
+            console.log("Adding new message to state:", newMessage);
+            
             // Add message if it's for the selected match
             setMessages(prev => {
               // Avoid duplicate messages
@@ -109,8 +117,11 @@ export function useMessageSubscription(
         }
       })
       .subscribe();
+      
+    console.log("Message subscription activated");
 
     return () => {
+      console.log("Cleaning up message subscription");
       messagesSubscription.unsubscribe();
     };
   }, [selectedMatch, setMessages]);
