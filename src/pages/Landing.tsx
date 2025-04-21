@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -25,12 +24,10 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center p-6 py-16 bg-[#E5DEFF]">
-        {/* PC中央タイトル: 文言を「Doshishya Abroad Pals」に変更 */}
-        <h1 className="text-4xl font-bold text-center mb-2">
-          Doshishya <span className="text-[#7f1184]">Abroad</span>
-        </h1>
-        <h1 className="text-4xl font-bold text-center mb-6">
-          <span className="text-[#7f1184]">Pals</span>
+        {/* PC中央タイトル: 「Doshisha Abroad Pals」に修正し、「Doshisha」と「Abroad Pals」の間で改行 */}
+        <h1 className="text-4xl font-bold text-center mb-6 whitespace-pre-line">
+          Doshisha{"\n"}
+          <span className="text-[#7f1184]">Abroad Pals</span>
         </h1>
         <p className="text-gray-600 text-center max-w-md mb-8">
           Join DAP, where university students worldwide connect for language
