@@ -15,9 +15,13 @@ export function useMatches() {
 
   const fetchMatches = async () => {
     try {
+      setLoading(true);
+      console.log("Fetching matches...");
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // Get matches where user is either user1 or user2 AND status is accepted
       const { data: matchesData, error } = await supabase
         .from("matches")
         .select(`
@@ -29,10 +33,12 @@ export function useMatches() {
           user1:profiles!matches_user1_id_fkey (*),
           user2:profiles!matches_user2_id_fkey (*)
         `)
-        .or(`status.eq.accepted,user1_id.eq.${user.id}`)
-        .order("created_at", { ascending: false });
+        .eq("status", "accepted")
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
 
       if (error) throw error;
+      
+      console.log(`Found ${matchesData?.length || 0} matches`);
 
       // Get latest message and unread count for each match
       const processedMatches = await Promise.all((matchesData || []).map(async (match) => {
@@ -55,6 +61,8 @@ export function useMatches() {
         // Count unread messages
         let unreadCount = 0;
         if (lastMessage && lastMessage.sender_id === otherUser.id) {
+          // For now just mark as 1 if the last message is from other user
+          // In a real app, you would count all unread messages
           unreadCount = 1;
         }
         
@@ -83,7 +91,7 @@ export function useMatches() {
         
         return {
           id: match.id,
-          status: match.status || 'accepted', // Ensure status is defined
+          status: match.status,
           user1_id: match.user1_id,
           user2_id: match.user2_id,
           otherUser: {
@@ -129,14 +137,16 @@ export function useMatches() {
         return timeB - timeA; // Most recent first
       });
 
+      console.log(`Processed ${sortedMatches.length} matches`);
       setMatches(sortedMatches);
-      setLoading(false);
     } catch (error: any) {
+      console.error("Error fetching matches:", error);
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
       });
+    } finally {
       setLoading(false);
     }
   };
