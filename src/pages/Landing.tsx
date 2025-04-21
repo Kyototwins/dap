@@ -25,12 +25,12 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center p-6 py-16 bg-[#E5DEFF]">
-        {/* PC中央タイトル: DAPのロゴではなくタイトル文なのでそのまま */}
+        {/* PC中央タイトル: 文言を「Doshishya Abroad Pals」に変更 */}
         <h1 className="text-4xl font-bold text-center mb-2">
-          Connect <span className="text-[#7f1184]">Beyond</span>
+          Doshishya <span className="text-[#7f1184]">Abroad</span>
         </h1>
         <h1 className="text-4xl font-bold text-center mb-6">
-          <span className="text-[#7f1184]">Borders</span>
+          <span className="text-[#7f1184]">Pals</span>
         </h1>
         <p className="text-gray-600 text-center max-w-md mb-8">
           Join DAP, where university students worldwide connect for language
