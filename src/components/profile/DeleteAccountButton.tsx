@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   AlertDialog,
@@ -30,17 +31,29 @@ export function DeleteAccountButton() {
         throw new Error("Failed to retrieve account information.");
       }
 
-      // Delete data from various tables
+      // WARNING: Order matters for foreign key constraints
+      // Delete relational data in proper order
+      
+      // First delete data that references matches
+      await supabase.from('messages').delete().eq('sender_id', user.id);
+      
+      // Delete event-related data
+      await supabase.from('event_comments').delete().eq('user_id', user.id);
+      await supabase.from('event_participants').delete().eq('user_id', user.id);
+      await supabase.from('events').delete().eq('creator_id', user.id);
+      
+      // Delete message groups and notifications
+      await supabase.from('message_group_members').delete().eq('user_id', user.id);
       await supabase.from('notifications').delete().eq('user_id', user.id);
+      
+      // Delete offered_experiences
+      await supabase.from('offered_experiences').delete().eq('user_id', user.id);
+      
+      // Delete matches where user is either user1 or user2
+      // These need to be deleted after messages are deleted
       await supabase.from('matches').delete().eq('user1_id', user.id);
       await supabase.from('matches').delete().eq('user2_id', user.id);
-      await supabase.from('messages').delete().eq('sender_id', user.id);
-      await supabase.from('events').delete().eq('creator_id', user.id);
-      await supabase.from('event_participants').delete().eq('user_id', user.id);
-      await supabase.from('event_comments').delete().eq('user_id', user.id);
-      await supabase.from('offered_experiences').delete().eq('user_id', user.id);
-      await supabase.from('message_group_members').delete().eq('user_id', user.id);
-
+      
       // Delete profile (last)
       await supabase.from('profiles').delete().eq('id', user.id);
 
@@ -62,6 +75,7 @@ export function DeleteAccountButton() {
 
       navigate("/login");
     } catch (error: any) {
+      console.error("Account deletion error:", error);
       toast({
         title: "Deletion Failed",
         description: error.message,
