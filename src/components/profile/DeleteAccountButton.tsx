@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   AlertDialog,
@@ -31,63 +30,44 @@ export function DeleteAccountButton() {
         throw new Error("Failed to retrieve account information.");
       }
 
-      // Delete user data from profiles table
-      const { error: profileDeleteError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', user.id);
-        
-      if (profileDeleteError) {
-        console.error("Error deleting profile data:", profileDeleteError);
-        throw new Error("Failed to delete profile data.");
-      }
-      
-      // Delete any related data from other tables (add as needed)
-      // Examples based on your database schema:
-      
-      // Delete from notifications
+      // 各テーブルからデータ削除
       await supabase.from('notifications').delete().eq('user_id', user.id);
-      
-      // Delete from matches (as user1 or user2)
       await supabase.from('matches').delete().eq('user1_id', user.id);
       await supabase.from('matches').delete().eq('user2_id', user.id);
-      
-      // Delete from messages
       await supabase.from('messages').delete().eq('sender_id', user.id);
-      
-      // Delete from events where user is creator
       await supabase.from('events').delete().eq('creator_id', user.id);
-      
-      // Delete from event_participants
       await supabase.from('event_participants').delete().eq('user_id', user.id);
-      
-      // Delete from event_comments
       await supabase.from('event_comments').delete().eq('user_id', user.id);
-      
-      // Delete from offered_experiences
       await supabase.from('offered_experiences').delete().eq('user_id', user.id);
-      
-      // Delete from message_group_members
       await supabase.from('message_group_members').delete().eq('user_id', user.id);
-      
-      // Handle user auth deletion
-      try {
-        // Try the admin delete first (this will likely fail on client side)
-        const { error: delError } = await supabase.auth.admin.deleteUser(user.id);
-        if (delError) throw delError;
-      } catch (adminError) {
-        console.log("Admin delete failed, trying user-level signout");
-        // If the admin delete fails, try the user-level delete
-        const { error: userDelError } = await supabase.auth.signOut({ scope: 'local' });
-        if (userDelError) throw userDelError;
+
+      // プロフィール削除（最後）
+      await supabase.from('profiles').delete().eq('id', user.id);
+
+      // service_role_keyは環境変数や安全な方法で取得する必要があるため、暫定的にwindow.prompt
+      // 本番では絶対にフロントエンドに埋め込まないでください
+      // 開発・検証のみでご利用ください
+      const serviceRole = window.prompt("service_roleキーを入力してください(開発用途)")?.trim();
+      if (!serviceRole) {
+        throw new Error("管理用キー（service_role）が必要です。");
+      }
+
+      // Edge Functionでauth.usersを削除
+      const fnRes = await fetch("https://yxacicvkyusnykivbmtg.functions.supabase.co/delete-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.id, service_role_key: serviceRole }),
+      });
+      const res = await fnRes.json();
+      if (!fnRes.ok || !res.success) {
+        throw new Error("auth.usersの削除に失敗しました: " + (res.error || ""));
       }
 
       toast({
         title: "Account Deleted",
         description: "Thank you for using our service.",
       });
-      
-      // Redirect to login page
+
       navigate("/login");
     } catch (error: any) {
       toast({
