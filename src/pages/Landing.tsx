@@ -21,7 +21,7 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center p-6 py-16 bg-[#D6BCFA]">
+      <section className="flex flex-col items-center justify-center p-6 py-16 bg-[#E5DEFF]">
         <h1 className="text-4xl font-bold text-center mb-2">
           Connect <span className="text-[#7f1184]">Beyond</span>
         </h1>
