@@ -7,16 +7,16 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 
 const HOBBY_OPTIONS = [
-  "写真",
-  "ハイキング",
-  "アート",
-  "読書",
-  "料理",
-  "旅行",
-  "音楽",
-  "スポーツ",
-  "ゲーム",
-  "プログラミング"
+  "Photography",
+  "Hiking",
+  "Art",
+  "Reading",
+  "Cooking",
+  "Traveling",
+  "Music",
+  "Sports",
+  "Games",
+  "Programming"
 ];
 
 interface HobbiesInputProps {

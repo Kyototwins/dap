@@ -33,7 +33,7 @@ export function PersonalDetails({
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor="age">年齢</Label>
+        <Label htmlFor="age">Age</Label>
         <Input
           id="age"
           type="number"
@@ -47,7 +47,7 @@ export function PersonalDetails({
       </div>
 
       <div className="space-y-2">
-        <Label>性別</Label>
+        <Label>Gender</Label>
         <Select
           value={gender}
           onValueChange={(value) => onChange("gender", value)}
@@ -55,9 +55,10 @@ export function PersonalDetails({
           disabled={loading}
         >
           <SelectTrigger>
-            <SelectValue placeholder="性別を選択" />
+            <SelectValue placeholder="Select gender" />
           </SelectTrigger>
           <SelectContent>
+            {/* options from constants will be translated in constants/profileOptions.ts */}
             {GENDER_OPTIONS.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
@@ -68,7 +69,7 @@ export function PersonalDetails({
       </div>
 
       <div className="space-y-2">
-        <Label>出身地</Label>
+        <Label>Origin</Label>
         <Select
           value={origin}
           onValueChange={(value) => onChange("origin", value)}
@@ -76,7 +77,7 @@ export function PersonalDetails({
           disabled={loading}
         >
           <SelectTrigger>
-            <SelectValue placeholder="出身地を選択" />
+            <SelectValue placeholder="Select origin" />
           </SelectTrigger>
           <SelectContent>
             {ORIGIN_OPTIONS.map((option) => (
@@ -89,7 +90,7 @@ export function PersonalDetails({
       </div>
 
       <div className="space-y-2">
-        <Label>性的指向</Label>
+        <Label>Sexuality</Label>
         <Select
           value={sexuality}
           onValueChange={(value) => onChange("sexuality", value)}
@@ -97,7 +98,7 @@ export function PersonalDetails({
           disabled={loading}
         >
           <SelectTrigger>
-            <SelectValue placeholder="性的指向を選択" />
+            <SelectValue placeholder="Select sexuality" />
           </SelectTrigger>
           <SelectContent>
             {SEXUALITY_OPTIONS.map((option) => (
@@ -110,10 +111,10 @@ export function PersonalDetails({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="aboutMe">自己紹介</Label>
+        <Label htmlFor="aboutMe">About Me</Label>
         <Textarea
           id="aboutMe"
-          placeholder="あなたの興味や趣味について教えてください"
+          placeholder="Tell us about your interests and hobbies"
           value={aboutMe}
           onChange={(e) => onChange("aboutMe", e.target.value)}
           className="min-h-[100px]"

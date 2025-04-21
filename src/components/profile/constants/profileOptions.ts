@@ -1,48 +1,49 @@
 
+// Department options (can stay romanized for context)
 export const DEPARTMENT_OPTIONS = [
-  "文学部",
-  "経済学部",
-  "法学部",
-  "理学部",
-  "工学部",
-  "医学部",
-  "教育学部",
-  "農学部",
-  "情報学部",
-  "国際関係学部",
-  "その他"
+  "Literature",
+  "Economics",
+  "Law",
+  "Science",
+  "Engineering",
+  "Medical",
+  "Education",
+  "Agriculture",
+  "Informatics",
+  "International Relations",
+  "Other"
 ];
 
 export const YEAR_OPTIONS = [
-  "1年生",
-  "2年生",
-  "3年生",
-  "4年生",
-  "修士1年",
-  "修士2年",
-  "博士",
-  "その他"
+  "1st Year",
+  "2nd Year",
+  "3rd Year",
+  "4th Year",
+  "Master 1st Year",
+  "Master 2nd Year",
+  "PhD",
+  "Other"
 ];
 
 export const GENDER_OPTIONS = [
-  { value: "male", label: "男性" },
-  { value: "female", label: "女性" },
-  { value: "other", label: "その他" },
-  { value: "prefer_not_to_say", label: "回答しない" }
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "other", label: "Other" },
+  { value: "prefer_not_to_say", label: "Prefer not to say" }
 ];
 
 export const ORIGIN_OPTIONS = [
-  { value: "japan", label: "日本" },
-  { value: "china", label: "中国" },
-  { value: "korea", label: "韓国" },
-  { value: "usa", label: "アメリカ" },
-  { value: "other", label: "その他" }
+  { value: "japan", label: "Japan" },
+  { value: "china", label: "China" },
+  { value: "korea", label: "Korea" },
+  { value: "usa", label: "USA" },
+  { value: "other", label: "Other" }
 ];
 
 export const SEXUALITY_OPTIONS = [
-  { value: "heterosexual", label: "異性愛" },
-  { value: "homosexual", label: "同性愛" },
-  { value: "bisexual", label: "両性愛" },
-  { value: "other", label: "その他" },
-  { value: "prefer_not_to_say", label: "回答しない" }
+  { value: "heterosexual", label: "Heterosexual" },
+  { value: "homosexual", label: "Homosexual" },
+  { value: "bisexual", label: "Bisexual" },
+  { value: "other", label: "Other" },
+  { value: "prefer_not_to_say", label: "Prefer not to say" }
 ];

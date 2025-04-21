@@ -11,19 +11,19 @@ import {
 } from "@/components/ui/select";
 
 const LANGUAGE_OPTIONS = [
-  "日本語",
-  "英語",
-  "中国語",
-  "韓国語",
-  "スペイン語",
-  "フランス語"
+  "Japanese",
+  "English",
+  "Chinese",
+  "Korean",
+  "Spanish",
+  "French"
 ];
 
 const LANGUAGE_LEVELS = [
-  { value: 1, label: "初級" },
-  { value: 2, label: "中級" },
-  { value: 3, label: "上級" },
-  { value: 4, label: "ネイティブ" },
+  { value: 1, label: "Beginner" },
+  { value: 2, label: "Intermediate" },
+  { value: 3, label: "Advanced" },
+  { value: 4, label: "Native" },
 ];
 
 interface LanguageSkillsInputProps {
@@ -44,7 +44,7 @@ export function LanguageSkillsInput({
   return (
     <>
       <div className="space-y-4">
-        <Label>言語スキル</Label>
+        <Label>Language Skills</Label>
         {languages.map((lang) => (
           <div key={lang} className="space-y-2 p-3 border rounded-md">
             <div className="flex justify-between items-center">
@@ -57,15 +57,15 @@ export function LanguageSkillsInput({
                   onChange("languages", newLangs);
                 }}
               >
-                削除
+                Remove
               </Badge>
             </div>
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>初級</span>
-                <span>中級</span>
-                <span>上級</span>
-                <span>ネイティブ</span>
+                <span>Beginner</span>
+                <span>Intermediate</span>
+                <span>Advanced</span>
+                <span>Native</span>
               </div>
               <Slider
                 value={[languageLevels[lang] || 1]}
@@ -97,7 +97,7 @@ export function LanguageSkillsInput({
             disabled={loading}
           >
             <SelectTrigger>
-              <SelectValue placeholder="言語を追加" />
+              <SelectValue placeholder="Add a language" />
             </SelectTrigger>
             <SelectContent>
               {LANGUAGE_OPTIONS.filter(lang => !languages.includes(lang)).map((lang) => (
@@ -111,7 +111,7 @@ export function LanguageSkillsInput({
       </div>
 
       <div className="space-y-2">
-        <Label>学習中の言語</Label>
+        <Label>Currently learning</Label>
         <div className="flex flex-wrap gap-2">
           {LANGUAGE_OPTIONS.map((lang) => (
             <Badge
