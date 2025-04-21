@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,8 +20,14 @@ export default function Landing() {
         <div className="text-[#7f1184] text-3xl font-bold">DAP</div>
       </header>
 
-      {/* Create Account & Login */}
-      <div className="flex flex-col items-center justify-center p-6 bg-gray-50 py-16">
+      {/* Hero Section */}
+      <section className="flex flex-col items-center justify-center p-6 bg-gray-50 py-16">
+        <h1 className="text-4xl font-bold text-center mb-2">
+          Connect <span className="text-[#7f1184]">Beyond</span>
+        </h1>
+        <h1 className="text-4xl font-bold text-center mb-6">
+          <span className="text-[#7f1184]">Borders</span>
+        </h1>
         <p className="text-gray-600 text-center max-w-md mb-8">
           Join DAP, where university students worldwide connect for language
           exchange, cultural understanding, and meaningful friendships.
@@ -40,7 +47,7 @@ export default function Landing() {
             Login
           </Button>
         </div>
-      </div>
+      </section>
 
       {/* How It Works */}
       <section className="px-6 py-16">
@@ -136,3 +143,4 @@ export default function Landing() {
     </div>
   );
 }
+
