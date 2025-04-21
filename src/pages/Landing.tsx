@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { User } from "lucide-react";
 
 export default function Landing() {
   const navigate = useNavigate();
-  
+
   // Check if user is already authenticated
   useEffect(() => {
     // Here you would check for an existing session
@@ -20,18 +19,8 @@ export default function Landing() {
         <div className="text-[#7f1184] text-3xl font-bold">DAP</div>
       </header>
 
-      {/* Hero Section */}
+      {/* Create Account & Login */}
       <section className="flex flex-col items-center justify-center p-6 bg-gray-50 py-16">
-        <h1 className="text-4xl font-bold text-center mb-2">
-          Connect <span className="text-[#7f1184]">Beyond</span>
-        </h1>
-        <h1 className="text-4xl font-bold text-center mb-6">
-          <span className="text-[#7f1184]">Borders</span>
-        </h1>
-        <p className="text-gray-600 text-center max-w-md mb-8">
-          Join DAP, where university students worldwide connect for language
-          exchange, cultural understanding, and meaningful friendships.
-        </p>
         <div className="flex flex-col w-full max-w-xs gap-3">
           <Button
             className="bg-[#7f1184] hover:bg-[#671073] text-white w-full py-6 text-lg"
@@ -52,7 +41,7 @@ export default function Landing() {
       {/* How It Works */}
       <section className="px-6 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">How DAP Works</h2>
-        
+
         <div className="space-y-8">
           {/* Step 1 */}
           <div className="bg-white rounded-xl p-6 border border-border shadow-sm">
@@ -66,7 +55,7 @@ export default function Landing() {
               Share your language skills, interests, and what you're looking for in a language exchange partner.
             </p>
           </div>
-          
+
           {/* Step 2 */}
           <div className="bg-white rounded-xl p-6 border border-border shadow-sm">
             <div className="flex justify-center mb-4">
@@ -79,7 +68,7 @@ export default function Landing() {
               Discover students with complementary language skills and shared interests from universities worldwide.
             </p>
           </div>
-          
+
           {/* Step 3 */}
           <div className="bg-white rounded-xl p-6 border border-border shadow-sm">
             <div className="flex justify-center mb-4">
@@ -143,4 +132,3 @@ export default function Landing() {
     </div>
   );
 }
-
