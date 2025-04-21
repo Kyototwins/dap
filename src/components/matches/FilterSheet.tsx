@@ -20,33 +20,33 @@ import { FilterState } from "@/types/matches";
 
 // Constants
 const LANGUAGE_OPTIONS = [
-  { value: "japanese", label: "日本語" },
-  { value: "english", label: "英語" },
-  { value: "chinese", label: "中国語" },
-  { value: "korean", label: "韓国語" },
-  { value: "french", label: "フランス語" },
-  { value: "spanish", label: "スペイン語" },
+  { value: "japanese", label: "Japanese" },
+  { value: "english", label: "English" },
+  { value: "chinese", label: "Chinese" },
+  { value: "korean", label: "Korean" },
+  { value: "french", label: "French" },
+  { value: "spanish", label: "Spanish" },
 ];
 
-// 出身国オプション
+// Country options
 const COUNTRY_OPTIONS = [
-  { value: "japan", label: "日本" },
-  { value: "usa", label: "アメリカ" },
-  { value: "china", label: "中国" },
-  { value: "korea", label: "韓国" },
-  { value: "other", label: "その他" },
+  { value: "japan", label: "Japan" },
+  { value: "usa", label: "USA" },
+  { value: "china", label: "China" },
+  { value: "korea", label: "Korea" },
+  { value: "other", label: "Other" },
 ];
 
-// 趣味オプション
+// Hobby options
 const HOBBY_OPTIONS = [
-  "旅行", "料理", "映画鑑賞", "読書", "音楽", "スポーツ", "アート", 
-  "写真", "ダンス", "ゲーム", "プログラミング", "語学"
+  "Traveling", "Cooking", "Watching Movies", "Reading", "Music", "Sports", "Art", 
+  "Photography", "Dancing", "Gaming", "Programming", "Languages"
 ];
 
-// ソートオプション定義
+// Sort options
 const SORT_OPTIONS = [
-  { value: "recent", label: "最新登録順" },
-  { value: "active", label: "アクティブ順" },
+  { value: "recent", label: "Newest Registered" },
+  { value: "active", label: "Most Active" },
 ];
 
 interface FilterSheetProps {
@@ -57,7 +57,7 @@ interface FilterSheetProps {
 }
 
 export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSheetProps) {
-  // 有効なフィルターの数を計算
+  // Calculate number of active filters
   const getActiveFilterCount = (): number => {
     let count = 0;
     if (filters.speakingLanguages.length > 0) count++;
@@ -69,7 +69,7 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
     return count;
   };
 
-  // フィルター変更ハンドラ
+  // Filter change handler
   const handleFilterChange = (key: keyof FilterState, value: any) => {
     setFilters({
       ...filters,
@@ -77,7 +77,7 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
     });
   };
 
-  // 言語選択トグルハンドラ
+  // Language selection toggle handler
   const toggleLanguage = (list: keyof FilterState, lang: string) => {
     const currentList = [...filters[list] as string[]];
     const index = currentList.indexOf(lang);
@@ -91,7 +91,7 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
     handleFilterChange(list, currentList);
   };
 
-  // 趣味選択トグルハンドラ
+  // Hobby selection toggle handler
   const toggleHobby = (hobby: string) => {
     const currentHobbies = [...filters.hobbies];
     const index = currentHobbies.indexOf(hobby);
@@ -105,7 +105,7 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
     handleFilterChange("hobbies", currentHobbies);
   };
 
-  // 出身国選択トグルハンドラ
+  // Country toggle handler
   const toggleCountry = (country: string) => {
     const currentCountries = [...filters.countries];
     const index = currentCountries.indexOf(country);
@@ -119,13 +119,13 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
     handleFilterChange("countries", currentCountries);
   };
 
-  // フィルター保存ハンドラ
+  // Save filter handler
   const handleSaveFilter = () => {
     setIsOpen(false);
-    // フィルターは既に適用されているので追加の処理は不要
+    // Filters are already applied, no extra action needed
   };
 
-  // フィルターリセットハンドラ
+  // Reset filter handler
   const handleResetFilter = () => {
     setFilters({
       ageRange: [18, 50],
@@ -146,7 +146,7 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
           className="bg-white/70 backdrop-blur-sm border-doshisha-softPurple flex gap-2 items-center"
         >
           <SlidersHorizontal className="h-4 w-4 text-doshisha-purple" />
-          フィルター
+          Filters
           {getActiveFilterCount() > 0 && (
             <Badge variant="secondary" className="ml-1 bg-doshisha-softPurple text-doshisha-darkPurple">
               {getActiveFilterCount()}
@@ -156,16 +156,16 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
       </SheetTrigger>
       <SheetContent className="sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>フィルター設定</SheetTitle>
+          <SheetTitle>Filter Settings</SheetTitle>
           <SheetDescription>
-            マッチング条件を設定してください
+            Please set your matching criteria
           </SheetDescription>
         </SheetHeader>
         
         <div className="py-6 space-y-6">
-          {/* ソート設定 */}
+          {/* Sort Settings */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium border-b pb-2">表示順</h3>
+            <h3 className="text-sm font-medium border-b pb-2">Sort Order</h3>
             <RadioGroup 
               value={filters.sortOption} 
               onValueChange={(value) => handleFilterChange("sortOption", value)}
@@ -180,13 +180,13 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
             </RadioGroup>
           </div>
           
-          {/* 年齢範囲 */}
+          {/* Age Range */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium border-b pb-2">年齢範囲</h3>
+            <h3 className="text-sm font-medium border-b pb-2">Age Range</h3>
             <div className="space-y-4">
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{filters.ageRange[0]}歳</span>
-                <span>{filters.ageRange[1]}歳</span>
+                <span>{filters.ageRange[0]} years</span>
+                <span>{filters.ageRange[1]} years</span>
               </div>
               <Slider
                 value={filters.ageRange}
@@ -199,13 +199,13 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
             </div>
           </div>
           
-          {/* 言語関連フィルター */}
+          {/* Language Filters */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium border-b pb-2">言語スキル</h3>
+            <h3 className="text-sm font-medium border-b pb-2">Language Skills</h3>
             
-            {/* 話せる言語 */}
+            {/* Speaking Languages */}
             <div className="space-y-2">
-              <h4 className="text-xs font-medium">話せる言語</h4>
+              <h4 className="text-xs font-medium">Speaking Languages</h4>
               <div className="flex flex-wrap gap-2">
                 {LANGUAGE_OPTIONS.map(lang => (
                   <Badge
@@ -224,16 +224,16 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
               </div>
             </div>
             
-            {/* 言語レベル */}
+            {/* Minimum Language Level */}
             {filters.speakingLanguages.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-xs font-medium">最低言語レベル</h4>
+                <h4 className="text-xs font-medium">Minimum Language Level</h4>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>初級</span>
-                    <span>中級</span>
-                    <span>上級</span>
-                    <span>ネイティブ</span>
+                    <span>Beginner</span>
+                    <span>Intermediate</span>
+                    <span>Advanced</span>
+                    <span>Native</span>
                   </div>
                   <Slider
                     value={[filters.minLanguageLevel]}
@@ -246,9 +246,9 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
               </div>
             )}
             
-            {/* 学習中の言語 */}
+            {/* Learning Languages */}
             <div className="space-y-2">
-              <h4 className="text-xs font-medium">学習中の言語</h4>
+              <h4 className="text-xs font-medium">Languages I'm Learning</h4>
               <div className="flex flex-wrap gap-2">
                 {LANGUAGE_OPTIONS.map(lang => (
                   <Badge
@@ -268,9 +268,9 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
             </div>
           </div>
           
-          {/* 趣味 */}
+          {/* Hobbies / Interests */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium border-b pb-2">趣味・興味</h3>
+            <h3 className="text-sm font-medium border-b pb-2">Hobbies & Interests</h3>
             <div className="flex flex-wrap gap-2">
               {HOBBY_OPTIONS.map(hobby => (
                 <Badge
@@ -289,9 +289,9 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
             </div>
           </div>
           
-          {/* 出身国 */}
+          {/* Countries of Origin */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium border-b pb-2">出身国</h3>
+            <h3 className="text-sm font-medium border-b pb-2">Country of Origin</h3>
             <div className="grid grid-cols-2 gap-2">
               {COUNTRY_OPTIONS.map(country => (
                 <div key={country.value} className="flex items-center space-x-2">
@@ -318,16 +318,17 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
             onClick={handleResetFilter}
             className="flex-1"
           >
-            リセット
+            Reset
           </Button>
           <Button 
             onClick={handleSaveFilter}
             className="flex-1 bg-doshisha-purple hover:bg-doshisha-darkPurple"
           >
-            適用する
+            Apply
           </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>
   );
 }
+
