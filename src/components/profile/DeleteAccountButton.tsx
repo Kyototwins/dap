@@ -98,17 +98,16 @@ export function DeleteAccountButton() {
             <AlertDialogCancel disabled={loading} onClick={() => setOpenSecond(false)}>
               キャンセル
             </AlertDialogCancel>
-            <AlertDialogAction
+            <Button
               variant="destructive"
               disabled={loading}
               onClick={handleDelete}
             >
               {loading ? "削除中..." : "削除する"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
   );
 }
-
