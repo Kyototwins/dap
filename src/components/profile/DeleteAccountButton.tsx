@@ -8,7 +8,6 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogAction,
   AlertDialogCancel
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -26,24 +25,36 @@ export function DeleteAccountButton() {
   const handleDelete = async () => {
     setLoading(true);
     try {
-      // サインイン済みユーザー取得
+      // Get current user
       const { data: { user }, error } = await supabase.auth.getUser();
       if (error || !user) {
-        throw new Error("アカウント情報の取得に失敗しました。");
+        throw new Error("Failed to retrieve account information.");
       }
-      // Supabaseのアカウント削除（ユーザー自身で自分を削除する場合）
+
+      // Delete user data from profiles table first
+      const { error: profileDeleteError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', user.id);
+        
+      if (profileDeleteError) {
+        console.error("Error deleting profile data:", profileDeleteError);
+      }
+      
+      // Delete the Supabase user account
       const { error: delError } = await supabase.auth.admin.deleteUser(user.id);
       if (delError) throw delError;
 
       toast({
-        title: "アカウントを削除しました",
-        description: "ご利用ありがとうございました。",
+        title: "Account Deleted",
+        description: "Thank you for using our service.",
       });
-      // ログイン画面に遷移
+      
+      // Redirect to login page
       navigate("/login");
     } catch (error: any) {
       toast({
-        title: "削除に失敗しました",
+        title: "Deletion Failed",
         description: error.message,
         variant: "destructive",
       });
@@ -59,27 +70,27 @@ export function DeleteAccountButton() {
       <AlertDialog open={openFirst} onOpenChange={setOpenFirst}>
         <AlertDialogTrigger asChild>
           <Button variant="destructive" size="sm" className="rounded-xl">
-            アカウントを削除
+            Delete Account
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>本当にアカウントを削除しますか？</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure you want to delete your account?</AlertDialogTitle>
             <AlertDialogDescription>
-              アカウント削除後は復元できません。<br />
-              続行する場合は「次へ」をクリックしてください。
+              Your account cannot be recovered after deletion.<br />
+              Click "Next" to proceed with the deletion process.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>キャンセル</AlertDialogCancel>
-            <AlertDialogAction
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
               onClick={() => {
                 setOpenFirst(false);
                 setOpenSecond(true);
               }}
             >
-              次へ
-            </AlertDialogAction>
+              Next
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -88,22 +99,22 @@ export function DeleteAccountButton() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              アカウントを完全に削除しますか？
+              Permanently delete your account?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              この操作は取り消せません。本当に削除しますか？
+              This action cannot be undone. All your data will be permanently removed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={loading} onClick={() => setOpenSecond(false)}>
-              キャンセル
+              Cancel
             </AlertDialogCancel>
             <Button
               variant="destructive"
               disabled={loading}
               onClick={handleDelete}
             >
-              {loading ? "削除中..." : "削除する"}
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
