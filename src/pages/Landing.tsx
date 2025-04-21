@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center p-6 bg-gray-50 py-16">
+      <section className="flex flex-col items-center justify-center p-6 py-16 bg-[#D6BCFA]">
         <h1 className="text-4xl font-bold text-center mb-2">
           Connect <span className="text-[#7f1184]">Beyond</span>
         </h1>
@@ -118,3 +119,4 @@ export default function Landing() {
     </div>
   );
 }
+
