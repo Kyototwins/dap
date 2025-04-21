@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { LanguageToggle } from "@/components/layout/LanguageToggle";
+import { DapLogo } from "@/components/common/DapLogo";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -34,7 +35,9 @@ export function AppLayout({ children }: LayoutProps) {
     <div className="min-h-screen pb-16">
       <header className="fixed top-0 right-0 left-0 z-50 bg-white border-b border-gray-200">
         <div className="container max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-doshisha-purple">DAP</h1>
+          <div>
+            <DapLogo />
+          </div>
           <div className="flex items-center gap-2">
             <LanguageToggle />
             <NotificationBell />

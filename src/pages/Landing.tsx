@@ -1,7 +1,9 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
+import { DapLogo } from "@/components/common/DapLogo";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -16,11 +18,14 @@ export default function Landing() {
     <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
       <header className="flex justify-between items-center p-4 bg-white">
-        <div className="text-[#7f1184] text-3xl font-bold">DAP</div>
+        <div>
+          <DapLogo />
+        </div>
       </header>
 
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center p-6 py-16 bg-[#E5DEFF]">
+        {/* PC中央タイトル: DAPのロゴではなくタイトル文なのでそのまま */}
         <h1 className="text-4xl font-bold text-center mb-2">
           Connect <span className="text-[#7f1184]">Beyond</span>
         </h1>
