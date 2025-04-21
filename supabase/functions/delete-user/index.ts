@@ -22,7 +22,7 @@ serve(async (req) => {
       });
     }
 
-    // 認証情報削除用のサービスロールキー取得
+    // Get service role key for admin operations
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     if (!serviceRoleKey) {
       return new Response(JSON.stringify({ success: false, error: "Service role key not configured" }), {
@@ -31,30 +31,40 @@ serve(async (req) => {
       });
     }
 
-    console.log(`Delete only auth.users for user: ${user_id}`);
+    const SUPABASE_URL = "https://yxacicvkyusnykivbmtg.supabase.co";
+    console.log(`Attempting to delete auth user with ID: ${user_id}`);
 
-    // SupabaseのAdmin APIでusersのみ削除
+    // Use the Auth Admin API to delete the user
     const res = await fetch(
-      `https://yxacicvkyusnykivbmtg.supabase.co/auth/v1/admin/users/${user_id}`,
+      `${SUPABASE_URL}/auth/v1/admin/users/${user_id}`,
       {
         method: "DELETE",
         headers: {
-          "apiKey": serviceRoleKey,
           "Authorization": `Bearer ${serviceRoleKey}`,
+          "apikey": serviceRoleKey,
           "Content-Type": "application/json"
         },
       }
     );
 
     const responseStatus = res.status;
-    const responseBody = await res.text();
-    console.log(`Supabase delete user response - Status: ${responseStatus}, Body: ${responseBody}`);
+    console.log(`Auth delete response status: ${responseStatus}`);
+    
+    let responseText;
+    try {
+      responseText = await res.text();
+      console.log(`Auth delete response body: ${responseText}`);
+    } catch (e) {
+      console.error("Error reading response:", e);
+      responseText = "Could not read response";
+    }
 
     let responseData;
     try {
-      responseData = JSON.parse(responseBody);
-    } catch {
-      responseData = { message: responseBody };
+      responseData = responseText ? JSON.parse(responseText) : {};
+    } catch (e) {
+      console.error("Error parsing response:", e);
+      responseData = { message: responseText };
     }
 
     if (!res.ok) {
@@ -69,7 +79,10 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ success: true }), { 
+    return new Response(JSON.stringify({ 
+      success: true,
+      message: "User authentication successfully deleted. Profile data remains intact."
+    }), { 
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
   } catch (err) {

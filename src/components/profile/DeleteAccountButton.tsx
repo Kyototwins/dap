@@ -48,6 +48,9 @@ export function DeleteAccountButton() {
         throw new Error("Failed to delete account authentication: " + (res.error ? JSON.stringify(res.error) : ""));
       }
 
+      // Sign out the user after successful deletion of auth info
+      await supabase.auth.signOut();
+
       toast({
         title: "Account Deleted",
         description: "You can now register again with the same email. Your data remains but is no longer associated with your account.",
