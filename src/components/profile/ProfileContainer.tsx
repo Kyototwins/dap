@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -6,7 +7,7 @@ import { Profile as ProfileType } from "@/types/messages";
 import { ProfileLoading } from "@/components/profile/ProfileLoading";
 import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
-import { DeleteAccountButton } from "./DeleteAccountButton";
+// DeleteAccountButtonのimportを削除
 
 export function ProfileContainer() {
   const [profile, setProfile] = useState<ProfileType | null>(null);
@@ -36,8 +37,8 @@ export function ProfileContainer() {
 
       if (error) throw error;
       setProfile(data as ProfileType);
-      
-      // Calculate profile completion
+
+      // プロフィールの完成度を計算
       if (data) {
         calculateCompletion(data);
       }
@@ -57,14 +58,14 @@ export function ProfileContainer() {
       'first_name', 'last_name', 'age', 'gender', 'origin', 'university',
       'department', 'about_me', 'avatar_url', 'languages'
     ];
-    
+
     const completedFields = fields.filter(field => {
       if (Array.isArray(profile[field])) {
         return profile[field].length > 0;
       }
       return profile[field] !== null && profile[field] !== '';
     });
-    
+
     setCompletion(Math.round((completedFields.length / fields.length) * 100));
   };
 
@@ -82,12 +83,12 @@ export function ProfileContainer() {
 
   return (
     <div>
-      <ProfileInfo 
-        profile={profile} 
-        completion={completion} 
-        onEditProfile={handleEditProfile} 
+      <ProfileInfo
+        profile={profile}
+        completion={completion}
+        onEditProfile={handleEditProfile}
       />
-      <DeleteAccountButton />
+      {/* DeleteAccountButtonは削除 */}
     </div>
   );
 }
