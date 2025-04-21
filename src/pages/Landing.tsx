@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -95,30 +94,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Testimonial */}
-      <section className="relative p-4 mt-8">
-        <div className="relative">
-          <img 
-            src="/public/lovable-uploads/dcec855f-513e-4a70-aae4-fa4c16529c99.png"
-            alt="Students studying together"
-            className="w-full h-64 object-cover rounded-xl"
-          />
-          <div className="absolute -bottom-6 left-4 flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm">
-            <div className="w-12 h-12 rounded-full overflow-hidden">
-              <img 
-                src="/public/lovable-uploads/dd8c0f48-e885-4658-8781-f1fb6bde0fd3.png" 
-                alt="Profile" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="text-left">
-              <p className="font-medium text-lg">Sophie, Paris</p>
-              <p className="text-gray-500 text-sm">Found 5 language partners</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="px-6 py-12 mt-4 bg-[#7f1184] text-white">
         <div className="max-w-md mx-auto text-center py-8">
@@ -143,4 +118,3 @@ export default function Landing() {
     </div>
   );
 }
-
