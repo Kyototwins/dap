@@ -58,9 +58,8 @@ export function EventDetailsDialog({
         <DialogHeader className="p-4 border-b">
           <DialogTitle className="text-lg">{event.title}</DialogTitle>
         </DialogHeader>
-        
         <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-          <div className="p-4 space-y-4 overflow-y-auto flex-1">
+          <div className="p-4 space-y-4 overflow-y-auto flex-shrink-0">
             {event.image_url && (
               <img
                 src={event.image_url}
@@ -68,32 +67,37 @@ export function EventDetailsDialog({
                 className="w-full h-48 object-cover rounded-lg"
               />
             )}
-            
+
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <span>{formatEventDate(event.date)}</span>
                 <span>•</span>
                 <span>{event.location}</span>
               </div>
-              
               <Badge variant="outline" className="bg-gray-100">
                 {displayCategory}
               </Badge>
-              
               <div className="text-sm text-gray-600">
                 Participants: {event.current_participants}/{event.max_participants}
               </div>
             </div>
-            
-            <p className="text-gray-700">{event.description}</p>
           </div>
-
-          <div className="flex-1 min-h-0 flex flex-col bg-gray-50 p-4">
+          {/* イベント説明は必ず外に独立して見えるように、下に移動 */}
+          <div className="px-4 pb-2">
+            <div className="font-semibold text-gray-700 mb-1">Description</div>
+            <div
+              className="text-gray-700 text-sm bg-gray-100 rounded p-3 max-h-32 overflow-y-auto"
+              style={{ whiteSpace: "pre-wrap" }}
+            >
+              {event.description}
+            </div>
+          </div>
+          {/* コメントセクション */}
+          <div className="flex-1 min-h-0 flex flex-col bg-gray-50 p-4 pt-2">
             <h3 className="font-medium mb-3">Comments</h3>
             <div className="flex-1 min-h-0 overflow-y-auto mb-4">
               <EventComments comments={comments} />
             </div>
-
             <div className="flex gap-2 items-end pt-2 border-t">
               <Textarea
                 value={newComment}
@@ -117,4 +121,3 @@ export function EventDetailsDialog({
     </Dialog>
   );
 }
-
