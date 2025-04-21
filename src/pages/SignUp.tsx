@@ -27,11 +27,12 @@ export default function SignUp() {
       });
       return;
     }
-    // 大学メールアドレスかチェック
-    if (!email.endsWith("@university.edu")) {
+    // 「doshisha.ac.jp」で終わるメールアドレスに限定
+    const doshishaEmailPattern = /@[\w.-]*doshisha\.ac\.jp$/i;
+    if (!doshishaEmailPattern.test(email)) {
       toast({
         title: "Email Requirement",
-        description: "Please use your university email address (ending with @university.edu).",
+        description: "Please use your university email address ending with doshisha.ac.jp (e.g. cgej@mail3.doshisha.ac.jp).",
         variant: "destructive",
       });
       return;
