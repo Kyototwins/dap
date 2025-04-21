@@ -117,3 +117,4 @@ export function HobbiesInput({ hobbies, onChange, loading }: HobbiesInputProps) 
     </div>
   );
 }
+

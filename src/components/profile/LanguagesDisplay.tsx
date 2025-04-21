@@ -23,19 +23,19 @@ export function LanguagesDisplay({ profile }: LanguagesDisplayProps) {
 
   const languageLevelText = (level: number) => {
     const levels = [
-      { value: 1, label: "初級" },
-      { value: 2, label: "中級" },
-      { value: 3, label: "上級" },
-      { value: 4, label: "ネイティブ" },
+      { value: 1, label: "Beginner" },
+      { value: 2, label: "Intermediate" },
+      { value: 3, label: "Advanced" },
+      { value: 4, label: "Native" },
     ];
-    return levels.find(l => l.value === level)?.label || "初級";
+    return levels.find(l => l.value === level)?.label || "Beginner";
   };
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
         <Languages className="w-5 h-5 text-amber-600" />
-        <h2 className="text-lg font-semibold">言語スキル</h2>
+        <h2 className="text-lg font-semibold">Language Skills</h2>
       </CardHeader>
       <CardContent className="space-y-4">
         {profile.languages && profile.languages.length > 0 && (
@@ -54,7 +54,7 @@ export function LanguagesDisplay({ profile }: LanguagesDisplayProps) {
 
         {profile.learning_languages && profile.learning_languages.length > 0 && (
           <div className="mt-6">
-            <h3 className="font-medium mb-3">学習中の言語</h3>
+            <h3 className="font-medium mb-3">Currently Learning</h3>
             <div className="flex flex-wrap gap-2">
               {profile.learning_languages.map((lang) => (
                 <Badge key={lang} variant="outline">{lang}</Badge>
@@ -66,3 +66,4 @@ export function LanguagesDisplay({ profile }: LanguagesDisplayProps) {
     </Card>
   );
 }
+

@@ -20,12 +20,12 @@ export function LanguageSkills({ profile, onEditClick }: LanguageSkillsProps) {
 
   const languageLevelText = (level: number) => {
     const levels = [
-      { value: 1, label: "初級" },
-      { value: 2, label: "中級" },
-      { value: 3, label: "上級" },
-      { value: 4, label: "ネイティブ" },
+      { value: 1, label: "Beginner" },
+      { value: 2, label: "Intermediate" },
+      { value: 3, label: "Advanced" },
+      { value: 4, label: "Native" },
     ];
-    return levels.find(l => l.value === level)?.label || "初級";
+    return levels.find(l => l.value === level)?.label || "Beginner";
   };
 
   return (
@@ -33,7 +33,7 @@ export function LanguageSkills({ profile, onEditClick }: LanguageSkillsProps) {
       <CardHeader className="flex flex-row items-center justify-between">
         <div className="flex items-center gap-2">
           <Languages className="w-5 h-5 text-amber-600" />
-          <h2 className="text-lg font-semibold">言語スキル</h2>
+          <h2 className="text-lg font-semibold">Language Skills</h2>
         </div>
         <Button variant="ghost" size="icon" onClick={onEditClick}>
           <Edit2 className="w-4 h-4" />
@@ -53,12 +53,12 @@ export function LanguageSkills({ profile, onEditClick }: LanguageSkillsProps) {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">言語スキルが未設定です</p>
+          <p className="text-muted-foreground">No language skills set</p>
         )}
 
         {profile.learning_languages && profile.learning_languages.length > 0 && (
           <div className="mt-6">
-            <h3 className="font-medium mb-3">学習中の言語</h3>
+            <h3 className="font-medium mb-3">Currently Learning</h3>
             <div className="flex flex-wrap gap-2">
               {profile.learning_languages.map((lang) => (
                 <Badge key={lang} variant="outline">{lang}</Badge>

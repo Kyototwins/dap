@@ -111,7 +111,7 @@ export function LanguageSkillsInput({
       </div>
 
       <div className="space-y-2">
-        <Label>Currently learning</Label>
+        <Label>Currently Learning</Label>
         <div className="flex flex-wrap gap-2">
           {LANGUAGE_OPTIONS.map((lang) => (
             <Badge
@@ -134,3 +134,4 @@ export function LanguageSkillsInput({
     </>
   );
 }
+
