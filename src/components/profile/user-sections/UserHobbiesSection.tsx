@@ -7,7 +7,7 @@ interface UserHobbiesSectionProps {
   title?: string;
 }
 
-export function UserHobbiesSection({ profile, title = "Hobbies & Interests" }: UserHobbiesSectionProps) {
+export function UserHobbiesSection({ profile, title = "Interests" }: UserHobbiesSectionProps) {
   if (!profile.hobbies || profile.hobbies.length === 0) return null;
   
   return (

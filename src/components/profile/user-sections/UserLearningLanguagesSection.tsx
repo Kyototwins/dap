@@ -7,7 +7,7 @@ interface UserLearningLanguagesSectionProps {
   title?: string;
 }
 
-export function UserLearningLanguagesSection({ profile, title = "Languages I'm Learning" }: UserLearningLanguagesSectionProps) {
+export function UserLearningLanguagesSection({ profile, title = "Learning Languages" }: UserLearningLanguagesSectionProps) {
   if (!profile.learning_languages || profile.learning_languages.length === 0) return null;
   
   return (
