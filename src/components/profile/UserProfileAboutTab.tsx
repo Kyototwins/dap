@@ -40,8 +40,8 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
       <UserPhotoSection profile={profile} />
       <UserBasicInfoSection profile={profile} />
       <UserLanguagesSection profile={profile} />
-      <UserLearningLanguagesSection profile={profile} />
-      <UserHobbiesSection profile={profile} />
+      <UserLearningLanguagesSection profile={profile} title="Learning Languages" />
+      <UserHobbiesSection profile={profile} title="Interests" />
       <UserMoreAboutSection profile={profile} />
       <UserStatsSection stats={stats} loading={loading} />
     </div>
