@@ -44,13 +44,13 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
       <UserLearningLanguagesSection profile={profile} title="Learning Languages" />
       
       {/* Hobby Photo Section */}
-      {profile.hobby_url && (
+      {profile.hobby_photo_url && (
         <Card>
           <CardContent className="p-6">
             <h3 className="font-medium text-lg mb-4">My Hobby Photo</h3>
             <div className="overflow-hidden rounded-lg">
               <img 
-                src={profile.hobby_url} 
+                src={profile.hobby_photo_url} 
                 alt="Hobby" 
                 className="w-full h-auto max-h-96 object-contain"
               />
@@ -65,13 +65,13 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
       <UserHobbiesSection profile={profile} title="Interests" />
 
       {/* Pet Photo Section */}
-      {profile.pet_url && (
+      {profile.pet_photo_url && (
         <Card>
           <CardContent className="p-6">
             <h3 className="font-medium text-lg mb-4">My Pet Photo</h3>
             <div className="overflow-hidden rounded-lg">
               <img 
-                src={profile.pet_url} 
+                src={profile.pet_photo_url} 
                 alt="Pet" 
                 className="w-full h-auto max-h-96 object-contain"
               />

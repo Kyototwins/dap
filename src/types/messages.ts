@@ -42,6 +42,10 @@ export interface Profile {
   worst_nightmare: string | null;
   friend_activity: string | null;
   best_quality: string | null;
+  hobby_photo_url: string | null;
+  pet_photo_url: string | null;
+  hobby_photo_comment: string | null;
+  pet_photo_comment: string | null;
 }
 
 export interface Message {
