@@ -6,27 +6,36 @@ import { useMessageSubscription } from "@/hooks/useMessageSubscription";
 import type { Match } from "@/types/messages";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useSearchParams } from "react-router-dom";
 
 export function useMessages() {
   const { matches, loading, fetchMatches } = useMatches();
   const { messages, setMessages, fetchMessages } = useMatchMessages();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   
-  // Debug log to check matches
+  // Check for user query parameter
   useEffect(() => {
-    console.log(`useMessages: ${matches.length} matches available`);
-    
-    // Auto-select first match if there is one and none selected
-    if (matches.length > 0 && !selectedMatch) {
+    const userId = searchParams.get('user');
+    if (userId && matches.length > 0) {
+      // Find match with specified user
+      const matchWithUser = matches.find(match => 
+        match.otherUser.id === userId
+      );
+      if (matchWithUser) {
+        console.log(`Found match with user ${userId}, selecting it`);
+        handleSelectMatch(matchWithUser);
+      }
+    } else if (matches.length > 0 && !selectedMatch) {
+      // If no specific user requested, select first match
       console.log(`Auto-selecting first match: ${matches[0].id}`);
       handleSelectMatch(matches[0]);
     } else if (matches.length === 0) {
-      // Reset selected match if there are no matches
       setSelectedMatch(null);
       setMessages([]);
     }
-  }, [matches]);
+  }, [matches, searchParams]);
   
   // Set up realtime subscription
   useMessageSubscription(selectedMatch, setMessages);
@@ -71,8 +80,24 @@ export function useMessages() {
       // Mark messages as read if needed
       if (match.unreadCount > 0) {
         console.log(`Marking ${match.unreadCount} messages as read`);
-        // For now we just update the matches list to reflect that messages have been read
-        fetchMatches();
+        
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          throw new Error("User not authenticated");
+        }
+
+        // Update message read status in the database
+        const { error: updateError } = await supabase
+          .from('matches')
+          .update({ unread_count: 0 })
+          .eq('id', match.id);
+
+        if (updateError) {
+          console.error("Error updating read status:", updateError);
+        } else {
+          // Refresh matches list to update UI
+          fetchMatches();
+        }
       }
     } catch (error) {
       console.error("Error in handleSelectMatch:", error);
