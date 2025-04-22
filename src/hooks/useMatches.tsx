@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,7 +38,6 @@ export function useMatches() {
           user1:profiles!matches_user1_id_fkey (*),
           user2:profiles!matches_user2_id_fkey (*)
         `)
-        .eq("status", "accepted")
         .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
 
       if (error) {
@@ -45,13 +45,23 @@ export function useMatches() {
         throw error;
       }
       
-      console.log(`Found ${matchesData?.length || 0} raw matches for user ${user.id}`);
-      if (matchesData && matchesData.length > 0) {
-        console.log("Sample raw match data:", matchesData[0]);
+      // Conditionally filter by status - first check if any matches exist
+      console.log(`Retrieved ${matchesData?.length || 0} raw matches (all statuses) for user ${user.id}`);
+      
+      // Filter by status only if there are matches
+      let filteredMatches = matchesData || [];
+      if (filteredMatches.length > 0) {
+        filteredMatches = filteredMatches.filter(match => match.status === 'accepted');
+        console.log(`After status filtering, ${filteredMatches.length} accepted matches remain`);
+      }
+      
+      if (filteredMatches.length > 0) {
+        console.log("Sample raw match data:", filteredMatches[0]);
       }
 
       // Get latest message and unread count for each match
-      const processedMatches = await Promise.all((matchesData || []).map(async (match) => {
+      const processedMatches = await Promise.all((filteredMatches || []).map(async (match) => {
+        // Determine which user is the "other" user
         const otherUser = match.user1_id === user.id ? match.user2 : match.user1;
         if (!otherUser) {
           console.error(`Missing other user data for match ${match.id}`);

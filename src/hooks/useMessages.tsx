@@ -21,8 +21,12 @@ export function useMessages() {
     if (matches.length > 0 && !selectedMatch) {
       console.log(`Auto-selecting first match: ${matches[0].id}`);
       handleSelectMatch(matches[0]);
+    } else if (matches.length === 0) {
+      // Reset selected match if there are no matches
+      setSelectedMatch(null);
+      setMessages([]);
     }
-  }, [matches, selectedMatch]);
+  }, [matches]);
   
   // Set up realtime subscription
   useMessageSubscription(selectedMatch, setMessages);
@@ -64,5 +68,6 @@ export function useMessages() {
     loading,
     handleSelectMatch,
     setMessages,
+    fetchMatches,
   };
 }

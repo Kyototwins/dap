@@ -13,6 +13,7 @@ export default function Messages() {
     loading,
     handleSelectMatch,
     setMessages,
+    fetchMatches,
   } = useMessages();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -29,11 +30,11 @@ export default function Messages() {
     setIsRefreshing(true);
     console.log("Refreshing messages page");
     try {
-      // Create a clean page refresh to reload all data
-      window.location.reload();
+      // Use the fetchMatches function directly instead of reloading the page
+      await fetchMatches();
+      setIsRefreshing(false);
     } catch (error) {
       console.error("Error refreshing:", error);
-    } finally {
       setIsRefreshing(false);
     }
   };
