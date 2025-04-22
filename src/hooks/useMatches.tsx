@@ -26,7 +26,7 @@ export function useMatches() {
 
       console.log("Authenticated user ID:", user.id);
 
-      // Get matches where user is either user1 or user2 AND status is accepted
+      // Get matches where user is either user1 or user2
       const { data: matchesData, error } = await supabase
         .from("matches")
         .select(`
@@ -45,18 +45,22 @@ export function useMatches() {
         throw error;
       }
       
-      // Conditionally filter by status - first check if any matches exist
+      // Log all matches first to understand what's happening
       console.log(`Retrieved ${matchesData?.length || 0} raw matches (all statuses) for user ${user.id}`);
-      
-      // Filter by status only if there are matches
-      let filteredMatches = matchesData || [];
-      if (filteredMatches.length > 0) {
-        filteredMatches = filteredMatches.filter(match => match.status === 'accepted');
-        console.log(`After status filtering, ${filteredMatches.length} accepted matches remain`);
+      if (matchesData && matchesData.length > 0) {
+        console.log("All matches statuses:", matchesData.map(m => m.status).join(', '));
       }
       
+      // Filter matches by status
+      let filteredMatches = matchesData || [];
+      // Include accepted matches only - this is crucial
+      filteredMatches = filteredMatches.filter(match => match.status === 'accepted');
+      console.log(`After status filtering: ${filteredMatches.length} accepted matches remain`);
+      
       if (filteredMatches.length > 0) {
-        console.log("Sample raw match data:", filteredMatches[0]);
+        console.log("Sample accepted match data:", filteredMatches[0]);
+      } else {
+        console.log("No accepted matches found - check if any matches need approval");
       }
 
       // Get latest message and unread count for each match

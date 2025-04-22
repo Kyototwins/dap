@@ -66,7 +66,10 @@ export default function Messages() {
         />
       ) : (
         <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-          <p className="mb-4">まだマッチしているユーザーがいません</p>
+          <p className="mb-4">マッチしているユーザーが見つかりませんでした</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            まだユーザーとマッチしていないか、マッチが承認されていない可能性があります
+          </p>
           <Button 
             variant="outline" 
             size="sm"

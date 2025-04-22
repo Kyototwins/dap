@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -114,7 +115,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
             ))
           ) : (
             <p className="text-center text-muted-foreground py-4">
-              マッチしているユーザーがいません。再読み込みしてください。
+              マッチングユーザーがまだ読み込まれていません
             </p>
           )}
         </div>
