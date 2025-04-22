@@ -85,7 +85,11 @@ export function useMatchMessages() {
               photo_comment: message.sender.photo_comment || null,
               worst_nightmare: message.sender.worst_nightmare || null,
               friend_activity: message.sender.friend_activity || null,
-              best_quality: message.sender.best_quality || null
+              best_quality: message.sender.best_quality || null,
+              hobby_photo_url: message.sender.hobby_photo_url || null,
+              pet_photo_url: message.sender.pet_photo_url || null,
+              hobby_photo_comment: message.sender.hobby_photo_comment || null,
+              pet_photo_comment: message.sender.pet_photo_comment || null
             }
           };
         });

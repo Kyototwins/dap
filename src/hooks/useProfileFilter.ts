@@ -48,7 +48,11 @@ export function useProfileFilter() {
         photo_comment: profile.photo_comment || null,
         worst_nightmare: profile.worst_nightmare || null,
         friend_activity: profile.friend_activity || null,
-        best_quality: profile.best_quality || null
+        best_quality: profile.best_quality || null,
+        hobby_photo_url: profile.hobby_photo_url || null,
+        pet_photo_url: profile.pet_photo_url || null,
+        hobby_photo_comment: profile.hobby_photo_comment || null,
+        pet_photo_comment: profile.pet_photo_comment || null
       })) || [];
       
       setProfiles(typedProfiles);

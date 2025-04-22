@@ -97,7 +97,11 @@ export function useMessageSending(
               photo_comment: profileData.photo_comment || null,
               worst_nightmare: profileData.worst_nightmare || null,
               friend_activity: profileData.friend_activity || null,
-              best_quality: profileData.best_quality || null
+              best_quality: profileData.best_quality || null,
+              hobby_photo_url: profileData.hobby_photo_url || null,
+              pet_photo_url: profileData.pet_photo_url || null,
+              hobby_photo_comment: profileData.hobby_photo_comment || null,
+              pet_photo_comment: profileData.pet_photo_comment || null
             }
           };
           

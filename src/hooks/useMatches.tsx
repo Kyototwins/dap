@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -148,7 +149,11 @@ export function useMatches() {
             photo_comment: otherUser.photo_comment || null,
             worst_nightmare: otherUser.worst_nightmare || null,
             friend_activity: otherUser.friend_activity || null,
-            best_quality: otherUser.best_quality || null
+            best_quality: otherUser.best_quality || null,
+            hobby_photo_url: otherUser.hobby_photo_url || null,
+            pet_photo_url: otherUser.pet_photo_url || null,
+            hobby_photo_comment: otherUser.hobby_photo_comment || null,
+            pet_photo_comment: otherUser.pet_photo_comment || null
           },
           lastMessage: lastMessage ? {
             content: lastMessage.content,

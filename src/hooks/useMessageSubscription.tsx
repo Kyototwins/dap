@@ -99,7 +99,11 @@ export function useMessageSubscription(
                 photo_comment: senderData.photo_comment || null,
                 worst_nightmare: senderData.worst_nightmare || null,
                 friend_activity: senderData.friend_activity || null,
-                best_quality: senderData.best_quality || null
+                best_quality: senderData.best_quality || null,
+                hobby_photo_url: senderData.hobby_photo_url || null,
+                pet_photo_url: senderData.pet_photo_url || null,
+                hobby_photo_comment: senderData.hobby_photo_comment || null,
+                pet_photo_comment: senderData.pet_photo_comment || null
               }
             };
             
