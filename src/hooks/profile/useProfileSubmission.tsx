@@ -30,6 +30,8 @@ export function useProfileSubmission() {
       let avatarUrl = images.avatar.preview;
       let imageUrl1 = images.image1.preview;
       let imageUrl2 = images.image2.preview;
+      let hobbyPhotoUrl = images.hobby.preview;
+      let petPhotoUrl = images.pet.preview;
 
       // Upload any new images
       if (images.avatar.file) {
@@ -41,6 +43,12 @@ export function useProfileSubmission() {
       if (images.image2.file) {
         imageUrl2 = await uploadImage(images.image2.file, 'images');
       }
+      if (images.hobby.file) {
+        hobbyPhotoUrl = await uploadImage(images.hobby.file, 'hobbies');
+      }
+      if (images.pet.file) {
+        petPhotoUrl = await uploadImage(images.pet.file, 'pets');
+      }
 
       await updateUserProfile(
         user.id,
@@ -48,7 +56,9 @@ export function useProfileSubmission() {
         additionalData,
         avatarUrl,
         imageUrl1,
-        imageUrl2
+        imageUrl2,
+        hobbyPhotoUrl,
+        petPhotoUrl
       );
 
       toast({

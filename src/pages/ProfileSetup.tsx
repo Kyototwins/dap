@@ -22,9 +22,7 @@ export default function ProfileSetup() {
     languageLevels: {},
     learning_languages: [],
     photoComment: "",
-    hobbyPhoto: "",
     hobbyPhotoComment: "",
-    petPhoto: "",
     petPhotoComment: "",
   });
   

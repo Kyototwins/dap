@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -33,6 +32,10 @@ interface ProfileData {
   worst_nightmare: string | null;
   friend_activity: string | null;
   best_quality: string | null;
+  hobby_photo_url: string | null;
+  pet_photo_url: string | null;
+  hobby_photo_comment: string | null;
+  pet_photo_comment: string | null;
 }
 
 export function useProfileFetching() {
@@ -91,7 +94,9 @@ export function useProfileFetching() {
           languages: profile.languages || [],
           languageLevels: languageLevels,
           learning_languages: profile.learning_languages || [],
-          photoComment: profile.photo_comment || ""
+          photoComment: profile.photo_comment || "",
+          hobbyPhotoComment: profile.hobby_photo_comment || "",
+          petPhotoComment: profile.pet_photo_comment || ""
         });
 
         // Set additional data - map database fields to our frontend model
@@ -120,6 +125,16 @@ export function useProfileFetching() {
             file: null, 
             preview: profile.image_url_2 || "", 
             uploading: false 
+          },
+          hobby: {
+            file: null,
+            preview: profile.hobby_photo_url || "",
+            uploading: false
+          },
+          pet: {
+            file: null,
+            preview: profile.pet_photo_url || "",
+            uploading: false
           }
         });
       }

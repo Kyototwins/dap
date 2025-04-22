@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
+import { ProfileFormData, AdditionalDataType } from "@/types/profile";
 
 export async function updateUserProfile(
   userId: string,
@@ -8,7 +8,9 @@ export async function updateUserProfile(
   additionalData: AdditionalDataType,
   avatarUrl: string | null,
   imageUrl1: string | null,
-  imageUrl2: string | null
+  imageUrl2: string | null,
+  hobbyPhotoUrl: string | null,
+  petPhotoUrl: string | null
 ) {
   // Convert language levels to JSON string for storage
   const languageLevelsJson = JSON.stringify(formData.languageLevels);
@@ -29,7 +31,11 @@ export async function updateUserProfile(
       avatar_url: avatarUrl,
       image_url_1: imageUrl1,
       image_url_2: imageUrl2,
+      hobby_photo_url: hobbyPhotoUrl,
+      pet_photo_url: petPhotoUrl,
       photo_comment: formData.photoComment,
+      hobby_photo_comment: formData.hobbyPhotoComment,
+      pet_photo_comment: formData.petPhotoComment,
       ideal_date: additionalData.idealDate,
       life_goal: additionalData.lifeGoal,
       superpower: additionalData.superpower,

@@ -1,4 +1,10 @@
 
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
+import { ImageUpload } from "@/components/profile/ImageUpload";
+import { ProfilePhotoCaption } from "@/components/profile/ProfilePhotoCaption";
+
 interface ProfileFormProps {
   formData: ProfileFormData;
   additionalData: AdditionalDataType;
@@ -9,4 +15,90 @@ interface ProfileFormProps {
   onPhotoCommentChange: (field: string, comment: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   loading: boolean;
+}
+
+export function ProfileForm({
+  formData,
+  additionalData,
+  images,
+  onChange,
+  onAdditionalChange,
+  onImageChange,
+  onPhotoCommentChange,
+  onSubmit,
+  loading
+}: ProfileFormProps) {
+  return (
+    <form onSubmit={onSubmit} className="space-y-8">
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Profile Photos</h2>
+        
+        {/* Avatar upload */}
+        <ImageUpload 
+          label="Profile Photo" 
+          image={images.avatar} 
+          onChange={(e) => onImageChange(e, 'avatar')} 
+          loading={loading} 
+        />
+        <ProfilePhotoCaption 
+          caption={formData.photoComment} 
+          onChange={(text) => onPhotoCommentChange('photoComment', text)} 
+          loading={loading} 
+        />
+        
+        {/* Additional photos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <ImageUpload 
+            label="Additional Photo 1" 
+            image={images.image1} 
+            onChange={(e) => onImageChange(e, 'image1')} 
+            loading={loading} 
+          />
+          <ImageUpload 
+            label="Additional Photo 2" 
+            image={images.image2} 
+            onChange={(e) => onImageChange(e, 'image2')} 
+            loading={loading} 
+          />
+        </div>
+        
+        {/* Hobby photo */}
+        <ImageUpload 
+          label="Photo of me enjoying my hobby" 
+          image={images.hobby} 
+          onChange={(e) => onImageChange(e, 'hobby')} 
+          loading={loading} 
+        />
+        <ProfilePhotoCaption 
+          caption={formData.hobbyPhotoComment || ''} 
+          onChange={(text) => onPhotoCommentChange('hobbyPhotoComment', text)} 
+          loading={loading} 
+        />
+        
+        {/* Pet photo */}
+        <ImageUpload 
+          label="Photo of my pet/favorite animal" 
+          image={images.pet} 
+          onChange={(e) => onImageChange(e, 'pet')} 
+          loading={loading} 
+        />
+        <ProfilePhotoCaption 
+          caption={formData.petPhotoComment || ''} 
+          onChange={(text) => onPhotoCommentChange('petPhotoComment', text)} 
+          loading={loading} 
+        />
+
+        {/* This is a placeholder for the rest of the form */}
+        <div className="space-y-4 mt-8">
+          {/* Additional form fields would go here */}
+        </div>
+      </div>
+      
+      <div className="flex justify-end">
+        <Button type="submit" disabled={loading}>
+          {loading ? "Saving..." : "Save Profile"}
+        </Button>
+      </div>
+    </form>
+  );
 }
