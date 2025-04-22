@@ -3,7 +3,7 @@ import { useMessages } from "@/hooks/useMessages";
 import { MessageContainer } from "@/components/messages/MessageContainer";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Messages() {
   const {
@@ -17,11 +17,19 @@ export default function Messages() {
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Debug log
+  useEffect(() => {
+    console.log("Messages page rendered");
+    console.log(`Matches available: ${matches.length}`);
+    console.log(`Messages available: ${messages.length}`);
+    console.log(`Selected match: ${selectedMatch?.id || 'none'}`);
+  }, [matches, messages, selectedMatch]);
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
+    console.log("Refreshing messages page");
     try {
-      // Update any state needed for refresh
-      // The fetchMatches function is already in the useMessages hook
+      // Create a clean page refresh to reload all data
       window.location.reload();
     } catch (error) {
       console.error("Error refreshing:", error);

@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -6,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import type { Match } from "@/types/messages";
 import { format, formatDistanceToNow } from "date-fns";
 import { ja } from "date-fns/locale";
+import { useEffect } from "react";
 
 interface MatchListProps {
   matches: Match[];
@@ -41,7 +41,16 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
     return format(messageDate, "M/d");
   };
 
-  console.log(`Rendering match list with ${matches.length} matches`);
+  useEffect(() => {
+    console.log(`MatchList rendering with ${matches.length} matches`);
+    if (matches.length > 0) {
+      console.log('First match sample:', {
+        id: matches[0].id,
+        user: `${matches[0].otherUser.first_name} ${matches[0].otherUser.last_name}`,
+        hasLastMessage: !!matches[0].lastMessage
+      });
+    }
+  }, [matches]);
 
   return (
     <div className="w-full h-full overflow-hidden">
@@ -64,8 +73,8 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
                         alt={`${match.otherUser.first_name}のアバター`}
                       />
                       <AvatarFallback>
-                        {match.otherUser.first_name?.[0]}
-                        {match.otherUser.last_name?.[0]}
+                        {match.otherUser.first_name?.[0] || '?'}
+                        {match.otherUser.last_name?.[0] || ''}
                       </AvatarFallback>
                     </Avatar>
                     
@@ -105,7 +114,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
             ))
           ) : (
             <p className="text-center text-muted-foreground py-4">
-              マッチしているユーザーが表示されていません。再読み込みしてください。
+              マッチしているユーザーがいません。再読み込みしてください。
             </p>
           )}
         </div>

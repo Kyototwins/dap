@@ -14,7 +14,7 @@ export function useMessageSubscription(
     console.log(`Setting up message subscription for match: ${selectedMatch.id}`);
     
     // Set up a realtime subscription for the selected match
-    const messagesSubscription = supabase
+    const channel = supabase
       .channel(`messages-channel-${selectedMatch.id}`) // Use unique channel name with match ID
       .on('postgres_changes', {
         event: 'INSERT',
@@ -42,7 +42,7 @@ export function useMessageSubscription(
           }
           
           if (senderData) {
-            console.log("Sender data found:", senderData);
+            console.log("Sender data found:", senderData.id);
             
             // Process language_levels to ensure it's the correct type
             let processedLanguageLevels: Record<string, number> = {};
@@ -75,8 +75,8 @@ export function useMessageSubscription(
               sender_id: payload.new.sender_id,
               sender: {
                 id: senderData.id,
-                first_name: senderData.first_name,
-                last_name: senderData.last_name,
+                first_name: senderData.first_name || 'ユーザー',
+                last_name: senderData.last_name || '',
                 avatar_url: senderData.avatar_url,
                 about_me: senderData.about_me,
                 age: senderData.age,
@@ -103,14 +103,17 @@ export function useMessageSubscription(
               }
             };
             
-            console.log("Adding new message to state:", newMessage);
+            console.log("Adding new message to state:", newMessage.id);
             
             // Add message if it's for the selected match
             setMessages(prev => {
               // Avoid duplicate messages
               if (prev.some(msg => msg.id === newMessage.id)) {
+                console.log("Duplicate message, not adding:", newMessage.id);
                 return prev;
               }
+              
+              console.log("Adding message to state:", newMessage.id);
               return [...prev, newMessage];
             });
           }
@@ -118,11 +121,11 @@ export function useMessageSubscription(
       })
       .subscribe();
       
-    console.log("Message subscription activated");
+    console.log("Message subscription activated for match:", selectedMatch.id);
 
     return () => {
-      console.log("Cleaning up message subscription");
-      messagesSubscription.unsubscribe();
+      console.log("Cleaning up message subscription for match:", selectedMatch.id);
+      supabase.removeChannel(channel);
     };
   }, [selectedMatch, setMessages]);
 }

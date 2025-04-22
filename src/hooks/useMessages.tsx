@@ -38,8 +38,14 @@ export function useMessages() {
       
       // Mark messages as read if needed
       if (match.unreadCount > 0) {
-        // Update the matches list to reflect that messages have been read
-        fetchMatches();
+        console.log(`Marking ${match.unreadCount} messages as read`);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          // Update messages to be marked as read
+          // This would typically update a read_status field in the database
+          // For now we just update the matches list to reflect that messages have been read
+          fetchMatches();
+        }
       }
     } catch (error) {
       console.error("Error in handleSelectMatch:", error);

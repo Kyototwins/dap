@@ -27,13 +27,36 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
   // Log messages for debugging
   useEffect(() => {
     console.log(`MessageChat render: ${messages.length} messages available`);
+    if (messages.length > 0) {
+      console.log('First message sample:', {
+        id: messages[0].id,
+        sender: messages[0].sender_id,
+        content: messages[0].content?.substring(0, 30),
+        time: messages[0].created_at
+      });
+    }
   }, [messages]);
 
   // Get current user ID when component mounts
   useEffect(() => {
     const getCurrentUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setCurrentUserId(data?.user?.id || null);
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        
+        if (error) {
+          console.error("Error getting current user:", error);
+          return;
+        }
+        
+        if (data?.user) {
+          console.log("Current user ID set:", data.user.id);
+          setCurrentUserId(data.user.id);
+        } else {
+          console.log("No authenticated user found");
+        }
+      } catch (err) {
+        console.error("Error in getCurrentUser:", err);
+      }
     };
     
     getCurrentUser();
@@ -57,6 +80,11 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
           messages.map((message) => {
             // Compare message sender ID with current user ID
             const isCurrentUser = message.sender_id === currentUserId;
+            
+            if (!message.id) {
+              console.warn("Message missing ID:", message);
+              return null;
+            }
 
             return (
               <div

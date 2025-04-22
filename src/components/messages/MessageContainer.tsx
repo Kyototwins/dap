@@ -26,11 +26,20 @@ export function MessageContainer({
   const { showMobileChat, handleBackToList } = useMobileChat(selectedMatch);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
+  // Debug log for messages
+  useEffect(() => {
+    console.log(`MessageContainer: ${messages.length} messages for display`);
+    if (messages.length > 0) {
+      console.log('First message sample:', messages[0]);
+    }
+  }, [messages]);
+
   useEffect(() => {
     // Get current user
     const fetchCurrentUser = async () => {
       const { data } = await supabase.auth.getUser();
       if (data.user) {
+        console.log("Current user authenticated:", data.user.id);
         const { data: profile } = await supabase
           .from("profiles")
           .select("*")
@@ -38,6 +47,8 @@ export function MessageContainer({
           .single();
           
         setCurrentUser({ ...data.user, profile });
+      } else {
+        console.log("No authenticated user found");
       }
     };
     
@@ -46,11 +57,23 @@ export function MessageContainer({
 
   const handleSendMsg = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedMatch || !newMessage.trim() || !currentUser) return;
+    if (!selectedMatch || !newMessage.trim() || !currentUser) {
+      console.log("Cannot send message - missing data:", { 
+        hasMatch: !!selectedMatch, 
+        hasMessage: !!newMessage.trim(), 
+        hasUser: !!currentUser 
+      });
+      return;
+    }
     
     try {
       // Use the utility function to send the message
       const result = await handleSendMessage();
+      if (result) {
+        console.log("Message sent successfully");
+      } else {
+        console.log("Failed to send message");
+      }
       
       // Reset the input
       setNewMessage("");

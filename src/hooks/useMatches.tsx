@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,7 +18,12 @@ export function useMatches() {
       console.log("Fetching matches...");
       
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) {
+        console.error("User not authenticated");
+        throw new Error("Not authenticated");
+      }
+
+      console.log("Authenticated user ID:", user.id);
 
       // Get matches where user is either user1 or user2 AND status is accepted
       const { data: matchesData, error } = await supabase
@@ -36,13 +40,25 @@ export function useMatches() {
         .eq("status", "accepted")
         .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Database error fetching matches:", error);
+        throw error;
+      }
       
-      console.log(`Found ${matchesData?.length || 0} matches`);
+      console.log(`Found ${matchesData?.length || 0} raw matches for user ${user.id}`);
+      if (matchesData && matchesData.length > 0) {
+        console.log("Sample raw match data:", matchesData[0]);
+      }
 
       // Get latest message and unread count for each match
       const processedMatches = await Promise.all((matchesData || []).map(async (match) => {
         const otherUser = match.user1_id === user.id ? match.user2 : match.user1;
+        if (!otherUser) {
+          console.error(`Missing other user data for match ${match.id}`);
+          return null;
+        }
+        
+        console.log(`Processing match ${match.id} with other user:`, otherUser.id);
         
         // Fetch the most recent message for this match
         const { data: latestMessages, error: messagesError } = await supabase
@@ -53,10 +69,11 @@ export function useMatches() {
           .limit(1);
           
         if (messagesError) {
-          console.error("Error fetching messages:", messagesError);
+          console.error("Error fetching messages for match:", match.id, messagesError);
         }
         
         const lastMessage = latestMessages && latestMessages.length > 0 ? latestMessages[0] : null;
+        console.log(`Match ${match.id} last message:`, lastMessage || "No messages");
         
         // Count unread messages
         let unreadCount = 0;
@@ -96,8 +113,8 @@ export function useMatches() {
           user2_id: match.user2_id,
           otherUser: {
             id: otherUser.id,
-            first_name: otherUser.first_name,
-            last_name: otherUser.last_name,
+            first_name: otherUser.first_name || 'ユーザー',
+            last_name: otherUser.last_name || '',
             avatar_url: otherUser.avatar_url,
             about_me: otherUser.about_me,
             age: otherUser.age,
@@ -130,22 +147,27 @@ export function useMatches() {
         } as Match;
       }));
 
+      // Filter out any null matches (from processing errors)
+      const validMatches = processedMatches.filter(match => match !== null) as Match[];
+
       // Sort matches by the last message's created_at timestamp (most recent first)
-      const sortedMatches = processedMatches.sort((a, b) => {
+      const sortedMatches = validMatches.sort((a, b) => {
         const timeA = a.lastMessage?.created_at ? new Date(a.lastMessage.created_at).getTime() : 0;
         const timeB = b.lastMessage?.created_at ? new Date(b.lastMessage.created_at).getTime() : 0;
         return timeB - timeA; // Most recent first
       });
 
-      console.log(`Processed ${sortedMatches.length} matches`);
+      console.log(`Processed ${sortedMatches.length} valid matches`);
       setMatches(sortedMatches);
     } catch (error: any) {
       console.error("Error fetching matches:", error);
       toast({
-        title: "Error",
-        description: error.message,
+        title: "エラー",
+        description: error.message || "マッチの取得に失敗しました",
         variant: "destructive",
       });
+      // Set empty matches rather than keeping loading state forever
+      setMatches([]);
     } finally {
       setLoading(false);
     }
