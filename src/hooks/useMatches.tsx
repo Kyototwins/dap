@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,16 +50,14 @@ export function useMatches() {
         console.log("All matches statuses:", matchesData.map(m => m.status).join(', '));
       }
       
-      // Filter matches by status
+      // Filter matches - IMPORTANT CHANGE: Include both accepted and pending matches
       let filteredMatches = matchesData || [];
-      // Include accepted matches only - this is crucial
-      filteredMatches = filteredMatches.filter(match => match.status === 'accepted');
-      console.log(`After status filtering: ${filteredMatches.length} accepted matches remain`);
+      console.log(`Total matches available: ${filteredMatches.length}`);
       
       if (filteredMatches.length > 0) {
-        console.log("Sample accepted match data:", filteredMatches[0]);
+        console.log("Sample match data:", filteredMatches[0]);
       } else {
-        console.log("No accepted matches found - check if any matches need approval");
+        console.log("No matches found");
       }
 
       // Get latest message and unread count for each match

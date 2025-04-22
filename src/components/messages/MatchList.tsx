@@ -48,7 +48,8 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
       console.log('First match sample:', {
         id: matches[0].id,
         user: `${matches[0].otherUser.first_name} ${matches[0].otherUser.last_name}`,
-        hasLastMessage: !!matches[0].lastMessage
+        hasLastMessage: !!matches[0].lastMessage,
+        status: matches[0].status
       });
     }
   }, [matches]);

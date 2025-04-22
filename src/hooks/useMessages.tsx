@@ -40,16 +40,39 @@ export function useMessages() {
       const fetchedMessages = await fetchMessages(match.id);
       console.log(`Fetched ${fetchedMessages.length} messages for match ${match.id}`);
       
+      // If no messages exist, create an initial welcome message
+      if (fetchedMessages.length === 0) {
+        console.log("No messages found, creating initial message");
+        
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          throw new Error("User not authenticated");
+        }
+        
+        // Create welcome message
+        const { data: newMessage, error: messageError } = await supabase
+          .from("messages")
+          .insert([{
+            match_id: match.id,
+            sender_id: user.id,
+            content: "こんにちは！よろしくお願いします。"
+          }])
+          .select();
+        
+        if (messageError) {
+          console.error("Error creating welcome message:", messageError);
+        } else if (newMessage) {
+          console.log("Created welcome message:", newMessage[0]);
+          // Refresh messages to include the welcome message
+          await fetchMessages(match.id);
+        }
+      }
+      
       // Mark messages as read if needed
       if (match.unreadCount > 0) {
         console.log(`Marking ${match.unreadCount} messages as read`);
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          // Update messages to be marked as read
-          // This would typically update a read_status field in the database
-          // For now we just update the matches list to reflect that messages have been read
-          fetchMatches();
-        }
+        // For now we just update the matches list to reflect that messages have been read
+        fetchMatches();
       }
     } catch (error) {
       console.error("Error in handleSelectMatch:", error);

@@ -22,6 +22,11 @@ export default function Messages() {
   useEffect(() => {
     console.log("Messages page rendered");
     console.log(`Matches available: ${matches.length}`);
+    if (matches.length > 0) {
+      matches.forEach((match, idx) => {
+        console.log(`Match ${idx+1}: ID=${match.id}, Status=${match.status}, User=${match.otherUser.first_name}`);
+      });
+    }
     console.log(`Messages available: ${messages.length}`);
     console.log(`Selected match: ${selectedMatch?.id || 'none'}`);
   }, [matches, messages, selectedMatch]);
@@ -68,7 +73,7 @@ export default function Messages() {
         <div className="flex flex-col items-center justify-center h-full p-6 text-center">
           <p className="mb-4">マッチしているユーザーが見つかりませんでした</p>
           <p className="text-sm text-muted-foreground mb-4">
-            まだユーザーとマッチしていないか、マッチが承認されていない可能性があります
+            マッチが承認されていない可能性があります。管理者にお問い合わせください。
           </p>
           <Button 
             variant="outline" 
