@@ -63,3 +63,4 @@ export async function fetchUserProfile(userId: string) {
   if (error) throw error;
   return data;
 }
+
