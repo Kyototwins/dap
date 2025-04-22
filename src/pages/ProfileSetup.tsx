@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { useProfileOperations } from "@/hooks/useProfileOperations";
@@ -21,7 +22,7 @@ export default function ProfileSetup() {
     languages: [],
     languageLevels: {},
     learning_languages: [],
-    photoComment: "",
+    photoComment: "", // Keep this, but it won't be used
     hobbyPhotoComment: "",
     petPhotoComment: "",
   });

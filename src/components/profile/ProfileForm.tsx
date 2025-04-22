@@ -33,33 +33,32 @@ export function ProfileForm({
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Profile Photos</h2>
         
-        {/* Avatar upload */}
+        {/* Avatar upload - without comment */}
         <ImageUpload 
           label="Profile Photo" 
           image={images.avatar} 
           onChange={(e) => onImageChange(e, 'avatar')} 
           loading={loading} 
         />
-        <ProfilePhotoCaption 
-          caption={formData.photoComment} 
-          onChange={(text) => onPhotoCommentChange('photoComment', text)} 
-          loading={loading} 
-        />
         
         {/* Additional photos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <ImageUpload 
-            label="Additional Photo 1" 
-            image={images.image1} 
-            onChange={(e) => onImageChange(e, 'image1')} 
-            loading={loading} 
-          />
-          <ImageUpload 
-            label="Additional Photo 2" 
-            image={images.image2} 
-            onChange={(e) => onImageChange(e, 'image2')} 
-            loading={loading} 
-          />
+          <div>
+            <ImageUpload 
+              label="Header Photo" 
+              image={images.image1} 
+              onChange={(e) => onImageChange(e, 'image1')} 
+              loading={loading} 
+            />
+          </div>
+          <div>
+            <ImageUpload 
+              label="Additional Photo 2" 
+              image={images.image2} 
+              onChange={(e) => onImageChange(e, 'image2')} 
+              loading={loading} 
+            />
+          </div>
         </div>
         
         {/* Hobby photo */}
