@@ -14,10 +14,17 @@ export function useMessages() {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
+  const [processingMatchSelection, setProcessingMatchSelection] = useState(false);
   
   // Check for user query parameter
   useEffect(() => {
     const userId = searchParams.get('user');
+    
+    // Skip auto-selection when already processing a manual selection
+    if (processingMatchSelection) {
+      return;
+    }
+    
     if (userId && matches.length > 0) {
       // Find match with specified user
       const matchWithUser = matches.find(match => 
@@ -35,16 +42,20 @@ export function useMessages() {
       setSelectedMatch(null);
       setMessages([]);
     }
-  }, [matches, searchParams]);
+  }, [matches, searchParams, processingMatchSelection]);
   
   // Set up realtime subscription
   useMessageSubscription(selectedMatch, setMessages);
 
   const handleSelectMatch = async (match: Match) => {
-    console.log("Selecting match:", match.id);
-    setSelectedMatch(match);
+    // Prevent multiple simultaneous selections
+    if (processingMatchSelection) return;
     
     try {
+      setProcessingMatchSelection(true);
+      console.log("Selecting match:", match.id);
+      setSelectedMatch(match);
+      
       // Fetch messages for this match
       const fetchedMessages = await fetchMessages(match.id);
       console.log(`Fetched ${fetchedMessages.length} messages for match ${match.id}`);
@@ -90,7 +101,7 @@ export function useMessages() {
         // We'll rely on the unreadCount property in the Match interface
         // rather than trying to update it directly in the database
         // This avoids the TypeScript error while still providing the same functionality
-        fetchMatches();
+        await fetchMatches();
       }
     } catch (error) {
       console.error("Error in handleSelectMatch:", error);
@@ -99,6 +110,8 @@ export function useMessages() {
         description: "メッセージの読み込みに失敗しました",
         variant: "destructive",
       });
+    } finally {
+      setProcessingMatchSelection(false);
     }
   };
 

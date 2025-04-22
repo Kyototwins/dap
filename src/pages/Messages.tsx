@@ -4,6 +4,7 @@ import { MessageContainer } from "@/components/messages/MessageContainer";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export default function Messages() {
   const {
@@ -17,6 +18,7 @@ export default function Messages() {
   } = useMessages();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [searchParams] = useSearchParams();
 
   // Debug log
   useEffect(() => {
@@ -29,7 +31,11 @@ export default function Messages() {
     }
     console.log(`Messages available: ${messages.length}`);
     console.log(`Selected match: ${selectedMatch?.id || 'none'}`);
-  }, [matches, messages, selectedMatch]);
+    
+    // Check if there's a specific user to display from URL parameters
+    const userIdParam = searchParams.get('user');
+    console.log(`URL user param: ${userIdParam || 'none'}`);
+  }, [matches, messages, selectedMatch, searchParams]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);

@@ -21,6 +21,12 @@ export function AppLayout({ children }: LayoutProps) {
     { icon: User, label: "Profile", path: "/profile" },
   ];
 
+  // ナビゲーション処理を更新して、URLクエリパラメータなしで／messagesに行くようにする
+  const handleNavigation = (path: string) => {
+    // メッセージボタンを押した時に、シンプルにパスのみを使用して遷移
+    navigate(path);
+  };
+
   const getPageTitle = () => {
     const currentPath = location.pathname;
     if (currentPath.startsWith("/matches")) return "Matching";
@@ -55,7 +61,7 @@ export function AppLayout({ children }: LayoutProps) {
             {navItems.map((item) => (
               <button
                 key={item.path}
-                onClick={() => navigate(item.path)}
+                onClick={() => handleNavigation(item.path)}
                 className={cn(
                   "flex flex-col items-center justify-center w-full h-full gap-1",
                   "text-gray-500 hover:text-doshisha-purple transition-colors",
