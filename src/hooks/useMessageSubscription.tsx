@@ -100,6 +100,7 @@ export function useMessageSubscription(
                 worst_nightmare: senderData.worst_nightmare || null,
                 friend_activity: senderData.friend_activity || null,
                 best_quality: senderData.best_quality || null,
+                // Add the missing properties with defaults
                 hobby_photo_url: senderData.hobby_photo_url || null,
                 pet_photo_url: senderData.pet_photo_url || null,
                 hobby_photo_comment: senderData.hobby_photo_comment || null,

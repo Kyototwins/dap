@@ -98,6 +98,7 @@ export function useMessageSending(
               worst_nightmare: profileData.worst_nightmare || null,
               friend_activity: profileData.friend_activity || null,
               best_quality: profileData.best_quality || null,
+              // Add the missing properties with defaults
               hobby_photo_url: profileData.hobby_photo_url || null,
               pet_photo_url: profileData.pet_photo_url || null,
               hobby_photo_comment: profileData.hobby_photo_comment || null,

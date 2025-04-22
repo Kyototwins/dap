@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -150,6 +149,7 @@ export function useMatches() {
             worst_nightmare: otherUser.worst_nightmare || null,
             friend_activity: otherUser.friend_activity || null,
             best_quality: otherUser.best_quality || null,
+            // Add the missing properties with defaults
             hobby_photo_url: otherUser.hobby_photo_url || null,
             pet_photo_url: otherUser.pet_photo_url || null,
             hobby_photo_comment: otherUser.hobby_photo_comment || null,

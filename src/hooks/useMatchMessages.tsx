@@ -86,6 +86,7 @@ export function useMatchMessages() {
               worst_nightmare: message.sender.worst_nightmare || null,
               friend_activity: message.sender.friend_activity || null,
               best_quality: message.sender.best_quality || null,
+              // Add the missing properties with defaults
               hobby_photo_url: message.sender.hobby_photo_url || null,
               pet_photo_url: message.sender.pet_photo_url || null,
               hobby_photo_comment: message.sender.hobby_photo_comment || null,
