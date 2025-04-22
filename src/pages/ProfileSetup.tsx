@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { useProfileOperations } from "@/hooks/useProfileOperations";
@@ -23,6 +22,10 @@ export default function ProfileSetup() {
     languageLevels: {},
     learning_languages: [],
     photoComment: "",
+    hobbyPhoto: "",
+    hobbyPhotoComment: "",
+    petPhoto: "",
+    petPhotoComment: "",
   });
   
   const [additionalData, setAdditionalData] = useState<AdditionalDataType>({
@@ -38,6 +41,8 @@ export default function ProfileSetup() {
     avatar: { file: null, preview: "", uploading: false },
     image1: { file: null, preview: "", uploading: false },
     image2: { file: null, preview: "", uploading: false },
+    hobby: { file: null, preview: "", uploading: false },
+    pet: { file: null, preview: "", uploading: false }
   });
 
   const { 
@@ -52,7 +57,7 @@ export default function ProfileSetup() {
     fetchUserProfile(setFormData, setAdditionalData, setImages);
   }, []);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2') => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2' | 'hobby' | 'pet') => {
     const file = e.target.files?.[0];
     if (file) {
       const preview = URL.createObjectURL(file);
@@ -67,8 +72,8 @@ export default function ProfileSetup() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handlePhotoCommentChange = (comment: string) => {
-    setFormData(prev => ({ ...prev, photoComment: comment }));
+  const handlePhotoCommentChange = (field: string, comment: string) => {
+    setFormData(prev => ({ ...prev, [field]: comment }));
   };
 
   const handleAdditionalChange = (name: string, value: string) => {
