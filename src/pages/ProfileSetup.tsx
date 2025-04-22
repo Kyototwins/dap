@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { useProfileOperations } from "@/hooks/useProfileOperations";
@@ -59,11 +58,15 @@ export default function ProfileSetup() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2' | 'hobby' | 'pet') => {
     const file = e.target.files?.[0];
     if (file) {
-      console.log(`Selected file for ${type}:`, file.name);
+      console.log(`Selected file for ${type}:`, file.name, "File object:", file);
+      
+      // Create a copy to avoid possible mutation issues
+      const fileCopy = new File([file], file.name, { type: file.type });
+      
       const preview = URL.createObjectURL(file);
       setImages(prev => ({
         ...prev,
-        [type]: { file, preview, uploading: false }
+        [type]: { file: fileCopy, preview, uploading: false }
       }));
     }
   };
@@ -82,7 +85,17 @@ export default function ProfileSetup() {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     console.log("Form submit triggered", { formData, additionalData, images });
-    handleSubmit(e, formData, additionalData, images);
+    
+    // Make sure we have valid files
+    const validatedImages = { ...images };
+    Object.entries(validatedImages).forEach(([key, value]) => {
+      if (value.file && !(value.file instanceof File)) {
+        console.warn(`Invalid file object for ${key}:`, value.file);
+        validatedImages[key as keyof ImageUploadState].file = null;
+      }
+    });
+    
+    handleSubmit(e, formData, additionalData, validatedImages);
   };
 
   if (initialLoading) {

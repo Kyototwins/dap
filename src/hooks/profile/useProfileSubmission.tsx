@@ -36,35 +36,71 @@ export function useProfileSubmission() {
       console.log("Processing profile submission for user:", user.id);
       console.log("Form data:", formData);
 
+      // Initialize URLs with current values
       let avatarUrl = images.avatar.preview;
       let imageUrl1 = images.image1.preview;
       let imageUrl2 = images.image2.preview;
       let hobbyPhotoUrl = images.hobby.preview;
       let petPhotoUrl = images.pet.preview;
 
+      // Check if these are blob URLs which need to be uploaded
+      const isBlobUrl = (url: string) => url.startsWith('blob:');
+
       // Upload any new images
-      if (images.avatar.file) {
-        console.log("Uploading new avatar image");
-        avatarUrl = await uploadImage(images.avatar.file, 'avatars');
-      }
-      if (images.image1.file) {
-        console.log("Uploading new image1");
-        imageUrl1 = await uploadImage(images.image1.file, 'images');
-      }
-      if (images.image2.file) {
-        console.log("Uploading new image2");
-        imageUrl2 = await uploadImage(images.image2.file, 'images');
-      }
-      if (images.hobby.file) {
-        console.log("Uploading new hobby image");
-        hobbyPhotoUrl = await uploadImage(images.hobby.file, 'hobbies');
-      }
-      if (images.pet.file) {
-        console.log("Uploading new pet image");
-        petPhotoUrl = await uploadImage(images.pet.file, 'pets');
+      try {
+        if (images.avatar.file) {
+          console.log("Uploading new avatar image");
+          const url = await uploadImage(images.avatar.file, 'avatars');
+          if (url) avatarUrl = url;
+        } else if (avatarUrl && isBlobUrl(avatarUrl)) {
+          console.log("Avatar is a blob URL but no file was provided");
+          avatarUrl = ""; // Reset URL if it's a blob without file
+        }
+
+        if (images.image1.file) {
+          console.log("Uploading new image1");
+          const url = await uploadImage(images.image1.file, 'images');
+          if (url) imageUrl1 = url;
+        } else if (imageUrl1 && isBlobUrl(imageUrl1)) {
+          imageUrl1 = ""; 
+        }
+
+        if (images.image2.file) {
+          console.log("Uploading new image2");
+          const url = await uploadImage(images.image2.file, 'images');
+          if (url) imageUrl2 = url;
+        } else if (imageUrl2 && isBlobUrl(imageUrl2)) {
+          imageUrl2 = "";
+        }
+
+        if (images.hobby.file) {
+          console.log("Uploading new hobby image", images.hobby.file);
+          const url = await uploadImage(images.hobby.file, 'hobbies');
+          if (url) hobbyPhotoUrl = url;
+        } else if (hobbyPhotoUrl && isBlobUrl(hobbyPhotoUrl)) {
+          hobbyPhotoUrl = "";
+        }
+
+        if (images.pet.file) {
+          console.log("Uploading new pet image", images.pet.file);
+          const url = await uploadImage(images.pet.file, 'pets');
+          if (url) petPhotoUrl = url;
+        } else if (petPhotoUrl && isBlobUrl(petPhotoUrl)) {
+          petPhotoUrl = "";
+        }
+      } catch (uploadError) {
+        console.error("Error during image upload:", uploadError);
+        toast({
+          title: "画像アップロードエラー",
+          description: "画像のアップロードに失敗しました。もう一度お試しください。",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
       }
 
       console.log("All images processed, updating profile");
+      console.log("Final URLs:", { avatarUrl, imageUrl1, imageUrl2, hobbyPhotoUrl, petPhotoUrl });
 
       await updateUserProfile(
         user.id,
