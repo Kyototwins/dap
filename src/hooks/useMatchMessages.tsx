@@ -53,45 +53,47 @@ export function useMatchMessages() {
             }
           }
 
+          // Create a new sender object with all required properties
+          const senderWithRequiredProps = {
+            id: message.sender.id,
+            first_name: message.sender.first_name,
+            last_name: message.sender.last_name,
+            avatar_url: message.sender.avatar_url,
+            about_me: message.sender.about_me,
+            age: message.sender.age,
+            gender: message.sender.gender,
+            ideal_date: message.sender.ideal_date,
+            image_url_1: message.sender.image_url_1,
+            image_url_2: message.sender.image_url_2,
+            life_goal: message.sender.life_goal,
+            origin: message.sender.origin,
+            sexuality: message.sender.sexuality,
+            university: message.sender.university,
+            department: message.sender.department || '',
+            year: message.sender.year || '',
+            hobbies: message.sender.hobbies || [],
+            languages: message.sender.languages || [],
+            language_levels: processedLanguageLevels,
+            superpower: message.sender.superpower || '',
+            learning_languages: message.sender.learning_languages || [],
+            created_at: message.sender.created_at,
+            photo_comment: message.sender.photo_comment || null,
+            worst_nightmare: message.sender.worst_nightmare || null,
+            friend_activity: message.sender.friend_activity || null,
+            best_quality: message.sender.best_quality || null,
+            hobby_photo_url: null,
+            pet_photo_url: null,
+            hobby_photo_comment: null,
+            pet_photo_comment: null
+          };
+
           return {
             id: message.id,
             content: message.content,
             created_at: message.created_at,
             match_id: message.match_id,
             sender_id: message.sender_id,
-            sender: {
-              id: message.sender.id,
-              first_name: message.sender.first_name,
-              last_name: message.sender.last_name,
-              avatar_url: message.sender.avatar_url,
-              about_me: message.sender.about_me,
-              age: message.sender.age,
-              gender: message.sender.gender,
-              ideal_date: message.sender.ideal_date,
-              image_url_1: message.sender.image_url_1,
-              image_url_2: message.sender.image_url_2,
-              life_goal: message.sender.life_goal,
-              origin: message.sender.origin,
-              sexuality: message.sender.sexuality,
-              university: message.sender.university,
-              department: message.sender.department || '',
-              year: message.sender.year || '',
-              hobbies: message.sender.hobbies || [],
-              languages: message.sender.languages || [],
-              language_levels: processedLanguageLevels,
-              superpower: message.sender.superpower || '',
-              learning_languages: message.sender.learning_languages || [],
-              created_at: message.sender.created_at,
-              photo_comment: message.sender.photo_comment || null,
-              worst_nightmare: message.sender.worst_nightmare || null,
-              friend_activity: message.sender.friend_activity || null,
-              best_quality: message.sender.best_quality || null,
-              // Add the missing properties with defaults
-              hobby_photo_url: message.sender.hobby_photo_url || null,
-              pet_photo_url: message.sender.pet_photo_url || null,
-              hobby_photo_comment: message.sender.hobby_photo_comment || null,
-              pet_photo_comment: message.sender.pet_photo_comment || null
-            }
+            sender: senderWithRequiredProps
           };
         });
 

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -117,44 +118,46 @@ export function useMatches() {
           }
         }
         
+        // Create otherUser with all required properties
+        const otherUserWithRequiredProps = {
+          id: otherUser.id,
+          first_name: otherUser.first_name || 'ユーザー',
+          last_name: otherUser.last_name || '',
+          avatar_url: otherUser.avatar_url,
+          about_me: otherUser.about_me,
+          age: otherUser.age,
+          gender: otherUser.gender,
+          ideal_date: otherUser.ideal_date,
+          image_url_1: otherUser.image_url_1,
+          image_url_2: otherUser.image_url_2,
+          life_goal: otherUser.life_goal,
+          origin: otherUser.origin,
+          sexuality: otherUser.sexuality,
+          university: otherUser.university,
+          department: otherUser.department || '',
+          year: otherUser.year || '',
+          hobbies: otherUser.hobbies || [],
+          languages: otherUser.languages || [],
+          language_levels: processedLanguageLevels,
+          superpower: otherUser.superpower || '',
+          learning_languages: otherUser.learning_languages || [],
+          created_at: otherUser.created_at,
+          photo_comment: otherUser.photo_comment || null,
+          worst_nightmare: otherUser.worst_nightmare || null,
+          friend_activity: otherUser.friend_activity || null,
+          best_quality: otherUser.best_quality || null,
+          hobby_photo_url: null,
+          pet_photo_url: null,
+          hobby_photo_comment: null,
+          pet_photo_comment: null
+        };
+        
         return {
           id: match.id,
           status: match.status,
           user1_id: match.user1_id,
           user2_id: match.user2_id,
-          otherUser: {
-            id: otherUser.id,
-            first_name: otherUser.first_name || 'ユーザー',
-            last_name: otherUser.last_name || '',
-            avatar_url: otherUser.avatar_url,
-            about_me: otherUser.about_me,
-            age: otherUser.age,
-            gender: otherUser.gender,
-            ideal_date: otherUser.ideal_date,
-            image_url_1: otherUser.image_url_1,
-            image_url_2: otherUser.image_url_2,
-            life_goal: otherUser.life_goal,
-            origin: otherUser.origin,
-            sexuality: otherUser.sexuality,
-            university: otherUser.university,
-            department: otherUser.department || '',
-            year: otherUser.year || '',
-            hobbies: otherUser.hobbies || [],
-            languages: otherUser.languages || [],
-            language_levels: processedLanguageLevels,
-            superpower: otherUser.superpower || '',
-            learning_languages: otherUser.learning_languages || [],
-            created_at: otherUser.created_at,
-            photo_comment: otherUser.photo_comment || null,
-            worst_nightmare: otherUser.worst_nightmare || null,
-            friend_activity: otherUser.friend_activity || null,
-            best_quality: otherUser.best_quality || null,
-            // Add the missing properties with defaults
-            hobby_photo_url: otherUser.hobby_photo_url || null,
-            pet_photo_url: otherUser.pet_photo_url || null,
-            hobby_photo_comment: otherUser.hobby_photo_comment || null,
-            pet_photo_comment: otherUser.pet_photo_comment || null
-          },
+          otherUser: otherUserWithRequiredProps,
           lastMessage: lastMessage ? {
             content: lastMessage.content,
             created_at: lastMessage.created_at
