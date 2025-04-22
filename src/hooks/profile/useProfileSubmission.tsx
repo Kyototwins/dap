@@ -24,8 +24,17 @@ export function useProfileSubmission() {
 
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
-      if (!user) throw new Error("User not found");
+      if (userError) {
+        console.error("User error:", userError);
+        throw userError;
+      }
+      if (!user) {
+        console.error("User not found");
+        throw new Error("User not found");
+      }
+
+      console.log("Processing profile submission for user:", user.id);
+      console.log("Form data:", formData);
 
       let avatarUrl = images.avatar.preview;
       let imageUrl1 = images.image1.preview;
@@ -35,20 +44,27 @@ export function useProfileSubmission() {
 
       // Upload any new images
       if (images.avatar.file) {
+        console.log("Uploading new avatar image");
         avatarUrl = await uploadImage(images.avatar.file, 'avatars');
       }
       if (images.image1.file) {
+        console.log("Uploading new image1");
         imageUrl1 = await uploadImage(images.image1.file, 'images');
       }
       if (images.image2.file) {
+        console.log("Uploading new image2");
         imageUrl2 = await uploadImage(images.image2.file, 'images');
       }
       if (images.hobby.file) {
+        console.log("Uploading new hobby image");
         hobbyPhotoUrl = await uploadImage(images.hobby.file, 'hobbies');
       }
       if (images.pet.file) {
+        console.log("Uploading new pet image");
         petPhotoUrl = await uploadImage(images.pet.file, 'pets');
       }
+
+      console.log("All images processed, updating profile");
 
       await updateUserProfile(
         user.id,
@@ -61,17 +77,20 @@ export function useProfileSubmission() {
         petPhotoUrl
       );
 
+      console.log("Profile updated successfully");
+
       toast({
-        title: "Profile saved",
-        description: "Redirecting to matches",
+        title: "プロフィールを保存しました",
+        description: "マッチングページに移動します",
       });
 
       navigate("/matches");
 
     } catch (error: any) {
+      console.error("Profile submission error:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to save profile.",
+        title: "エラー",
+        description: error.message || "プロフィールの保存に失敗しました。",
         variant: "destructive",
       });
     } finally {

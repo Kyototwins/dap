@@ -59,6 +59,7 @@ export default function ProfileSetup() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2' | 'hobby' | 'pet') => {
     const file = e.target.files?.[0];
     if (file) {
+      console.log(`Selected file for ${type}:`, file.name);
       const preview = URL.createObjectURL(file);
       setImages(prev => ({
         ...prev,
@@ -80,6 +81,7 @@ export default function ProfileSetup() {
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {
+    console.log("Form submit triggered", { formData, additionalData, images });
     handleSubmit(e, formData, additionalData, images);
   };
 
