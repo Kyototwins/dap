@@ -4,6 +4,10 @@ import { Button } from "@/components/ui/button";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
 import { ImageUpload } from "@/components/profile/ImageUpload";
 import { ProfilePhotoCaption } from "@/components/profile/ProfilePhotoCaption";
+import { HobbiesInput } from "@/components/profile/HobbiesInput";
+import { LanguageSkillsInput } from "@/components/profile/LanguageSkillsInput";
+import { BasicInfoForm } from "@/components/profile/BasicInfoForm";
+import { AdditionalInfo } from "@/components/profile/AdditionalInfo";
 
 interface ProfileFormProps {
   formData: ProfileFormData;
@@ -30,6 +34,7 @@ export function ProfileForm({
 }: ProfileFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-8">
+      {/* Photos Section */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Profile Photos</h2>
         
@@ -86,11 +91,45 @@ export function ProfileForm({
           onChange={(text) => onPhotoCommentChange('petPhotoComment', text)} 
           loading={loading} 
         />
+      </div>
 
-        {/* This is a placeholder for the rest of the form */}
-        <div className="space-y-4 mt-8">
-          {/* Additional form fields would go here */}
-        </div>
+      {/* Basic Info Section */}
+      <BasicInfoForm 
+        formData={formData}
+        onChange={onChange}
+        loading={loading}
+      />
+
+      {/* Language Skills Section */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Language Skills</h2>
+        <LanguageSkillsInput
+          languages={formData.languages}
+          languageLevels={formData.languageLevels}
+          learningLanguages={formData.learning_languages}
+          onChange={onChange}
+          loading={loading}
+        />
+      </div>
+
+      {/* Hobbies Section */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Hobbies & Interests</h2>
+        <HobbiesInput
+          hobbies={formData.hobbies}
+          onChange={onChange}
+          loading={loading}
+        />
+      </div>
+
+      {/* Additional Questions Section */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Additional Information</h2>
+        <AdditionalInfo
+          data={additionalData}
+          onChange={onAdditionalChange}
+          loading={loading}
+        />
       </div>
       
       <div className="flex justify-end">
