@@ -23,9 +23,15 @@ export function AppLayout({ children }: LayoutProps) {
 
   // ナビゲーション処理を更新
   const handleNavigation = (path: string) => {
-    // メッセージボタンを押した時に、クエリパラメータなしでナビゲートする
-    // パスのみを使用して遷移（クエリパラメーターをクリア）
-    navigate(path, { replace: true });
+    // メッセージボタンを押した時、強制的にクエリパラメータなしでナビゲートする
+    if (path === "/messages") {
+      // メッセージは常にリスト表示から始める（クエリパラメータを削除）
+      navigate("/messages", { replace: true });
+      console.log("Navigating to messages list view");
+    } else {
+      // 他のパスは通常通りナビゲート
+      navigate(path, { replace: true });
+    }
   };
 
   const getPageTitle = () => {

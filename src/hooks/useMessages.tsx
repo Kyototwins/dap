@@ -6,7 +6,7 @@ import { useMessageSubscription } from "@/hooks/useMessageSubscription";
 import type { Match } from "@/types/messages";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 
 export function useMessages() {
   const { matches, loading, fetchMatches } = useMatches();
@@ -16,6 +16,7 @@ export function useMessages() {
   const [searchParams] = useSearchParams();
   const [processingMatchSelection, setProcessingMatchSelection] = useState(false);
   const [userIdProcessed, setUserIdProcessed] = useState<string | null>(null);
+  const location = useLocation();
   
   // Check for user query parameter
   useEffect(() => {
@@ -43,11 +44,10 @@ export function useMessages() {
         handleSelectMatch(matchWithUser);
       }
     } else if (matches.length > 0 && !selectedMatch) {
-      // If no specific user requested and no match selected, select first match
-      // Only do this if there's no user ID parameter to avoid overriding a profile-specific navigation
-      if (!userId) {
-        console.log(`Auto-selecting first match: ${matches[0].id}`);
-        handleSelectMatch(matches[0]);
+      // 直接URLパラメータなしで/messagesにアクセスした場合のみ、自動選択する
+      // ボトムナビゲーションから来た場合は最初のマッチを自動選択しない
+      if (!userId && location.key) {  // location.keyがある場合は履歴エントリがある
+        console.log("Not auto-selecting first match - showing match list");
       }
     } else if (matches.length === 0) {
       setSelectedMatch(null);
