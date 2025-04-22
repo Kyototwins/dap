@@ -8,6 +8,7 @@ import { HobbiesInput } from "@/components/profile/HobbiesInput";
 import { LanguageSkillsInput } from "@/components/profile/LanguageSkillsInput";
 import { BasicInfoForm } from "@/components/profile/BasicInfoForm";
 import { AdditionalInfo } from "@/components/profile/AdditionalInfo";
+import { AdditionalQuestions } from "@/components/profile/AdditionalQuestions"; 
 
 interface ProfileFormProps {
   formData: ProfileFormData;
@@ -125,7 +126,7 @@ export function ProfileForm({
       {/* Additional Questions Section */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Additional Information</h2>
-        <AdditionalInfo
+        <AdditionalQuestions
           data={additionalData}
           onChange={onAdditionalChange}
           loading={loading}
