@@ -21,10 +21,11 @@ export function AppLayout({ children }: LayoutProps) {
     { icon: User, label: "Profile", path: "/profile" },
   ];
 
-  // ナビゲーション処理を更新して、URLクエリパラメータなしで／messagesに行くようにする
+  // ナビゲーション処理を更新
   const handleNavigation = (path: string) => {
-    // メッセージボタンを押した時に、シンプルにパスのみを使用して遷移
-    navigate(path);
+    // メッセージボタンを押した時に、クエリパラメータなしでナビゲートする
+    // パスのみを使用して遷移（クエリパラメーターをクリア）
+    navigate(path, { replace: true });
   };
 
   const getPageTitle = () => {

@@ -15,13 +15,19 @@ export function useMessages() {
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const [processingMatchSelection, setProcessingMatchSelection] = useState(false);
+  const [userIdProcessed, setUserIdProcessed] = useState<string | null>(null);
   
   // Check for user query parameter
   useEffect(() => {
     const userId = searchParams.get('user');
     
-    // Skip auto-selection when already processing a manual selection
+    // Skip if we're already processing a selection
     if (processingMatchSelection) {
+      return;
+    }
+
+    // Skip if we already processed this user ID to avoid oscillation
+    if (userId && userId === userIdProcessed) {
       return;
     }
     
@@ -30,19 +36,24 @@ export function useMessages() {
       const matchWithUser = matches.find(match => 
         match.otherUser.id === userId
       );
+      
       if (matchWithUser) {
         console.log(`Found match with user ${userId}, selecting it`);
+        setUserIdProcessed(userId); // Mark this user ID as processed
         handleSelectMatch(matchWithUser);
       }
     } else if (matches.length > 0 && !selectedMatch) {
-      // If no specific user requested, select first match
-      console.log(`Auto-selecting first match: ${matches[0].id}`);
-      handleSelectMatch(matches[0]);
+      // If no specific user requested and no match selected, select first match
+      // Only do this if there's no user ID parameter to avoid overriding a profile-specific navigation
+      if (!userId) {
+        console.log(`Auto-selecting first match: ${matches[0].id}`);
+        handleSelectMatch(matches[0]);
+      }
     } else if (matches.length === 0) {
       setSelectedMatch(null);
       setMessages([]);
     }
-  }, [matches, searchParams, processingMatchSelection]);
+  }, [matches, searchParams]);
   
   // Set up realtime subscription
   useMessageSubscription(selectedMatch, setMessages);
