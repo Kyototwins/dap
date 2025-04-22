@@ -10,6 +10,7 @@ import { UserLearningLanguagesSection } from "./user-sections/UserLearningLangua
 import { UserHobbiesSection } from "./user-sections/UserHobbiesSection";
 import { UserMoreAboutSection } from "./user-sections/UserMoreAboutSection";
 import { UserStatsSection } from "./user-sections/UserStatsSection";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface UserProfileAboutTabProps {
   profile: Profile;
@@ -41,7 +42,47 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
       <UserBasicInfoSection profile={profile} />
       <UserLanguagesSection profile={profile} />
       <UserLearningLanguagesSection profile={profile} title="Learning Languages" />
+      
+      {/* Hobby Photo Section */}
+      {profile.hobby_url && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="font-medium text-lg mb-4">My Hobby Photo</h3>
+            <div className="overflow-hidden rounded-lg">
+              <img 
+                src={profile.hobby_url} 
+                alt="Hobby" 
+                className="w-full h-auto max-h-96 object-contain"
+              />
+              {profile.hobby_photo_comment && (
+                <p className="mt-3 text-gray-600 italic">{profile.hobby_photo_comment}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <UserHobbiesSection profile={profile} title="Interests" />
+
+      {/* Pet Photo Section */}
+      {profile.pet_url && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="font-medium text-lg mb-4">My Pet Photo</h3>
+            <div className="overflow-hidden rounded-lg">
+              <img 
+                src={profile.pet_url} 
+                alt="Pet" 
+                className="w-full h-auto max-h-96 object-contain"
+              />
+              {profile.pet_photo_comment && (
+                <p className="mt-3 text-gray-600 italic">{profile.pet_photo_comment}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <UserMoreAboutSection profile={profile} />
       <UserStatsSection stats={stats} loading={loading} />
     </div>
