@@ -53,6 +53,10 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
                 src={profile.hobby_photo_url} 
                 alt="Hobby" 
                 className="w-full h-auto max-h-96 object-contain"
+                onError={(e) => {
+                  console.error("Hobby image load error:", e);
+                  (e.target as HTMLImageElement).src = "/placeholder.svg";
+                }}
               />
               {profile.hobby_photo_comment && (
                 <p className="mt-3 text-gray-600 italic">{profile.hobby_photo_comment}</p>
@@ -74,6 +78,10 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
                 src={profile.pet_photo_url} 
                 alt="Pet" 
                 className="w-full h-auto max-h-96 object-contain"
+                onError={(e) => {
+                  console.error("Pet image load error:", e);
+                  (e.target as HTMLImageElement).src = "/placeholder.svg";
+                }}
               />
               {profile.pet_photo_comment && (
                 <p className="mt-3 text-gray-600 italic">{profile.pet_photo_comment}</p>

@@ -1,3 +1,4 @@
+
 import { Profile } from "@/types/messages";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -82,6 +83,23 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
         </div>
       )}
       
+      {/* Hobby Photo */}
+      {profile.hobby_photo_url && (
+        <div className="p-6 border border-gray-200 rounded-lg mb-6">
+          <h2 className="text-xl font-bold mb-4">My Hobby Photo</h2>
+          <div className="overflow-hidden rounded-lg">
+            <img 
+              src={profile.hobby_photo_url} 
+              alt="Hobby Photo" 
+              className="w-full h-auto max-h-96 object-contain"
+            />
+            {profile.hobby_photo_comment && (
+              <p className="mt-3 text-gray-600 italic">{profile.hobby_photo_comment}</p>
+            )}
+          </div>
+        </div>
+      )}
+      
       {/* Hobbies/Interests */}
       {profile.hobbies && profile.hobbies.length > 0 && (
         <div className="p-6 border border-gray-200 rounded-lg mb-6">
@@ -92,6 +110,23 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
                 {hobby}
               </span>
             ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Pet Photo */}
+      {profile.pet_photo_url && (
+        <div className="p-6 border border-gray-200 rounded-lg mb-6">
+          <h2 className="text-xl font-bold mb-4">My Pet Photo</h2>
+          <div className="overflow-hidden rounded-lg">
+            <img 
+              src={profile.pet_photo_url} 
+              alt="Pet Photo" 
+              className="w-full h-auto max-h-96 object-contain"
+            />
+            {profile.pet_photo_comment && (
+              <p className="mt-3 text-gray-600 italic">{profile.pet_photo_comment}</p>
+            )}
           </div>
         </div>
       )}

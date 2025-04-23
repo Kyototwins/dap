@@ -7,6 +7,7 @@ interface UserPhotoSectionProps {
 }
 
 export function UserPhotoSection({ profile }: UserPhotoSectionProps) {
+  // Only display this section if there's an image to show
   if (!profile.image_url_2) return null;
   
   return (
