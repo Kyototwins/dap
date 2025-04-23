@@ -55,6 +55,9 @@ export function EventDetailsDialog({
 
   const displayCategory = categoryTranslationMap[event.category] || event.category;
 
+  // 最新のコメント（配列の最後）
+  const latestComment = comments.length > 0 ? comments[comments.length - 1] : null;
+
   return (
     <>
       {/* 通常のイベント詳細ダイアログ */}
@@ -89,7 +92,7 @@ export function EventDetailsDialog({
               </div>
             </div>
             
-            {/* イベント説明 - 変更：スクロールなく全体を表示 */}
+            {/* イベント説明 */}
             <div className="px-4 pb-4">
               <div className="font-semibold text-gray-700 mb-1">Description</div>
               <div
@@ -115,8 +118,30 @@ export function EventDetailsDialog({
                   <Expand className="h-4 w-4" />
                 </Button>
               </div>
+              {/* 最新コメントのみ表示 */}
               <div className="flex-1 min-h-0 overflow-y-auto mb-4">
-                <EventComments comments={comments} />
+                {latestComment ? (
+                  <div className="flex gap-3">
+                    <img
+                      src={latestComment.user?.avatar_url || "/placeholder.svg"}
+                      alt={`${latestComment.user?.first_name}'s avatar`}
+                      className="h-8 w-8 rounded-full flex-shrink-0"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-sm">
+                          {latestComment.user?.first_name} {latestComment.user?.last_name}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {new Date(latestComment.created_at).toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="text-sm mt-1">{latestComment.content}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-center text-gray-500">No comments yet</p>
+                )}
               </div>
               <div className="flex gap-2 items-end pt-2 border-t">
                 <Textarea
@@ -130,7 +155,8 @@ export function EventDetailsDialog({
                   onClick={onSubmitComment}
                   disabled={!newComment.trim()}
                   size="icon"
-                  className="bg-doshisha-purple hover:bg-doshisha-darkPurple h-10 w-10"
+                  // 紫色に（カスタムカラー/primary/hoverも紫で統一）
+                  className="bg-primary hover:bg-primary/90 text-white h-10 w-10"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
@@ -164,7 +190,8 @@ export function EventDetailsDialog({
                 onClick={onSubmitComment}
                 disabled={!newComment.trim()}
                 size="icon"
-                className="bg-doshisha-purple hover:bg-doshisha-darkPurple h-12 w-12"
+                // 紫色に
+                className="bg-primary hover:bg-primary/90 text-white h-12 w-12"
               >
                 <Send className="h-5 w-5" />
               </Button>
@@ -175,3 +202,4 @@ export function EventDetailsDialog({
     </>
   );
 }
+
