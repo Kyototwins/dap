@@ -445,6 +445,7 @@ export type Database = {
           gender: string | null
           hobbies: string[] | null
           hobby_photo_comment: string | null
+          hobby_photo_url: string | null
           id: string
           ideal_date: string | null
           image_url_1: string | null
@@ -456,6 +457,7 @@ export type Database = {
           life_goal: string | null
           origin: string | null
           pet_photo_comment: string | null
+          pet_photo_url: string | null
           photo_comment: string | null
           sexuality: string | null
           superpower: string | null
@@ -475,6 +477,7 @@ export type Database = {
           gender?: string | null
           hobbies?: string[] | null
           hobby_photo_comment?: string | null
+          hobby_photo_url?: string | null
           id: string
           ideal_date?: string | null
           image_url_1?: string | null
@@ -486,6 +489,7 @@ export type Database = {
           life_goal?: string | null
           origin?: string | null
           pet_photo_comment?: string | null
+          pet_photo_url?: string | null
           photo_comment?: string | null
           sexuality?: string | null
           superpower?: string | null
@@ -505,6 +509,7 @@ export type Database = {
           gender?: string | null
           hobbies?: string[] | null
           hobby_photo_comment?: string | null
+          hobby_photo_url?: string | null
           id?: string
           ideal_date?: string | null
           image_url_1?: string | null
@@ -516,6 +521,7 @@ export type Database = {
           life_goal?: string | null
           origin?: string | null
           pet_photo_comment?: string | null
+          pet_photo_url?: string | null
           photo_comment?: string | null
           sexuality?: string | null
           superpower?: string | null
