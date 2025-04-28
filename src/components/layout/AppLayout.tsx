@@ -1,8 +1,13 @@
 
-import { MessageSquare, User, Search, Calendar } from "lucide-react";
+import { MessageSquare, User, Search, Calendar, Menu } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { NotificationBell } from "@/components/notifications/NotificationBell";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { LanguageToggle } from "@/components/layout/LanguageToggle";
 import { DapLogo } from "@/components/common/DapLogo";
 
@@ -53,7 +58,21 @@ export function AppLayout({ children }: LayoutProps) {
           </div>
           <div className="flex items-center gap-2">
             <LanguageToggle />
-            <NotificationBell />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-2">
+                  <Menu className="h-5 w-5 text-gray-700" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate("/help")}>
+                  Help
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/about")}>
+                  About
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>

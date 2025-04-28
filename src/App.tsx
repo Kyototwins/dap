@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,8 @@ import CreateEvent from "./pages/CreateEvent";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
+import Help from "./pages/Help";
+import About from "./pages/About";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -31,65 +32,65 @@ function App() {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <NotificationProvider>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/profile/setup" element={<ProfileSetup />} />
-                
-                {/* アプリのメイン画面 - AppLayoutでラップ */}
-                <Route
-                  path="/matches"
-                  element={
-                    <AppLayout>
-                      <Matches />
-                    </AppLayout>
-                  }
-                />
-                <Route
-                  path="/messages"
-                  element={
-                    <AppLayout>
-                      <Messages />
-                    </AppLayout>
-                  }
-                />
-                <Route
-                  path="/events"
-                  element={
-                    <AppLayout>
-                      <Events />
-                    </AppLayout>
-                  }
-                />
-                <Route
-                  path="/events/new"
-                  element={
-                    <AppLayout>
-                      <CreateEvent />
-                    </AppLayout>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <AppLayout>
-                      <Profile />
-                    </AppLayout>
-                  }
-                />
-                <Route
-                  path="/profile/:id"
-                  element={
-                    <AppLayout>
-                      <UserProfile />
-                    </AppLayout>
-                  }
-                />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </NotificationProvider>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/profile/setup" element={<ProfileSetup />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/about" element={<About />} />
+              
+              {/* アプリのメイン画面 - AppLayoutでラップ */}
+              <Route
+                path="/matches"
+                element={
+                  <AppLayout>
+                    <Matches />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/messages"
+                element={
+                  <AppLayout>
+                    <Messages />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/events"
+                element={
+                  <AppLayout>
+                    <Events />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/events/new"
+                element={
+                  <AppLayout>
+                    <CreateEvent />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <AppLayout>
+                    <Profile />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/profile/:id"
+                element={
+                  <AppLayout>
+                    <UserProfile />
+                  </AppLayout>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </BrowserRouter>
         </LanguageProvider>
       </TooltipProvider>
