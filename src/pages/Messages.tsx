@@ -1,4 +1,3 @@
-
 import { useMessages } from "@/hooks/useMessages";
 import { MessageContainer } from "@/components/messages/MessageContainer";
 import { Button } from "@/components/ui/button";
@@ -61,7 +60,7 @@ export default function Messages() {
           className="gap-2"
         >
           <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-          更新
+          Refresh Messages
         </Button>
       </div>
       

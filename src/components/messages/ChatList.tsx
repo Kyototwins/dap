@@ -23,7 +23,7 @@ export function ChatList({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <input 
             type="text"
-            placeholder="メッセージを検索..."
+            placeholder="Search Messages..."
             className="w-full pl-10 pr-4 py-3 bg-gray-50 border-0 rounded-lg text-sm"
           />
         </div>

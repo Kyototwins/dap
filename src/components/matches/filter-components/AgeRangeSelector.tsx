@@ -20,12 +20,12 @@ export function AgeRangeSelector({ value, onChange }: AgeRangeSelectorProps) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-medium border-b pb-2">年齢範囲</h3>
+      <h3 className="text-sm font-medium border-b pb-2">Age Range</h3>
       
       <div className="space-y-6">
         <div className="space-y-2">
           <Label className="text-xs text-muted-foreground">
-            最小年齢: {value[0]}歳
+            Minimum Age: {value[0]} years
           </Label>
           <Slider
             value={[value[0]]}
@@ -39,7 +39,7 @@ export function AgeRangeSelector({ value, onChange }: AgeRangeSelectorProps) {
 
         <div className="space-y-2">
           <Label className="text-xs text-muted-foreground">
-            最大年齢: {value[1]}歳
+            Maximum Age: {value[1]} years
           </Label>
           <Slider
             value={[value[1]]}
@@ -54,4 +54,3 @@ export function AgeRangeSelector({ value, onChange }: AgeRangeSelectorProps) {
     </div>
   );
 }
-
