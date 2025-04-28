@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -200,71 +199,46 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
           </div>
           
           {/* Language Filters */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium border-b pb-2">Language Skills</h3>
-            
-            {/* Speaking Languages */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-medium">Speaking Languages</h4>
-              <div className="flex flex-wrap gap-2">
-                {LANGUAGE_OPTIONS.map(lang => (
-                  <Badge
-                    key={lang.value}
-                    variant={filters.speakingLanguages.includes(lang.label) ? "default" : "outline"}
-                    className={`cursor-pointer ${
-                      filters.speakingLanguages.includes(lang.label) 
-                        ? "bg-doshisha-purple text-white hover:bg-doshisha-darkPurple" 
-                        : "bg-white text-doshisha-darkPurple hover:bg-doshisha-softPurple"
-                    }`}
-                    onClick={() => toggleLanguage("speakingLanguages", lang.label)}
-                  >
-                    {lang.label}
-                  </Badge>
-                ))}
-              </div>
+          
+          {/* Speaking Languages */}
+          <div className="space-y-2">
+            <h4 className="text-xs font-medium">Speaking Languages</h4>
+            <div className="flex flex-wrap gap-2">
+              {LANGUAGE_OPTIONS.map(lang => (
+                <Badge
+                  key={lang.value}
+                  variant={filters.speakingLanguages.includes(lang.label) ? "default" : "outline"}
+                  className={`cursor-pointer ${
+                    filters.speakingLanguages.includes(lang.label) 
+                      ? "bg-[#7f1184] text-white hover:bg-[#671073]" 
+                      : "bg-white text-[#7f1184] hover:bg-[#f3e8ff]"
+                  }`}
+                  onClick={() => toggleLanguage("speakingLanguages", lang.label)}
+                >
+                  {lang.label}
+                </Badge>
+              ))}
             </div>
+          </div>
             
-            {/* Minimum Language Level */}
-            {filters.speakingLanguages.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-xs font-medium">Minimum Language Level</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Beginner</span>
-                    <span>Intermediate</span>
-                    <span>Advanced</span>
-                    <span>Native</span>
-                  </div>
-                  <Slider
-                    value={[filters.minLanguageLevel]}
-                    min={1}
-                    max={4}
-                    step={1}
-                    onValueChange={(value) => handleFilterChange("minLanguageLevel", value[0])}
-                  />
-                </div>
-              </div>
-            )}
-            
-            {/* Learning Languages */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-medium">Languages I'm Learning</h4>
-              <div className="flex flex-wrap gap-2">
-                {LANGUAGE_OPTIONS.map(lang => (
-                  <Badge
-                    key={lang.value}
-                    variant={filters.learningLanguages.includes(lang.label) ? "default" : "outline"}
-                    className={`cursor-pointer ${
-                      filters.learningLanguages.includes(lang.label) 
-                        ? "bg-doshisha-purple text-white hover:bg-doshisha-darkPurple" 
-                        : "bg-white text-doshisha-darkPurple hover:bg-doshisha-softPurple"
-                    }`}
-                    onClick={() => toggleLanguage("learningLanguages", lang.label)}
-                  >
-                    {lang.label}
-                  </Badge>
-                ))}
-              </div>
+          {/* Learning Languages */}
+          <div className="space-y-2">
+            <h4 className="text-xs font-medium">Languages I'm Learning</h4>
+            <div className="flex flex-wrap gap-2">
+              {LANGUAGE_OPTIONS.map(lang => (
+                <Badge
+                  key={lang.value}
+                  variant={filters.learningLanguages.includes(lang.label) ? "default" : "outline"}
+                  className={`cursor-pointer ${
+                    filters.learningLanguages.includes(lang.label) 
+                      ? "bg-[#7f1184] text-white hover:bg-[#671073]" 
+                      : "bg-white text-[#7f1184] hover:bg-[#f3e8ff]"
+                  }`}
+                  onClick={() => toggleLanguage("learningLanguages", lang.label)}
+                >
+                  {lang.label}
+                </Badge>
+              ))}
             </div>
           </div>
           
@@ -278,8 +252,8 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
                   variant={filters.hobbies.includes(hobby) ? "default" : "outline"}
                   className={`cursor-pointer ${
                     filters.hobbies.includes(hobby) 
-                      ? "bg-doshisha-purple text-white hover:bg-doshisha-darkPurple" 
-                      : "bg-white text-doshisha-darkPurple hover:bg-doshisha-softPurple"
+                      ? "bg-[#7f1184] text-white hover:bg-[#671073]" 
+                      : "bg-white text-[#7f1184] hover:bg-[#f3e8ff]"
                   }`}
                   onClick={() => toggleHobby(hobby)}
                 >
@@ -331,4 +305,3 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
     </Sheet>
   );
 }
-
