@@ -1,10 +1,6 @@
-import { useState, useEffect } from "react";
+
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { 
   Sheet, 
   SheetContent, 
@@ -16,37 +12,11 @@ import {
 } from "@/components/ui/sheet";
 import { SlidersHorizontal } from "lucide-react";
 import { FilterState } from "@/types/matches";
-
-// Constants
-const LANGUAGE_OPTIONS = [
-  { value: "japanese", label: "Japanese" },
-  { value: "english", label: "English" },
-  { value: "chinese", label: "Chinese" },
-  { value: "korean", label: "Korean" },
-  { value: "french", label: "French" },
-  { value: "spanish", label: "Spanish" },
-];
-
-// Country options
-const COUNTRY_OPTIONS = [
-  { value: "japan", label: "Japan" },
-  { value: "usa", label: "USA" },
-  { value: "china", label: "China" },
-  { value: "korea", label: "Korea" },
-  { value: "other", label: "Other" },
-];
-
-// Hobby options
-const HOBBY_OPTIONS = [
-  "Traveling", "Cooking", "Watching Movies", "Reading", "Music", "Sports", "Art", 
-  "Photography", "Dancing", "Gaming", "Programming", "Languages"
-];
-
-// Sort options
-const SORT_OPTIONS = [
-  { value: "recent", label: "Newest Registered" },
-  { value: "active", label: "Most Active" },
-];
+import { SortOptions } from "./filter-components/SortOptions";
+import { AgeRangeSelector } from "./filter-components/AgeRangeSelector";
+import { LanguageSelector } from "./filter-components/LanguageSelector";
+import { HobbySelector } from "./filter-components/HobbySelector";
+import { CountrySelector } from "./filter-components/CountrySelector";
 
 interface FilterSheetProps {
   filters: FilterState;
@@ -90,40 +60,6 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
     handleFilterChange(list, currentList);
   };
 
-  // Hobby selection toggle handler
-  const toggleHobby = (hobby: string) => {
-    const currentHobbies = [...filters.hobbies];
-    const index = currentHobbies.indexOf(hobby);
-    
-    if (index >= 0) {
-      currentHobbies.splice(index, 1);
-    } else {
-      currentHobbies.push(hobby);
-    }
-    
-    handleFilterChange("hobbies", currentHobbies);
-  };
-
-  // Country toggle handler
-  const toggleCountry = (country: string) => {
-    const currentCountries = [...filters.countries];
-    const index = currentCountries.indexOf(country);
-    
-    if (index >= 0) {
-      currentCountries.splice(index, 1);
-    } else {
-      currentCountries.push(country);
-    }
-    
-    handleFilterChange("countries", currentCountries);
-  };
-
-  // Save filter handler
-  const handleSaveFilter = () => {
-    setIsOpen(false);
-    // Filters are already applied, no extra action needed
-  };
-
   // Reset filter handler
   const handleResetFilter = () => {
     setFilters({
@@ -162,128 +98,59 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
         </SheetHeader>
         
         <div className="py-6 space-y-6">
-          {/* Sort Settings */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium border-b pb-2">Sort Order</h3>
-            <RadioGroup 
-              value={filters.sortOption} 
-              onValueChange={(value) => handleFilterChange("sortOption", value)}
-              className="space-y-1"
-            >
-              {SORT_OPTIONS.map(option => (
-                <div key={option.value} className="flex items-center space-x-2">
-                  <RadioGroupItem value={option.value} id={option.value} />
-                  <label htmlFor={option.value} className="text-sm">{option.label}</label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
+          <SortOptions 
+            value={filters.sortOption}
+            onChange={(value) => handleFilterChange("sortOption", value)}
+          />
           
-          {/* Age Range */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium border-b pb-2">Age Range</h3>
-            <div className="space-y-4">
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{filters.ageRange[0]} years</span>
-                <span>{filters.ageRange[1]} years</span>
-              </div>
-              <Slider
-                value={filters.ageRange}
-                min={18}
-                max={60}
-                step={1}
-                onValueChange={(value) => handleFilterChange("ageRange", value as [number, number])}
-                className="my-4"
-              />
-            </div>
-          </div>
+          <AgeRangeSelector 
+            value={filters.ageRange}
+            onChange={(value) => handleFilterChange("ageRange", value)}
+          />
           
-          {/* Language Filters */}
+          <LanguageSelector 
+            title="Speaking Languages"
+            selectedLanguages={filters.speakingLanguages}
+            onToggleLanguage={(lang) => toggleLanguage("speakingLanguages", lang)}
+          />
           
-          {/* Speaking Languages */}
-          <div className="space-y-2">
-            <h4 className="text-xs font-medium">Speaking Languages</h4>
-            <div className="flex flex-wrap gap-2">
-              {LANGUAGE_OPTIONS.map(lang => (
-                <Badge
-                  key={lang.value}
-                  variant={filters.speakingLanguages.includes(lang.label) ? "default" : "outline"}
-                  className={`cursor-pointer ${
-                    filters.speakingLanguages.includes(lang.label) 
-                      ? "bg-[#7f1184] text-white hover:bg-[#671073]" 
-                      : "bg-white text-[#7f1184] hover:bg-[#f3e8ff]"
-                  }`}
-                  onClick={() => toggleLanguage("speakingLanguages", lang.label)}
-                >
-                  {lang.label}
-                </Badge>
-              ))}
-            </div>
-          </div>
-            
-          {/* Learning Languages */}
-          <div className="space-y-2">
-            <h4 className="text-xs font-medium">Languages I'm Learning</h4>
-            <div className="flex flex-wrap gap-2">
-              {LANGUAGE_OPTIONS.map(lang => (
-                <Badge
-                  key={lang.value}
-                  variant={filters.learningLanguages.includes(lang.label) ? "default" : "outline"}
-                  className={`cursor-pointer ${
-                    filters.learningLanguages.includes(lang.label) 
-                      ? "bg-[#7f1184] text-white hover:bg-[#671073]" 
-                      : "bg-white text-[#7f1184] hover:bg-[#f3e8ff]"
-                  }`}
-                  onClick={() => toggleLanguage("learningLanguages", lang.label)}
-                >
-                  {lang.label}
-                </Badge>
-              ))}
-            </div>
-          </div>
+          <LanguageSelector 
+            title="Languages I'm Learning"
+            selectedLanguages={filters.learningLanguages}
+            onToggleLanguage={(lang) => toggleLanguage("learningLanguages", lang)}
+          />
           
-          {/* Hobbies / Interests */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium border-b pb-2">Hobbies & Interests</h3>
-            <div className="flex flex-wrap gap-2">
-              {HOBBY_OPTIONS.map(hobby => (
-                <Badge
-                  key={hobby}
-                  variant={filters.hobbies.includes(hobby) ? "default" : "outline"}
-                  className={`cursor-pointer ${
-                    filters.hobbies.includes(hobby) 
-                      ? "bg-[#7f1184] text-white hover:bg-[#671073]" 
-                      : "bg-white text-[#7f1184] hover:bg-[#f3e8ff]"
-                  }`}
-                  onClick={() => toggleHobby(hobby)}
-                >
-                  {hobby}
-                </Badge>
-              ))}
-            </div>
-          </div>
+          <HobbySelector 
+            selectedHobbies={filters.hobbies}
+            onToggleHobby={(hobby) => {
+              const currentHobbies = [...filters.hobbies];
+              const index = currentHobbies.indexOf(hobby);
+              
+              if (index >= 0) {
+                currentHobbies.splice(index, 1);
+              } else {
+                currentHobbies.push(hobby);
+              }
+              
+              handleFilterChange("hobbies", currentHobbies);
+            }}
+          />
           
-          {/* Countries of Origin */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium border-b pb-2">Country of Origin</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {COUNTRY_OPTIONS.map(country => (
-                <div key={country.value} className="flex items-center space-x-2">
-                  <Checkbox 
-                    id={country.value} 
-                    checked={filters.countries.includes(country.value)}
-                    onCheckedChange={() => toggleCountry(country.value)}
-                  />
-                  <label
-                    htmlFor={country.value}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {country.label}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
+          <CountrySelector 
+            selectedCountries={filters.countries}
+            onToggleCountry={(country) => {
+              const currentCountries = [...filters.countries];
+              const index = currentCountries.indexOf(country);
+              
+              if (index >= 0) {
+                currentCountries.splice(index, 1);
+              } else {
+                currentCountries.push(country);
+              }
+              
+              handleFilterChange("countries", currentCountries);
+            }}
+          />
         </div>
         
         <SheetFooter className="flex gap-2 pt-4 border-t">
@@ -295,7 +162,7 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
             Reset
           </Button>
           <Button 
-            onClick={handleSaveFilter}
+            onClick={() => setIsOpen(false)}
             className="flex-1 bg-doshisha-purple hover:bg-doshisha-darkPurple"
           >
             Apply
@@ -305,3 +172,4 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
     </Sheet>
   );
 }
+
