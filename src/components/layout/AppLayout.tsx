@@ -1,14 +1,10 @@
 
-import { MessageSquare, User, Search, Calendar, Menu } from "lucide-react";
+import { MessageSquare, User, Search, Calendar, Menu, HelpCircle, LogOut } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LanguageToggle } from "@/components/layout/LanguageToggle";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import { DapLogo } from "@/components/common/DapLogo";
 
 interface LayoutProps {
@@ -26,27 +22,22 @@ export function AppLayout({ children }: LayoutProps) {
     { icon: User, label: "Profile", path: "/profile" },
   ];
 
-  // ナビゲーション処理を更新
   const handleNavigation = (path: string) => {
-    // メッセージボタンを押した時、強制的にクエリパラメータなしでナビゲートする
     if (path === "/messages") {
-      // メッセージは常にリスト表示から始める（クエリパラメータを削除）
       navigate("/messages", { replace: true });
       console.log("Navigating to messages list view");
     } else {
-      // 他のパスは通常通りナビゲート
       navigate(path, { replace: true });
     }
   };
 
-  const getPageTitle = () => {
-    const currentPath = location.pathname;
-    if (currentPath.startsWith("/matches")) return "Matching";
-    if (currentPath.startsWith("/messages")) return "Messages";
-    if (currentPath.startsWith("/events/new")) return "Create Event";
-    if (currentPath.startsWith("/events")) return "Events";
-    if (currentPath.startsWith("/profile")) return "Profile";
-    return "DAP";
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
   return (
@@ -57,22 +48,33 @@ export function AppLayout({ children }: LayoutProps) {
             <DapLogo />
           </div>
           <div className="flex items-center gap-2">
-            <LanguageToggle />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="p-2">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
                   <Menu className="h-5 w-5 text-gray-700" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => navigate("/help")}>
-                  Help
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/about")}>
-                  About
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <div className="flex flex-col gap-4 mt-8">
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start" 
+                    onClick={() => navigate("/help")}
+                  >
+                    <HelpCircle className="mr-2 h-5 w-5" />
+                    Help
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start text-red-600 hover:text-red-600 hover:bg-red-50" 
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="mr-2 h-5 w-5" />
+                    Logout
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>
