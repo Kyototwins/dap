@@ -1,22 +1,20 @@
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetHeader, 
-  SheetTitle, 
-  SheetDescription,
-  SheetFooter,
+import {
+  Sheet,
+  SheetContent,
   SheetTrigger
 } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { SlidersHorizontal } from "lucide-react";
 import { FilterState } from "@/types/matches";
 import { SortOptions } from "./filter-components/SortOptions";
 import { AgeRangeSelector } from "./filter-components/AgeRangeSelector";
 import { LanguageSelector } from "./filter-components/LanguageSelector";
-import { HobbySelector } from "./filter-components/HobbySelector";
+import { HobbySelector } from "./filter-components/HobbiesSelector";
 import { CountrySelector } from "./filter-components/CountrySelector";
+import { FilterSheetHeader } from "./filter-components/FilterSheetHeader";
+import { FilterSheetFooter } from "./filter-components/FilterSheetFooter";
 
 interface FilterSheetProps {
   filters: FilterState;
@@ -90,12 +88,7 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
         </Button>
       </SheetTrigger>
       <SheetContent className="sm:max-w-md overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Filter Settings</SheetTitle>
-          <SheetDescription>
-            Please set your matching criteria
-          </SheetDescription>
-        </SheetHeader>
+        <FilterSheetHeader />
         
         <div className="py-6 space-y-6">
           <SortOptions 
@@ -153,23 +146,11 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
           />
         </div>
         
-        <SheetFooter className="flex gap-2 pt-4 border-t">
-          <Button 
-            variant="outline" 
-            onClick={handleResetFilter}
-            className="flex-1"
-          >
-            Reset
-          </Button>
-          <Button 
-            onClick={() => setIsOpen(false)}
-            className="flex-1 bg-doshisha-purple hover:bg-doshisha-darkPurple"
-          >
-            Apply
-          </Button>
-        </SheetFooter>
+        <FilterSheetFooter 
+          onReset={handleResetFilter}
+          onClose={() => setIsOpen(false)}
+        />
       </SheetContent>
     </Sheet>
   );
 }
-
