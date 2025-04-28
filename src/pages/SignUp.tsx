@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -27,6 +26,7 @@ export default function SignUp() {
       });
       return;
     }
+    
     // 「doshisha.ac.jp」で終わるメールアドレスに限定
     const doshishaEmailPattern = /@[\w.-]*doshisha\.ac\.jp$/i;
     if (!doshishaEmailPattern.test(email)) {
@@ -37,6 +37,7 @@ export default function SignUp() {
       });
       return;
     }
+    
     await handleSignUp({ email, password, name });
   };
 

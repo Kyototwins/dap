@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -98,7 +97,7 @@ export default function Login() {
         </form>
         
         <div className="mt-8 text-center">
-          <span className="text-muted-foreground text-sm">Don't have an account? </span>
+          <span className="text-muted-foreground text-sm">Don't have an account? </span> 
           <Link
             to="/signup"
             className="text-[#7f1184] font-medium hover:underline hover-lift inline-block transition-all"
