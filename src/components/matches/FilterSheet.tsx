@@ -11,7 +11,7 @@ import { FilterState } from "@/types/matches";
 import { SortOptions } from "./filter-components/SortOptions";
 import { AgeRangeSelector } from "./filter-components/AgeRangeSelector";
 import { LanguageSelector } from "./filter-components/LanguageSelector";
-import { HobbySelector } from "./filter-components/HobbiesSelector";
+import { HobbySelector } from "./filter-components/HobbySelector"; // Fixed import path
 import { CountrySelector } from "./filter-components/CountrySelector";
 import { FilterSheetHeader } from "./filter-components/FilterSheetHeader";
 import { FilterSheetFooter } from "./filter-components/FilterSheetFooter";
