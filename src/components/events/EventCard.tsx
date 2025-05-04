@@ -134,11 +134,11 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
         <div className="mt-4 flex gap-2">
           <Button
             className={`flex-1 rounded-xl ${
-              isParticipating || isCreator
+              isParticipating 
                 ? "bg-gray-200 hover:bg-gray-300 text-gray-700" 
                 : isPastEvent 
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                  : "bg-[#3b82f6] hover:bg-[#2563eb] text-white"
+                  : "bg-[#7f1184] hover:bg-[#671073] text-white"
             }`}
             disabled={isPastEvent}
             onClick={(e) => {
@@ -146,7 +146,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
               if (!isPastEvent) onJoin(event.id, event.title);
             }}
           >
-            {isParticipating || isCreator
+            {isParticipating
               ? <>
                   <Check className="w-4 h-4 mr-1" />
                   Cancel Participation
