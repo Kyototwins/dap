@@ -1,6 +1,6 @@
 
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { EventDetailsDialog } from "@/components/events/EventDetailsDialog";
 import { EventsHeader } from "@/components/events/EventsHeader";
@@ -12,12 +12,14 @@ import { joinEvent } from "@/services/eventService";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { SortOption } from "@/components/events/EventSortOptions";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Events() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [calendarViewOpen, setCalendarViewOpen] = useState(false);
   const [hidePastEvents, setHidePastEvents] = useState(false);
+  const [userHasCreatedEvents, setUserHasCreatedEvents] = useState(false);
 
   const {
     filteredEvents,
@@ -39,6 +41,29 @@ export default function Events() {
     handleSubmitComment,
     fetchEvents
   } = useEvents();
+  
+  useEffect(() => {
+    // Check if user has created any events
+    const checkUserEvents = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
+        const { data: events, error } = await supabase
+          .from("events")
+          .select("id")
+          .eq("creator_id", user.id)
+          .limit(1);
+          
+        if (error) throw error;
+        setUserHasCreatedEvents(events && events.length > 0);
+      } catch (error) {
+        console.error("Error checking user events:", error);
+      }
+    };
+    
+    checkUserEvents();
+  }, []);
   
   const handleJoinEvent = async (eventId: string, eventTitle: string) => {
     try {
@@ -116,17 +141,19 @@ export default function Events() {
         onOpenChange={setCalendarViewOpen}
       />
 
-      {/* Floating Create Event Button with speech bubble */}
-      <div className="fixed bottom-16 right-6 z-10 flex flex-col items-end gap-2">
-        <div className="flex justify-center w-full">
-          <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight pl-4 pt-2 px-0 mx--1 text-center my--1">
-            Add your<br />
-            own event
-          </p>
+      {/* Floating Create Event Button with speech bubble - only shown if user hasn't created events */}
+      {!userHasCreatedEvents && (
+        <div className="fixed bottom-16 right-6 z-10 flex flex-col items-end gap-2">
+          <div className="flex justify-center w-full">
+            <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight pl-4 pt-2 px-0 mx--1 text-center my--1">
+              Add your<br />
+              own event
+            </p>
+          </div>
+          <Button onClick={() => navigate("/events/new")} className="bg-[#7f1184] hover:bg-[#671073] text-white rounded-full shadow-lg" size="icon">
+            <Plus className="w-5 h-5" />
+          </Button>
         </div>
-        <Button onClick={() => navigate("/events/new")} className="bg-[#7f1184] hover:bg-[#671073] text-white rounded-full shadow-lg" size="icon">
-          <Plus className="w-5 h-5" />
-        </Button>
-      </div>
+      )}
     </div>;
 }

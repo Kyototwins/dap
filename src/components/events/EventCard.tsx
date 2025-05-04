@@ -38,7 +38,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
 
   return (
     <Card 
-      className={`overflow-hidden cursor-pointer hover:shadow-lg transition-shadow rounded-xl border-[#e4e4e7] relative ${isOlderThanMonth ? 'opacity-70' : ''}`}
+      className={`overflow-hidden cursor-pointer hover:shadow-lg transition-shadow rounded-xl border-[#e4e4e7] relative ${isPastEvent ? 'opacity-70' : ''}`}
       onClick={() => onCardClick(event)}
     >
       {isPastEvent && (
