@@ -1,21 +1,24 @@
 
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { EventDetailsDialog } from "@/components/events/EventDetailsDialog";
 import { EventsHeader } from "@/components/events/EventsHeader";
 import { EventFilters } from "@/components/events/EventFilters";
 import { EventList } from "@/components/events/EventList";
-import { EventSortOptions } from "@/components/events/EventSortOptions";
+import { EventCalendarView } from "@/components/events/EventCalendarView";
 import { useEvents } from "@/hooks/useEvents";
 import { joinEvent } from "@/services/eventService";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { SortOption } from "@/components/events/EventSortOptions";
 
 export default function Events() {
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const [calendarViewOpen, setCalendarViewOpen] = useState(false);
+  const [hidePastEvents, setHidePastEvents] = useState(false);
+
   const {
     filteredEvents,
     selectedEvent,
@@ -57,19 +60,58 @@ export default function Events() {
       });
     }
   };
+
+  // Filter out past events if the checkbox is checked
+  let displayedEvents = filteredEvents;
+  if (hidePastEvents) {
+    const now = new Date();
+    displayedEvents = displayedEvents.filter(event => new Date(event.date) >= now);
+  }
   
   const hasFilters = searchQuery !== "" || timeFilter !== "all" || categoryFilter !== "all";
   
   return <div className="max-w-md mx-auto py-4 space-y-4">
-      <EventsHeader onSearchChange={setSearchQuery} />
+      <EventsHeader 
+        onSearchChange={setSearchQuery}
+        sortOption={sortOption}
+        onSortChange={setSortOption}
+        hidePastEvents={hidePastEvents}
+        onHidePastEventsChange={setHidePastEvents}
+        onCalendarViewClick={() => setCalendarViewOpen(true)}
+      />
       
-      <EventSortOptions value={sortOption} onChange={setSortOption} />
-      
-      <EventFilters timeFilter={timeFilter} categoryFilter={categoryFilter} onTimeFilterChange={setTimeFilter} onCategoryFilterChange={setCategoryFilter} />
+      <EventFilters 
+        timeFilter={timeFilter} 
+        categoryFilter={categoryFilter} 
+        onTimeFilterChange={setTimeFilter} 
+        onCategoryFilterChange={setCategoryFilter} 
+      />
 
-      <EventList events={filteredEvents} loading={loading} participations={participations} onJoinEvent={handleJoinEvent} onSelectEvent={setSelectedEvent} hasFilters={hasFilters} />
+      <EventList 
+        events={displayedEvents} 
+        loading={loading} 
+        participations={participations} 
+        onJoinEvent={handleJoinEvent} 
+        onSelectEvent={setSelectedEvent} 
+        hasFilters={hasFilters} 
+      />
 
-      <EventDetailsDialog event={selectedEvent} comments={comments} newComment={newComment} setNewComment={setNewComment} onSubmitComment={handleSubmitComment} open={!!selectedEvent} onOpenChange={open => !open && setSelectedEvent(null)} />
+      <EventDetailsDialog 
+        event={selectedEvent} 
+        comments={comments} 
+        newComment={newComment} 
+        setNewComment={setNewComment} 
+        onSubmitComment={handleSubmitComment} 
+        open={!!selectedEvent} 
+        onOpenChange={open => !open && setSelectedEvent(null)} 
+      />
+
+      <EventCalendarView 
+        events={filteredEvents}
+        participations={participations}
+        open={calendarViewOpen}
+        onOpenChange={setCalendarViewOpen}
+      />
 
       {/* Floating Create Event Button with simple text */}
       <div className="fixed bottom-16 right-6 z-10 flex flex-col items-end gap-2">

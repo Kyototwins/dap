@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -157,6 +156,13 @@ export function useEvents() {
       supabase.removeChannel(channel);
     };
   };
+
+  useEffect(() => {
+    if (selectedEvent) {
+      loadEventComments(selectedEvent.id);
+      setupCommentSubscription(selectedEvent.id);
+    }
+  }, [selectedEvent]);
 
   const handleSubmitComment = async () => {
     if (!selectedEvent || !newComment.trim()) return;
