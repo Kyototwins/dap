@@ -62,17 +62,6 @@ export function EventList({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="font-bold text-lg">Events</h2>
-        <Button 
-          onClick={() => navigate("/events/new")} 
-          className="bg-doshisha-purple hover:bg-doshisha-darkPurple"
-          size="sm"
-        >
-          <Plus className="w-4 h-4 mr-1" />
-          Create
-        </Button>
-      </div>
       {events.map((event) => (
         <EventCard
           key={event.id}

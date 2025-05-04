@@ -7,6 +7,8 @@ import { EventFilters } from "@/components/events/EventFilters";
 import { EventList } from "@/components/events/EventList";
 import { useEvents } from "@/hooks/useEvents";
 import { joinEvent } from "@/services/eventService";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 export default function Events() {
   const navigate = useNavigate();
@@ -57,6 +59,18 @@ export default function Events() {
 
   return (
     <div className="max-w-md mx-auto py-4 space-y-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Events</h1>
+        <Button 
+          onClick={() => navigate("/events/new")} 
+          className="bg-doshisha-purple hover:bg-doshisha-darkPurple"
+          size="sm"
+        >
+          <Plus className="w-4 h-4 mr-1" />
+          Create
+        </Button>
+      </div>
+
       <EventsHeader
         onSearchChange={setSearchQuery}
       />
