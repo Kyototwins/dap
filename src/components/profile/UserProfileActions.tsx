@@ -35,7 +35,7 @@ export function UserProfileActions({
           className="flex-1 gap-2 bg-[#7f1184] hover:bg-[#671073] rounded-xl"
         >
           <Edit className="w-4 h-4" />
-          <span>編集</span>
+          <span>Edit</span>
         </Button>
       ) : isMatched ? (
         <>
@@ -44,7 +44,7 @@ export function UserProfileActions({
             className="flex-1 gap-2 bg-[#7f1184] hover:bg-[#671073] rounded-xl text-white"
           >
             <MessageSquare className="w-4 h-4" />
-            メッセージ
+            Message
           </Button>
           <BlockButton otherUserId={profileId} />
         </>

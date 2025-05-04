@@ -80,7 +80,7 @@ export function UserCard({ profile }: UserCardProps) {
 
           {profile.languages && profile.languages.length > 0 && profile.language_levels && (
             <div className="mb-3">
-              <h4 className="text-xs font-medium text-muted-foreground mb-1">言語スキル</h4>
+              <h4 className="text-xs font-medium text-muted-foreground mb-1">Language Skills</h4>
               <div className="flex flex-wrap gap-1 mb-2">
                 {profile.languages.slice(0, 3).map((lang) => (
                   <Badge key={lang} variant="language">

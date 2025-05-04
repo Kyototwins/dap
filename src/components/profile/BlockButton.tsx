@@ -15,20 +15,20 @@ export function BlockButton({ otherUserId, disabled }: BlockButtonProps) {
   const { toast } = useToast();
 
   const handleBlock = async () => {
-    if (!window.confirm("この相手をブロックしますか？")) return;
+    if (!window.confirm("Do you want to block this user?")) return;
     setIsLoading(true);
     try {
       // Instead of using a blocks table, we can create a notification to the server
       // This is a temporary solution until the blocks table is created in Supabase
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("認証されていません");
+      if (!user) throw new Error("Not authenticated");
 
       // Create a notification indicating a block action
       const { error } = await supabase.from("notifications").insert([
         {
           user_id: user.id,
           related_id: otherUserId,
-          content: "ユーザーをブロックしました",
+          content: "User has been blocked",
           type: "block_user"
         },
       ]);
@@ -36,12 +36,12 @@ export function BlockButton({ otherUserId, disabled }: BlockButtonProps) {
       if (error) throw error;
 
       toast({
-        title: "ブロックしました",
-        description: "このユーザーからのメッセージ等は届きません。",
+        title: "User blocked",
+        description: "You will no longer receive messages from this user.",
       });
     } catch (error: any) {
       toast({
-        title: "エラー",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -58,7 +58,7 @@ export function BlockButton({ otherUserId, disabled }: BlockButtonProps) {
       disabled={isLoading || disabled}
     >
       <Ban className="w-4 h-4" />
-      ブロック
+      Block
     </Button>
   );
 }
