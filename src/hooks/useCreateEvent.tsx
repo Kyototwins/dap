@@ -37,7 +37,7 @@ export function useCreateEvent() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("認証されていません");
+      if (!user) throw new Error("Not authenticated");
 
       const fileExt = file.name.split('.').pop();
       const filePath = `event-images/${user.id}/${crypto.randomUUID()}.${fileExt}`;
@@ -56,7 +56,7 @@ export function useCreateEvent() {
       return publicUrl;
     } catch (error: any) {
       toast({
-        title: "画像のアップロードに失敗しました",
+        title: "Failed to upload image",
         description: error.message,
         variant: "destructive",
       });
@@ -70,12 +70,17 @@ export function useCreateEvent() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("認証されていません");
+      if (!user) throw new Error("Not authenticated");
 
       let imageUrl = "";
       if (image.file) {
         imageUrl = await handleImageChange({ target: { files: [image.file] } } as any) || "";
       }
+
+      // Handle unlimited participants (max_participants = 0)
+      const maxParticipants = formData.max_participants === "" || formData.max_participants === "0" 
+        ? 0 
+        : parseInt(formData.max_participants);
 
       const { error } = await supabase
         .from("events")
@@ -86,7 +91,7 @@ export function useCreateEvent() {
             location: formData.location,
             date: formData.date,
             category: formData.category,
-            max_participants: parseInt(formData.max_participants),
+            max_participants: maxParticipants,
             image_url: imageUrl,
             creator_id: user.id,
             current_participants: 1,
@@ -97,14 +102,17 @@ export function useCreateEvent() {
       if (error) throw error;
 
       toast({
-        title: "イベントを作成しました",
-        description: "イベントの作成が完了しました。",
+        title: "Event created",
+        description: "Your event has been created successfully.",
       });
+
+      // Set event creation flag in localStorage
+      localStorage.setItem('created_event', 'true');
 
       navigate("/events");
     } catch (error: any) {
       toast({
-        title: "エラーが発生しました",
+        title: "Error occurred",
         description: error.message,
         variant: "destructive",
       });

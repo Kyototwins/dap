@@ -7,6 +7,8 @@ import { formatDate } from "@/lib/date-utils";
 import { Event } from "@/types/events";
 import { Ribbon, Check } from "lucide-react";
 import { format } from "date-fns";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const categoryTranslationMap: Record<string, string> = {
   'スポーツ': 'Sports',
@@ -21,6 +23,8 @@ const categoryTranslationMap: Record<string, string> = {
   'Karaoke': 'Karaoke',
   'Sightseeing': 'Sightseeing',
   'Other': 'Other',
+  '勉強会': 'Study',
+  '食事会': 'Meal',
 };
 
 interface EventCardProps {
@@ -31,6 +35,20 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, isParticipating, onJoin, onCardClick }: EventCardProps) {
+  const [isCreator, setIsCreator] = useState(false);
+  
+  useEffect(() => {
+    // Check if the current user is the creator of this event
+    const checkIfCreator = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user && event.creator_id === data.user.id) {
+        setIsCreator(true);
+      }
+    };
+    
+    checkIfCreator();
+  }, [event.creator_id]);
+
   const displayCategory = categoryTranslationMap[event.category] || event.category;
   const eventDate = new Date(event.date);
   const currentDate = new Date();
@@ -44,6 +62,11 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
   const startTime = format(eventDate, 'h:mm a');
   const endTime = format(new Date(eventDate.getTime() + 2 * 60 * 60 * 1000), 'h:mm a');
   const timeRange = `${startTime} - ${endTime}`;
+  
+  // For unlimited participants, show the infinity symbol
+  const participantsDisplay = event.max_participants === 0 
+    ? `${event.current_participants}/∞` 
+    : `${event.current_participants}/${event.max_participants}`;
 
   return (
     <Card 
@@ -102,14 +125,14 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
           </div>
           <div className="text-sm">
             <span className="text-gray-600">
-              Participants: {event.current_participants}/{event.max_participants}
+              Participants: {participantsDisplay}
             </span>
           </div>
         </div>
         <div className="mt-4">
           <Button
             className={`w-full rounded-xl ${
-              isParticipating 
+              isParticipating || isCreator
                 ? "bg-gray-200 hover:bg-gray-300 text-gray-700" 
                 : isPastEvent 
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
@@ -121,14 +144,14 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
               if (!isPastEvent) onJoin(event.id, event.title);
             }}
           >
-            {isParticipating 
+            {isParticipating || isCreator
               ? <>
                   <Check className="w-4 h-4 mr-1" />
                   Cancel Participation
                 </>
               : isPastEvent
                 ? "Event Ended"
-                : event.current_participants >= event.max_participants
+                : event.max_participants !== 0 && event.current_participants >= event.max_participants
                   ? "Full"
                   : "Join Event"}
           </Button>
@@ -137,4 +160,3 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
     </Card>
   );
 }
-

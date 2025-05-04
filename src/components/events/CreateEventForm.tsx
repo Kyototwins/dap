@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/profile/ImageUpload";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -25,19 +26,21 @@ export function CreateEventForm() {
     handleSubmit 
   } = useCreateEvent();
   
+  const [unlimitedParticipants, setUnlimitedParticipants] = useState(false);
+  
   const categories = [
-    "スポーツ",
-    "勉強会",
-    "食事会",
-    "カラオケ",
-    "観光",
-    "その他",
+    "Sports",
+    "Study",
+    "Meal",
+    "Karaoke",
+    "Sightseeing",
+    "Other",
   ];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-lg">
       <div className="space-y-2">
-        <Label htmlFor="title">タイトル</Label>
+        <Label htmlFor="title">Title</Label>
         <Input
           id="title"
           value={formData.title}
@@ -50,7 +53,7 @@ export function CreateEventForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">説明</Label>
+        <Label htmlFor="description">Description</Label>
         <Textarea
           id="description"
           value={formData.description}
@@ -63,9 +66,9 @@ export function CreateEventForm() {
       </div>
 
       <div className="space-y-2">
-        <Label>イベント画像</Label>
+        <Label>Event Image</Label>
         <ImageUpload
-          label="画像をアップロード"
+          label="Upload Image"
           image={image}
           onChange={handleImageChange}
           loading={loading}
@@ -73,7 +76,7 @@ export function CreateEventForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="location">場所</Label>
+        <Label htmlFor="location">Location</Label>
         <Input
           id="location"
           value={formData.location}
@@ -86,7 +89,7 @@ export function CreateEventForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="date">日時</Label>
+        <Label htmlFor="date">Date & Time</Label>
         <Input
           id="date"
           type="datetime-local"
@@ -100,7 +103,7 @@ export function CreateEventForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="category">カテゴリー</Label>
+        <Label htmlFor="category">Category</Label>
         <Select
           value={formData.category}
           onValueChange={(value) =>
@@ -109,7 +112,7 @@ export function CreateEventForm() {
           required
         >
           <SelectTrigger className="border-gray-300 rounded-md focus-visible:ring-gray-500">
-            <SelectValue placeholder="カテゴリーを選択" />
+            <SelectValue placeholder="Select a category" />
           </SelectTrigger>
           <SelectContent>
             {categories.map((category) => (
@@ -121,19 +124,44 @@ export function CreateEventForm() {
         </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="max_participants">最大参加人数</Label>
-        <Input
-          id="max_participants"
-          type="number"
-          min="1"
-          value={formData.max_participants}
-          onChange={(e) =>
-            setFormData({ ...formData, max_participants: e.target.value })
-          }
-          className="border-gray-300 rounded-md focus-visible:ring-gray-500"
-          required
-        />
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="unlimited" 
+            checked={unlimitedParticipants} 
+            onCheckedChange={(checked) => {
+              setUnlimitedParticipants(!!checked);
+              if (checked) {
+                setFormData({ ...formData, max_participants: "0" });
+              } else {
+                setFormData({ ...formData, max_participants: "" });
+              }
+            }}
+          />
+          <label
+            htmlFor="unlimited"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Unlimited participants
+          </label>
+        </div>
+        
+        {!unlimitedParticipants && (
+          <div className="space-y-2">
+            <Label htmlFor="max_participants">Maximum Participants</Label>
+            <Input
+              id="max_participants"
+              type="number"
+              min="1"
+              value={formData.max_participants}
+              onChange={(e) =>
+                setFormData({ ...formData, max_participants: e.target.value })
+              }
+              className="border-gray-300 rounded-md focus-visible:ring-gray-500"
+              required
+            />
+          </div>
+        )}
       </div>
 
       <div className="flex gap-4 pt-4">
@@ -143,14 +171,14 @@ export function CreateEventForm() {
           onClick={() => window.history.back()}
           className="border-gray-300 hover:bg-gray-50 flex-1 rounded-md"
         >
-          キャンセル
+          Cancel
         </Button>
         <Button 
           type="submit" 
           disabled={loading}
           className="bg-black text-white hover:bg-gray-800 flex-1 rounded-md"
         >
-          {loading ? "作成中..." : "作成する"}
+          {loading ? "Creating..." : "Create Event"}
         </Button>
       </div>
     </form>
