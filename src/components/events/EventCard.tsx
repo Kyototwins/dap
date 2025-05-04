@@ -9,6 +9,7 @@ import { Ribbon, Check, Edit } from "lucide-react";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const categoryTranslationMap: Record<string, string> = {
   'スポーツ': 'Sports',
@@ -37,6 +38,7 @@ interface EventCardProps {
 export function EventCard({ event, isParticipating, onJoin, onCardClick }: EventCardProps) {
   const [isCreator, setIsCreator] = useState(false);
   const [displayedParticipants, setDisplayedParticipants] = useState(event.current_participants);
+  const navigate = useNavigate();
   
   useEffect(() => {
     // Check if the current user is the creator of this event
@@ -94,6 +96,12 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
 
   const isDisabled = isPastEvent || (!isParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants);
   
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Navigate to edit event page
+    navigate(`/events/edit/${event.id}`);
+  };
+
   return (
     <Card 
       className={`overflow-hidden cursor-pointer hover:shadow-lg transition-shadow rounded-xl border-[#e4e4e7] relative ${isPastEvent ? 'opacity-70' : ''}`}
@@ -171,11 +179,8 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
           {isCreator && (
             <Button
               className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
-              onClick={(e) => {
-                e.stopPropagation();
-                // Will be implemented in the details dialog
-              }}
-              title="Edit description"
+              onClick={handleEditClick}
+              title="Edit event"
             >
               <Edit className="w-4 h-4" />
             </Button>
