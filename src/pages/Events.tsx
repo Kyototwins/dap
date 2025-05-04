@@ -89,13 +89,17 @@ export default function Events() {
         onOpenChange={(open) => !open && setSelectedEvent(null)}
       />
 
-      {/* Floating Create Event Button with curved text */}
-      <div className="fixed bottom-16 right-4 z-10 flex flex-col items-end gap-2">
-        <div className="bg-[#E5DEFF] px-3 py-1.5 rounded-full shadow-md border border-[#D6BCFA] transform -rotate-2">
-          <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight text-center animate-[pulse_0.75s_ease_0s_2,pulse_3s_ease_5s_1,pulse_0.75s_ease_15s_2,pulse_3s_ease_30s_1_infinite]" style={{ transform: "perspective(20px) rotateX(5deg)" }}>
-            add your<br />
-            own event
-          </p>
+      {/* Floating Create Event Button with arched text */}
+      <div className="fixed bottom-16 right-4 z-10 flex flex-col items-center gap-2">
+        <div className="bg-[#E5DEFF] px-4 py-2 rounded-full shadow-md border border-[#D6BCFA] transform -rotate-1 blur-[0.5px]">
+          <svg width="85" height="38" viewBox="0 0 85 38" xmlns="http://www.w3.org/2000/svg">
+            <path id="curve" d="M5 19C5 8 80 8 80 19" fill="transparent" />
+            <text textAnchor="middle">
+              <textPath xlinkHref="#curve" startOffset="50%" className="text-[0.7rem] font-medium text-[#7f1184] fill-[#7f1184]">
+                add your own event
+              </textPath>
+            </text>
+          </svg>
         </div>
         <Button 
           onClick={() => navigate("/events/new")} 
