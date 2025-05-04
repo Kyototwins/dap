@@ -83,8 +83,8 @@ export function useCreateEvent() {
         ? 0 
         : parseInt(formData.max_participants);
 
-      // Fix for end_date - Only include if it has a value
-      const eventData: any = {
+      // Create base event data
+      const eventData: Record<string, any> = {
         title: formData.title,
         description: formData.description,
         location: formData.location,
