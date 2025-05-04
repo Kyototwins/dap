@@ -92,7 +92,7 @@ export default function Events() {
       {/* Floating Create Event Button with simple text */}
       <div className="fixed bottom-16 right-6 z-10 flex flex-col items-end gap-2">
         <div className="flex justify-center w-full">
-          <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight text-center">
+          <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight text-center pl-4 pt-2">
             Add your<br />
             own event
           </p>
