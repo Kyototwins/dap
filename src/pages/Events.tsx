@@ -1,13 +1,16 @@
+
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { EventDetailsDialog } from "@/components/events/EventDetailsDialog";
 import { EventsHeader } from "@/components/events/EventsHeader";
 import { EventFilters } from "@/components/events/EventFilters";
 import { EventList } from "@/components/events/EventList";
+import { EventSortOptions } from "@/components/events/EventSortOptions";
 import { useEvents } from "@/hooks/useEvents";
 import { joinEvent } from "@/services/eventService";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+
 export default function Events() {
   const navigate = useNavigate();
   const {
@@ -28,9 +31,12 @@ export default function Events() {
     setTimeFilter,
     categoryFilter,
     setCategoryFilter,
+    sortOption,
+    setSortOption,
     handleSubmitComment,
     fetchEvents
   } = useEvents();
+  
   const handleJoinEvent = async (eventId: string, eventTitle: string) => {
     try {
       const eventToJoin = filteredEvents.find(e => e.id === eventId);
@@ -51,9 +57,13 @@ export default function Events() {
       });
     }
   };
+  
   const hasFilters = searchQuery !== "" || timeFilter !== "all" || categoryFilter !== "all";
+  
   return <div className="max-w-md mx-auto py-4 space-y-4">
       <EventsHeader onSearchChange={setSearchQuery} />
+      
+      <EventSortOptions value={sortOption} onChange={setSortOption} />
       
       <EventFilters timeFilter={timeFilter} categoryFilter={categoryFilter} onTimeFilterChange={setTimeFilter} onCategoryFilterChange={setCategoryFilter} />
 

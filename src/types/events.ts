@@ -1,5 +1,6 @@
 
 import { TimeFilter, CategoryFilter } from "@/components/events/EventFilters";
+import { SortOption } from "@/components/events/EventSortOptions";
 
 export interface EventCreator {
   first_name: string | null;
@@ -19,6 +20,7 @@ export interface Event {
   creator_id: string;
   category: string;
   creator?: EventCreator;
+  created_at: string;
 }
 
 export interface EventComment {

@@ -7,6 +7,7 @@ import { TimeFilter, CategoryFilter } from "@/components/events/EventFilters";
 import { filterEvents } from "@/utils/eventFilters";
 import { fetchEventComments, submitEventComment } from "@/services/eventCommentService";
 import { fetchEvents, fetchUserParticipations } from "@/services/eventDataService";
+import { SortOption } from "@/components/events/EventSortOptions";
 
 export function useEvents() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -19,6 +20,7 @@ export function useEvents() {
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+  const [sortOption, setSortOption] = useState<SortOption>("date_asc");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -28,8 +30,43 @@ export function useEvents() {
   useEffect(() => {
     // Apply filters to events
     const filtered = filterEvents(events, searchQuery, timeFilter, categoryFilter);
-    setFilteredEvents(filtered);
-  }, [events, searchQuery, timeFilter, categoryFilter]);
+    
+    // Apply sorting
+    const sorted = sortEvents(filtered, sortOption);
+    
+    // Remove events over a month old
+    const current = new Date();
+    const filteredByAge = sorted.filter(event => {
+      const eventDate = new Date(event.date);
+      const isPastEvent = eventDate < current;
+      const isOlderThanMonth = isPastEvent && 
+        (current.getTime() - eventDate.getTime()) > (30 * 24 * 60 * 60 * 1000);
+      return !isOlderThanMonth;
+    });
+    
+    setFilteredEvents(filteredByAge);
+  }, [events, searchQuery, timeFilter, categoryFilter, sortOption]);
+
+  const sortEvents = (eventsList: Event[], sort: SortOption): Event[] => {
+    const sortedEvents = [...eventsList];
+    
+    switch (sort) {
+      case 'newest':
+        return sortedEvents.sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      case 'popular':
+        return sortedEvents.sort((a, b) => 
+          b.current_participants - a.current_participants
+        );
+      case 'date_asc':
+        return sortedEvents.sort((a, b) => 
+          new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+      default:
+        return sortedEvents;
+    }
+  };
 
   useEffect(() => {
     if (selectedEvent) {
@@ -178,6 +215,8 @@ export function useEvents() {
     setTimeFilter,
     categoryFilter,
     setCategoryFilter,
+    sortOption,
+    setSortOption,
     handleSubmitComment,
     fetchEvents: refreshEvents,
     fetchUserParticipations: refreshParticipations
