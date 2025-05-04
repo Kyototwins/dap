@@ -52,6 +52,21 @@ export default function Help() {
               </div>
             </div>
           </section>
+          
+          <section className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+            <h2 className="text-xl font-semibold mb-3">Contact Us</h2>
+            <p className="text-gray-600">
+              If you have any questions or suggestions, feel free to contact our Instagram DM!{" "}
+              <a 
+                href="https://www.instagram.com/creator_dap?igsh=MXJncXV0a2dzYjZuNg==" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-[#7f1184] hover:underline font-medium"
+              >
+                https://www.instagram.com/creator_dap?igsh=MXJncXV0a2dzYjZuNg==
+              </a>
+            </p>
+          </section>
         </div>
       </div>
     </div>
