@@ -89,11 +89,12 @@ export default function Events() {
         onOpenChange={(open) => !open && setSelectedEvent(null)}
       />
 
-      {/* Floating Create Event Button with cute text */}
+      {/* Floating Create Event Button with curved text */}
       <div className="fixed bottom-16 right-4 z-10 flex flex-col items-end gap-2">
-        <div className="bg-white px-2.5 py-1 rounded-full shadow-md border border-pink-200 transform -rotate-2 scale-90">
-          <p className="text-xs font-medium text-[#9b87f5] animate-[pulse_0.75s_ease_0s_2,pulse_0.75s_ease_10s_2,pulse_0.75s_ease_20s_2_infinite]">
-            ✨ add your own event! ✨
+        <div className="bg-white px-3 py-1.5 rounded-full shadow-md border border-pink-200 transform -rotate-2 scale-90">
+          <p className="text-[0.7rem] font-medium text-[#9b87f5] leading-tight text-center animate-[pulse_0.75s_ease_0s_2,pulse_3s_ease_5s_1,pulse_0.75s_ease_15s_2,pulse_3s_ease_30s_1_infinite]">
+            ✨ add your own<br />
+            event! ✨
           </p>
         </div>
         <Button 
