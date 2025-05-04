@@ -89,7 +89,7 @@ export default function Matches() {
         
         <TabsContent value="likes" className="mt-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">People who like you</h2>
+            <h2 className="text-lg font-semibold">They want to be friends!</h2>
             <Button 
               size="icon" 
               variant="outline"
