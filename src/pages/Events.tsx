@@ -62,7 +62,7 @@ export default function Events() {
       <div className="flex justify-end">
         <Button 
           onClick={() => navigate("/events/new")} 
-          className="bg-doshisha-purple hover:bg-doshisha-darkPurple"
+          className="bg-purple-600 hover:bg-purple-700 text-white"
           size="sm"
         >
           <Plus className="w-4 h-4 mr-1" />
