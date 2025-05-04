@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -69,7 +70,7 @@ export default function Events() {
   
   const hasFilters = searchQuery !== "" || timeFilter !== "all" || categoryFilter !== "all";
   
-  return <div className="max-w-md mx-auto py-4 space-y-4">
+  return <div className="max-w-md mx-auto py-2 space-y-3">
       <EventsHeader 
         onSearchChange={setSearchQuery}
         sortOption={sortOption}
