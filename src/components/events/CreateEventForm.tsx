@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCreateEvent } from "@/hooks/useCreateEvent";
+import { format } from "date-fns";
 
 export function CreateEventForm() {
   const { 
@@ -27,6 +28,7 @@ export function CreateEventForm() {
   } = useCreateEvent();
   
   const [unlimitedParticipants, setUnlimitedParticipants] = useState(false);
+  const [noEndTime, setNoEndTime] = useState(false);
   
   const categories = [
     "Sports",
@@ -36,6 +38,10 @@ export function CreateEventForm() {
     "Sightseeing",
     "Other",
   ];
+
+  // Format today's date for the min attribute
+  const today = new Date();
+  const formattedToday = format(today, "yyyy-MM-dd'T'HH:mm");
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-lg">
@@ -88,18 +94,56 @@ export function CreateEventForm() {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="date">Date & Time</Label>
-        <Input
-          id="date"
-          type="datetime-local"
-          value={formData.date}
-          onChange={(e) =>
-            setFormData({ ...formData, date: e.target.value })
-          }
-          className="border-gray-300 rounded-md focus-visible:ring-gray-500"
-          required
-        />
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="startDate">Start Date & Time</Label>
+          <Input
+            id="startDate"
+            type="datetime-local"
+            min={formattedToday}
+            value={formData.date}
+            onChange={(e) =>
+              setFormData({ ...formData, date: e.target.value })
+            }
+            className="border-gray-300 rounded-md focus-visible:ring-gray-500"
+            required
+          />
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="noEndTime" 
+            checked={noEndTime} 
+            onCheckedChange={(checked) => {
+              setNoEndTime(!!checked);
+              if (checked) {
+                setFormData({ ...formData, end_date: "" });
+              }
+            }}
+          />
+          <label
+            htmlFor="noEndTime"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            No end time (open-ended event)
+          </label>
+        </div>
+        
+        {!noEndTime && (
+          <div className="space-y-2">
+            <Label htmlFor="endDate">End Date & Time</Label>
+            <Input
+              id="endDate"
+              type="datetime-local"
+              min={formData.date || formattedToday}
+              value={formData.end_date || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, end_date: e.target.value })
+              }
+              className="border-gray-300 rounded-md focus-visible:ring-gray-500"
+            />
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">

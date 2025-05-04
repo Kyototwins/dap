@@ -15,6 +15,7 @@ export interface Event {
   image_url: string | null;
   location: string;
   date: string;
+  end_date?: string | null;
   max_participants: number;
   current_participants: number;
   creator_id: string;

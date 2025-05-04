@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/date-utils";
 import { Event } from "@/types/events";
-import { Ribbon, Check } from "lucide-react";
+import { Ribbon, Check, Edit } from "lucide-react";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,10 +60,12 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
   
   // Format time range (assuming events last 2 hours if no end time is provided)
   const startTime = format(eventDate, 'h:mm a');
-  const endTime = format(new Date(eventDate.getTime() + 2 * 60 * 60 * 1000), 'h:mm a');
-  const timeRange = `${startTime} - ${endTime}`;
+  const endTime = event.end_date 
+    ? format(new Date(event.end_date), 'h:mm a') 
+    : format(new Date(eventDate.getTime() + 2 * 60 * 60 * 1000), 'h:mm a');
+  const timeRange = event.end_date ? `${startTime} - ${endTime}` : `${startTime}`;
   
-  // For unlimited participants, show the infinity symbol
+  // For unlimited participants, show the infinity symbol with current participants
   const participantsDisplay = event.max_participants === 0 
     ? `${event.current_participants}/∞` 
     : `${event.current_participants}/${event.max_participants}`;
@@ -129,9 +131,9 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
             </span>
           </div>
         </div>
-        <div className="mt-4">
+        <div className="mt-4 flex gap-2">
           <Button
-            className={`w-full rounded-xl ${
+            className={`flex-1 rounded-xl ${
               isParticipating || isCreator
                 ? "bg-gray-200 hover:bg-gray-300 text-gray-700" 
                 : isPastEvent 
@@ -155,6 +157,19 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
                   ? "Full"
                   : "Join Event"}
           </Button>
+          
+          {isCreator && (
+            <Button
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
+              onClick={(e) => {
+                e.stopPropagation();
+                // Will be implemented in the details dialog
+              }}
+              title="Edit description"
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
     </Card>

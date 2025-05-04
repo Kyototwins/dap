@@ -11,6 +11,7 @@ export function useCreateEvent() {
     description: "",
     location: "",
     date: "",
+    end_date: "",
     category: "",
     max_participants: "",
   });
@@ -90,6 +91,7 @@ export function useCreateEvent() {
             description: formData.description,
             location: formData.location,
             date: formData.date,
+            end_date: formData.end_date || null, // Handle end_date
             category: formData.category,
             max_participants: maxParticipants,
             image_url: imageUrl,

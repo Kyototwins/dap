@@ -136,7 +136,8 @@ export default function Events() {
         setNewComment={setNewComment} 
         onSubmitComment={handleSubmitComment} 
         open={!!selectedEvent} 
-        onOpenChange={open => !open && setSelectedEvent(null)} 
+        onOpenChange={open => !open && setSelectedEvent(null)}
+        refreshEvents={fetchEvents}
       />
 
       <EventCalendarView 
