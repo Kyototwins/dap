@@ -3,6 +3,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+// Define the proper event insert type from the Database type
+type EventInsert = Database['public']['Tables']['events']['Insert'];
 
 export function useCreateEvent() {
   const [loading, setLoading] = useState(false);
@@ -83,8 +87,8 @@ export function useCreateEvent() {
         ? 0 
         : parseInt(formData.max_participants);
 
-      // Create base event data
-      const eventData: Record<string, any> = {
+      // Create base event data with proper typing
+      const eventData: EventInsert = {
         title: formData.title,
         description: formData.description,
         location: formData.location,
@@ -102,7 +106,6 @@ export function useCreateEvent() {
         eventData.end_date = formData.end_date;
       }
 
-      // Fix: Pass a single object to insert, not an array of objects
       const { error } = await supabase
         .from("events")
         .insert(eventData);
