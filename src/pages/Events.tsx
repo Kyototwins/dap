@@ -59,17 +59,6 @@ export default function Events() {
 
   return (
     <div className="max-w-md mx-auto py-4 space-y-4">
-      <div className="flex justify-end">
-        <Button 
-          onClick={() => navigate("/events/new")} 
-          className="bg-purple-600 hover:bg-purple-700 text-white"
-          size="sm"
-        >
-          <Plus className="w-4 h-4 mr-1" />
-          Create Event
-        </Button>
-      </div>
-
       <EventsHeader
         onSearchChange={setSearchQuery}
       />
@@ -99,6 +88,17 @@ export default function Events() {
         open={!!selectedEvent}
         onOpenChange={(open) => !open && setSelectedEvent(null)}
       />
+
+      {/* Floating Create Event Button */}
+      <div className="fixed bottom-20 right-4 z-10">
+        <Button 
+          onClick={() => navigate("/events/new")} 
+          className="bg-[#7f1184] hover:bg-[#671073] text-white rounded-full shadow-lg"
+          size="icon"
+        >
+          <Plus className="w-5 h-5" />
+        </Button>
+      </div>
     </div>
   );
 }
