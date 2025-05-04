@@ -91,8 +91,8 @@ export default function Events() {
 
       {/* Floating Create Event Button with cute text */}
       <div className="fixed bottom-16 right-4 z-10 flex flex-col items-end gap-2">
-        <div className="bg-white px-3 py-1.5 rounded-full shadow-md border border-pink-200 transform -rotate-2">
-          <p className="text-sm font-medium text-[#9b87f5] animate-pulse">
+        <div className="bg-white px-2.5 py-1 rounded-full shadow-md border border-pink-200 transform -rotate-2 scale-90">
+          <p className="text-xs font-medium text-[#9b87f5] animate-[pulse_0.75s_ease_0s_2,pulse_0.75s_ease_10s_2,pulse_0.75s_ease_20s_2_infinite]">
             ✨ add your own event! ✨
           </p>
         </div>
