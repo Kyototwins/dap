@@ -56,24 +56,6 @@ export function EventsHeader({
           </Select>
         </div>
       </div>
-      
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="hide-past-events" 
-            checked={hidePastEvents} 
-            onCheckedChange={checked => onHidePastEventsChange(checked as boolean)} 
-          />
-          <label htmlFor="hide-past-events" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Hide past events
-          </label>
-        </div>
-        
-        <Button variant="outline" size="sm" onClick={onCalendarViewClick} className="flex items-center gap-1">
-          <Calendar className="h-4 w-4" />
-          <span>Your schedule</span>
-        </Button>
-      </div>
     </div>
   );
 }

@@ -84,7 +84,10 @@ export default function Events() {
         timeFilter={timeFilter} 
         categoryFilter={categoryFilter} 
         onTimeFilterChange={setTimeFilter} 
-        onCategoryFilterChange={setCategoryFilter} 
+        onCategoryFilterChange={setCategoryFilter}
+        hidePastEvents={hidePastEvents}
+        onHidePastEventsChange={setHidePastEvents}
+        onCalendarViewClick={() => setCalendarViewOpen(true)}
       />
 
       <EventList 
