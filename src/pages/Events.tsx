@@ -59,15 +59,14 @@ export default function Events() {
 
   return (
     <div className="max-w-md mx-auto py-4 space-y-4">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Events</h1>
+      <div className="flex justify-end">
         <Button 
           onClick={() => navigate("/events/new")} 
           className="bg-doshisha-purple hover:bg-doshisha-darkPurple"
           size="sm"
         >
           <Plus className="w-4 h-4 mr-1" />
-          Create
+          Create Event
         </Button>
       </div>
 
