@@ -75,7 +75,7 @@ export default function Events() {
       
       if (isNowParticipating !== !isCurrentlyParticipating) {
         // If backend result doesn't match expected state, revert the UI
-        setParticipations(participations);
+        await fetchUserParticipations();
       }
 
       // Refresh events to get updated participant counts
@@ -95,6 +95,7 @@ export default function Events() {
         variant: "destructive"
       });
       fetchUserParticipations(); // Reset participations on error
+      fetchEvents(); // Refresh event data on error
     }
   };
   

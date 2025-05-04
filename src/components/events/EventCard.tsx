@@ -55,23 +55,11 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
     setDisplayedParticipants(event.current_participants);
   }, [event.current_participants]);
 
-  // Local UI update for immediate feedback
-  useEffect(() => {
-    // If user just joined, increment the displayed count
-    // If user just left, decrement the displayed count
-    if (isParticipating && displayedParticipants < event.current_participants + 1) {
-      setDisplayedParticipants(event.current_participants);
-    } else if (!isParticipating && displayedParticipants > event.current_participants - 1 && !isCreator) {
-      setDisplayedParticipants(event.current_participants);
-    }
-  }, [isParticipating, event.current_participants]);
-
   const displayCategory = categoryTranslationMap[event.category] || event.category;
   const eventDate = new Date(event.date);
   const currentDate = new Date();
   const isPastEvent = eventDate < currentDate;
-  const isOlderThanMonth = isPastEvent && (currentDate.getTime() - eventDate.getTime()) > (30 * 24 * 60 * 60 * 1000);
-
+  
   // Format date and time
   const formattedDate = format(eventDate, 'yyyy/MM/dd');
   
@@ -87,8 +75,24 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
     ? `${displayedParticipants}/∞` 
     : `${displayedParticipants}/${event.max_participants}`;
 
-  // Handle participation status for creators
-  const showCancelButton = isParticipating || (isCreator && !isPastEvent);
+  // Handle button state for event participation
+  let buttonText = "Join Event";
+  let buttonClasses = "bg-[#7f1184] hover:bg-[#671073] text-white";
+  let buttonIcon = null;
+  
+  if (isParticipating) {
+    buttonText = "Cancel Participation";
+    buttonClasses = "bg-gray-200 hover:bg-gray-300 text-gray-700";
+    buttonIcon = <Check className="w-4 h-4 mr-1" />;
+  } else if (isPastEvent) {
+    buttonText = "Event Ended";
+    buttonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
+  } else if (event.max_participants !== 0 && displayedParticipants >= event.max_participants) {
+    buttonText = "Full";
+    buttonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
+  }
+
+  const isDisabled = isPastEvent || (!isParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants);
   
   return (
     <Card 
@@ -153,29 +157,15 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
         </div>
         <div className="mt-4 flex gap-2">
           <Button
-            className={`flex-1 rounded-xl ${
-              showCancelButton
-                ? "bg-gray-200 hover:bg-gray-300 text-gray-700" 
-                : isPastEvent 
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                  : "bg-[#7f1184] hover:bg-[#671073] text-white"
-            }`}
-            disabled={isPastEvent}
+            className={`flex-1 rounded-xl ${buttonClasses}`}
+            disabled={isDisabled}
             onClick={(e) => {
               e.stopPropagation();
-              if (!isPastEvent) onJoin(event.id, event.title);
+              if (!isDisabled) onJoin(event.id, event.title);
             }}
           >
-            {showCancelButton
-              ? <>
-                  <Check className="w-4 h-4 mr-1" />
-                  Cancel Participation
-                </>
-              : isPastEvent
-                ? "Event Ended"
-                : event.max_participants !== 0 && displayedParticipants >= event.max_participants
-                  ? "Full"
-                  : "Join Event"}
+            {buttonIcon}
+            {buttonText}
           </Button>
           
           {isCreator && (
