@@ -91,10 +91,10 @@ export default function Events() {
 
       {/* Floating Create Event Button with curved text */}
       <div className="fixed bottom-16 right-4 z-10 flex flex-col items-end gap-2">
-        <div className="bg-white px-3 py-1.5 rounded-full shadow-md border border-pink-200 transform -rotate-2 scale-90">
-          <p className="text-[0.7rem] font-medium text-[#9b87f5] leading-tight text-center animate-[pulse_0.75s_ease_0s_2,pulse_3s_ease_5s_1,pulse_0.75s_ease_15s_2,pulse_3s_ease_30s_1_infinite]">
-            ✨ add your own<br />
-            event! ✨
+        <div className="bg-[#E5DEFF] px-3 py-1.5 rounded-full shadow-md border border-[#D6BCFA] transform -rotate-2">
+          <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight text-center animate-[pulse_0.75s_ease_0s_2,pulse_3s_ease_5s_1,pulse_0.75s_ease_15s_2,pulse_3s_ease_30s_1_infinite]" style={{ transform: "perspective(20px) rotateX(5deg)" }}>
+            add your<br />
+            own event
           </p>
         </div>
         <Button 
