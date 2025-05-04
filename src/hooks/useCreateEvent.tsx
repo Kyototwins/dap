@@ -8,6 +8,11 @@ import type { Database } from "@/integrations/supabase/types";
 // Define the proper event insert type from the Database type
 type EventInsert = Database['public']['Tables']['events']['Insert'];
 
+// Create an extended type that includes the end_date field
+interface EventInsertWithEndDate extends EventInsert {
+  end_date?: string | null;
+}
+
 export function useCreateEvent() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -88,7 +93,7 @@ export function useCreateEvent() {
         : parseInt(formData.max_participants);
 
       // Create base event data with proper typing
-      const eventData: EventInsert = {
+      const eventData: EventInsertWithEndDate = {
         title: formData.title,
         description: formData.description,
         location: formData.location,
