@@ -116,7 +116,7 @@ export default function Events() {
         onOpenChange={setCalendarViewOpen}
       />
 
-      {/* Floating Create Event Button with simple text */}
+      {/* Floating Create Event Button with speech bubble */}
       <div className="fixed bottom-16 right-6 z-10 flex flex-col items-end gap-2">
         <div className="flex justify-center w-full">
           <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight pl-4 pt-2 px-0 mx--1 text-center my--1">

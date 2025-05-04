@@ -13,7 +13,12 @@ export function useEventParticipations() {
       setParticipations(participationsData);
       return participationsData;
     } catch (error: any) {
-      console.error("参加状況の更新に失敗しました:", error);
+      console.error("Failed to load participation status:", error);
+      toast({
+        title: "Error loading participations",
+        description: error.message,
+        variant: "destructive",
+      });
       return {};
     }
   };
