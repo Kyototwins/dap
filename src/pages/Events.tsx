@@ -89,8 +89,13 @@ export default function Events() {
         onOpenChange={(open) => !open && setSelectedEvent(null)}
       />
 
-      {/* Floating Create Event Button */}
-      <div className="fixed bottom-20 right-4 z-10">
+      {/* Floating Create Event Button with cute text */}
+      <div className="fixed bottom-16 right-4 z-10 flex flex-col items-end gap-2">
+        <div className="bg-white px-3 py-1.5 rounded-full shadow-md border border-pink-200 transform -rotate-2">
+          <p className="text-sm font-medium text-[#9b87f5] animate-pulse">
+            ✨ add your own event! ✨
+          </p>
+        </div>
         <Button 
           onClick={() => navigate("/events/new")} 
           className="bg-[#7f1184] hover:bg-[#671073] text-white rounded-full shadow-lg"
