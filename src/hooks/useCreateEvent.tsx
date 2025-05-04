@@ -102,9 +102,10 @@ export function useCreateEvent() {
         eventData.end_date = formData.end_date;
       }
 
+      // Fix: Pass a single object to insert, not an array of objects
       const { error } = await supabase
         .from("events")
-        .insert([eventData]);
+        .insert(eventData);
 
       if (error) throw error;
 
