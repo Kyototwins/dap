@@ -83,23 +83,28 @@ export function useCreateEvent() {
         ? 0 
         : parseInt(formData.max_participants);
 
+      // Fix for end_date - Only include if it has a value
+      const eventData: any = {
+        title: formData.title,
+        description: formData.description,
+        location: formData.location,
+        date: formData.date,
+        category: formData.category,
+        max_participants: maxParticipants,
+        image_url: imageUrl,
+        creator_id: user.id,
+        current_participants: 1,
+        status: "active",
+      };
+      
+      // Only add end_date if it has a value
+      if (formData.end_date && formData.end_date.trim() !== '') {
+        eventData.end_date = formData.end_date;
+      }
+
       const { error } = await supabase
         .from("events")
-        .insert([
-          {
-            title: formData.title,
-            description: formData.description,
-            location: formData.location,
-            date: formData.date,
-            end_date: formData.end_date || null, // Handle end_date
-            category: formData.category,
-            max_participants: maxParticipants,
-            image_url: imageUrl,
-            creator_id: user.id,
-            current_participants: 1,
-            status: "active",
-          },
-        ]);
+        .insert([eventData]);
 
       if (error) throw error;
 

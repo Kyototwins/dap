@@ -42,9 +42,9 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
     .select("*")
     .eq("event_id", eventId)
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
-  if (checkError && checkError.code !== "PGRST116") {
+  if (checkError) {
     throw checkError;
   }
 

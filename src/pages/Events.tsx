@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -73,13 +72,11 @@ export default function Events() {
       // Call backend to update participation
       const isNowParticipating = await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
       
-      if (isNowParticipating !== !isCurrentlyParticipating) {
-        // If backend result doesn't match expected state, revert the UI
-        await fetchUserParticipations();
-      }
-
       // Refresh events to get updated participant counts
       await fetchEvents();
+      
+      // Refresh user participations to ensure consistency
+      await fetchUserParticipations();
       
       toast({
         title: isNowParticipating ? "Joined event" : "Cancelled participation",
