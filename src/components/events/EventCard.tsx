@@ -36,6 +36,7 @@ interface EventCardProps {
 
 export function EventCard({ event, isParticipating, onJoin, onCardClick }: EventCardProps) {
   const [isCreator, setIsCreator] = useState(false);
+  const [displayedParticipants, setDisplayedParticipants] = useState(event.current_participants);
   
   useEffect(() => {
     // Check if the current user is the creator of this event
@@ -48,6 +49,22 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
     
     checkIfCreator();
   }, [event.creator_id]);
+
+  // Update displayed participants when the actual count changes
+  useEffect(() => {
+    setDisplayedParticipants(event.current_participants);
+  }, [event.current_participants]);
+
+  // Local UI update for immediate feedback
+  useEffect(() => {
+    // If user just joined, increment the displayed count
+    // If user just left, decrement the displayed count
+    if (isParticipating && displayedParticipants < event.current_participants + 1) {
+      setDisplayedParticipants(event.current_participants);
+    } else if (!isParticipating && displayedParticipants > event.current_participants - 1 && !isCreator) {
+      setDisplayedParticipants(event.current_participants);
+    }
+  }, [isParticipating, event.current_participants]);
 
   const displayCategory = categoryTranslationMap[event.category] || event.category;
   const eventDate = new Date(event.date);
@@ -67,9 +84,12 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
   
   // For unlimited participants, show the infinity symbol with current participants
   const participantsDisplay = event.max_participants === 0 
-    ? `${event.current_participants}/∞` 
-    : `${event.current_participants}/${event.max_participants}`;
+    ? `${displayedParticipants}/∞` 
+    : `${displayedParticipants}/${event.max_participants}`;
 
+  // Handle participation status for creators
+  const showCancelButton = isParticipating || (isCreator && !isPastEvent);
+  
   return (
     <Card 
       className={`overflow-hidden cursor-pointer hover:shadow-lg transition-shadow rounded-xl border-[#e4e4e7] relative ${isPastEvent ? 'opacity-70' : ''}`}
@@ -134,7 +154,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
         <div className="mt-4 flex gap-2">
           <Button
             className={`flex-1 rounded-xl ${
-              isParticipating 
+              showCancelButton
                 ? "bg-gray-200 hover:bg-gray-300 text-gray-700" 
                 : isPastEvent 
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
@@ -146,14 +166,14 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
               if (!isPastEvent) onJoin(event.id, event.title);
             }}
           >
-            {isParticipating
+            {showCancelButton
               ? <>
                   <Check className="w-4 h-4 mr-1" />
                   Cancel Participation
                 </>
               : isPastEvent
                 ? "Event Ended"
-                : event.max_participants !== 0 && event.current_participants >= event.max_participants
+                : event.max_participants !== 0 && displayedParticipants >= event.max_participants
                   ? "Full"
                   : "Join Event"}
           </Button>

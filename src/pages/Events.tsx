@@ -57,16 +57,26 @@ export default function Events() {
       const eventToJoin = filteredEvents.find(e => e.id === eventId);
       if (!eventToJoin) throw new Error("Event not found");
       
-      const isNowParticipating = await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
-
-      // Update UI state for immediate feedback
+      // Update local UI before backend call for better UX
+      const isCurrentlyParticipating = !!participations[eventId];
       const updatedParticipations = { ...participations };
-      if (isNowParticipating) {
-        updatedParticipations[eventId] = true;
-      } else {
+      
+      if (isCurrentlyParticipating) {
         delete updatedParticipations[eventId];
+      } else {
+        updatedParticipations[eventId] = true;
       }
+      
+      // Temporarily update UI
       setParticipations(updatedParticipations);
+      
+      // Call backend to update participation
+      const isNowParticipating = await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
+      
+      if (isNowParticipating !== !isCurrentlyParticipating) {
+        // If backend result doesn't match expected state, revert the UI
+        setParticipations(participations);
+      }
 
       // Refresh events to get updated participant counts
       await fetchEvents();
@@ -77,17 +87,14 @@ export default function Events() {
           ? "You have successfully joined the event." 
           : "You have cancelled your participation."
       });
-      
-      // Refresh the list of events the user is participating in
-      if (!isNowParticipating) {
-        fetchUserParticipations();
-      }
     } catch (error: any) {
+      // Revert UI on error
       toast({
         title: "Error occurred",
         description: error.message,
         variant: "destructive"
       });
+      fetchUserParticipations(); // Reset participations on error
     }
   };
   
