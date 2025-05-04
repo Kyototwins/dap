@@ -38,7 +38,7 @@ export function EventCalendarView({ events, participations, open, onOpenChange }
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Your Event Calendar</DialogTitle>
+          <DialogTitle>Your Schedule</DialogTitle>
           <DialogDescription>
             Events you are participating in
           </DialogDescription>

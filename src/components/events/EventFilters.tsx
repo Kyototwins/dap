@@ -18,7 +18,7 @@ export function EventFilters({
   onCategoryFilterChange 
 }: EventFiltersProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
         <FilterButton 
           active={timeFilter === 'all'} 

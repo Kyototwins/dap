@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -60,7 +59,7 @@ export default function Events() {
       });
     }
   };
-
+  
   // Filter out past events if the checkbox is checked
   let displayedEvents = filteredEvents;
   if (hidePastEvents) {

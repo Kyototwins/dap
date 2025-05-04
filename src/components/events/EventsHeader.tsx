@@ -1,3 +1,4 @@
+
 import { Search, Calendar } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SortOption } from "@/components/events/EventSortOptions";
@@ -36,14 +37,28 @@ export function EventsHeader({
       <div className="flex flex-col md:flex-row gap-3">
         {/* Search Input */}
         <div className="relative flex-1">
-          
-          
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search events..."
+              className="w-full px-3 py-2 pl-10 border border-gray-200 rounded-lg text-sm"
+              onChange={handleSearchChange}
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          </div>
         </div>
         
-        {/* Sort Dropdown */}
-        <div className="w-full md:w-auto">
+        {/* Date Filter and Sort Dropdown in one row */}
+        <div className="flex space-x-3 w-full md:w-auto">
+          <input 
+            type="date" 
+            value={dateFilter} 
+            onChange={handleDateFilterChange} 
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm flex-1 md:flex-none w-full md:w-auto" 
+          />
+          
           <Select value={sortOption} onValueChange={value => onSortChange(value as SortOption)}>
-            <SelectTrigger className="w-full md:w-[180px]">
+            <SelectTrigger className="w-[120px]">
               <SelectValue placeholder="Sort by..." />
             </SelectTrigger>
             <SelectContent>
@@ -55,25 +70,22 @@ export function EventsHeader({
         </div>
       </div>
       
-      {/* Date Filter and Hide Past Events Checkbox */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div className="flex items-center space-x-2 flex-1">
-          <input type="date" value={dateFilter} onChange={handleDateFilterChange} className="px-3 py-2 border border-gray-200 rounded-lg text-sm flex-1" />
+      <div className="flex items-center space-x-4 mt-2">
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="hide-past-events" 
+            checked={hidePastEvents} 
+            onCheckedChange={checked => onHidePastEventsChange(checked as boolean)} 
+          />
+          <label htmlFor="hide-past-events" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Hide past events
+          </label>
         </div>
         
-        <div className="flex items-center space-x-8">
-          <div className="flex items-center space-x-2">
-            <Checkbox id="hide-past-events" checked={hidePastEvents} onCheckedChange={checked => onHidePastEventsChange(checked as boolean)} />
-            <label htmlFor="hide-past-events" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Hide past events
-            </label>
-          </div>
-          
-          <Button variant="outline" size="sm" onClick={onCalendarViewClick} className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            <span>Calendar</span>
-          </Button>
-        </div>
+        <Button variant="outline" size="sm" onClick={onCalendarViewClick} className="flex items-center gap-1">
+          <Calendar className="h-4 w-4" />
+          <span>Your schedule</span>
+        </Button>
       </div>
     </div>;
 }
