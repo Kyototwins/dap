@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -8,11 +7,6 @@ import type { Database } from "@/integrations/supabase/types";
 // Define the proper event insert type from the Database type
 type EventInsert = Database['public']['Tables']['events']['Insert'];
 
-// Create an extended type that includes the end_date field
-interface EventInsertWithEndDate extends EventInsert {
-  end_date?: string | null;
-}
-
 export function useCreateEvent() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -20,7 +14,6 @@ export function useCreateEvent() {
     description: "",
     location: "",
     date: "",
-    end_date: "",
     category: "",
     max_participants: "",
   });
@@ -92,8 +85,8 @@ export function useCreateEvent() {
         ? 0 
         : parseInt(formData.max_participants);
 
-      // Create base event data with proper typing
-      const eventData: EventInsertWithEndDate = {
+      // Create base event data with proper typing - removed end_date
+      const eventData: EventInsert = {
         title: formData.title,
         description: formData.description,
         location: formData.location,
@@ -105,11 +98,6 @@ export function useCreateEvent() {
         current_participants: 1,
         status: "active",
       };
-      
-      // Only add end_date if it has a value
-      if (formData.end_date && formData.end_date.trim() !== '') {
-        eventData.end_date = formData.end_date;
-      }
 
       const { error } = await supabase
         .from("events")
