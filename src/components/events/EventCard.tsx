@@ -52,7 +52,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
     >
       {isPastEvent && (
         <div className="absolute top-0 right-0 z-10 overflow-hidden w-20 h-20">
-          <div className="absolute transform rotate-45 bg-[#ff3838] text-white text-xs font-bold py-1 text-center right-[-35px] top-[15px] w-[140px]">
+          <div className="absolute transform rotate-45 bg-[#444444] text-white text-xs font-bold py-1 text-center right-[-35px] top-[15px] w-[140px]">
             <span className="flex items-center justify-center gap-1">
               <Ribbon className="h-3 w-3" />
               Past Event
@@ -137,3 +137,4 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
     </Card>
   );
 }
+
