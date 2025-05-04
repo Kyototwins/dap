@@ -89,14 +89,12 @@ export default function Events() {
         onOpenChange={(open) => !open && setSelectedEvent(null)}
       />
 
-      {/* Floating Create Event Button with curved text */}
+      {/* Floating Create Event Button with simple text */}
       <div className="fixed bottom-16 right-4 z-10 flex flex-col items-end gap-2">
-        <div className="bg-[#E5DEFF] px-3 py-1.5 rounded-full shadow-md border border-[#D6BCFA] transform -rotate-2">
-          <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight text-center animate-[pulse_0.75s_ease_0s_2,pulse_3s_ease_5s_1,pulse_0.75s_ease_15s_2,pulse_3s_ease_30s_1_infinite]" style={{ transform: "perspective(20px) rotateX(5deg)" }}>
-            add your<br />
-            own event
-          </p>
-        </div>
+        <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight text-center animate-[pulse_0.75s_ease_0s_2,pulse_3s_ease_5s_1,pulse_0.75s_ease_15s_2,pulse_3s_ease_30s_1_infinite]">
+          add your<br />
+          own event
+        </p>
         <Button 
           onClick={() => navigate("/events/new")} 
           className="bg-[#7f1184] hover:bg-[#671073] text-white rounded-full shadow-lg"
