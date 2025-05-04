@@ -34,6 +34,7 @@ export function useEvents() {
 
   const {
     participations,
+    setParticipations,
     loadParticipations
   } = useEventParticipations();
 
@@ -67,7 +68,7 @@ export function useEvents() {
       setEvents(eventsData);
     } catch (error: any) {
       toast({
-        title: "イベントの更新に失敗しました",
+        title: "Failed to update events",
         description: error.message,
         variant: "destructive",
       });
@@ -88,6 +89,7 @@ export function useEvents() {
     newComment,
     setNewComment,
     participations,
+    setParticipations,
     loading,
     searchQuery,
     setSearchQuery,

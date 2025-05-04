@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/date-utils";
 import { Event } from "@/types/events";
-import { Ribbon } from "lucide-react";
+import { Ribbon, Check } from "lucide-react";
+import { format } from "date-fns";
 
 const categoryTranslationMap: Record<string, string> = {
   'スポーツ': 'Sports',
@@ -36,6 +37,14 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
   const isPastEvent = eventDate < currentDate;
   const isOlderThanMonth = isPastEvent && (currentDate.getTime() - eventDate.getTime()) > (30 * 24 * 60 * 60 * 1000);
 
+  // Format date and time
+  const formattedDate = format(eventDate, 'yyyy/MM/dd');
+  
+  // Format time range (assuming events last 2 hours if no end time is provided)
+  const startTime = format(eventDate, 'h:mm a');
+  const endTime = format(new Date(eventDate.getTime() + 2 * 60 * 60 * 1000), 'h:mm a');
+  const timeRange = `${startTime} - ${endTime}`;
+
   return (
     <Card 
       className={`overflow-hidden cursor-pointer hover:shadow-lg transition-shadow rounded-xl border-[#e4e4e7] relative ${isPastEvent ? 'opacity-70' : ''}`}
@@ -46,7 +55,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
           <div className="absolute transform rotate-45 bg-[#ff3838] text-white text-xs font-bold py-1 text-center right-[-35px] top-[15px] w-[140px]">
             <span className="flex items-center justify-center gap-1">
               <Ribbon className="h-3 w-3" />
-              開催済み
+              Past Event
             </span>
           </div>
         </div>
@@ -63,13 +72,13 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
           <Avatar className="h-10 w-10">
             <img
               src={event.creator?.avatar_url || "/placeholder.svg"}
-              alt={`${event.creator?.first_name}のアバター`}
+              alt={`${event.creator?.first_name}'s avatar`}
             />
           </Avatar>
           <div>
             <h3 className="font-semibold">{event.title}</h3>
             <p className="text-sm text-gray-600">
-              主催: {event.creator?.first_name} {event.creator?.last_name}
+              Organizer: {event.creator?.first_name} {event.creator?.last_name}
             </p>
           </div>
         </div>
@@ -80,7 +89,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
           <div className="flex items-center gap-2 text-sm">
             <Badge variant="language">{displayCategory}</Badge>
             <span className="text-gray-600">
-              {formatDate(event.date)}
+              {formattedDate}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
@@ -88,26 +97,40 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
               {event.location}
             </span>
             <span className="text-gray-600">
-              参加者: {event.current_participants}/{event.max_participants}
+              {timeRange}
+            </span>
+          </div>
+          <div className="text-sm">
+            <span className="text-gray-600">
+              Participants: {event.current_participants}/{event.max_participants}
             </span>
           </div>
         </div>
         <div className="mt-4">
           <Button
-            className={`w-full rounded-xl ${isParticipating ? "bg-gray-200 hover:bg-gray-300 text-gray-700" : isPastEvent ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-[#3b82f6] hover:bg-[#2563eb] text-white"}`}
-            disabled={event.current_participants >= event.max_participants || isParticipating || isPastEvent}
+            className={`w-full rounded-xl ${
+              isParticipating 
+                ? "bg-gray-200 hover:bg-gray-300 text-gray-700" 
+                : isPastEvent 
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                  : "bg-[#3b82f6] hover:bg-[#2563eb] text-white"
+            }`}
+            disabled={isPastEvent}
             onClick={(e) => {
               e.stopPropagation();
-              if (!isPastEvent && !isParticipating) onJoin(event.id, event.title);
+              if (!isPastEvent) onJoin(event.id, event.title);
             }}
           >
             {isParticipating 
-              ? "参加済み"
+              ? <>
+                  <Check className="w-4 h-4 mr-1" />
+                  Cancel Participation
+                </>
               : isPastEvent
-                ? "開催終了"
+                ? "Event Ended"
                 : event.current_participants >= event.max_participants
-                  ? "満員です"
-                  : "参加する"}
+                  ? "Full"
+                  : "Join Event"}
           </Button>
         </div>
       </div>

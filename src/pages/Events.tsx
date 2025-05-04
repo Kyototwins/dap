@@ -29,6 +29,7 @@ export default function Events() {
     newComment,
     setNewComment,
     participations,
+    setParticipations,
     loading,
     searchQuery,
     setSearchQuery,
@@ -39,7 +40,8 @@ export default function Events() {
     sortOption,
     setSortOption,
     handleSubmitComment,
-    fetchEvents
+    fetchEvents,
+    fetchUserParticipations
   } = useEvents();
   
   useEffect(() => {
@@ -69,14 +71,32 @@ export default function Events() {
     try {
       const eventToJoin = filteredEvents.find(e => e.id === eventId);
       if (!eventToJoin) throw new Error("Event not found");
-      await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
+      
+      const isNowParticipating = await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
 
-      // Update UI state
+      // Update UI state for immediate feedback
+      const updatedParticipations = { ...participations };
+      if (isNowParticipating) {
+        updatedParticipations[eventId] = true;
+      } else {
+        delete updatedParticipations[eventId];
+      }
+      setParticipations(updatedParticipations);
+
+      // Refresh events to get updated participant counts
       await fetchEvents();
+      
       toast({
-        title: "Joined event",
-        description: "You have successfully joined the event."
+        title: isNowParticipating ? "Joined event" : "Cancelled participation",
+        description: isNowParticipating 
+          ? "You have successfully joined the event." 
+          : "You have cancelled your participation."
       });
+      
+      // Refresh the list of events the user is participating in
+      if (!isNowParticipating) {
+        fetchUserParticipations();
+      }
     } catch (error: any) {
       toast({
         title: "Error occurred",
@@ -144,11 +164,13 @@ export default function Events() {
       {/* Floating Create Event Button with speech bubble - only shown if user hasn't created events */}
       {!userHasCreatedEvents && (
         <div className="fixed bottom-16 right-6 z-10 flex flex-col items-end gap-2">
-          <div className="flex justify-center w-full">
-            <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight pl-4 pt-2 px-0 mx--1 text-center my--1">
+          <div className="bg-white border border-gray-200 rounded-lg p-2 shadow-md relative">
+            <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight">
               Add your<br />
               own event
             </p>
+            {/* Triangle for speech bubble effect */}
+            <div className="absolute bottom-[-8px] right-5 w-4 h-4 bg-white border-r border-b border-gray-200 transform rotate-45"></div>
           </div>
           <Button onClick={() => navigate("/events/new")} className="bg-[#7f1184] hover:bg-[#671073] text-white rounded-full shadow-lg" size="icon">
             <Plus className="w-5 h-5" />

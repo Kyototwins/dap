@@ -2,10 +2,9 @@
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { Event, EventParticipationMap } from "@/types/events";
-import { formatDate } from "@/lib/date-utils";
+import { formatDate, formatTimeRange } from "@/lib/date-utils";
 
 interface EventCalendarViewProps {
   events: Event[];
@@ -83,7 +82,7 @@ export function EventCalendarView({ events, participations, open, onOpenChange }
                 {eventsForSelectedDate.map((event) => (
                   <div key={event.id} className="border rounded-lg p-3 bg-white">
                     <h4 className="font-medium">{event.title}</h4>
-                    <p className="text-sm text-gray-600">{new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    <p className="text-sm text-gray-600">{formatTimeRange(event.date)}</p>
                     <p className="text-sm text-gray-600">{event.location}</p>
                   </div>
                 ))}

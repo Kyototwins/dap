@@ -4,11 +4,7 @@
  */
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString('ja-JP', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
+  return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
 }
 
 /**
@@ -16,13 +12,13 @@ export function formatDate(dateString: string): string {
  */
 export function formatDateTime(dateString: string): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString('ja-JP', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 || 12;
+  const formattedMinutes = String(minutes).padStart(2, '0');
+  
+  return `${formatDate(dateString)} ${formattedHours}:${formattedMinutes}${ampm}`;
 }
 
 /**
@@ -59,4 +55,23 @@ export function isThisMonth(dateString: string): boolean {
   const today = new Date();
   return date.getMonth() === today.getMonth() &&
     date.getFullYear() === today.getFullYear();
+}
+
+/**
+ * Format time range for events
+ */
+export function formatTimeRange(startDateString: string, durationHours: number = 2): string {
+  const startDate = new Date(startDateString);
+  const endDate = new Date(startDate.getTime() + durationHours * 60 * 60 * 1000);
+  
+  const formatTime = (date: Date) => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    return `${formattedHours}:${formattedMinutes}${ampm}`;
+  };
+  
+  return `${formatTime(startDate)} - ${formatTime(endDate)}`;
 }
