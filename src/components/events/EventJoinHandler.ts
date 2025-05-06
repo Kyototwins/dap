@@ -1,7 +1,7 @@
 
 import { Event, EventParticipationMap } from "@/types/events";
 import { joinEvent } from "@/services/eventService";
-import { useToast } from "@/components/ui/use-toast";
+import { toast as showToast } from "@/hooks/use-toast";
 
 export async function handleJoinEvent(
   eventId: string,
@@ -13,8 +13,6 @@ export async function handleJoinEvent(
   fetchEvents: () => Promise<void>,
   setProcessingEventId: (id: string | null) => void
 ) {
-  const { toast } = useToast();
-  
   try {
     const eventToJoin = filteredEvents.find(e => e.id === eventId);
     if (!eventToJoin) throw new Error("イベントが見つかりません");
@@ -40,7 +38,7 @@ export async function handleJoinEvent(
     console.log("Join event result:", isJoined, "for event", eventId);
     
     // Show toast notification with correct message based on actual result from server
-    toast({
+    showToast({
       title: isJoined ? "イベントに参加しました" : "参加をキャンセルしました",
       description: isJoined 
         ? "イベントに参加しました。" 
@@ -55,7 +53,7 @@ export async function handleJoinEvent(
   } catch (error: any) {
     console.error("Join event error:", error);
     // Revert UI on error
-    toast({
+    showToast({
       title: "エラーが発生しました",
       description: error.message,
       variant: "destructive"

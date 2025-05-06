@@ -8,6 +8,7 @@ import { EventList } from "@/components/events/EventList";
 import { EventCalendarView } from "@/components/events/EventCalendarView";
 import { useEvents } from "@/hooks/useEvents";
 import { CreateEventButton } from "@/components/events/CreateEventButton";
+import { handleJoinEvent } from "@/components/events/EventJoinHandler";
 
 export default function EventsPage() {
   const navigate = useNavigate();
@@ -79,13 +80,12 @@ export default function EventsPage() {
   
   const hasFilters = searchQuery !== "" || timeFilter !== "all" || categoryFilter !== "all";
   
-  const handleJoinEvent = async (eventId: string, eventTitle: string) => {
+  const handleEventParticipation = async (eventId: string, eventTitle: string) => {
     try {
       // Prevent multiple clicks while processing
       if (processingEventId === eventId) return;
       setProcessingEventId(eventId);
       
-      const { handleJoinEvent } = await import("@/components/events/EventJoinHandler");
       await handleJoinEvent(
         eventId, 
         eventTitle, 
@@ -127,7 +127,7 @@ export default function EventsPage() {
         events={displayedEvents} 
         loading={loading} 
         participations={participations} 
-        onJoinEvent={handleJoinEvent} 
+        onJoinEvent={handleEventParticipation} 
         onSelectEvent={setSelectedEvent} 
         hasFilters={hasFilters}
         processingEventId={processingEventId}
