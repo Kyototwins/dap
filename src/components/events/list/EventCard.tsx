@@ -32,8 +32,13 @@ export function EventCard({
   const [displayedParticipants, setDisplayedParticipants] = useState(event.current_participants);
   const navigate = useNavigate();
   
+  // Effect to update displayed participants when the actual event data changes
   useEffect(() => {
-    // Check if the current user is the creator of this event
+    setDisplayedParticipants(event.current_participants);
+  }, [event.current_participants]);
+  
+  // Effect to check if the current user is the creator and update participation status
+  useEffect(() => {
     const checkIfCreator = async () => {
       const { data } = await supabase.auth.getUser();
       if (data.user && event.creator_id === data.user.id) {
@@ -48,10 +53,12 @@ export function EventCard({
     checkIfCreator();
   }, [event.creator_id, isParticipating]);
 
-  // Update displayed participants when the actual count changes
+  // Update participation status when the isParticipating prop changes
   useEffect(() => {
-    setDisplayedParticipants(event.current_participants);
-  }, [event.current_participants]);
+    if (!isCreator) {
+      setEffectiveIsParticipating(isParticipating);
+    }
+  }, [isParticipating, isCreator]);
 
   const displayCategory = categoryTranslationMap[event.category] || event.category;
   const eventDate = new Date(event.date);
@@ -70,7 +77,13 @@ export function EventCard({
 
   const handleJoinClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!isDisabled && !effectiveIsParticipating) onJoin(event.id, event.title);
+    if (!isDisabled && !effectiveIsParticipating) {
+      onJoin(event.id, event.title);
+      // Optimistically update the displayed participant count
+      if (!isProcessing) {
+        setDisplayedParticipants(prevCount => prevCount + 1);
+      }
+    }
   };
 
   return (

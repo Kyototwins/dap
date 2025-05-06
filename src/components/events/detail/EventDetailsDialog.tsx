@@ -71,7 +71,15 @@ export function EventDetailsDialog({
   const [effectiveIsParticipating, setEffectiveIsParticipating] = useState(isParticipating);
   const [commentsFullscreen, setCommentsFullscreen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [displayedParticipants, setDisplayedParticipants] = useState(event?.current_participants || 0);
   const { toast } = useToast();
+
+  // Update displayed participants when the event data changes
+  useEffect(() => {
+    if (event) {
+      setDisplayedParticipants(event.current_participants);
+    }
+  }, [event?.current_participants]);
 
   useEffect(() => {
     // Check if current user is the creator when event changes
@@ -93,6 +101,13 @@ export function EventDetailsDialog({
     }
   }, [event, isParticipating]);
 
+  // Update participation status when the isParticipating prop changes
+  useEffect(() => {
+    if (!isCreator && event) {
+      setEffectiveIsParticipating(isParticipating);
+    }
+  }, [isParticipating, isCreator, event]);
+
   if (!event) return null;
   
   const formatEventDate = (dateString: string) => {
@@ -113,7 +128,7 @@ export function EventDetailsDialog({
   // Calculate if event is disabled for participation
   const isDisabled = isProcessing || 
     isPastEvent || 
-    (!effectiveIsParticipating && event.max_participants !== 0 && event.current_participants >= event.max_participants) || 
+    (!effectiveIsParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants) || 
     effectiveIsParticipating;
   
   // Determine participation button state
@@ -179,6 +194,16 @@ export function EventDetailsDialog({
     onOpenChange(false); // Close the main dialog
   };
 
+  const handleParticipateClick = () => {
+    if (!isDisabled && !effectiveIsParticipating) {
+      onParticipate(event.id, event.title);
+      // Optimistically update the displayed participant count
+      if (!isProcessing) {
+        setDisplayedParticipants(prevCount => prevCount + 1);
+      }
+    }
+  };
+
   return (
     <>
       {/* Main event details dialog */}
@@ -209,8 +234,8 @@ export function EventDetailsDialog({
                 </Badge>
                 <div className="text-sm text-gray-600">
                   参加者: {event.max_participants === 0 
-                    ? `${event.current_participants}/∞` 
-                    : `${event.current_participants}/${event.max_participants}`}
+                    ? `${displayedParticipants}/∞` 
+                    : `${displayedParticipants}/${event.max_participants}`}
                 </div>
               </div>
 
@@ -218,7 +243,7 @@ export function EventDetailsDialog({
               <Button
                 className={`w-full rounded-xl ${participateButtonClasses}`}
                 disabled={isDisabled}
-                onClick={() => !effectiveIsParticipating && onParticipate(event.id, event.title)}
+                onClick={handleParticipateClick}
               >
                 {participateButtonIcon}
                 {participateButtonText}

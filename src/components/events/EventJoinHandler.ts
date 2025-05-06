@@ -40,6 +40,10 @@ export async function handleJoinEvent(
     // Update UI with correct participation status
     setParticipations(updatedParticipations);
     
+    // Update local event data to increment participant count
+    // This provides immediate UI feedback without waiting for the server
+    eventToJoin.current_participants += 1;
+    
     // Show toast notification with correct message
     showToast({
       title: "イベントに参加しました",
