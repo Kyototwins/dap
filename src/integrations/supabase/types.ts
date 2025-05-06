@@ -142,6 +142,7 @@ export type Database = {
           id: string
           image_url: string | null
           location: string
+          map_link: string | null
           max_participants: number
           status: string | null
           title: string
@@ -156,6 +157,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           location: string
+          map_link?: string | null
           max_participants: number
           status?: string | null
           title: string
@@ -170,6 +172,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           location?: string
+          map_link?: string | null
           max_participants?: number
           status?: string | null
           title?: string
