@@ -44,3 +44,8 @@ export interface EventDeleteResult {
   success: boolean;
   message: string;
 }
+
+export interface JoinEventResponse {
+  success: boolean;
+  message?: string;
+}

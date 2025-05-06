@@ -1,12 +1,7 @@
 
-import { Event, EventParticipationMap } from "@/types/events";
+import { Event, EventParticipationMap, JoinEventResponse } from "@/types/events";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-
-interface JoinEventResponse {
-  success: boolean;
-  message?: string;
-}
 
 export async function handleJoinEvent(
   eventId: string,
@@ -57,23 +52,13 @@ export async function handleJoinEvent(
       });
     } else {
       // Call RPC function to join event with properly typed response
-      const { data, error } = await supabase.rpc<JoinEventResponse>('join_event', {
+      const { data, error } = await supabase.rpc('join_event', {
         p_event_id: eventId,
         p_user_id: userData.user.id
       });
 
       if (error) {
         throw error;
-      }
-
-      if (data && !data.success) {
-        toast({
-          title: "Could not join event",
-          description: data.message || "Unknown error",
-          variant: "destructive",
-        });
-        setProcessingEventId(null);
-        return;
       }
 
       // Update local participation state (optimistic UI update)
