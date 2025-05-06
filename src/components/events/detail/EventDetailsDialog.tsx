@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Event, EventComment } from "@/types/events";
@@ -9,7 +10,8 @@ import { EventDetailsDescription } from "./sections/EventDetailsDescription";
 import { EventCommentSection } from "./sections/EventCommentSection";
 import { EventCommentsFullscreenDialog } from "./dialogs/EventCommentsFullscreenDialog";
 import { EventDeleteDialog } from "./dialogs/EventDeleteDialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface EventDetailsDialogProps {
   event: Event | null;
@@ -113,8 +115,16 @@ export function EventDetailsDialog({
       {/* Main event details dialog */}
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-md max-h-[95vh] h-[95vh] flex flex-col p-0 overflow-hidden">
-          <DialogHeader className="p-4 border-b">
-            <DialogTitle className="text-lg">{event.title}</DialogTitle>
+          <DialogHeader className="p-4 border-b flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <DialogClose asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="sr-only">Back</span>
+                </Button>
+              </DialogClose>
+              <DialogTitle className="text-lg">{event.title}</DialogTitle>
+            </div>
           </DialogHeader>
           <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
             {/* Event basic info */}
