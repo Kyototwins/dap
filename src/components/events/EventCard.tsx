@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/date-utils";
 import { Event } from "@/types/events";
-import { Ribbon, Check, Edit, Loader2 } from "lucide-react";
+import { Ribbon, Check, Edit, Loader2, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -73,6 +73,12 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
   const participantsDisplay = event.max_participants === 0 
     ? `${displayedParticipants}/∞` 
     : `${displayedParticipants}/${event.max_participants}`;
+
+  // Generate a Google Maps link
+  const getMapLink = (location: string) => {
+    const encodedLocation = encodeURIComponent(location);
+    return `https://maps.google.com/maps?q=${encodedLocation}`;
+  };
 
   // Handle button state for event participation
   let buttonText = "Join Event";
@@ -147,15 +153,22 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
           <div className="flex items-center gap-2 text-sm">
             <Badge variant="language">{displayCategory}</Badge>
             <span className="text-gray-600">
-              {formattedDate}
+              {formattedDate} {startTime}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-gray-600">
-              {event.location}
-            </span>
-            <span className="text-gray-600">
-              {startTime}
+            <span className="flex items-center text-gray-600">
+              <MapPin className="h-3 w-3 mr-1" /> 
+              <a 
+                href={getMapLink(event.location)} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:underline hover:text-blue-600"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <span className="font-medium mr-1">Place:</span>
+                {event.location}
+              </a>
             </span>
           </div>
           <div className="text-sm">

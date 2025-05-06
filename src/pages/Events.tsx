@@ -78,21 +78,20 @@ export default function Events() {
       setParticipations(updatedParticipations);
       
       // Call backend to update participation
-      const isNowParticipating = await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
+      const isJoined = await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
       
-      console.log("Join event result:", isNowParticipating, "for event", eventId);
+      console.log("Join event result:", isJoined, "for event", eventId);
       
-      // Don't immediately fetch participation data from server, trust our local state
-      // Instead, just refresh events to update participant counts
-      await fetchEvents();
-      
-      // Show toast notification
+      // Show toast notification with correct message based on actual result from server
       toast({
-        title: isNowParticipating ? "Joined event" : "Cancelled participation",
-        description: isNowParticipating 
+        title: isJoined ? "Joined event" : "Cancelled participation",
+        description: isJoined 
           ? "You have successfully joined the event." 
           : "You have cancelled your participation."
       });
+      
+      // Refresh events to update participant counts
+      await fetchEvents();
     } catch (error: any) {
       console.error("Join event error:", error);
       // Revert UI on error
