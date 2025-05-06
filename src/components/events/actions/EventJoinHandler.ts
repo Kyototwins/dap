@@ -56,7 +56,7 @@ export async function handleJoinEvent(
         description: `You've successfully left ${eventTitle}`,
       });
     } else {
-      // Call RPC function to join event
+      // Call RPC function to join event with properly typed response
       const { data, error } = await supabase.rpc<JoinEventResponse>('join_event', {
         p_event_id: eventId,
         p_user_id: userData.user.id
