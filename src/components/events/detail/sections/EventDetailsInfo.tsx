@@ -9,6 +9,7 @@ interface EventDetailsInfoProps {
   isParticipating?: boolean;
   isProcessing?: boolean;
   onDeleteClick?: () => void;
+  onParticipate?: (eventId: string, eventTitle: string) => void;
 }
 
 const categoryTranslationMap: Record<string, string> = {
@@ -32,7 +33,8 @@ export function EventDetailsInfo({
   isCreator, 
   isParticipating = false,
   isProcessing = false,
-  onDeleteClick 
+  onDeleteClick,
+  onParticipate
 }: EventDetailsInfoProps) {
   const formatEventDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -59,9 +61,24 @@ export function EventDetailsInfo({
           <span>•</span>
           <span>{event.location}</span>
         </div>
-        <Badge variant="outline" className="bg-gray-100">
-          {displayCategory}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="bg-gray-100">
+            {displayCategory}
+          </Badge>
+          
+          {/* Join button for non-creators */}
+          {!isCreator && onParticipate && (
+            <Button
+              onClick={() => onParticipate(event.id, event.title)}
+              disabled={isProcessing}
+              variant={isParticipating ? "outline" : "default"}
+              className={`${isParticipating ? "bg-[#e5deff] text-[#7f1184] hover:bg-[#d8cefd] hover:text-[#7f1184]" : ""}`}
+              size="sm"
+            >
+              {isProcessing ? "Processing..." : isParticipating ? "Joined" : "Join Event"}
+            </Button>
+          )}
+        </div>
         <div className="text-sm text-gray-600">
           Participants: {event.max_participants === 0 
             ? `${event.current_participants}/∞` 

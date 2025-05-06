@@ -127,22 +127,8 @@ export function EventDetailsDialog({
                 isParticipating={isParticipating}
                 isProcessing={isProcessing}
                 onDeleteClick={handleDeleteClick}
+                onParticipate={onParticipate}
               />
-              
-              {/* Join button overlay on image for non-creators */}
-              {!isCreator && onParticipate && (
-                <div className="absolute top-4 right-4 z-10">
-                  <Button
-                    onClick={() => onParticipate(event.id, event.title)}
-                    disabled={isProcessing || isParticipating}
-                    variant={isParticipating ? "outline" : "default"}
-                    className={`rounded-full shadow-lg ${isParticipating ? "bg-[#e5deff] text-[#7f1184] hover:bg-[#d8cefd] hover:text-[#7f1184]" : ""}`}
-                    size="sm"
-                  >
-                    {isProcessing ? "Processing..." : isParticipating ? "Joined" : "Join Event"}
-                  </Button>
-                </div>
-              )}
             </div>
             
             {/* Event description section */}
