@@ -13,6 +13,7 @@ interface EventListProps {
   onJoinEvent: (eventId: string, eventTitle: string) => void;
   onSelectEvent: (event: Event) => void;
   hasFilters: boolean;
+  processingEventId?: string | null;
 }
 
 export function EventList({ 
@@ -21,7 +22,8 @@ export function EventList({
   participations, 
   onJoinEvent, 
   onSelectEvent,
-  hasFilters
+  hasFilters,
+  processingEventId
 }: EventListProps) {
   const navigate = useNavigate();
 
@@ -70,6 +72,7 @@ export function EventList({
           isParticipating={!!participations[event.id]}
           onJoin={onJoinEvent}
           onCardClick={onSelectEvent}
+          isProcessing={processingEventId === event.id}
         />
       ))}
     </div>

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/date-utils";
 import { Event } from "@/types/events";
-import { Ribbon, Check, Edit } from "lucide-react";
+import { Ribbon, Check, Edit, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,9 +33,10 @@ interface EventCardProps {
   isParticipating: boolean;
   onJoin: (eventId: string, eventTitle: string) => void;
   onCardClick: (event: Event) => void;
+  isProcessing?: boolean;
 }
 
-export function EventCard({ event, isParticipating, onJoin, onCardClick }: EventCardProps) {
+export function EventCard({ event, isParticipating, onJoin, onCardClick, isProcessing = false }: EventCardProps) {
   const [isCreator, setIsCreator] = useState(false);
   const [displayedParticipants, setDisplayedParticipants] = useState(event.current_participants);
   const navigate = useNavigate();
@@ -78,7 +79,11 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
   let buttonClasses = "bg-[#7f1184] hover:bg-[#671073] text-white";
   let buttonIcon = null;
   
-  if (isParticipating) {
+  if (isProcessing) {
+    buttonText = isParticipating ? "Cancelling..." : "Joining...";
+    buttonClasses = "bg-gray-300 text-gray-600";
+    buttonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
+  } else if (isParticipating) {
     buttonText = "Cancel Participation";
     buttonClasses = "bg-gray-200 hover:bg-gray-300 text-gray-700";
     buttonIcon = <Check className="w-4 h-4 mr-1" />;
@@ -90,7 +95,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
     buttonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
   }
 
-  const isDisabled = isPastEvent || (!isParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants);
+  const isDisabled = isProcessing || isPastEvent || (!isParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants);
   
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -177,6 +182,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
               className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
               onClick={handleEditClick}
               title="Edit event"
+              disabled={isProcessing}
             >
               <Edit className="w-4 h-4" />
             </Button>

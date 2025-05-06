@@ -20,6 +20,7 @@ export default function Events() {
   const [calendarViewOpen, setCalendarViewOpen] = useState(false);
   const [hidePastEvents, setHidePastEvents] = useState(false);
   const [hasCreatedEvent, setHasCreatedEvent] = useState(false);
+  const [processingEventId, setProcessingEventId] = useState<string | null>(null);
 
   const {
     filteredEvents,
@@ -54,6 +55,10 @@ export default function Events() {
   
   const handleJoinEvent = async (eventId: string, eventTitle: string) => {
     try {
+      // Prevent multiple clicks while processing
+      if (processingEventId === eventId) return;
+      setProcessingEventId(eventId);
+      
       const eventToJoin = filteredEvents.find(e => e.id === eventId);
       if (!eventToJoin) throw new Error("Event not found");
       
@@ -77,9 +82,9 @@ export default function Events() {
       
       console.log("Join event result:", isNowParticipating, "for event", eventId);
       
-      // Refresh data to ensure UI is in sync with server
+      // Don't immediately fetch participation data from server, trust our local state
+      // Instead, just refresh events to update participant counts
       await fetchEvents();
-      await fetchUserParticipations();
       
       // Show toast notification
       toast({
@@ -96,9 +101,12 @@ export default function Events() {
         description: error.message,
         variant: "destructive"
       });
-      // Reset data from server
+      // Only reset on error
       fetchUserParticipations();
       fetchEvents();
+    } finally {
+      // Clear processing state
+      setProcessingEventId(null);
     }
   };
   
@@ -137,7 +145,8 @@ export default function Events() {
         participations={participations} 
         onJoinEvent={handleJoinEvent} 
         onSelectEvent={setSelectedEvent} 
-        hasFilters={hasFilters} 
+        hasFilters={hasFilters}
+        processingEventId={processingEventId}
       />
 
       <EventDetailsDialog 
