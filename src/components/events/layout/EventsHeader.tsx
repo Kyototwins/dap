@@ -55,7 +55,7 @@ export function EventsHeader({
           </label>
         </div>
         
-        <Button onClick={onCalendarViewClick} variant="outline" size="sm" className="flex items-center gap-1 text-[#7f1184] border-[#d8cefd] bg-gray-200 hover:bg-gray-100 font-medium">
+        <Button onClick={onCalendarViewClick} variant="outline" size="sm" className="flex items-center gap-1 font-medium bg-transparent text-card-foreground">
           <Calendar className="h-4 w-4" />
           <span>View your schedule</span>
         </Button>
