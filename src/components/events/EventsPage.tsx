@@ -8,6 +8,7 @@ import { EventDetailsDialog } from "./detail/EventDetailsDialog";
 import { EventCalendarView } from "./calendar/EventCalendarView";
 import { CreateEventButton } from "./actions/CreateEventButton";
 import { useEvents } from "@/hooks/useEvents";
+import { handleJoinEvent } from "./EventJoinHandler";
 
 export default function EventsPage() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ export default function EventsPage() {
     newComment,
     setNewComment,
     participations,
+    setParticipations,
     loading,
     searchQuery,
     setSearchQuery,
@@ -34,7 +36,6 @@ export default function EventsPage() {
     sortOption,
     setSortOption,
     handleSubmitComment,
-    handleEventAction,
     fetchEvents,
     deleteEvent,
     refreshUserParticipations
@@ -83,13 +84,20 @@ export default function EventsPage() {
   const handleEventParticipation = async (eventId: string, eventTitle: string) => {
     try {
       // Prevent multiple clicks while processing
-      if (processingEventId === eventId) return;
-      setProcessingEventId(eventId);
+      if (processingEventId) return;
       
-      await handleEventAction(eventId, eventTitle);
+      await handleJoinEvent(
+        eventId, 
+        eventTitle, 
+        filteredEvents, 
+        participations, 
+        setParticipations,
+        refreshUserParticipations,
+        fetchEvents,
+        setProcessingEventId
+      );
     } catch (error) {
       console.error("Error handling event action:", error);
-    } finally {
       setProcessingEventId(null);
     }
   };

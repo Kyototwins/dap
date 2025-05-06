@@ -20,6 +20,9 @@ export async function handleJoinEvent(
     // Get current participation status
     const isCurrentlyParticipating = !!participations[eventId];
     
+    // Set processing state
+    setProcessingEventId(eventId);
+    
     // Update UI optimistically
     const updatedParticipations = { ...participations };
     
@@ -33,23 +36,23 @@ export async function handleJoinEvent(
     setParticipations(updatedParticipations);
     
     // Call backend to update participation
-    const isJoined = await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
+    const isParticipatingNow = await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
     
-    console.log("Join event result:", isJoined, "for event", eventId);
+    console.log("Join event result:", isParticipatingNow, "for event", eventId);
     
     // Show toast notification with correct message based on actual result from server
     showToast({
-      title: isJoined ? "イベントに参加しました" : "参加をキャンセルしました",
-      description: isJoined 
-        ? "イベントに参加しました。" 
-        : "イベント参加をキャンセルしました。"
+      title: isParticipatingNow ? "イベントに参加しました" : "参加をキャンセルしました",
+      description: isParticipatingNow 
+        ? `「${eventTitle}」に参加しました。` 
+        : `「${eventTitle}」の参加をキャンセルしました。`
     });
     
-    // Refresh participation status from server to ensure consistency
-    await fetchUserParticipations();
-    
-    // Refresh events to update participant counts
-    await fetchEvents();
+    // Refresh participation status and events data from server to ensure consistency
+    await Promise.all([
+      fetchUserParticipations(),
+      fetchEvents()
+    ]);
   } catch (error: any) {
     console.error("Join event error:", error);
     // Revert UI on error
