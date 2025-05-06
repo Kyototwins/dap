@@ -1,0 +1,76 @@
+
+import React from "react";
+import { Badge } from "@/components/ui/badge";
+import { MapPin } from "lucide-react";
+import { format } from "date-fns";
+
+interface EventCardDetailsProps {
+  description: string;
+  category: string;
+  displayCategory: string;
+  eventDate: Date;
+  location: string;
+  currentParticipants: number;
+  maxParticipants: number;
+}
+
+export function EventCardDetails({ 
+  description, 
+  category, 
+  displayCategory, 
+  eventDate, 
+  location, 
+  currentParticipants, 
+  maxParticipants 
+}: EventCardDetailsProps) {
+  // Format date and time
+  const formattedDate = format(eventDate, 'yyyy/MM/dd');
+  const startTime = format(eventDate, 'h:mm a');
+  
+  // For unlimited participants, show the infinity symbol with current participants
+  const participantsDisplay = maxParticipants === 0 
+    ? `${currentParticipants}/∞` 
+    : `${currentParticipants}/${maxParticipants}`;
+
+  // Generate a Google Maps link
+  const getMapLink = (location: string) => {
+    const encodedLocation = encodeURIComponent(location);
+    return `https://maps.google.com/maps?q=${encodedLocation}`;
+  };
+
+  return (
+    <>
+      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+        {description}
+      </p>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 text-sm">
+          <Badge variant="language">{displayCategory}</Badge>
+          <span className="text-gray-600">
+            {formattedDate} {startTime}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="flex items-center text-gray-600">
+            <MapPin className="h-3 w-3 mr-1" /> 
+            <a 
+              href={getMapLink(location)} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:underline hover:text-blue-600"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="font-medium mr-1">Place:</span>
+              {location}
+            </a>
+          </span>
+        </div>
+        <div className="text-sm">
+          <span className="text-gray-600">
+            Participants: {participantsDisplay}
+          </span>
+        </div>
+      </div>
+    </>
+  );
+}
