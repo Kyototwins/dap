@@ -45,6 +45,28 @@ export default function Events() {
     fetchUserParticipations
   } = useEvents();
   
+  // Load participation status on component mount and when returning to this page
+  useEffect(() => {
+    const refreshData = () => {
+      fetchUserParticipations();
+    };
+    
+    // Initial load
+    refreshData();
+    
+    // Set up a listener for when the component becomes visible again
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        console.log("Page visible, refreshing participation data");
+        refreshData();
+      }
+    });
+    
+    return () => {
+      document.removeEventListener("visibilitychange", refreshData);
+    };
+  }, []);
+  
   useEffect(() => {
     // Check if user has created an event
     const createdEvent = localStorage.getItem('created_event');
@@ -89,6 +111,9 @@ export default function Events() {
           ? "You have successfully joined the event." 
           : "You have cancelled your participation."
       });
+      
+      // Refresh participation status from server to ensure consistency
+      await fetchUserParticipations();
       
       // Refresh events to update participant counts
       await fetchEvents();

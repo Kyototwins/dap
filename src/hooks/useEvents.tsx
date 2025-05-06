@@ -38,8 +38,37 @@ export function useEvents() {
     loadParticipations
   } = useEventParticipations();
 
+  // Added focus effect to reload participations when tab/window regains focus
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log("Window focused, refreshing participations");
+      loadParticipations();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
   useEffect(() => {
     loadInitialData();
+
+    // Set up a route change listener to refresh data when returning to this page
+    const handleRouteChange = () => {
+      const currentPath = window.location.pathname;
+      if (currentPath === '/events') {
+        console.log('Back on events page, refreshing data');
+        loadParticipations();
+      }
+    };
+
+    // Add event listener for 'popstate' to detect navigation with browser back/forward buttons
+    window.addEventListener('popstate', handleRouteChange);
+
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
+    };
   }, []);
 
   const loadInitialData = async () => {
