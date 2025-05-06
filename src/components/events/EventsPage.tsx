@@ -99,6 +99,8 @@ export default function EventsPage() {
       
       // If we're viewing the event details, update selected event to reflect changes
       if (selectedEvent && selectedEvent.id === eventId) {
+        // Fetch the updated event
+        await fetchEvents();
         const updatedEvent = filteredEvents.find(event => event.id === eventId);
         if (updatedEvent) {
           setSelectedEvent(updatedEvent);

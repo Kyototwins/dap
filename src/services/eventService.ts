@@ -21,55 +21,30 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
 
     // If already participating, cancel participation
     if (existingParticipation) {
-      const { error: deleteError } = await supabase
-        .from("event_participants")
-        .delete()
-        .eq("event_id", eventId)
-        .eq("user_id", user.id);
+      // Start a transaction by using RPC
+      const { data: result, error: rpcError } = await supabase.rpc('cancel_event_participation', {
+        p_event_id: eventId,
+        p_user_id: user.id
+      });
 
-      if (deleteError) {
-        console.error("Error deleting participation:", deleteError);
-        throw deleteError;
-      }
-
-      // Update participant count (decrement by 1)
-      const { error: updateError } = await supabase
-        .from("events")
-        .update({ current_participants: Math.max(0, currentParticipants - 1) })
-        .eq("id", eventId);
-
-      if (updateError) {
-        console.error("Error updating participant count:", updateError);
-        throw updateError;
+      if (rpcError) {
+        console.error("Error canceling participation:", rpcError);
+        throw rpcError;
       }
       
       return false; // User is no longer participating
     }
 
     // User is not participating, so add them
-    const { error: participationError } = await supabase
-      .from("event_participants")
-      .insert([
-        {
-          event_id: eventId,
-          user_id: user.id,
-        },
-      ]);
+    // Start a transaction by using RPC
+    const { data: result, error: rpcError } = await supabase.rpc('join_event', {
+      p_event_id: eventId,
+      p_user_id: user.id
+    });
 
-    if (participationError) {
-      console.error("Error adding participation:", participationError);
-      throw participationError;
-    }
-
-    // Update participant count (increment by 1)
-    const { error: updateError } = await supabase
-      .from("events")
-      .update({ current_participants: currentParticipants + 1 })
-      .eq("id", eventId);
-
-    if (updateError) {
-      console.error("Error updating participant count:", updateError);
-      throw updateError;
+    if (rpcError) {
+      console.error("Error joining event:", rpcError);
+      throw rpcError;
     }
 
     return true; // User is now participating

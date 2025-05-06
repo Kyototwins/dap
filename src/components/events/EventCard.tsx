@@ -20,7 +20,6 @@ interface EventCardProps {
 
 export function EventCard({ event, isParticipating, onJoin, onCardClick, isProcessing = false }: EventCardProps) {
   const [isCreator, setIsCreator] = useState(false);
-  const [displayedParticipants, setDisplayedParticipants] = useState(event.current_participants);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -35,11 +34,6 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
     checkIfCreator();
   }, [event.creator_id]);
 
-  // Update displayed participants when the actual count changes
-  useEffect(() => {
-    setDisplayedParticipants(event.current_participants);
-  }, [event.current_participants]);
-
   const displayCategory = categoryTranslationMap[event.category] || event.category;
   const eventDate = new Date(event.date);
   const currentDate = new Date();
@@ -48,7 +42,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
   // Determine if the button should be disabled
   const isDisabled = isProcessing || 
     isPastEvent || 
-    (!isParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants);
+    (!isParticipating && event.max_participants !== 0 && event.current_participants >= event.max_participants);
   
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -85,7 +79,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
           displayCategory={displayCategory}
           eventDate={eventDate}
           location={event.location}
-          currentParticipants={displayedParticipants}
+          currentParticipants={event.current_participants}
           maxParticipants={event.max_participants}
         />
         
@@ -95,7 +89,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
           isPastEvent={isPastEvent}
           isProcessing={isProcessing}
           isDisabled={isDisabled}
-          displayedParticipants={displayedParticipants}
+          displayedParticipants={event.current_participants}
           maxParticipants={event.max_participants}
           onJoin={handleJoinClick}
           onEdit={handleEditClick}
