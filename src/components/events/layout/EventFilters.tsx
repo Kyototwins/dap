@@ -1,7 +1,5 @@
 
-import { Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { FilterButton } from "../ui/FilterButton";
 
 export type TimeFilter = 'all' | 'today' | 'this-week' | 'this-month';
 export type CategoryFilter = 'all' | 'Sports' | 'Study' | 'Meal' | 'Karaoke' | 'Sightseeing' | 'Other';
@@ -99,45 +97,14 @@ export function EventFilters({
         </FilterButton>
       </div>
       
-      <div className="flex items-center justify-between pt-1">
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="hide-past-events" 
-            checked={hidePastEvents} 
-            onCheckedChange={checked => onHidePastEventsChange(checked as boolean)} 
-          />
-          <label htmlFor="hide-past-events" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Hide past events
-          </label>
-        </div>
-        
-        <Button variant="outline" size="sm" onClick={onCalendarViewClick} className="flex items-center gap-1">
-          <Calendar className="h-4 w-4" />
-          <span>Your schedule</span>
-        </Button>
+      <div className="flex items-center justify-end pt-1">
+        <button 
+          onClick={onCalendarViewClick}
+          className="text-sm flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          View your schedule
+        </button>
       </div>
     </div>
-  );
-}
-
-interface FilterButtonProps {
-  children: React.ReactNode;
-  active: boolean;
-  onClick: () => void;
-}
-
-function FilterButton({ children, active, onClick }: FilterButtonProps) {
-  return (
-    <button
-      className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
-        active 
-          ? "bg-[#7f1184] text-white" 
-          : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-      }`}
-      onClick={onClick}
-      aria-pressed={active}
-    >
-      {children}
-    </button>
   );
 }

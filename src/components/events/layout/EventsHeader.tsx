@@ -2,19 +2,24 @@
 import { useState } from "react";
 import { SortOption } from "@/components/events/EventSortOptions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface EventsHeaderProps {
   onSearchChange: (searchQuery: string) => void;
   sortOption: SortOption;
   onSortChange: (value: SortOption) => void;
   onCalendarViewClick: () => void;
+  hidePastEvents: boolean;
+  onHidePastEventsChange: (value: boolean) => void;
 }
 
 export function EventsHeader({
   onSearchChange,
   sortOption,
   onSortChange,
-  onCalendarViewClick
+  onCalendarViewClick,
+  hidePastEvents,
+  onHidePastEventsChange
 }: EventsHeaderProps) {
   const [dateFilter, setDateFilter] = useState<string>("");
   
@@ -49,6 +54,18 @@ export function EventsHeader({
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      {/* Add the "Hide past events" checkbox */}
+      <div className="flex items-center space-x-2">
+        <Checkbox 
+          id="header-hide-past-events" 
+          checked={hidePastEvents} 
+          onCheckedChange={checked => onHidePastEventsChange(checked as boolean)} 
+        />
+        <label htmlFor="header-hide-past-events" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          Hide past events
+        </label>
       </div>
     </div>
   );
