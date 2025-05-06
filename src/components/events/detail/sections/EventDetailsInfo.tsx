@@ -1,125 +1,50 @@
 
+import { Event } from "@/types/events";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Event } from "@/types/events";
-import { CheckIcon, Loader2, Plus } from "lucide-react";
-import { categoryTranslationMap } from "../../utils/categoryTranslation";
-import { useEffect, useState } from "react";
 
 interface EventDetailsInfoProps {
   event: Event;
-  isParticipating: boolean;
   isCreator: boolean;
-  isProcessing: boolean;
-  displayedParticipants: number;
-  setDisplayedParticipants: React.Dispatch<React.SetStateAction<number>>;
-  onParticipate: (eventId: string, eventTitle: string) => void;
+  isParticipating?: boolean;
+  isProcessing?: boolean;
+  onParticipate?: (eventId: string, eventTitle: string) => void;
+  onDeleteClick?: () => void;
 }
 
-export function EventDetailsInfo({
-  event,
-  isParticipating,
-  isCreator,
-  isProcessing,
-  displayedParticipants,
-  setDisplayedParticipants,
-  onParticipate
+const categoryTranslationMap: Record<string, string> = {
+  'スポーツ': 'Sports',
+  '勉強': 'Study',
+  '食事': 'Meal',
+  'カラオケ': 'Karaoke',
+  '観光': 'Sightseeing',
+  'その他': 'Other',
+  // fallback if category is already English or others
+  'Sports': 'Sports',
+  'Study': 'Study',
+  'Meal': 'Meal',
+  'Karaoke': 'Karaoke',
+  'Sightseeing': 'Sightseeing',
+  'Other': 'Other',
+};
+
+export function EventDetailsInfo({ 
+  event, 
+  isCreator, 
+  isParticipating = false,
+  isProcessing = false,
+  onParticipate,
+  onDeleteClick 
 }: EventDetailsInfoProps) {
-  const [effectiveIsParticipating, setEffectiveIsParticipating] = useState(isParticipating);
-  
-  // Format event date
   const formatEventDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'numeric',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-    }).format(date);
+    return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
-
-  // Update participation status when props change
-  useEffect(() => {
-    if (isCreator) {
-      setEffectiveIsParticipating(true);
-    } else {
-      setEffectiveIsParticipating(isParticipating);
-    }
-  }, [isParticipating, isCreator]);
-
-  // Update displayed participants when the event.current_participants changes
-  useEffect(() => {
-    if (event && event.current_participants) {
-      setDisplayedParticipants(event.current_participants);
-    }
-  }, [event.current_participants, setDisplayedParticipants]);
-
-  // Maintain the displayedParticipants value even after state resets
-  // This helps prevent the count from resetting to 1 after joining
-  useEffect(() => {
-    const storedCount = localStorage.getItem(`event_${event.id}_count`);
-    if (storedCount) {
-      const count = parseInt(storedCount, 10);
-      // Only update if stored count is greater than current count
-      if (count > displayedParticipants) {
-        setDisplayedParticipants(count);
-      } else {
-        localStorage.setItem(`event_${event.id}_count`, String(displayedParticipants));
-      }
-    } else {
-      localStorage.setItem(`event_${event.id}_count`, String(displayedParticipants));
-    }
-  }, [event.id, displayedParticipants, setDisplayedParticipants]);
 
   const displayCategory = categoryTranslationMap[event.category] || event.category;
-  const eventDate = new Date(event.date);
-  const currentDate = new Date();
-  const isPastEvent = eventDate < currentDate;
-
-  // Calculate if event is disabled for participation
-  const isDisabled = isProcessing || 
-    isPastEvent || 
-    (!effectiveIsParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants) || 
-    effectiveIsParticipating;
-  
-  // Determine participation button state
-  let participateButtonText = "Join Event";
-  let participateButtonClasses = "bg-[#7f1184] hover:bg-[#671073] text-white";
-  let participateButtonIcon = <Plus className="w-4 h-4 mr-1" />;
-  
-  if (isProcessing) {
-    participateButtonText = "Joining...";
-    participateButtonClasses = "bg-gray-300 text-gray-600 cursor-wait";
-    participateButtonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
-  } else if (effectiveIsParticipating) {
-    participateButtonText = "Joined";
-    participateButtonClasses = "bg-[#b65dbb] hover:bg-[#a74bae] text-white"; // Lighter shade of purple
-    participateButtonIcon = <CheckIcon className="w-4 h-4 mr-1" />;
-  } else if (isPastEvent) {
-    participateButtonText = "Event Ended";
-    participateButtonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
-    participateButtonIcon = null;
-  } else if (event.max_participants !== 0 && event.current_participants >= event.max_participants) {
-    participateButtonText = "Full";
-    participateButtonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
-    participateButtonIcon = null;
-  }
-
-  const handleParticipateClick = () => {
-    if (!isDisabled && !effectiveIsParticipating) {
-      onParticipate(event.id, event.title);
-      
-      // Optimistically update the displayed participant count
-      if (!isProcessing) {
-        const newCount = displayedParticipants + 1;
-        setDisplayedParticipants(newCount);
-        localStorage.setItem(`event_${event.id}_count`, String(newCount));
-      }
-    }
-  };
 
   return (
-    <div className="p-4 space-y-4 overflow-y-auto flex-shrink-0">
+    <>
       {event.image_url && (
         <img
           src={event.image_url}
@@ -139,20 +64,34 @@ export function EventDetailsInfo({
         </Badge>
         <div className="text-sm text-gray-600">
           Participants: {event.max_participants === 0 
-            ? `${displayedParticipants}/∞` 
-            : `${displayedParticipants}/${event.max_participants}`}
+            ? `${event.current_participants}/∞` 
+            : `${event.current_participants}/${event.max_participants}`}
         </div>
+        
+        {/* Join Event button for non-creators */}
+        {!isCreator && onParticipate && (
+          <Button
+            onClick={() => onParticipate(event.id, event.title)}
+            disabled={isProcessing || isParticipating}
+            variant={isParticipating ? "outline" : "default"}
+            className={isParticipating ? "bg-gray-100" : ""}
+            size="sm"
+          >
+            {isProcessing ? "Processing..." : isParticipating ? "Joined" : "Join Event"}
+          </Button>
+        )}
+        
+        {/* Delete button for creators */}
+        {isCreator && onDeleteClick && (
+          <Button 
+            onClick={onDeleteClick}
+            variant="destructive"
+            size="sm"
+          >
+            Delete Event
+          </Button>
+        )}
       </div>
-
-      {/* Participation button */}
-      <Button
-        className={`w-full rounded-xl ${participateButtonClasses}`}
-        disabled={isDisabled}
-        onClick={handleParticipateClick}
-      >
-        {participateButtonIcon}
-        {participateButtonText}
-      </Button>
-    </div>
+    </>
   );
 }
