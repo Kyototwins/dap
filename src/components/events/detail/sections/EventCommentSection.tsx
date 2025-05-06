@@ -26,14 +26,14 @@ export function EventCommentSection({
   return (
     <div className="flex-1 min-h-0 flex flex-col bg-gray-50 p-4 pt-2">
       <div className="flex items-center mb-3 justify-between">
-        <h3 className="font-medium">コメント</h3>
+        <h3 className="font-medium">Comments</h3>
         <Button
           type="button"
           variant="outline"
           size="icon"
           className="hover:bg-doshisha-purple hover:text-white"
           onClick={onExpandClick}
-          aria-label="全画面表示"
+          aria-label="Show fullscreen"
         >
           <Expand className="h-4 w-4" />
         </Button>
@@ -44,7 +44,7 @@ export function EventCommentSection({
         {latestComments.length > 0 ? (
           <EventComments comments={latestComments} />
         ) : (
-          <p className="text-center text-gray-500 py-4">コメントはまだありません</p>
+          <p className="text-center text-gray-500 py-4">No comments yet</p>
         )}
         
         {comments.length > 3 && (
@@ -53,7 +53,7 @@ export function EventCommentSection({
             className="w-full mt-2 text-sm text-gray-600" 
             onClick={onExpandClick}
           >
-            すべてのコメントを表示 ({comments.length})
+            View all comments ({comments.length})
           </Button>
         )}
       </div>
@@ -62,7 +62,7 @@ export function EventCommentSection({
         <Textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          placeholder="コメントを入力..."
+          placeholder="Enter a comment..."
           className="flex-1 min-h-[60px] max-h-[120px] resize-none bg-white"
           rows={2}
         />

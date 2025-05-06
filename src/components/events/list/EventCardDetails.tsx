@@ -23,7 +23,7 @@ export function EventCardDetails({
 }: EventCardDetailsProps) {
   // Format date for display
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('ja-JP', {
+    return new Intl.DateTimeFormat('en-US', {
       month: 'numeric',
       day: 'numeric',
       hour: 'numeric',
@@ -56,8 +56,8 @@ export function EventCardDetails({
           <Users className="h-3.5 w-3.5" />
           <span>
             {maxParticipants === 0 
-              ? `${currentParticipants}人参加` 
-              : `${currentParticipants}/${maxParticipants}人参加`}
+              ? `${currentParticipants} participating` 
+              : `${currentParticipants}/${maxParticipants} participating`}
           </span>
         </div>
       </div>

@@ -52,13 +52,13 @@ export function EventList({
       <div className="text-center py-8 space-y-4">
         <p className="text-gray-500">
           {hasFilters
-            ? "フィルタに一致するイベントがありません"
-            : "表示できるイベントがありません"}
+            ? "No events match your filters"
+            : "No events to display"}
         </p>
         <div className="flex justify-center">
           <Button onClick={() => navigate("/events/new")} className="bg-doshisha-purple hover:bg-doshisha-darkPurple">
             <Plus className="w-4 h-4 mr-2" />
-            イベントを作成
+            Create Event
           </Button>
         </div>
       </div>

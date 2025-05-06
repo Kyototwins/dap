@@ -32,25 +32,25 @@ export function EventFilters({
           active={timeFilter === 'all'} 
           onClick={() => onTimeFilterChange('all')}
         >
-          すべて
+          All
         </FilterButton>
         <FilterButton 
           active={timeFilter === 'today'} 
           onClick={() => onTimeFilterChange('today')}
         >
-          今日
+          Today
         </FilterButton>
         <FilterButton 
           active={timeFilter === 'this-week'} 
           onClick={() => onTimeFilterChange('this-week')}
         >
-          今週
+          This Week
         </FilterButton>
         <FilterButton 
           active={timeFilter === 'this-month'} 
           onClick={() => onTimeFilterChange('this-month')}
         >
-          今月
+          This Month
         </FilterButton>
       </div>
       
@@ -59,43 +59,43 @@ export function EventFilters({
           active={categoryFilter === 'all'} 
           onClick={() => onCategoryFilterChange('all')}
         >
-          すべて
+          All
         </FilterButton>
         <FilterButton 
           active={categoryFilter === 'Sports'} 
           onClick={() => onCategoryFilterChange('Sports')}
         >
-          スポーツ
+          Sports
         </FilterButton>
         <FilterButton 
           active={categoryFilter === 'Study'} 
           onClick={() => onCategoryFilterChange('Study')}
         >
-          勉強
+          Study
         </FilterButton>
         <FilterButton 
           active={categoryFilter === 'Meal'} 
           onClick={() => onCategoryFilterChange('Meal')}
         >
-          食事
+          Meal
         </FilterButton>
         <FilterButton 
           active={categoryFilter === 'Karaoke'} 
           onClick={() => onCategoryFilterChange('Karaoke')}
         >
-          カラオケ
+          Karaoke
         </FilterButton>
         <FilterButton 
           active={categoryFilter === 'Sightseeing'} 
           onClick={() => onCategoryFilterChange('Sightseeing')}
         >
-          観光
+          Sightseeing
         </FilterButton>
         <FilterButton 
           active={categoryFilter === 'Other'} 
           onClick={() => onCategoryFilterChange('Other')}
         >
-          その他
+          Other
         </FilterButton>
       </div>
       
@@ -107,13 +107,13 @@ export function EventFilters({
             onCheckedChange={checked => onHidePastEventsChange(checked as boolean)} 
           />
           <label htmlFor="hide-past-events" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            過去のイベントを非表示
+            Hide past events
           </label>
         </div>
         
         <Button variant="outline" size="sm" onClick={onCalendarViewClick} className="flex items-center gap-1">
           <Calendar className="h-4 w-4" />
-          <span>スケジュール</span>
+          <span>Your schedule</span>
         </Button>
       </div>
     </div>

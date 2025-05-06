@@ -30,7 +30,7 @@ export function EventCommentsFullscreenDialog({
       <DialogContent className="max-w-2xl w-full h-[95vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="p-4 border-b">
           <DialogTitle className="text-lg flex items-center gap-2">
-            コメント: <span className="truncate max-w-xs">{event.title}</span>
+            Comments: <span className="truncate max-w-xs">{event.title}</span>
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-1 flex-col bg-gray-50 py-4 px-6 overflow-hidden">
@@ -41,7 +41,7 @@ export function EventCommentsFullscreenDialog({
             <Textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="コメントを入力..."
+              placeholder="Enter a comment..."
               className="flex-1 min-h-[80px] max-h-56 resize-none bg-white"
               rows={3}
             />

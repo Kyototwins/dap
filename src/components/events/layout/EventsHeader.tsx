@@ -35,17 +35,17 @@ export function EventsHeader({
             value={dateFilter} 
             onChange={handleDateFilterChange} 
             className="px-3 py-2 border border-gray-200 rounded-lg text-sm flex-1" 
-            aria-label="日付でフィルター"
+            aria-label="Filter by date"
           />
           
           <Select value={sortOption} onValueChange={value => onSortChange(value as SortOption)}>
-            <SelectTrigger className="w-[120px]" aria-label="並び替え">
-              <SelectValue placeholder="並び替え..." />
+            <SelectTrigger className="w-[120px]" aria-label="Sort by">
+              <SelectValue placeholder="Sort by..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="newest">最新順</SelectItem>
-              <SelectItem value="popular">人気順</SelectItem>
-              <SelectItem value="date_asc">日付順</SelectItem>
+              <SelectItem value="newest">Newest</SelectItem>
+              <SelectItem value="popular">Most Popular</SelectItem>
+              <SelectItem value="date_asc">Date (Ascending)</SelectItem>
             </SelectContent>
           </Select>
         </div>

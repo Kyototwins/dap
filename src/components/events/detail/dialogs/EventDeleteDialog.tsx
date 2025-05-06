@@ -25,15 +25,15 @@ export function EventDeleteDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>イベントを削除</AlertDialogTitle>
+          <AlertDialogTitle>Delete Event</AlertDialogTitle>
           <AlertDialogDescription>
-            このイベントを本当に削除しますか？この操作は元に戻せません。
+            Are you sure you want to delete this event? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>キャンセル</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirmDelete} className="bg-red-600 hover:bg-red-700">
-            削除する
+            Delete
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

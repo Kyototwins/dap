@@ -14,8 +14,8 @@ export function CreateEventButton({ hasCreatedEvent, navigate }: CreateEventButt
       {!hasCreatedEvent && (
         <div className="bg-white border border-gray-200 rounded-lg p-2 shadow-md relative">
           <p className="text-[0.7rem] font-medium text-[#7f1184] leading-tight">
-            あなたの<br />
-            イベントを作成しよう
+            Add your<br />
+            own event
           </p>
           {/* Triangle for speech bubble effect */}
           <div className="absolute bottom-[-8px] right-5 w-4 h-4 bg-white border-r border-b border-gray-200 transform rotate-45"></div>
@@ -25,7 +25,7 @@ export function CreateEventButton({ hasCreatedEvent, navigate }: CreateEventButt
         onClick={() => navigate("/events/new")} 
         className="bg-[#7f1184] hover:bg-[#671073] text-white rounded-full shadow-lg" 
         size="icon"
-        aria-label="イベントを作成"
+        aria-label="Create event"
       >
         <Plus className="w-5 h-5" />
       </Button>

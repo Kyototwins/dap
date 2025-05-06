@@ -30,7 +30,7 @@ export function EventDetailsInfo({
   // Format event date
   const formatEventDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('ja-JP', {
+    return new Intl.DateTimeFormat('en-US', {
       month: 'numeric',
       day: 'numeric',
       hour: 'numeric',
@@ -66,24 +66,24 @@ export function EventDetailsInfo({
     effectiveIsParticipating;
   
   // Determine participation button state
-  let participateButtonText = "イベントに参加する";
+  let participateButtonText = "Join Event";
   let participateButtonClasses = "bg-[#7f1184] hover:bg-[#671073] text-white";
   let participateButtonIcon = <Plus className="w-4 h-4 mr-1" />;
   
   if (isProcessing) {
-    participateButtonText = "参加中...";
+    participateButtonText = "Joining...";
     participateButtonClasses = "bg-gray-300 text-gray-600 cursor-wait";
     participateButtonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
   } else if (effectiveIsParticipating) {
-    participateButtonText = "参加済み";
+    participateButtonText = "Joined";
     participateButtonClasses = "bg-[#b65dbb] hover:bg-[#a74bae] text-white"; // Lighter shade of purple
     participateButtonIcon = <CheckIcon className="w-4 h-4 mr-1" />;
   } else if (isPastEvent) {
-    participateButtonText = "イベント終了";
+    participateButtonText = "Event Ended";
     participateButtonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
     participateButtonIcon = null;
   } else if (event.max_participants !== 0 && event.current_participants >= event.max_participants) {
-    participateButtonText = "満員";
+    participateButtonText = "Full";
     participateButtonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
     participateButtonIcon = null;
   }
@@ -118,7 +118,7 @@ export function EventDetailsInfo({
           {displayCategory}
         </Badge>
         <div className="text-sm text-gray-600">
-          参加者: {event.max_participants === 0 
+          Participants: {event.max_participants === 0 
             ? `${displayedParticipants}/∞` 
             : `${displayedParticipants}/${event.max_participants}`}
         </div>

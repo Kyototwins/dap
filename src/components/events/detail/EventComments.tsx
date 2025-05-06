@@ -9,7 +9,7 @@ interface EventCommentsProps {
 
 export function EventComments({ comments }: EventCommentsProps) {
   const formatDateTime = (dateString: string) => {
-    return new Intl.DateTimeFormat('ja-JP', {
+    return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'numeric',
       day: 'numeric',
@@ -21,14 +21,14 @@ export function EventComments({ comments }: EventCommentsProps) {
   return (
     <div className="space-y-4">
       {comments.length === 0 ? (
-        <p className="text-center text-gray-500 py-4">コメントはまだありません</p>
+        <p className="text-center text-gray-500 py-4">No comments yet</p>
       ) : (
         comments.map((comment) => (
           <div key={comment.id} className="flex gap-3">
             <Avatar className="h-8 w-8 flex-shrink-0">
               <img
                 src={comment.user?.avatar_url || "/placeholder.svg"}
-                alt={`${comment.user?.first_name}のアバター`}
+                alt={`${comment.user?.first_name}'s avatar`}
               />
             </Avatar>
             <div className="flex-1">

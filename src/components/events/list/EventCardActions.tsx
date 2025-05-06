@@ -43,24 +43,24 @@ export function EventCardActions({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Handle button state for event participation
-  let buttonText = "イベントに参加する";
+  let buttonText = "Join Event";
   let buttonClasses = "bg-[#7f1184] hover:bg-[#671073] text-white";
   let buttonIcon = <Plus className="w-4 h-4 mr-1" />;
   
   if (isProcessing) {
-    buttonText = "参加中...";
+    buttonText = "Joining...";
     buttonClasses = "bg-gray-300 text-gray-600 cursor-wait";
     buttonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
   } else if (isParticipating) {
-    buttonText = "参加済み";
+    buttonText = "Joined";
     buttonClasses = "bg-[#b65dbb] hover:bg-[#a74bae] text-white"; // Lighter shade of purple
     buttonIcon = <Check className="w-4 h-4 mr-1" />;
   } else if (isPastEvent) {
-    buttonText = "イベント終了";
+    buttonText = "Event Ended";
     buttonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
     buttonIcon = null;
   } else if (maxParticipants !== 0 && displayedParticipants >= maxParticipants) {
-    buttonText = "満員";
+    buttonText = "Full";
     buttonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
     buttonIcon = null;
   }
@@ -94,9 +94,9 @@ export function EventCardActions({
             <Button
               className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
               onClick={onEdit}
-              title="イベントを編集"
+              title="Edit event"
               disabled={isProcessing}
-              aria-label="イベントを編集"
+              aria-label="Edit event"
             >
               <Edit className="w-4 h-4" />
             </Button>
@@ -104,9 +104,9 @@ export function EventCardActions({
             <Button
               className="bg-red-100 hover:bg-red-200 text-red-700 rounded-xl"
               onClick={handleDeleteClick}
-              title="イベントを削除"
+              title="Delete event"
               disabled={isProcessing}
-              aria-label="イベントを削除"
+              aria-label="Delete event"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -118,13 +118,13 @@ export function EventCardActions({
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent onClick={e => e.stopPropagation()}>
           <AlertDialogHeader>
-            <AlertDialogTitle>イベントを削除</AlertDialogTitle>
+            <AlertDialogTitle>Delete Event</AlertDialogTitle>
             <AlertDialogDescription>
-              このイベントを本当に削除しますか？この操作は元に戻せません。
+              Are you sure you want to delete this event? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={e => e.stopPropagation()}>キャンセル</AlertDialogCancel>
+            <AlertDialogCancel onClick={e => e.stopPropagation()}>Cancel</AlertDialogCancel>
             <AlertDialogAction 
               onClick={e => {
                 e.stopPropagation();
@@ -132,7 +132,7 @@ export function EventCardActions({
               }}
               className="bg-red-600 hover:bg-red-700"
             >
-              削除する
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
