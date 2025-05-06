@@ -57,8 +57,10 @@ export default function Events() {
       const eventToJoin = filteredEvents.find(e => e.id === eventId);
       if (!eventToJoin) throw new Error("Event not found");
       
-      // Update local UI before backend call for better UX
+      // Get current participation status
       const isCurrentlyParticipating = !!participations[eventId];
+      
+      // Update UI optimistically
       const updatedParticipations = { ...participations };
       
       if (isCurrentlyParticipating) {
@@ -67,18 +69,19 @@ export default function Events() {
         updatedParticipations[eventId] = true;
       }
       
-      // Temporarily update UI
+      // Update UI immediately for better UX
       setParticipations(updatedParticipations);
       
       // Call backend to update participation
       const isNowParticipating = await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
       
-      // Refresh events to get updated participant counts
-      await fetchEvents();
+      console.log("Join event result:", isNowParticipating, "for event", eventId);
       
-      // Refresh user participations to ensure consistency
+      // Refresh data to ensure UI is in sync with server
+      await fetchEvents();
       await fetchUserParticipations();
       
+      // Show toast notification
       toast({
         title: isNowParticipating ? "Joined event" : "Cancelled participation",
         description: isNowParticipating 
@@ -86,14 +89,16 @@ export default function Events() {
           : "You have cancelled your participation."
       });
     } catch (error: any) {
+      console.error("Join event error:", error);
       // Revert UI on error
       toast({
         title: "Error occurred",
         description: error.message,
         variant: "destructive"
       });
-      fetchUserParticipations(); // Reset participations on error
-      fetchEvents(); // Refresh event data on error
+      // Reset data from server
+      fetchUserParticipations();
+      fetchEvents();
     }
   };
   

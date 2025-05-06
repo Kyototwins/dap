@@ -10,6 +10,7 @@ export function useEventParticipations() {
   const loadParticipations = async () => {
     try {
       const participationsData = await fetchUserParticipations();
+      console.log("Loaded participations:", participationsData);
       setParticipations(participationsData);
       return participationsData;
     } catch (error: any) {

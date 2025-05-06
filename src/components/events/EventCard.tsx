@@ -65,12 +65,8 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
   // Format date and time
   const formattedDate = format(eventDate, 'yyyy/MM/dd');
   
-  // Format time range (assuming events last 2 hours if no end time is provided)
+  // Format time - simplified to show just the start time
   const startTime = format(eventDate, 'h:mm a');
-  const endTime = event.end_date 
-    ? format(new Date(event.end_date), 'h:mm a') 
-    : format(new Date(eventDate.getTime() + 2 * 60 * 60 * 1000), 'h:mm a');
-  const timeRange = event.end_date ? `${startTime} - ${endTime}` : `${startTime}`;
   
   // For unlimited participants, show the infinity symbol with current participants
   const participantsDisplay = event.max_participants === 0 
@@ -154,7 +150,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick }: Event
               {event.location}
             </span>
             <span className="text-gray-600">
-              {timeRange}
+              {startTime}
             </span>
           </div>
           <div className="text-sm">
