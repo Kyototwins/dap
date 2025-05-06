@@ -21,7 +21,7 @@ export function EventCommentSection({
   onExpandClick
 }: EventCommentSectionProps) {
   // Get the latest comment
-  const latestComments = comments.length > 0 ? comments.slice(-3) : [];
+  const latestComments = comments.length > 0 ? comments.slice(-1) : [];
 
   return (
     <div className="flex-1 min-h-0 flex flex-col bg-gray-50 p-4 pt-2">
@@ -39,7 +39,7 @@ export function EventCommentSection({
         </Button>
       </div>
       
-      {/* Show recent comments */}
+      {/* Show latest comment */}
       <div className="flex-1 min-h-0 overflow-y-auto mb-4">
         {latestComments.length > 0 ? (
           <EventComments comments={latestComments} />
@@ -47,7 +47,7 @@ export function EventCommentSection({
           <p className="text-center text-gray-500 py-4">No comments yet</p>
         )}
         
-        {comments.length > 3 && (
+        {comments.length > 1 && (
           <Button 
             variant="link" 
             className="w-full mt-2 text-sm text-gray-600" 

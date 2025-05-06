@@ -8,7 +8,6 @@ interface EventDetailsInfoProps {
   isCreator: boolean;
   isParticipating?: boolean;
   isProcessing?: boolean;
-  onParticipate?: (eventId: string, eventTitle: string) => void;
   onDeleteClick?: () => void;
 }
 
@@ -33,7 +32,6 @@ export function EventDetailsInfo({
   isCreator, 
   isParticipating = false,
   isProcessing = false,
-  onParticipate,
   onDeleteClick 
 }: EventDetailsInfoProps) {
   const formatEventDate = (dateString: string) => {
@@ -67,19 +65,6 @@ export function EventDetailsInfo({
             ? `${event.current_participants}/∞` 
             : `${event.current_participants}/${event.max_participants}`}
         </div>
-        
-        {/* Join Event button for non-creators */}
-        {!isCreator && onParticipate && (
-          <Button
-            onClick={() => onParticipate(event.id, event.title)}
-            disabled={isProcessing || isParticipating}
-            variant={isParticipating ? "outline" : "default"}
-            className={isParticipating ? "bg-[#e5deff] text-[#7f1184] hover:bg-[#d8cefd] hover:text-[#7f1184]" : ""}
-            size="sm"
-          >
-            {isProcessing ? "Processing..." : isParticipating ? "Joined" : "Join Event"}
-          </Button>
-        )}
         
         {/* Delete button for creators */}
         {isCreator && onDeleteClick && (
