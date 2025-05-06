@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -10,7 +9,7 @@ import { EventCalendarView } from "@/components/events/EventCalendarView";
 import { useEvents } from "@/hooks/useEvents";
 import { joinEvent } from "@/services/eventService";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Eye, EyeOff } from "lucide-react";
 import { SortOption } from "@/components/events/EventSortOptions";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -40,6 +39,8 @@ export default function Events() {
     setCategoryFilter,
     sortOption,
     setSortOption,
+    hideAllEvents,
+    setHideAllEvents,
     handleSubmitComment,
     fetchEvents,
     fetchUserParticipations
@@ -153,18 +154,30 @@ export default function Events() {
         onCalendarViewClick={() => setCalendarViewOpen(true)}
       />
       
-      <EventFilters 
-        timeFilter={timeFilter} 
-        categoryFilter={categoryFilter} 
-        onTimeFilterChange={setTimeFilter} 
-        onCategoryFilterChange={setCategoryFilter}
-        hidePastEvents={hidePastEvents}
-        onHidePastEventsChange={setHidePastEvents}
-        onCalendarViewClick={() => setCalendarViewOpen(true)}
-      />
+      <div className="flex justify-between items-center">
+        <EventFilters 
+          timeFilter={timeFilter} 
+          categoryFilter={categoryFilter} 
+          onTimeFilterChange={setTimeFilter} 
+          onCategoryFilterChange={setCategoryFilter}
+          hidePastEvents={hidePastEvents}
+          onHidePastEventsChange={setHidePastEvents}
+          onCalendarViewClick={() => setCalendarViewOpen(true)}
+        />
+        
+        <Button 
+          onClick={() => setHideAllEvents(!hideAllEvents)}
+          variant="outline"
+          size="sm"
+          className="ml-2"
+        >
+          {hideAllEvents ? <Eye className="h-4 w-4 mr-1" /> : <EyeOff className="h-4 w-4 mr-1" />}
+          {hideAllEvents ? "Show Events" : "Hide All"}
+        </Button>
+      </div>
 
       <EventList 
-        events={displayedEvents} 
+        events={hideAllEvents ? [] : displayedEvents} 
         loading={loading} 
         participations={participations} 
         onJoinEvent={handleJoinEvent} 

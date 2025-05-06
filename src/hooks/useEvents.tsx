@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Event } from "@/types/events";
@@ -22,7 +21,9 @@ export function useEvents() {
     categoryFilter,
     setCategoryFilter,
     sortOption,
-    setSortOption
+    setSortOption,
+    hideAllEvents,
+    setHideAllEvents
   } = useEventFilters(events);
 
   const {
@@ -128,6 +129,8 @@ export function useEvents() {
     setCategoryFilter,
     sortOption,
     setSortOption,
+    hideAllEvents,
+    setHideAllEvents,
     handleSubmitComment: handleSubmitEventComment,
     fetchEvents: refreshEvents,
     fetchUserParticipations: loadParticipations
