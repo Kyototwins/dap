@@ -1,5 +1,5 @@
 
-import { Event, EventParticipationMap, JoinEventResponse } from "@/types/events";
+import { Event, EventParticipationMap } from "@/types/events";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -50,15 +50,49 @@ export async function handleJoinEvent(
         title: "Left event",
         description: `You've successfully left ${eventTitle}`,
       });
+      
+      // Update the participant count
+      const eventToUpdate = events.find(e => e.id === eventId);
+      if (eventToUpdate && eventToUpdate.current_participants > 0) {
+        const { error: updateError } = await supabase
+          .from('events')
+          .update({ current_participants: eventToUpdate.current_participants - 1 })
+          .eq('id', eventId);
+          
+        if (updateError) {
+          console.error("Error updating participant count:", updateError);
+        }
+      }
     } else {
-      // Call RPC function to join event with properly typed response
-      const { data, error } = await supabase.rpc('join_event', {
-        p_event_id: eventId,
-        p_user_id: userData.user.id
-      });
+      // Instead of using RPC function, we'll manually insert the participation and update count
+      
+      // First, insert participation record
+      const { error: insertError } = await supabase
+        .from('event_participants')
+        .insert([{ event_id: eventId, user_id: userData.user.id }]);
 
-      if (error) {
-        throw error;
+      if (insertError) {
+        throw insertError;
+      }
+      
+      // Update the participant count
+      const eventToUpdate = events.find(e => e.id === eventId);
+      if (eventToUpdate) {
+        const { error: updateError } = await supabase
+          .from('events')
+          .update({ current_participants: eventToUpdate.current_participants + 1 })
+          .eq('id', eventId);
+          
+        if (updateError) {
+          console.error("Error updating participant count:", updateError);
+          // If update fails, remove the participation record to maintain consistency
+          await supabase
+            .from('event_participants')
+            .delete()
+            .eq('event_id', eventId)
+            .eq('user_id', userData.user.id);
+          throw updateError;
+        }
       }
 
       // Update local participation state (optimistic UI update)
