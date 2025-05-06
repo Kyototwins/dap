@@ -21,9 +21,7 @@ export function useEvents() {
     categoryFilter,
     setCategoryFilter,
     sortOption,
-    setSortOption,
-    hideAllEvents,
-    setHideAllEvents
+    setSortOption
   } = useEventFilters(events);
 
   const {
@@ -129,8 +127,6 @@ export function useEvents() {
     setCategoryFilter,
     sortOption,
     setSortOption,
-    hideAllEvents,
-    setHideAllEvents,
     handleSubmitComment: handleSubmitEventComment,
     fetchEvents: refreshEvents,
     fetchUserParticipations: loadParticipations

@@ -11,15 +11,8 @@ export function useEventFilters(events: Event[]) {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [sortOption, setSortOption] = useState<SortOption>("date_asc");
-  const [hideAllEvents, setHideAllEvents] = useState(false);
 
   useEffect(() => {
-    // If hideAllEvents is true, return empty array
-    if (hideAllEvents) {
-      setFilteredEvents([]);
-      return;
-    }
-    
     // Apply filters to events
     const filtered = filterEvents(events, searchQuery, timeFilter, categoryFilter);
     
@@ -37,7 +30,7 @@ export function useEventFilters(events: Event[]) {
     });
     
     setFilteredEvents(filteredByAge);
-  }, [events, searchQuery, timeFilter, categoryFilter, sortOption, hideAllEvents]);
+  }, [events, searchQuery, timeFilter, categoryFilter, sortOption]);
 
   const sortEvents = (eventsList: Event[], sort: SortOption): Event[] => {
     const sortedEvents = [...eventsList];
@@ -69,8 +62,6 @@ export function useEventFilters(events: Event[]) {
     categoryFilter,
     setCategoryFilter,
     sortOption,
-    setSortOption,
-    hideAllEvents,
-    setHideAllEvents
+    setSortOption
   };
 }
