@@ -61,10 +61,10 @@ export async function handleJoinEvent(
         throw error;
       }
 
-      if (!data.success) {
+      if (data && !data.success) {
         toast({
           title: "Could not join event",
-          description: data.message,
+          description: data.message || "Unknown error",
           variant: "destructive",
         });
         setProcessingEventId(null);

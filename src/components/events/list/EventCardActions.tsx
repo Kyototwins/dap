@@ -81,7 +81,7 @@ export function EventCardActions({
       <div className="mt-4 flex gap-2">
         <Button
           className={`flex-1 rounded-xl ${buttonClasses}`}
-          disabled={isDisabled || isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants) || isParticipating}
+          disabled={isDisabled || isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants) || isProcessing}
           onClick={onJoin}
           aria-label={buttonText}
         >
