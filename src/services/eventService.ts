@@ -25,15 +25,25 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
     }
 
     // User is not participating, so add them
-    // Start a transaction by using RPC
-    const { data: result, error: rpcError } = await supabase.rpc('join_event', {
-        p_event_id: eventId,
-        p_user_id: user.id
-    } as Record<string, any>); // Use Record<string, any> to bypass TypeScript checking
-
-    if (rpcError) {
-      console.error("Error joining event:", rpcError);
-      throw rpcError;
+    // First, insert the participation record directly
+    const { error: insertError } = await supabase
+      .from("event_participants")
+      .insert([{ event_id: eventId, user_id: user.id }]);
+      
+    if (insertError) {
+      console.error("Error inserting participant:", insertError);
+      throw insertError;
+    }
+    
+    // Then update the participant count
+    const { error: updateError } = await supabase
+      .from("events")
+      .update({ current_participants: currentParticipants + 1 })
+      .eq("id", eventId);
+      
+    if (updateError) {
+      console.error("Error updating participant count:", updateError);
+      throw updateError;
     }
 
     return true; // User is now participating
