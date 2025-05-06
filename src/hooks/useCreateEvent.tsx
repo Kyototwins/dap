@@ -87,8 +87,8 @@ export function useCreateEvent() {
         ? 0 
         : parseInt(formData.max_participants);
 
-      // Create base event data with proper typing - added map_link
-      const eventData: EventInsert = {
+      // Create event data
+      const eventData = {
         title: formData.title,
         description: formData.description,
         location: formData.location,
@@ -99,8 +99,13 @@ export function useCreateEvent() {
         creator_id: user.id,
         current_participants: 1,
         status: "active",
-        map_link: formData.map_link || null, // Optional map link
-      };
+      } as EventInsert;
+
+      // Use optional map_link only if provided
+      if (formData.map_link) {
+        // We need to cast to 'any' since the type doesn't have map_link yet
+        (eventData as any).map_link = formData.map_link;
+      }
 
       const { error } = await supabase
         .from("events")
