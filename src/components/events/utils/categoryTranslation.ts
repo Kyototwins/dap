@@ -7,10 +7,10 @@ export const categoryTranslationMap: Record<string, string> = {
   '観光': 'Sightseeing',
   'その他': 'Other',
   // fallback if category is already English or others
-  'Sports': 'スポーツ',
-  'Study': '勉強',
-  'Meal': '食事',
-  'Karaoke': 'カラオケ',
-  'Sightseeing': '観光',
-  'Other': 'その他',
+  'Sports': 'Sports',
+  'Study': 'Study',
+  'Meal': 'Meal',
+  'Karaoke': 'Karaoke',
+  'Sightseeing': 'Sightseeing',
+  'Other': 'Other',
 };

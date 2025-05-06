@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -16,6 +17,7 @@ export function useCreateEvent() {
     date: "",
     category: "",
     max_participants: "",
+    map_link: "", // Added map_link field
   });
   const [image, setImage] = useState<{
     file: File | null;
@@ -85,7 +87,7 @@ export function useCreateEvent() {
         ? 0 
         : parseInt(formData.max_participants);
 
-      // Create base event data with proper typing - removed end_date
+      // Create base event data with proper typing - added map_link
       const eventData: EventInsert = {
         title: formData.title,
         description: formData.description,
@@ -97,6 +99,7 @@ export function useCreateEvent() {
         creator_id: user.id,
         current_participants: 1,
         status: "active",
+        map_link: formData.map_link || null, // Optional map link
       };
 
       const { error } = await supabase

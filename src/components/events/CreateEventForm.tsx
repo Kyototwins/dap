@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useCreateEvent } from "@/hooks/useCreateEvent";
 import { format } from "date-fns";
+import { Link2 } from "lucide-react";
 
 export function CreateEventForm() {
   const { 
@@ -91,6 +92,27 @@ export function CreateEventForm() {
           className="border-gray-300 rounded-md focus-visible:ring-gray-500"
           required
         />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="map_link">
+          Map Link <span className="text-xs text-gray-500">(optional)</span>
+        </Label>
+        <div className="relative">
+          <Input
+            id="map_link"
+            value={formData.map_link}
+            onChange={(e) =>
+              setFormData({ ...formData, map_link: e.target.value })
+            }
+            className="border-gray-300 rounded-md focus-visible:ring-gray-500 pl-9"
+            placeholder="https://maps.google.com/..."
+          />
+          <Link2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        </div>
+        <p className="text-xs text-gray-500 mt-1">
+          You can add a Google Maps or any other map service link (optional).
+        </p>
       </div>
 
       <div className="space-y-2">

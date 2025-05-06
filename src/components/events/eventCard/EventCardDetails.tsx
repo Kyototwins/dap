@@ -1,7 +1,6 @@
-
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { MapPin } from "lucide-react";
+import { MapPin, Link2 } from "lucide-react";
 import { format } from "date-fns";
 
 interface EventCardDetailsProps {
@@ -12,6 +11,7 @@ interface EventCardDetailsProps {
   location: string;
   currentParticipants: number;
   maxParticipants: number;
+  mapLink?: string | null;
 }
 
 export function EventCardDetails({ 
@@ -21,7 +21,8 @@ export function EventCardDetails({
   eventDate, 
   location, 
   currentParticipants, 
-  maxParticipants 
+  maxParticipants,
+  mapLink
 }: EventCardDetailsProps) {
   // Format date and time
   const formattedDate = format(eventDate, 'yyyy/MM/dd');
@@ -34,6 +35,12 @@ export function EventCardDetails({
 
   // Generate a Google Maps link
   const getMapLink = (location: string) => {
+    // If a custom map link is provided, use that instead
+    if (mapLink) {
+      return mapLink;
+    }
+    
+    // Otherwise generate a Google Maps link from the location
     const encodedLocation = encodeURIComponent(location);
     return `https://maps.google.com/maps?q=${encodedLocation}`;
   };
@@ -63,6 +70,9 @@ export function EventCardDetails({
               <span className="font-medium mr-1">Place:</span>
               {location}
             </a>
+            {mapLink && (
+              <Link2 className="ml-1 h-3 w-3 text-blue-500" />
+            )}
           </span>
         </div>
         <div className="text-sm">

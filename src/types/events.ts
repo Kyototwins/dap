@@ -20,6 +20,7 @@ export interface Event {
   creator?: EventCreator;
   created_at: string;
   status?: string;
+  map_link?: string | null;
 }
 
 export interface EventComment {
