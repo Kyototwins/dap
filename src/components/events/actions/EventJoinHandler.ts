@@ -46,6 +46,16 @@ export async function handleJoinEvent(
       delete newParticipations[eventId];
       setParticipations(newParticipations);
 
+      // Remove from localStorage
+      try {
+        const joinedEventsStr = localStorage.getItem('joined_events') || '{}';
+        const joinedEvents = JSON.parse(joinedEventsStr);
+        delete joinedEvents[eventId];
+        localStorage.setItem('joined_events', JSON.stringify(joinedEvents));
+      } catch (e) {
+        console.error("Error updating localStorage:", e);
+      }
+
       toast({
         title: "Left event",
         description: `You've successfully left ${eventTitle}`,
@@ -100,6 +110,16 @@ export async function handleJoinEvent(
         ...participations,
         [eventId]: true
       });
+
+      // Store in localStorage that this user has joined this event
+      try {
+        const joinedEventsStr = localStorage.getItem('joined_events') || '{}';
+        const joinedEvents = JSON.parse(joinedEventsStr);
+        joinedEvents[eventId] = true;
+        localStorage.setItem('joined_events', JSON.stringify(joinedEvents));
+      } catch (e) {
+        console.error("Error updating localStorage:", e);
+      }
 
       toast({
         title: "Joined event",

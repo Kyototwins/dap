@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Event, EventComment } from "@/types/events";
@@ -116,19 +115,11 @@ export function EventDetailsDialog({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-md max-h-[95vh] h-[95vh] flex flex-col p-0 overflow-hidden">
           <DialogHeader className="p-4 border-b flex flex-row items-center justify-between">
-            <div className="flex items-center gap-2">
-              <DialogClose asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <ChevronLeft className="h-4 w-4" />
-                  <span className="sr-only">Back</span>
-                </Button>
-              </DialogClose>
-              <DialogTitle className="text-lg">{event.title}</DialogTitle>
-            </div>
+            <DialogTitle className="text-lg">{event.title}</DialogTitle>
           </DialogHeader>
           <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
             {/* Event basic info */}
-            <div className="p-4 space-y-4 overflow-y-auto flex-shrink-0">
+            <div className="p-4 space-y-4 overflow-y-auto flex-shrink-0 relative">
               {/* Event details information */}
               <EventDetailsInfo 
                 event={event}
@@ -137,6 +128,21 @@ export function EventDetailsDialog({
                 isProcessing={isProcessing}
                 onDeleteClick={handleDeleteClick}
               />
+              
+              {/* Join button overlay on image for non-creators */}
+              {!isCreator && onParticipate && (
+                <div className="absolute top-4 right-4 z-10">
+                  <Button
+                    onClick={() => onParticipate(event.id, event.title)}
+                    disabled={isProcessing || isParticipating}
+                    variant={isParticipating ? "outline" : "default"}
+                    className={`rounded-full shadow-lg ${isParticipating ? "bg-[#e5deff] text-[#7f1184] hover:bg-[#d8cefd] hover:text-[#7f1184]" : ""}`}
+                    size="sm"
+                  >
+                    {isProcessing ? "Processing..." : isParticipating ? "Joined" : "Join Event"}
+                  </Button>
+                </div>
+              )}
             </div>
             
             {/* Event description section */}
@@ -158,21 +164,6 @@ export function EventDetailsDialog({
               onSubmitComment={onSubmitComment}
               onExpandClick={() => setCommentsFullscreen(true)}
             />
-            
-            {/* Floating join button for non-creators */}
-            {!isCreator && onParticipate && (
-              <div className="absolute bottom-4 right-4 z-10">
-                <Button
-                  onClick={() => onParticipate(event.id, event.title)}
-                  disabled={isProcessing || isParticipating}
-                  variant={isParticipating ? "outline" : "default"}
-                  className={`rounded-full shadow-lg ${isParticipating ? "bg-[#e5deff] text-[#7f1184] hover:bg-[#d8cefd] hover:text-[#7f1184]" : ""}`}
-                  size="sm"
-                >
-                  {isProcessing ? "Processing..." : isParticipating ? "Joined" : "Join Event"}
-                </Button>
-              </div>
-            )}
           </div>
         </DialogContent>
       </Dialog>

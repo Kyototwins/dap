@@ -43,13 +43,15 @@ export function EventDetailsInfo({
 
   return (
     <>
-      {event.image_url && (
-        <img
-          src={event.image_url}
-          alt={event.title}
-          className="w-full h-48 object-cover rounded-lg"
-        />
-      )}
+      <div className="relative">
+        {event.image_url && (
+          <img
+            src={event.image_url}
+            alt={event.title}
+            className="w-full h-48 object-cover rounded-lg"
+          />
+        )}
+      </div>
 
       <div className="space-y-2">
         <div className="flex items-center gap-2 text-sm text-gray-600">
