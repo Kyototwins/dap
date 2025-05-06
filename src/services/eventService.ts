@@ -29,7 +29,7 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
     const { data: result, error: rpcError } = await supabase.rpc('join_event', {
         p_event_id: eventId,
         p_user_id: user.id
-    } as any); // Use type assertion to bypass TypeScript error
+    } as {p_event_id: string, p_user_id: string}); // Explicitly type the parameters
 
     if (rpcError) {
       console.error("Error joining event:", rpcError);
