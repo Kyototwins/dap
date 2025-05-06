@@ -1,37 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
-export async function createMessageGroup(eventId: string, eventTitle: string) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
-  const { data: groupData, error: groupError } = await supabase
-    .from("message_groups")
-    .insert([
-      {
-        name: eventTitle,
-        event_id: eventId
-      }
-    ])
-    .select()
-    .single();
-
-  if (groupError) throw groupError;
-
-  const { error: memberError } = await supabase
-    .from("message_group_members")
-    .insert([
-      {
-        group_id: groupData.id,
-        user_id: user.id
-      }
-    ]);
-
-  if (memberError) throw memberError;
-
-  return groupData;
-}
-
 export async function joinEvent(eventId: string, eventTitle: string, currentParticipants: number) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
@@ -63,7 +32,7 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
         throw deleteError;
       }
 
-      // Update participant count (always decrement by 1)
+      // Update participant count (decrement by 1)
       const { error: updateError } = await supabase
         .from("events")
         .update({ current_participants: Math.max(0, currentParticipants - 1) })
@@ -74,7 +43,7 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
         throw updateError;
       }
       
-      return false; // Returning false to indicate user is no longer participating
+      return false; // User is no longer participating
     }
 
     // User is not participating, so add them
@@ -92,7 +61,7 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
       throw participationError;
     }
 
-    // Update participant count (always increment by 1)
+    // Update participant count (increment by 1)
     const { error: updateError } = await supabase
       .from("events")
       .update({ current_participants: currentParticipants + 1 })
@@ -103,7 +72,7 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
       throw updateError;
     }
 
-    return true; // Returning true to indicate user is now participating
+    return true; // User is now participating
   } catch (error) {
     console.error("Join event error:", error);
     throw error;

@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Check, Edit, Loader2 } from "lucide-react";
+import { Check, Edit, Loader2, Plus } from "lucide-react";
 
 interface EventCardActionsProps {
   isCreator: boolean;
@@ -27,25 +27,27 @@ export function EventCardActions({
   onEdit 
 }: EventCardActionsProps) {
   // Handle button state for event participation
-  let buttonText = "Join Event";
+  let buttonText = "イベントに参加する";
   let buttonClasses = "bg-[#7f1184] hover:bg-[#671073] text-white";
-  let buttonIcon = null;
+  let buttonIcon = <Plus className="w-4 h-4 mr-1" />;
   
   if (isProcessing) {
     // Show different text based on current participation state
-    buttonText = isParticipating ? "Cancelling..." : "Joining...";
+    buttonText = isParticipating ? "キャンセル中..." : "参加中...";
     buttonClasses = "bg-gray-300 text-gray-600";
     buttonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
   } else if (isParticipating) {
-    buttonText = "Cancel Participation";
+    buttonText = "参加をキャンセルする";
     buttonClasses = "bg-gray-200 hover:bg-gray-300 text-gray-700";
     buttonIcon = <Check className="w-4 h-4 mr-1" />;
   } else if (isPastEvent) {
-    buttonText = "Event Ended";
+    buttonText = "イベント終了";
     buttonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
+    buttonIcon = null;
   } else if (maxParticipants !== 0 && displayedParticipants >= maxParticipants) {
-    buttonText = "Full";
+    buttonText = "満員";
     buttonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
+    buttonIcon = null;
   }
 
   return (
@@ -63,7 +65,7 @@ export function EventCardActions({
         <Button
           className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl"
           onClick={onEdit}
-          title="Edit event"
+          title="イベントを編集"
           disabled={isProcessing}
         >
           <Edit className="w-4 h-4" />

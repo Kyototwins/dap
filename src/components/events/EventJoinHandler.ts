@@ -41,10 +41,10 @@ export async function handleJoinEvent(
     
     // Show toast notification with correct message based on actual result from server
     toast({
-      title: isJoined ? "Joined event" : "Cancelled participation",
+      title: isJoined ? "イベントに参加しました" : "参加をキャンセルしました",
       description: isJoined 
-        ? "You have successfully joined the event." 
-        : "You have cancelled your participation."
+        ? "イベントに参加しました。" 
+        : "イベント参加をキャンセルしました。"
     });
     
     // Refresh participation status from server to ensure consistency
@@ -56,7 +56,7 @@ export async function handleJoinEvent(
     console.error("Join event error:", error);
     // Revert UI on error
     toast({
-      title: "Error occurred",
+      title: "エラーが発生しました",
       description: error.message,
       variant: "destructive"
     });
