@@ -63,7 +63,7 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
         throw deleteError;
       }
 
-      // Update participant count
+      // Update participant count (always decrement by 1)
       const { error: updateError } = await supabase
         .from("events")
         .update({ current_participants: Math.max(0, currentParticipants - 1) })
@@ -92,7 +92,7 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
       throw participationError;
     }
 
-    // Update participant count
+    // Update participant count (always increment by 1)
     const { error: updateError } = await supabase
       .from("events")
       .update({ current_participants: currentParticipants + 1 })

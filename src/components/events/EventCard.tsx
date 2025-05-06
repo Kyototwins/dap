@@ -86,6 +86,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
   let buttonIcon = null;
   
   if (isProcessing) {
+    // Show different text based on current participation state
     buttonText = isParticipating ? "Cancelling..." : "Joining...";
     buttonClasses = "bg-gray-300 text-gray-600";
     buttonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
