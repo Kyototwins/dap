@@ -184,45 +184,6 @@ export type Database = {
           },
         ]
       }
-      group_messages: {
-        Row: {
-          content: string
-          created_at: string | null
-          group_id: string | null
-          id: string
-          sender_id: string | null
-        }
-        Insert: {
-          content: string
-          created_at?: string | null
-          group_id?: string | null
-          id?: string
-          sender_id?: string | null
-        }
-        Update: {
-          content?: string
-          created_at?: string | null
-          group_id?: string | null
-          id?: string
-          sender_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "group_messages_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "message_groups"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "group_messages_sender_id_fkey"
-            columns: ["sender_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       matches: {
         Row: {
           created_at: string | null
@@ -258,74 +219,6 @@ export type Database = {
             columns: ["user2_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      message_group_members: {
-        Row: {
-          group_id: string | null
-          id: string
-          joined_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          group_id?: string | null
-          id?: string
-          joined_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          group_id?: string | null
-          id?: string
-          joined_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "message_group_members_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "message_groups"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "message_group_members_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      message_groups: {
-        Row: {
-          created_at: string | null
-          event_id: string | null
-          id: string
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          event_id?: string | null
-          id?: string
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          event_id?: string | null
-          id?: string
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "message_groups_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]
