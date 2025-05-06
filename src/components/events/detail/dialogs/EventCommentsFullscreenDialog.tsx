@@ -1,8 +1,8 @@
 
-import { Button } from "@/components/ui/button";
+import { Event, EventComment } from "@/types/events";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Event, EventComment } from "@/types/events";
+import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { EventComments } from "../EventComments";
 
@@ -30,7 +30,7 @@ export function EventCommentsFullscreenDialog({
       <DialogContent className="max-w-2xl w-full h-[95vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="p-4 border-b">
           <DialogTitle className="text-lg flex items-center gap-2">
-            Comments: <span className="truncate max-w-xs">{event.title}</span>
+            Comments for: <span className="truncate max-w-xs">{event.title}</span>
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-1 flex-col bg-gray-50 py-4 px-6 overflow-hidden">

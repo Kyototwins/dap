@@ -25,14 +25,14 @@ export function EventDeleteDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Event</AlertDialogTitle>
+          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete this event? This action cannot be undone.
+            This action cannot be undone. This will permanently delete your event and remove all participants' access.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirmDelete} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogAction onClick={onConfirmDelete} className="bg-destructive text-destructive-foreground">
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>
