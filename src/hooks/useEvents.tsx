@@ -6,7 +6,6 @@ import { fetchEvents, deleteEventById } from "@/services/eventDataService";
 import { useEventFilters } from "@/hooks/events/useEventFilters";
 import { useEventComments } from "@/hooks/events/useEventComments";
 import { useEventParticipations } from "@/hooks/events/useEventParticipations";
-import { handleEventAction } from "@/services/eventActionsService";
 
 export function useEvents() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -152,7 +151,6 @@ export function useEvents() {
     sortOption,
     setSortOption,
     handleSubmitComment: handleSubmitEventComment,
-    handleEventAction,
     fetchEvents: refreshEvents,
     refreshUserParticipations: loadParticipations,
     deleteEvent
