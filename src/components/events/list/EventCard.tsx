@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Event } from "@/types/events";
 import { useEffect, useState } from "react";
@@ -113,6 +112,7 @@ export function EventCard({
           location={event.location}
           currentParticipants={displayedParticipants}
           maxParticipants={event.max_participants}
+          mapLink={event.map_link}
         />
         
         <EventCardActions 

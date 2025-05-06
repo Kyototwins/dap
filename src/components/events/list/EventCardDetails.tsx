@@ -1,6 +1,6 @@
 
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Users } from "lucide-react";
+import { Calendar, MapPin, Users, Link2 } from "lucide-react";
 
 interface EventCardDetailsProps {
   description: string;
@@ -10,6 +10,7 @@ interface EventCardDetailsProps {
   location: string;
   currentParticipants: number;
   maxParticipants: number;
+  mapLink?: string | null;
 }
 
 export function EventCardDetails({
@@ -19,7 +20,8 @@ export function EventCardDetails({
   eventDate,
   location,
   currentParticipants,
-  maxParticipants
+  maxParticipants,
+  mapLink
 }: EventCardDetailsProps) {
   // Format date for display
   const formatDate = (date: Date) => {
@@ -50,6 +52,18 @@ export function EventCardDetails({
         <div className="flex items-center gap-1.5 text-xs text-gray-600">
           <MapPin className="h-3.5 w-3.5" />
           <span>{location}</span>
+          {mapLink && (
+            <a 
+              href={mapLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center text-blue-500 hover:text-blue-600 hover:underline ml-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Link2 className="h-3 w-3 mr-0.5" />
+              <span>Map</span>
+            </a>
+          )}
         </div>
         
         <div className="flex items-center gap-1.5 text-xs text-gray-600">
