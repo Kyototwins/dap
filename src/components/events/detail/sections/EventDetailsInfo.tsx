@@ -12,7 +12,7 @@ interface EventDetailsInfoProps {
   isCreator: boolean;
   isProcessing: boolean;
   displayedParticipants: number;
-  setDisplayedParticipants: (value: number) => void;
+  setDisplayedParticipants: React.Dispatch<React.SetStateAction<number>>;
   onParticipate: (eventId: string, eventTitle: string) => void;
 }
 
@@ -86,7 +86,7 @@ export function EventDetailsInfo({
       onParticipate(event.id, event.title);
       // Optimistically update the displayed participant count
       if (!isProcessing) {
-        setDisplayedParticipants(prevCount => prevCount + 1);
+        setDisplayedParticipants(prev => prev + 1);
       }
     }
   };
