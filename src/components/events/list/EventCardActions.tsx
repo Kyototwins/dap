@@ -53,7 +53,7 @@ export function EventCardActions({
     buttonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
   } else if (isParticipating) {
     buttonText = "Joined";
-    buttonClasses = "bg-[#b65dbb] hover:bg-[#a74bae] text-white"; // Lighter shade of purple
+    buttonClasses = "bg-[#e5deff] hover:bg-[#d8cefd] text-[#7f1184]"; // Much lighter purple with purple text
     buttonIcon = <Check className="w-4 h-4 mr-1" />;
   } else if (isPastEvent) {
     buttonText = "Event Ended";

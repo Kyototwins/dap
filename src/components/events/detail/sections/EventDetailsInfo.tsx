@@ -74,7 +74,7 @@ export function EventDetailsInfo({
             onClick={() => onParticipate(event.id, event.title)}
             disabled={isProcessing || isParticipating}
             variant={isParticipating ? "outline" : "default"}
-            className={isParticipating ? "bg-gray-100" : ""}
+            className={isParticipating ? "bg-[#e5deff] text-[#7f1184] hover:bg-[#d8cefd] hover:text-[#7f1184]" : ""}
             size="sm"
           >
             {isProcessing ? "Processing..." : isParticipating ? "Joined" : "Join Event"}

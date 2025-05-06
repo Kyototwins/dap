@@ -3,6 +3,11 @@ import { Event, EventParticipationMap } from "@/types/events";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
+interface JoinEventResponse {
+  success: boolean;
+  message?: string;
+}
+
 export async function handleJoinEvent(
   eventId: string,
   eventTitle: string,
@@ -52,7 +57,7 @@ export async function handleJoinEvent(
       });
     } else {
       // Call RPC function to join event
-      const { data, error } = await supabase.rpc('join_event', {
+      const { data, error } = await supabase.rpc<JoinEventResponse>('join_event', {
         p_event_id: eventId,
         p_user_id: userData.user.id
       });
