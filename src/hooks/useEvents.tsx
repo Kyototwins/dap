@@ -1,16 +1,17 @@
+
 import { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { Event } from "@/types/events";
-import { fetchEvents } from "@/services/eventDataService";
+import { fetchEvents, deleteEventById } from "@/services/eventDataService";
 import { useEventFilters } from "@/hooks/events/useEventFilters";
 import { useEventComments } from "@/hooks/events/useEventComments";
 import { useEventParticipations } from "@/hooks/events/useEventParticipations";
+import { handleEventAction } from "@/services/eventActionsService";
 
 export function useEvents() {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   const {
     filteredEvents,
@@ -96,7 +97,7 @@ export function useEvents() {
       setEvents(eventsData);
     } catch (error: any) {
       toast({
-        title: "Failed to update events",
+        title: "イベントの更新に失敗しました",
         description: error.message,
         variant: "destructive",
       });
@@ -106,6 +107,29 @@ export function useEvents() {
   const handleSubmitEventComment = async () => {
     if (!selectedEvent) return;
     await handleSubmitComment(selectedEvent.id);
+  };
+  
+  const deleteEvent = async (eventId: string): Promise<boolean> => {
+    try {
+      await deleteEventById(eventId);
+      
+      // Remove the event from local state
+      setEvents((prevEvents) => prevEvents.filter((event) => event.id !== eventId));
+      
+      toast({
+        title: "イベントを削除しました",
+        description: "イベントが正常に削除されました。"
+      });
+      
+      return true;
+    } catch (error: any) {
+      toast({
+        title: "イベントの削除に失敗しました",
+        description: error.message,
+        variant: "destructive",
+      });
+      return false;
+    }
   };
 
   return {
@@ -128,7 +152,9 @@ export function useEvents() {
     sortOption,
     setSortOption,
     handleSubmitComment: handleSubmitEventComment,
+    handleEventAction,
     fetchEvents: refreshEvents,
-    fetchUserParticipations: loadParticipations
+    refreshUserParticipations: loadParticipations,
+    deleteEvent
   };
 }

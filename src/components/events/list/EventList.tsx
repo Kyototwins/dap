@@ -1,0 +1,83 @@
+
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Event, EventParticipationMap } from "@/types/events";
+import { EventCard } from "./EventCard";
+
+interface EventListProps {
+  events: Event[];
+  loading: boolean;
+  participations: EventParticipationMap;
+  onJoinEvent: (eventId: string, eventTitle: string) => void;
+  onDeleteEvent: (eventId: string) => void;
+  onSelectEvent: (event: Event) => void;
+  hasFilters: boolean;
+  processingEventId?: string | null;
+}
+
+export function EventList({ 
+  events, 
+  loading, 
+  participations, 
+  onJoinEvent,
+  onDeleteEvent, 
+  onSelectEvent,
+  hasFilters,
+  processingEventId
+}: EventListProps) {
+  const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div key={index} className="bg-gray-100 rounded-lg p-4 space-y-3">
+            <Skeleton className="h-32 w-full rounded-lg" />
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <div className="flex justify-between">
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-4 w-1/4" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (events.length === 0) {
+    return (
+      <div className="text-center py-8 space-y-4">
+        <p className="text-gray-500">
+          {hasFilters
+            ? "フィルタに一致するイベントがありません"
+            : "表示できるイベントがありません"}
+        </p>
+        <div className="flex justify-center">
+          <Button onClick={() => navigate("/events/new")} className="bg-doshisha-purple hover:bg-doshisha-darkPurple">
+            <Plus className="w-4 h-4 mr-2" />
+            イベントを作成
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {events.map((event) => (
+        <EventCard
+          key={event.id}
+          event={event}
+          isParticipating={!!participations[event.id]}
+          onJoin={onJoinEvent}
+          onDelete={onDeleteEvent}
+          onCardClick={onSelectEvent}
+          isProcessing={processingEventId === event.id}
+        />
+      ))}
+    </div>
+  );
+}

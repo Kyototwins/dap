@@ -1,14 +1,13 @@
 
-import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { EventDetailsDialog } from "@/components/events/EventDetailsDialog";
-import { EventsHeader } from "@/components/events/EventsHeader";
-import { EventFilters } from "@/components/events/EventFilters";
-import { EventList } from "@/components/events/EventList";
-import { EventCalendarView } from "@/components/events/EventCalendarView";
+import { useNavigate } from "react-router-dom";
+import { EventsHeader } from "./layout/EventsHeader";
+import { EventFilters } from "./layout/EventFilters";
+import { EventList } from "./list/EventList";
+import { EventDetailsDialog } from "./detail/EventDetailsDialog";
+import { EventCalendarView } from "./calendar/EventCalendarView";
+import { CreateEventButton } from "./actions/CreateEventButton";
 import { useEvents } from "@/hooks/useEvents";
-import { CreateEventButton } from "@/components/events/CreateEventButton";
-import { handleJoinEvent } from "@/components/events/EventJoinHandler";
 
 export default function EventsPage() {
   const navigate = useNavigate();
@@ -16,7 +15,7 @@ export default function EventsPage() {
   const [hidePastEvents, setHidePastEvents] = useState(false);
   const [hasCreatedEvent, setHasCreatedEvent] = useState(false);
   const [processingEventId, setProcessingEventId] = useState<string | null>(null);
-
+  
   const {
     filteredEvents,
     selectedEvent,
@@ -25,7 +24,6 @@ export default function EventsPage() {
     newComment,
     setNewComment,
     participations,
-    setParticipations,
     loading,
     searchQuery,
     setSearchQuery,
@@ -36,14 +34,16 @@ export default function EventsPage() {
     sortOption,
     setSortOption,
     handleSubmitComment,
+    handleEventAction,
     fetchEvents,
-    fetchUserParticipations
+    deleteEvent,
+    refreshUserParticipations
   } = useEvents();
   
   // Load participation status on component mount and when returning to this page
   useEffect(() => {
     const refreshData = () => {
-      fetchUserParticipations();
+      refreshUserParticipations();
       fetchEvents();
     };
     
@@ -86,19 +86,18 @@ export default function EventsPage() {
       if (processingEventId === eventId) return;
       setProcessingEventId(eventId);
       
-      await handleJoinEvent(
-        eventId, 
-        eventTitle, 
-        filteredEvents, 
-        participations, 
-        setParticipations, 
-        fetchUserParticipations, 
-        fetchEvents, 
-        setProcessingEventId
-      );
+      await handleEventAction(eventId, eventTitle);
     } catch (error) {
-      console.error("Error handling join event:", error);
+      console.error("Error handling event action:", error);
+    } finally {
       setProcessingEventId(null);
+    }
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    const success = await deleteEvent(eventId);
+    if (success && selectedEvent?.id === eventId) {
+      setSelectedEvent(null);
     }
   };
   
@@ -108,8 +107,6 @@ export default function EventsPage() {
         onSearchChange={setSearchQuery}
         sortOption={sortOption}
         onSortChange={setSortOption}
-        hidePastEvents={hidePastEvents}
-        onHidePastEventsChange={setHidePastEvents}
         onCalendarViewClick={() => setCalendarViewOpen(true)}
       />
       
@@ -127,7 +124,8 @@ export default function EventsPage() {
         events={displayedEvents} 
         loading={loading} 
         participations={participations} 
-        onJoinEvent={handleEventParticipation} 
+        onJoinEvent={handleEventParticipation}
+        onDeleteEvent={handleDeleteEvent}
         onSelectEvent={setSelectedEvent} 
         hasFilters={hasFilters}
         processingEventId={processingEventId}
@@ -142,6 +140,10 @@ export default function EventsPage() {
         open={!!selectedEvent} 
         onOpenChange={open => !open && setSelectedEvent(null)}
         refreshEvents={fetchEvents}
+        onDeleteEvent={handleDeleteEvent}
+        isParticipating={selectedEvent ? !!participations[selectedEvent.id] : false}
+        onParticipate={handleEventParticipation}
+        isProcessing={selectedEvent ? processingEventId === selectedEvent.id : false}
       />
 
       <EventCalendarView 

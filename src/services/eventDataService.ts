@@ -48,3 +48,52 @@ export async function fetchUserParticipations(): Promise<EventParticipationMap> 
     return {};
   }
 }
+
+export async function deleteEventById(eventId: string): Promise<void> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("認証されていません");
+
+    // First check if the user is the event creator
+    const { data: event, error: fetchError } = await supabase
+      .from("events")
+      .select("creator_id")
+      .eq("id", eventId)
+      .single();
+      
+    if (fetchError) throw fetchError;
+    if (!event) throw new Error("イベントが見つかりません");
+    
+    if (event.creator_id !== user.id) {
+      throw new Error("このイベントを削除する権限がありません");
+    }
+
+    // First, delete all participants
+    const { error: deleteParticipantsError } = await supabase
+      .from("event_participants")
+      .delete()
+      .eq("event_id", eventId);
+      
+    if (deleteParticipantsError) throw deleteParticipantsError;
+    
+    // Then, delete all comments
+    const { error: deleteCommentsError } = await supabase
+      .from("event_comments")
+      .delete()
+      .eq("event_id", eventId);
+      
+    if (deleteCommentsError) throw deleteCommentsError;
+    
+    // Finally, delete the event
+    const { error: deleteEventError } = await supabase
+      .from("events")
+      .delete()
+      .eq("id", eventId);
+      
+    if (deleteEventError) throw deleteEventError;
+    
+  } catch (error: any) {
+    console.error("Error deleting event:", error);
+    throw error;
+  }
+}

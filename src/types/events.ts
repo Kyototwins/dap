@@ -1,7 +1,4 @@
 
-import { TimeFilter, CategoryFilter } from "@/components/events/EventFilters";
-import { SortOption } from "@/components/events/EventSortOptions";
-
 export interface EventCreator {
   first_name: string | null;
   last_name: string | null;
@@ -22,6 +19,7 @@ export interface Event {
   category: string;
   creator?: EventCreator;
   created_at: string;
+  status?: string;
 }
 
 export interface EventComment {
@@ -39,4 +37,9 @@ export interface EventComment {
 
 export interface EventParticipationMap {
   [key: string]: boolean;
+}
+
+export interface EventDeleteResult {
+  success: boolean;
+  message: string;
 }
