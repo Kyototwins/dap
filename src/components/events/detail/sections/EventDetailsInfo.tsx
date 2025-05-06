@@ -47,6 +47,13 @@ export function EventDetailsInfo({
     }
   }, [isParticipating, isCreator]);
 
+  // Update displayed participants when the event.current_participants changes
+  useEffect(() => {
+    if (event && event.current_participants) {
+      setDisplayedParticipants(event.current_participants);
+    }
+  }, [event.current_participants, setDisplayedParticipants]);
+
   const displayCategory = categoryTranslationMap[event.category] || event.category;
   const eventDate = new Date(event.date);
   const currentDate = new Date();
@@ -69,7 +76,7 @@ export function EventDetailsInfo({
     participateButtonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
   } else if (effectiveIsParticipating) {
     participateButtonText = "参加済み";
-    participateButtonClasses = "bg-green-600 hover:bg-green-700 text-white";
+    participateButtonClasses = "bg-[#b65dbb] hover:bg-[#a74bae] text-white"; // Lighter shade of purple
     participateButtonIcon = <CheckIcon className="w-4 h-4 mr-1" />;
   } else if (isPastEvent) {
     participateButtonText = "イベント終了";

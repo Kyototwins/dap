@@ -53,7 +53,7 @@ export function EventCardActions({
     buttonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
   } else if (isParticipating) {
     buttonText = "参加済み";
-    buttonClasses = "bg-green-600 hover:bg-green-700 text-white";
+    buttonClasses = "bg-[#b65dbb] hover:bg-[#a74bae] text-white"; // Lighter shade of purple
     buttonIcon = <Check className="w-4 h-4 mr-1" />;
   } else if (isPastEvent) {
     buttonText = "イベント終了";

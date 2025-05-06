@@ -33,16 +33,10 @@ export async function handleJoinEvent(
     
     console.log("Join event result:", isParticipatingNow, "for event", eventId);
     
-    // Update UI based on actual result from server
+    // Update participation status in local state
     const updatedParticipations = { ...participations };
     updatedParticipations[eventId] = true;
-    
-    // Update UI with correct participation status
     setParticipations(updatedParticipations);
-    
-    // Update local event data to increment participant count
-    // This provides immediate UI feedback without waiting for the server
-    eventToJoin.current_participants += 1;
     
     // Show toast notification with correct message
     showToast({
@@ -51,13 +45,14 @@ export async function handleJoinEvent(
     });
     
     // Refresh participation status and events data from server to ensure consistency
+    // Use Promise.all to make both requests concurrently for better performance
     await Promise.all([
       fetchUserParticipations(),
       fetchEvents()
     ]);
   } catch (error: any) {
     console.error("Join event error:", error);
-    // Revert UI on error
+    // Show error message
     showToast({
       title: "エラーが発生しました",
       description: error.message,
