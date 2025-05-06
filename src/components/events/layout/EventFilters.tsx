@@ -1,9 +1,6 @@
-
 import { FilterButton } from "../ui/FilterButton";
-
 export type TimeFilter = 'all' | 'today' | 'this-week' | 'this-month';
 export type CategoryFilter = 'all' | 'Sports' | 'Study' | 'Meal' | 'Karaoke' | 'Sightseeing' | 'Other';
-
 interface EventFiltersProps {
   timeFilter: TimeFilter;
   categoryFilter: CategoryFilter;
@@ -13,98 +10,55 @@ interface EventFiltersProps {
   onHidePastEventsChange: (value: boolean) => void;
   onCalendarViewClick: () => void;
 }
-
-export function EventFilters({ 
-  timeFilter, 
-  categoryFilter, 
-  onTimeFilterChange, 
+export function EventFilters({
+  timeFilter,
+  categoryFilter,
+  onTimeFilterChange,
   onCategoryFilterChange,
   hidePastEvents,
   onHidePastEventsChange,
   onCalendarViewClick
 }: EventFiltersProps) {
-  return (
-    <div className="space-y-3">
+  return <div className="space-y-3">
       <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
-        <FilterButton 
-          active={timeFilter === 'all'} 
-          onClick={() => onTimeFilterChange('all')}
-        >
+        <FilterButton active={timeFilter === 'all'} onClick={() => onTimeFilterChange('all')}>
           All
         </FilterButton>
-        <FilterButton 
-          active={timeFilter === 'today'} 
-          onClick={() => onTimeFilterChange('today')}
-        >
+        <FilterButton active={timeFilter === 'today'} onClick={() => onTimeFilterChange('today')}>
           Today
         </FilterButton>
-        <FilterButton 
-          active={timeFilter === 'this-week'} 
-          onClick={() => onTimeFilterChange('this-week')}
-        >
+        <FilterButton active={timeFilter === 'this-week'} onClick={() => onTimeFilterChange('this-week')}>
           This Week
         </FilterButton>
-        <FilterButton 
-          active={timeFilter === 'this-month'} 
-          onClick={() => onTimeFilterChange('this-month')}
-        >
+        <FilterButton active={timeFilter === 'this-month'} onClick={() => onTimeFilterChange('this-month')}>
           This Month
         </FilterButton>
       </div>
       
       <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
-        <FilterButton 
-          active={categoryFilter === 'all'} 
-          onClick={() => onCategoryFilterChange('all')}
-        >
+        <FilterButton active={categoryFilter === 'all'} onClick={() => onCategoryFilterChange('all')}>
           All
         </FilterButton>
-        <FilterButton 
-          active={categoryFilter === 'Sports'} 
-          onClick={() => onCategoryFilterChange('Sports')}
-        >
+        <FilterButton active={categoryFilter === 'Sports'} onClick={() => onCategoryFilterChange('Sports')}>
           Sports
         </FilterButton>
-        <FilterButton 
-          active={categoryFilter === 'Study'} 
-          onClick={() => onCategoryFilterChange('Study')}
-        >
+        <FilterButton active={categoryFilter === 'Study'} onClick={() => onCategoryFilterChange('Study')}>
           Study
         </FilterButton>
-        <FilterButton 
-          active={categoryFilter === 'Meal'} 
-          onClick={() => onCategoryFilterChange('Meal')}
-        >
+        <FilterButton active={categoryFilter === 'Meal'} onClick={() => onCategoryFilterChange('Meal')}>
           Meal
         </FilterButton>
-        <FilterButton 
-          active={categoryFilter === 'Karaoke'} 
-          onClick={() => onCategoryFilterChange('Karaoke')}
-        >
+        <FilterButton active={categoryFilter === 'Karaoke'} onClick={() => onCategoryFilterChange('Karaoke')}>
           Karaoke
         </FilterButton>
-        <FilterButton 
-          active={categoryFilter === 'Sightseeing'} 
-          onClick={() => onCategoryFilterChange('Sightseeing')}
-        >
+        <FilterButton active={categoryFilter === 'Sightseeing'} onClick={() => onCategoryFilterChange('Sightseeing')}>
           Sightseeing
         </FilterButton>
-        <FilterButton 
-          active={categoryFilter === 'Other'} 
-          onClick={() => onCategoryFilterChange('Other')}
-        >
+        <FilterButton active={categoryFilter === 'Other'} onClick={() => onCategoryFilterChange('Other')}>
           Other
         </FilterButton>
       </div>
       
-      <div className="flex items-center justify-end pt-1">
-        <button 
-          onClick={onCalendarViewClick}
-          className="text-sm flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          View your schedule
-        </button>
-      </div>
-    </div>
-  );
+      
+    </div>;
 }
