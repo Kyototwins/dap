@@ -47,11 +47,26 @@ export async function handleJoinEvent(
     // Refresh participation status and events data from server
     await fetchUserParticipations();
     
-    // We'll handle fetching events with a slight delay to ensure
+    // We'll handle fetching events immediately to ensure
     // the database has processed the participation update
-    setTimeout(async () => {
-      await fetchEvents();
-    }, 500);
+    await fetchEvents();
+    
+    // Store in localStorage that this user has joined this event
+    // This helps with persistence between page loads
+    try {
+      // Get existing joined events or initialize empty object
+      const joinedEventsStr = localStorage.getItem('joined_events') || '{}';
+      const joinedEvents = JSON.parse(joinedEventsStr);
+      
+      // Mark this event as joined
+      joinedEvents[eventId] = true;
+      
+      // Save back to localStorage
+      localStorage.setItem('joined_events', JSON.stringify(joinedEvents));
+    } catch (storageError) {
+      console.error("Error storing joined event in localStorage:", storageError);
+      // Non-critical error, we can continue
+    }
   } catch (error: any) {
     console.error("Join event error:", error);
     // Show error message

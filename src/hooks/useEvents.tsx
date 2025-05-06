@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Event } from "@/types/events";
 import { fetchEvents, deleteEventById } from "@/services/eventDataService";
@@ -39,14 +39,26 @@ export function useEvents() {
 
   // Added focus effect to reload participations when tab/window regains focus
   useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        console.log("Window visible, refreshing participations and events");
+        loadParticipations();
+        refreshEvents();
+      }
+    };
+    
     const handleFocus = () => {
-      console.log("Window focused, refreshing participations");
+      console.log("Window focused, refreshing participations and events");
       loadParticipations();
+      refreshEvents();
     };
     
     window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
     return () => {
       window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
@@ -59,6 +71,7 @@ export function useEvents() {
       if (currentPath === '/events') {
         console.log('Back on events page, refreshing data');
         loadParticipations();
+        refreshEvents();
       }
     };
 
@@ -79,9 +92,27 @@ export function useEvents() {
       ]);
       
       setEvents(eventsData);
+      
+      // Apply any stored participant counts from localStorage
+      eventsData.forEach(event => {
+        const storedCount = localStorage.getItem(`event_${event.id}_count`);
+        if (storedCount) {
+          const count = parseInt(storedCount, 10);
+          // Only use the stored count if it's higher than the current count
+          if (count > event.current_participants) {
+            event.current_participants = count;
+          } else {
+            // Update localStorage with the current count if it's higher
+            localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
+          }
+        } else {
+          // Initialize localStorage with the current count
+          localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
+        }
+      });
     } catch (error: any) {
       toast({
-        title: "エラーが発生しました",
+        title: "Error occurred",
         description: error.message,
         variant: "destructive",
       });
@@ -90,9 +121,28 @@ export function useEvents() {
     }
   };
 
-  const refreshEvents = async () => {
+  const refreshEvents = useCallback(async () => {
     try {
       const eventsData = await fetchEvents();
+      
+      // Apply any stored participant counts from localStorage
+      eventsData.forEach(event => {
+        const storedCount = localStorage.getItem(`event_${event.id}_count`);
+        if (storedCount) {
+          const count = parseInt(storedCount, 10);
+          // Only use the stored count if it's higher than the current count
+          if (count > event.current_participants) {
+            event.current_participants = count;
+          } else {
+            // Update localStorage with the current count if it's higher
+            localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
+          }
+        } else {
+          // Initialize localStorage with the current count
+          localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
+        }
+      });
+      
       setEvents(eventsData);
       
       // Update selected event if it exists
@@ -104,12 +154,12 @@ export function useEvents() {
       }
     } catch (error: any) {
       toast({
-        title: "イベントの更新に失敗しました",
+        title: "Failed to update events",
         description: error.message,
         variant: "destructive",
       });
     }
-  };
+  }, [selectedEvent]);
 
   const handleSubmitEventComment = async () => {
     if (!selectedEvent) return;
@@ -124,14 +174,14 @@ export function useEvents() {
       setEvents((prevEvents) => prevEvents.filter((event) => event.id !== eventId));
       
       toast({
-        title: "イベントを削除しました",
-        description: "イベントが正常に削除されました。"
+        title: "Event deleted",
+        description: "The event has been successfully deleted."
       });
       
       return true;
     } catch (error: any) {
       toast({
-        title: "イベントの削除に失敗しました",
+        title: "Failed to delete event",
         description: error.message,
         variant: "destructive",
       });

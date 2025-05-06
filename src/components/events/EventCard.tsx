@@ -16,9 +16,10 @@ interface EventCardProps {
   onJoin: (eventId: string, eventTitle: string) => void;
   onCardClick: (event: Event) => void;
   isProcessing?: boolean;
+  onDelete?: (eventId: string) => void;
 }
 
-export function EventCard({ event, isParticipating, onJoin, onCardClick, isProcessing = false }: EventCardProps) {
+export function EventCard({ event, isParticipating, onJoin, onCardClick, isProcessing = false, onDelete }: EventCardProps) {
   const [isCreator, setIsCreator] = useState(false);
   const [effectiveIsParticipating, setEffectiveIsParticipating] = useState(isParticipating);
   const [displayedParticipants, setDisplayedParticipants] = useState(event.current_participants);
@@ -87,6 +88,13 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
     }
   };
 
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDelete) {
+      onDelete(event.id);
+    }
+  };
+
   return (
     <Card 
       className={`overflow-hidden cursor-pointer hover:shadow-lg transition-shadow rounded-xl border-[#e4e4e7] relative ${isPastEvent ? 'opacity-70' : ''}`}
@@ -126,7 +134,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
           maxParticipants={event.max_participants}
           onJoin={handleJoinClick}
           onEdit={handleEditClick}
-          onDelete={() => {}}
+          onDelete={handleDeleteClick}
           eventId={event.id}
         />
       </div>

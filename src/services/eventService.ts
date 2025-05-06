@@ -24,30 +24,47 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
       return true; // User is already participating
     }
 
-    // Update the participant count first to ensure it's correctly reflected
-    const { error: updateError } = await supabase
-      .from("events")
-      .update({ current_participants: currentParticipants + 1 })
-      .eq("id", eventId);
-      
-    if (updateError) {
-      console.error("Error updating participant count:", updateError);
-      throw updateError;
-    }
-    
-    // Then insert the participation record
+    // Insert the participation record first
     const { error: insertError } = await supabase
       .from("event_participants")
       .insert([{ event_id: eventId, user_id: user.id }]);
       
     if (insertError) {
       console.error("Error inserting participant:", insertError);
-      // If insertion fails, revert the count
-      await supabase
-        .from("events")
-        .update({ current_participants: currentParticipants })
-        .eq("id", eventId);
       throw insertError;
+    }
+    
+    // Then update the participant count to ensure it's correctly reflected
+    // We fetch the current count from the database to ensure accuracy
+    const { data: eventData, error: fetchError } = await supabase
+      .from("events")
+      .select("current_participants")
+      .eq("id", eventId)
+      .single();
+      
+    if (fetchError) {
+      console.error("Error fetching current participant count:", fetchError);
+      throw fetchError;
+    }
+    
+    // Get the actual current count from the database
+    const actualCurrentCount = eventData.current_participants || 0;
+    
+    // Update with the actual current count + 1
+    const { error: updateError } = await supabase
+      .from("events")
+      .update({ current_participants: actualCurrentCount + 1 })
+      .eq("id", eventId);
+      
+    if (updateError) {
+      console.error("Error updating participant count:", updateError);
+      // If update fails, remove the participation record to maintain consistency
+      await supabase
+        .from("event_participants")
+        .delete()
+        .eq("event_id", eventId)
+        .eq("user_id", user.id);
+      throw updateError;
     }
 
     return true; // User is now participating

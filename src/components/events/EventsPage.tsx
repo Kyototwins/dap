@@ -51,18 +51,37 @@ export default function EventsPage() {
     // Initial load
     refreshData();
     
-    // Set up a listener for when the component becomes visible again
+    // Set up visibility change listener
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
-        console.log("Page visible, refreshing participation data");
+        console.log("Page visible, refreshing data");
         refreshData();
       }
     });
     
+    // Set up focus event listener
+    window.addEventListener('focus', () => {
+      console.log("Window focused, refreshing data");
+      refreshData();
+    });
+    
+    // Create router change listener using popstate
+    window.addEventListener('popstate', () => {
+      console.log("Navigation detected, refreshing data");
+      refreshData();
+    });
+    
     return () => {
-      document.removeEventListener("visibilitychange", refreshData);
+      document.removeEventListener("visibilitychange", () => {});
+      window.removeEventListener('focus', () => {});
+      window.removeEventListener('popstate', () => {});
     };
   }, []);
+  
+  // Fix for EventCardActions onDelete prop missing
+  const handleEventCardDelete = async (eventId: string) => {
+    await deleteEvent(eventId);
+  };
   
   useEffect(() => {
     // Check if user has created an event
