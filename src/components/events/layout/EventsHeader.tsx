@@ -3,6 +3,8 @@ import { useState } from "react";
 import { SortOption } from "@/components/events/EventSortOptions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "lucide-react";
 
 interface EventsHeaderProps {
   onSearchChange: (searchQuery: string) => void;
@@ -56,16 +58,28 @@ export function EventsHeader({
         </div>
       </div>
 
-      {/* Add the "Hide past events" checkbox */}
-      <div className="flex items-center space-x-2">
-        <Checkbox 
-          id="header-hide-past-events" 
-          checked={hidePastEvents} 
-          onCheckedChange={checked => onHidePastEventsChange(checked as boolean)} 
-        />
-        <label htmlFor="header-hide-past-events" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          Hide past events
-        </label>
+      {/* Add the "Hide past events" checkbox and View Schedule button in one row */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="header-hide-past-events" 
+            checked={hidePastEvents} 
+            onCheckedChange={checked => onHidePastEventsChange(checked as boolean)} 
+          />
+          <label htmlFor="header-hide-past-events" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Hide past events
+          </label>
+        </div>
+        
+        <Button 
+          onClick={onCalendarViewClick} 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-1 bg-[#e5deff] text-[#7f1184] hover:bg-[#d8cefd] border-[#d8cefd]"
+        >
+          <Calendar className="h-4 w-4" />
+          <span>View your schedule</span>
+        </Button>
       </div>
     </div>
   );

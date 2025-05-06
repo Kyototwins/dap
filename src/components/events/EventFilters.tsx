@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -23,8 +22,7 @@ export function EventFilters({
   onTimeFilterChange, 
   onCategoryFilterChange,
   hidePastEvents,
-  onHidePastEventsChange,
-  onCalendarViewClick
+  onHidePastEventsChange
 }: EventFiltersProps) {
   return (
     <div className="space-y-3">
@@ -100,22 +98,15 @@ export function EventFilters({
         </FilterButton>
       </div>
       
-      <div className="flex items-center justify-between pt-1">
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="hide-past-events" 
-            checked={hidePastEvents} 
-            onCheckedChange={checked => onHidePastEventsChange(checked as boolean)} 
-          />
-          <label htmlFor="hide-past-events" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Hide past events
-          </label>
-        </div>
-        
-        <Button variant="outline" size="sm" onClick={onCalendarViewClick} className="flex items-center gap-1">
-          <Calendar className="h-4 w-4" />
-          <span>Your schedule</span>
-        </Button>
+      <div className="flex items-center space-x-2 pt-1">
+        <Checkbox 
+          id="hide-past-events" 
+          checked={hidePastEvents} 
+          onCheckedChange={checked => onHidePastEventsChange(checked as boolean)} 
+        />
+        <label htmlFor="hide-past-events" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          Hide past events
+        </label>
       </div>
     </div>
   );
