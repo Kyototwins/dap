@@ -20,6 +20,11 @@ export async function handleJoinEvent(
     // Get current participation status
     const isCurrentlyParticipating = !!participations[eventId];
     
+    // If already participating, do nothing
+    if (isCurrentlyParticipating) {
+      return;
+    }
+    
     // Set processing state
     setProcessingEventId(eventId);
     
@@ -30,22 +35,15 @@ export async function handleJoinEvent(
     
     // Update UI based on actual result from server
     const updatedParticipations = { ...participations };
-    
-    if (isParticipatingNow) {
-      updatedParticipations[eventId] = true;
-    } else {
-      delete updatedParticipations[eventId];
-    }
+    updatedParticipations[eventId] = true;
     
     // Update UI with correct participation status
     setParticipations(updatedParticipations);
     
-    // Show toast notification with correct message based on actual result from server
+    // Show toast notification with correct message
     showToast({
-      title: isParticipatingNow ? "イベントに参加しました" : "参加をキャンセルしました",
-      description: isParticipatingNow 
-        ? `「${eventTitle}」に参加しました。` 
-        : `「${eventTitle}」の参加をキャンセルしました。`
+      title: "イベントに参加しました",
+      description: `「${eventTitle}」に参加しました。`
     });
     
     // Refresh participation status and events data from server to ensure consistency

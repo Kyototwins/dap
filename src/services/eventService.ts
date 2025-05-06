@@ -19,20 +19,9 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
       throw checkError;
     }
 
-    // If already participating, cancel participation
+    // If already participating, just return true (do nothing)
     if (existingParticipation) {
-      // Start a transaction by using RPC
-      const { data: result, error: rpcError } = await supabase.rpc('cancel_event_participation', {
-        p_event_id: eventId,
-        p_user_id: user.id
-      } as any); // Use type assertion to bypass TypeScript error
-
-      if (rpcError) {
-        console.error("Error canceling participation:", rpcError);
-        throw rpcError;
-      }
-      
-      return false; // User is no longer participating
+      return true; // User is already participating
     }
 
     // User is not participating, so add them

@@ -28,6 +28,7 @@ export function EventCard({
   isProcessing = false 
 }: EventCardProps) {
   const [isCreator, setIsCreator] = useState(false);
+  const [effectiveIsParticipating, setEffectiveIsParticipating] = useState(isParticipating);
   const [displayedParticipants, setDisplayedParticipants] = useState(event.current_participants);
   const navigate = useNavigate();
   
@@ -37,11 +38,15 @@ export function EventCard({
       const { data } = await supabase.auth.getUser();
       if (data.user && event.creator_id === data.user.id) {
         setIsCreator(true);
+        // Auto-set creators as participating
+        setEffectiveIsParticipating(true);
+      } else {
+        setEffectiveIsParticipating(isParticipating);
       }
     };
     
     checkIfCreator();
-  }, [event.creator_id]);
+  }, [event.creator_id, isParticipating]);
 
   // Update displayed participants when the actual count changes
   useEffect(() => {
@@ -56,7 +61,7 @@ export function EventCard({
   // Determine if the button should be disabled
   const isDisabled = isProcessing || 
     isPastEvent || 
-    (!isParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants);
+    (!effectiveIsParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants);
   
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -65,12 +70,7 @@ export function EventCard({
 
   const handleJoinClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!isDisabled) onJoin(event.id, event.title);
-  };
-  
-  const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Will be implemented in the actions component
+    if (!isDisabled && !effectiveIsParticipating) onJoin(event.id, event.title);
   };
 
   return (
@@ -104,7 +104,7 @@ export function EventCard({
         
         <EventCardActions 
           isCreator={isCreator}
-          isParticipating={isParticipating}
+          isParticipating={effectiveIsParticipating}
           isPastEvent={isPastEvent}
           isProcessing={isProcessing}
           isDisabled={isDisabled}

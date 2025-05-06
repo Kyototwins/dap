@@ -48,13 +48,12 @@ export function EventCardActions({
   let buttonIcon = <Plus className="w-4 h-4 mr-1" />;
   
   if (isProcessing) {
-    // Show different text based on current participation state
-    buttonText = isParticipating ? "キャンセル中..." : "参加中...";
+    buttonText = "参加中...";
     buttonClasses = "bg-gray-300 text-gray-600 cursor-wait";
     buttonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
   } else if (isParticipating) {
-    buttonText = "参加をキャンセルする";
-    buttonClasses = "bg-gray-200 hover:bg-gray-300 text-gray-700";
+    buttonText = "参加済み";
+    buttonClasses = "bg-green-600 hover:bg-green-700 text-white";
     buttonIcon = <Check className="w-4 h-4 mr-1" />;
   } else if (isPastEvent) {
     buttonText = "イベント終了";
@@ -82,7 +81,7 @@ export function EventCardActions({
       <div className="mt-4 flex gap-2">
         <Button
           className={`flex-1 rounded-xl ${buttonClasses}`}
-          disabled={isDisabled || isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants)}
+          disabled={isDisabled || isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants) || isParticipating}
           onClick={onJoin}
           aria-label={buttonText}
         >

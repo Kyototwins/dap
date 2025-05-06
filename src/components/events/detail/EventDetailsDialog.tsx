@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Send, Expand, Edit, Check, X, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -69,6 +68,7 @@ export function EventDetailsDialog({
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [editedDescription, setEditedDescription] = useState("");
   const [isCreator, setIsCreator] = useState(false);
+  const [effectiveIsParticipating, setEffectiveIsParticipating] = useState(isParticipating);
   const [commentsFullscreen, setCommentsFullscreen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
@@ -82,14 +82,16 @@ export function EventDetailsDialog({
         const { data } = await supabase.auth.getUser();
         if (data.user && event.creator_id === data.user.id) {
           setIsCreator(true);
+          // Auto-set creators as participating
+          setEffectiveIsParticipating(true);
         } else {
-          setIsCreator(false);
+          setEffectiveIsParticipating(isParticipating);
         }
       };
       
       checkIfCreator();
     }
-  }, [event]);
+  }, [event, isParticipating]);
 
   if (!event) return null;
   
@@ -111,7 +113,8 @@ export function EventDetailsDialog({
   // Calculate if event is disabled for participation
   const isDisabled = isProcessing || 
     isPastEvent || 
-    (!isParticipating && event.max_participants !== 0 && event.current_participants >= event.max_participants);
+    (!effectiveIsParticipating && event.max_participants !== 0 && event.current_participants >= event.max_participants) || 
+    effectiveIsParticipating;
   
   // Determine participation button state
   let participateButtonText = "イベントに参加する";
@@ -119,12 +122,12 @@ export function EventDetailsDialog({
   let participateButtonIcon = <Plus className="w-4 h-4 mr-1" />;
   
   if (isProcessing) {
-    participateButtonText = isParticipating ? "キャンセル中..." : "参加中...";
+    participateButtonText = "参加中...";
     participateButtonClasses = "bg-gray-300 text-gray-600 cursor-wait";
     participateButtonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
-  } else if (isParticipating) {
-    participateButtonText = "参加をキャンセルする";
-    participateButtonClasses = "bg-gray-200 hover:bg-gray-300 text-gray-700";
+  } else if (effectiveIsParticipating) {
+    participateButtonText = "参加済み";
+    participateButtonClasses = "bg-green-600 hover:bg-green-700 text-white";
     participateButtonIcon = <CheckIcon className="w-4 h-4 mr-1" />;
   } else if (isPastEvent) {
     participateButtonText = "イベント終了";
@@ -215,7 +218,7 @@ export function EventDetailsDialog({
               <Button
                 className={`w-full rounded-xl ${participateButtonClasses}`}
                 disabled={isDisabled}
-                onClick={() => onParticipate(event.id, event.title)}
+                onClick={() => !effectiveIsParticipating && onParticipate(event.id, event.title)}
               >
                 {participateButtonIcon}
                 {participateButtonText}
