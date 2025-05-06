@@ -43,6 +43,7 @@ export default function EventsPage() {
   useEffect(() => {
     const refreshData = () => {
       fetchUserParticipations();
+      fetchEvents();
     };
     
     // Initial load
@@ -96,6 +97,7 @@ export default function EventsPage() {
         setProcessingEventId
       );
     } catch (error) {
+      console.error("Error handling join event:", error);
       setProcessingEventId(null);
     }
   };

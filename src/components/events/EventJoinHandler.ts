@@ -17,7 +17,7 @@ export async function handleJoinEvent(
   
   try {
     const eventToJoin = filteredEvents.find(e => e.id === eventId);
-    if (!eventToJoin) throw new Error("Event not found");
+    if (!eventToJoin) throw new Error("イベントが見つかりません");
     
     // Get current participation status
     const isCurrentlyParticipating = !!participations[eventId];
@@ -60,9 +60,9 @@ export async function handleJoinEvent(
       description: error.message,
       variant: "destructive"
     });
-    // Only reset on error
-    fetchUserParticipations();
-    fetchEvents();
+    // Refresh data from server to ensure UI is in sync
+    await fetchUserParticipations();
+    await fetchEvents();
   } finally {
     // Clear processing state
     setProcessingEventId(null);

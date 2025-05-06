@@ -34,7 +34,7 @@ export function EventCardActions({
   if (isProcessing) {
     // Show different text based on current participation state
     buttonText = isParticipating ? "キャンセル中..." : "参加中...";
-    buttonClasses = "bg-gray-300 text-gray-600";
+    buttonClasses = "bg-gray-300 text-gray-600 cursor-wait";
     buttonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
   } else if (isParticipating) {
     buttonText = "参加をキャンセルする";
@@ -54,7 +54,7 @@ export function EventCardActions({
     <div className="mt-4 flex gap-2">
       <Button
         className={`flex-1 rounded-xl ${buttonClasses}`}
-        disabled={isDisabled}
+        disabled={isDisabled || isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants)}
         onClick={onJoin}
       >
         {buttonIcon}
