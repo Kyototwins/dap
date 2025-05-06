@@ -38,8 +38,8 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
     // User is not participating, so add them
     // Start a transaction by using RPC
     const { data: result, error: rpcError } = await supabase.rpc('join_event', {
-      p_event_id: eventId,
-      p_user_id: user.id
+        p_event_id: eventId,
+        p_user_id: user.id
     });
 
     if (rpcError) {
