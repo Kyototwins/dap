@@ -23,22 +23,22 @@ export async function handleJoinEvent(
     // Set processing state
     setProcessingEventId(eventId);
     
-    // Update UI optimistically
-    const updatedParticipations = { ...participations };
-    
-    if (isCurrentlyParticipating) {
-      delete updatedParticipations[eventId];
-    } else {
-      updatedParticipations[eventId] = true;
-    }
-    
-    // Update UI immediately for better UX
-    setParticipations(updatedParticipations);
-    
     // Call backend to update participation
     const isParticipatingNow = await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
     
     console.log("Join event result:", isParticipatingNow, "for event", eventId);
+    
+    // Update UI based on actual result from server
+    const updatedParticipations = { ...participations };
+    
+    if (isParticipatingNow) {
+      updatedParticipations[eventId] = true;
+    } else {
+      delete updatedParticipations[eventId];
+    }
+    
+    // Update UI with correct participation status
+    setParticipations(updatedParticipations);
     
     // Show toast notification with correct message based on actual result from server
     showToast({

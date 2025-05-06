@@ -94,6 +94,14 @@ export function useEvents() {
     try {
       const eventsData = await fetchEvents();
       setEvents(eventsData);
+      
+      // Update selected event if it exists
+      if (selectedEvent) {
+        const updatedSelectedEvent = eventsData.find(event => event.id === selectedEvent.id);
+        if (updatedSelectedEvent) {
+          setSelectedEvent(updatedSelectedEvent);
+        }
+      }
     } catch (error: any) {
       toast({
         title: "イベントの更新に失敗しました",

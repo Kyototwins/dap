@@ -43,9 +43,9 @@ export default function EventsPage() {
   
   // Load participation status on component mount and when returning to this page
   useEffect(() => {
-    const refreshData = () => {
-      refreshUserParticipations();
-      fetchEvents();
+    const refreshData = async () => {
+      await refreshUserParticipations();
+      await fetchEvents();
     };
     
     // Initial load
@@ -96,6 +96,14 @@ export default function EventsPage() {
         fetchEvents,
         setProcessingEventId
       );
+      
+      // If we're viewing the event details, update selected event to reflect changes
+      if (selectedEvent && selectedEvent.id === eventId) {
+        const updatedEvent = filteredEvents.find(event => event.id === eventId);
+        if (updatedEvent) {
+          setSelectedEvent(updatedEvent);
+        }
+      }
     } catch (error) {
       console.error("Error handling event action:", error);
       setProcessingEventId(null);
