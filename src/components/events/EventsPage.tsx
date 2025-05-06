@@ -86,6 +86,14 @@ export default function EventsPage() {
       // Prevent multiple clicks while processing
       if (processingEventId) return;
       
+      // Store the current participant count before joining
+      const eventToJoin = filteredEvents.find(e => e.id === eventId);
+      if (eventToJoin) {
+        const currentCount = eventToJoin.current_participants;
+        // Store the current count + 1 (optimistic update)
+        localStorage.setItem(`event_${eventId}_count`, String(currentCount + 1));
+      }
+      
       await handleJoinEvent(
         eventId, 
         eventTitle, 

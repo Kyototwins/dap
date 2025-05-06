@@ -54,6 +54,23 @@ export function EventDetailsInfo({
     }
   }, [event.current_participants, setDisplayedParticipants]);
 
+  // Maintain the displayedParticipants value even after state resets
+  // This helps prevent the count from resetting to 1 after joining
+  useEffect(() => {
+    const storedCount = localStorage.getItem(`event_${event.id}_count`);
+    if (storedCount) {
+      const count = parseInt(storedCount, 10);
+      // Only update if stored count is greater than current count
+      if (count > displayedParticipants) {
+        setDisplayedParticipants(count);
+      } else {
+        localStorage.setItem(`event_${event.id}_count`, String(displayedParticipants));
+      }
+    } else {
+      localStorage.setItem(`event_${event.id}_count`, String(displayedParticipants));
+    }
+  }, [event.id, displayedParticipants, setDisplayedParticipants]);
+
   const displayCategory = categoryTranslationMap[event.category] || event.category;
   const eventDate = new Date(event.date);
   const currentDate = new Date();
@@ -91,9 +108,12 @@ export function EventDetailsInfo({
   const handleParticipateClick = () => {
     if (!isDisabled && !effectiveIsParticipating) {
       onParticipate(event.id, event.title);
+      
       // Optimistically update the displayed participant count
       if (!isProcessing) {
-        setDisplayedParticipants(prev => prev + 1);
+        const newCount = displayedParticipants + 1;
+        setDisplayedParticipants(newCount);
+        localStorage.setItem(`event_${event.id}_count`, String(newCount));
       }
     }
   };

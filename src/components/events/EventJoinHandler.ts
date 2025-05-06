@@ -15,7 +15,7 @@ export async function handleJoinEvent(
 ) {
   try {
     const eventToJoin = filteredEvents.find(e => e.id === eventId);
-    if (!eventToJoin) throw new Error("イベントが見つかりません");
+    if (!eventToJoin) throw new Error("Event not found");
     
     // Get current participation status
     const isCurrentlyParticipating = !!participations[eventId];
@@ -40,21 +40,23 @@ export async function handleJoinEvent(
     
     // Show toast notification with correct message
     showToast({
-      title: "イベントに参加しました",
-      description: `「${eventTitle}」に参加しました。`
+      title: "Joined the event",
+      description: `You've joined "${eventTitle}".`
     });
     
-    // Refresh participation status and events data from server to ensure consistency
-    // Use Promise.all to make both requests concurrently for better performance
-    await Promise.all([
-      fetchUserParticipations(),
-      fetchEvents()
-    ]);
+    // Refresh participation status and events data from server
+    await fetchUserParticipations();
+    
+    // We'll handle fetching events with a slight delay to ensure
+    // the database has processed the participation update
+    setTimeout(async () => {
+      await fetchEvents();
+    }, 500);
   } catch (error: any) {
     console.error("Join event error:", error);
     // Show error message
     showToast({
-      title: "エラーが発生しました",
+      title: "Error occurred",
       description: error.message,
       variant: "destructive"
     });

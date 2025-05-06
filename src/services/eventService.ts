@@ -24,18 +24,7 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
       return true; // User is already participating
     }
 
-    // User is not participating, so add them
-    // First, insert the participation record directly
-    const { error: insertError } = await supabase
-      .from("event_participants")
-      .insert([{ event_id: eventId, user_id: user.id }]);
-      
-    if (insertError) {
-      console.error("Error inserting participant:", insertError);
-      throw insertError;
-    }
-    
-    // Then update the participant count
+    // Update the participant count first to ensure it's correctly reflected
     const { error: updateError } = await supabase
       .from("events")
       .update({ current_participants: currentParticipants + 1 })
@@ -44,6 +33,21 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
     if (updateError) {
       console.error("Error updating participant count:", updateError);
       throw updateError;
+    }
+    
+    // Then insert the participation record
+    const { error: insertError } = await supabase
+      .from("event_participants")
+      .insert([{ event_id: eventId, user_id: user.id }]);
+      
+    if (insertError) {
+      console.error("Error inserting participant:", insertError);
+      // If insertion fails, revert the count
+      await supabase
+        .from("events")
+        .update({ current_participants: currentParticipants })
+        .eq("id", eventId);
+      throw insertError;
     }
 
     return true; // User is now participating
