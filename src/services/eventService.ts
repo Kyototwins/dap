@@ -23,7 +23,7 @@ export async function joinEvent(eventId: string, eventTitle: string): Promise<bo
     if (existingParticipation) {
       return true;
     } else {
-      // Call the join_event function with parameters as an object
+      // Call the join_event function with parameters as a properly typed object
       const { error: joinError } = await supabase
         .rpc('join_event', {
           p_event_id: eventId,
