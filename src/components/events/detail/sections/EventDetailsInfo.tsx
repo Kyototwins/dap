@@ -2,7 +2,7 @@
 import { Event } from "@/types/events";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link2, MapPin, X } from "lucide-react";
+import { Link2, MapPin, Check } from "lucide-react";
 
 interface EventDetailsInfoProps {
   event: Event;
@@ -45,11 +45,12 @@ export function EventDetailsInfo({
   const displayCategory = categoryTranslationMap[event.category] || event.category;
   
   // Determine button text and styling based on participation status
-  const buttonText = isParticipating ? "Leave Event" : "Join Event";
+  const buttonText = isParticipating ? "Joined" : "Join Event";
   const buttonVariant = isParticipating ? "outline" : "default";
   const buttonClass = isParticipating 
     ? "bg-[#e5deff] text-[#7f1184] hover:bg-[#d8cefd] hover:text-[#7f1184]" 
     : "";
+  const buttonIcon = isParticipating ? <Check className="w-4 h-4 mr-1" /> : null;
 
   return (
     <>
@@ -93,16 +94,17 @@ export function EventDetailsInfo({
             {displayCategory}
           </Badge>
           
-          {/* Join/Leave button for non-creators */}
+          {/* Join button for non-creators */}
           {!isCreator && onParticipate && (
             <Button
               onClick={() => onParticipate(event.id, event.title)}
-              disabled={isProcessing}
+              disabled={isProcessing || isParticipating}
               variant={buttonVariant}
               className={buttonClass}
               size="sm"
             >
               {isProcessing ? "Processing..." : buttonText}
+              {buttonIcon}
             </Button>
           )}
         </div>

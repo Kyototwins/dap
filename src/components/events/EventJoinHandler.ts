@@ -45,7 +45,7 @@ export async function handleJoinEvent(
       });
     } else {
       showToast({
-        title: "Left the event",
+        title: "Left the event", 
         description: `You've left "${eventTitle}".`
       });
     }

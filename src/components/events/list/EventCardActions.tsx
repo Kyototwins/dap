@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-import { Check, Edit, Loader2, Plus, Trash2, X } from "lucide-react";
+import { Check, Edit, Loader2, Plus, Trash2 } from "lucide-react";
 
 interface EventCardActionsProps {
   isCreator: boolean;
@@ -43,16 +43,16 @@ export function EventCardActions({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Handle button state for event participation
-  let buttonText = isParticipating ? "Leave Event" : "Join Event";
+  let buttonText = isParticipating ? "Joined" : "Join Event";
   let buttonClasses = isParticipating 
     ? "bg-[#e5deff] hover:bg-[#d8cefd] text-[#7f1184]" 
     : "bg-[#7f1184] hover:bg-[#671073] text-white";
   let buttonIcon = isParticipating 
-    ? <X className="w-4 h-4 mr-1" /> 
+    ? <Check className="w-4 h-4 mr-1" /> 
     : <Plus className="w-4 h-4 mr-1" />;
   
   if (isProcessing) {
-    buttonText = isParticipating ? "Leaving..." : "Joining...";
+    buttonText = isParticipating ? "Processing..." : "Joining...";
     buttonClasses = "bg-gray-300 text-gray-600 cursor-wait";
     buttonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
   } else if (isPastEvent) {
@@ -81,7 +81,7 @@ export function EventCardActions({
       <div className="mt-4 flex gap-2">
         <Button
           className={`flex-1 rounded-xl ${buttonClasses}`}
-          disabled={isDisabled || isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants) || isProcessing}
+          disabled={isDisabled || isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants) || isParticipating}
           onClick={onJoin}
           aria-label={buttonText}
         >
