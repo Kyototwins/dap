@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { Match } from "@/types/messages";
+import { fetchUserMatches, processMatch } from "@/services/matchService";
 
 export function useMatches() {
   const [matches, setMatches] = useState<Match[]>([]);
@@ -18,153 +18,19 @@ export function useMatches() {
       setLoading(true);
       console.log("Fetching matches...");
       
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.error("User not authenticated");
-        throw new Error("Not authenticated");
-      }
-
-      console.log("Authenticated user ID:", user.id);
-
-      // Get matches where user is either user1 or user2
-      const { data: matchesData, error } = await supabase
-        .from("matches")
-        .select(`
-          id,
-          user1_id,
-          user2_id,
-          status,
-          created_at,
-          user1:profiles!matches_user1_id_fkey (*),
-          user2:profiles!matches_user2_id_fkey (*)
-        `)
-        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
-
-      if (error) {
-        console.error("Database error fetching matches:", error);
-        throw error;
-      }
+      const { matchesData, userId } = await fetchUserMatches();
+      console.log(`Total matches available: ${matchesData?.length || 0}`);
       
-      // Log all matches first to understand what's happening
-      console.log(`Retrieved ${matchesData?.length || 0} raw matches (all statuses) for user ${user.id}`);
-      if (matchesData && matchesData.length > 0) {
-        console.log("All matches statuses:", matchesData.map(m => m.status).join(', '));
-      }
-      
-      // Filter matches - IMPORTANT CHANGE: Include both accepted and pending matches
-      let filteredMatches = matchesData || [];
-      console.log(`Total matches available: ${filteredMatches.length}`);
-      
-      if (filteredMatches.length > 0) {
-        console.log("Sample match data:", filteredMatches[0]);
+      if ((matchesData || []).length > 0) {
+        console.log("Sample match data:", matchesData[0]);
       } else {
         console.log("No matches found");
       }
 
-      // Get latest message and unread count for each match
-      const processedMatches = await Promise.all((filteredMatches || []).map(async (match) => {
-        // Determine which user is the "other" user
-        const otherUser = match.user1_id === user.id ? match.user2 : match.user1;
-        if (!otherUser) {
-          console.error(`Missing other user data for match ${match.id}`);
-          return null;
-        }
-        
-        console.log(`Processing match ${match.id} with other user:`, otherUser.id);
-        
-        // Fetch the most recent message for this match
-        const { data: latestMessages, error: messagesError } = await supabase
-          .from("messages")
-          .select("content, created_at, sender_id")
-          .eq("match_id", match.id)
-          .order("created_at", { ascending: false })
-          .limit(1);
-          
-        if (messagesError) {
-          console.error("Error fetching messages for match:", match.id, messagesError);
-        }
-        
-        const lastMessage = latestMessages && latestMessages.length > 0 ? latestMessages[0] : null;
-        console.log(`Match ${match.id} last message:`, lastMessage || "No messages");
-        
-        // Count unread messages
-        let unreadCount = 0;
-        if (lastMessage && lastMessage.sender_id === otherUser.id) {
-          // For now just mark as 1 if the last message is from other user
-          // In a real app, you would count all unread messages
-          unreadCount = 1;
-        }
-        
-        // Process language_levels to ensure it's the correct type
-        let processedLanguageLevels: Record<string, number> = {};
-        if (otherUser.language_levels) {
-          // If it's a string, try to parse it
-          if (typeof otherUser.language_levels === 'string') {
-            try {
-              processedLanguageLevels = JSON.parse(otherUser.language_levels);
-            } catch (e) {
-              console.error("Error parsing language_levels:", e);
-            }
-          } 
-          // If it's already an object, safely convert it to Record<string, number>
-          else if (typeof otherUser.language_levels === 'object') {
-            Object.entries(otherUser.language_levels).forEach(([key, value]) => {
-              if (typeof value === 'number') {
-                processedLanguageLevels[key] = value;
-              } else if (typeof value === 'string' && !isNaN(Number(value))) {
-                processedLanguageLevels[key] = Number(value);
-              }
-            });
-          }
-        }
-        
-        // Create otherUser with all required properties
-        const otherUserWithRequiredProps = {
-          id: otherUser.id,
-          first_name: otherUser.first_name || 'ユーザー',
-          last_name: otherUser.last_name || '',
-          avatar_url: otherUser.avatar_url,
-          about_me: otherUser.about_me,
-          age: otherUser.age,
-          gender: otherUser.gender,
-          ideal_date: otherUser.ideal_date,
-          image_url_1: otherUser.image_url_1,
-          image_url_2: otherUser.image_url_2,
-          life_goal: otherUser.life_goal,
-          origin: otherUser.origin,
-          sexuality: otherUser.sexuality,
-          university: otherUser.university,
-          department: otherUser.department || '',
-          year: otherUser.year || '',
-          hobbies: otherUser.hobbies || [],
-          languages: otherUser.languages || [],
-          language_levels: processedLanguageLevels,
-          superpower: otherUser.superpower || '',
-          learning_languages: otherUser.learning_languages || [],
-          created_at: otherUser.created_at,
-          photo_comment: otherUser.photo_comment || null,
-          worst_nightmare: otherUser.worst_nightmare || null,
-          friend_activity: otherUser.friend_activity || null,
-          best_quality: otherUser.best_quality || null,
-          hobby_photo_url: null,
-          pet_photo_url: null,
-          hobby_photo_comment: null,
-          pet_photo_comment: null
-        };
-        
-        return {
-          id: match.id,
-          status: match.status,
-          user1_id: match.user1_id,
-          user2_id: match.user2_id,
-          otherUser: otherUserWithRequiredProps,
-          lastMessage: lastMessage ? {
-            content: lastMessage.content,
-            created_at: lastMessage.created_at
-          } : undefined,
-          unreadCount: unreadCount
-        } as Match;
-      }));
+      // Process each match to get latest message and other details
+      const processedMatches = await Promise.all((matchesData || []).map(match => 
+        processMatch(match, userId)
+      ));
 
       // Filter out any null matches (from processing errors)
       const validMatches = processedMatches.filter(match => match !== null) as Match[];
