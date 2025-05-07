@@ -1,7 +1,8 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { JoinEventResponse } from "@/types/events";
 
-export async function joinEvent(eventId: string, eventTitle: string, currentParticipants: number) {
+export async function joinEvent(eventId: string, eventTitle: string): Promise<boolean> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
@@ -19,55 +20,36 @@ export async function joinEvent(eventId: string, eventTitle: string, currentPart
       throw checkError;
     }
 
-    // If already participating, just return true (do nothing)
+    // If already participating, we'll leave the event
     if (existingParticipation) {
-      return true; // User is already participating
-    }
-
-    // Insert the participation record first
-    const { error: insertError } = await supabase
-      .from("event_participants")
-      .insert([{ event_id: eventId, user_id: user.id }]);
+      // Call the RPC function to cancel participation
+      const { error: cancelError } = await supabase
+        .rpc('cancel_event_participation', { 
+          p_event_id: eventId, 
+          p_user_id: user.id 
+        });
       
-    if (insertError) {
-      console.error("Error inserting participant:", insertError);
-      throw insertError;
-    }
-    
-    // Then update the participant count to ensure it's correctly reflected
-    // We fetch the current count from the database to ensure accuracy
-    const { data: eventData, error: fetchError } = await supabase
-      .from("events")
-      .select("current_participants")
-      .eq("id", eventId)
-      .single();
+      if (cancelError) {
+        console.error("Error canceling participation:", cancelError);
+        throw cancelError;
+      }
       
-    if (fetchError) {
-      console.error("Error fetching current participant count:", fetchError);
-      throw fetchError;
-    }
-    
-    // Get the actual current count from the database
-    const actualCurrentCount = eventData.current_participants || 0;
-    
-    // Update with the actual current count + 1
-    const { error: updateError } = await supabase
-      .from("events")
-      .update({ current_participants: actualCurrentCount + 1 })
-      .eq("id", eventId);
+      return false; // User is no longer participating
+    } else {
+      // Call the RPC function to join the event
+      const { error: joinError } = await supabase
+        .rpc('join_event', { 
+          p_event_id: eventId, 
+          p_user_id: user.id 
+        });
       
-    if (updateError) {
-      console.error("Error updating participant count:", updateError);
-      // If update fails, remove the participation record to maintain consistency
-      await supabase
-        .from("event_participants")
-        .delete()
-        .eq("event_id", eventId)
-        .eq("user_id", user.id);
-      throw updateError;
+      if (joinError) {
+        console.error("Error joining event:", joinError);
+        throw joinError;
+      }
+      
+      return true; // User is now participating
     }
-
-    return true; // User is now participating
   } catch (error) {
     console.error("Join event error:", error);
     throw error;

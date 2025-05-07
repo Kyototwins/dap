@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-import { Check, Edit, Loader2, Plus, Trash2 } from "lucide-react";
+import { Check, Edit, Loader2, Plus, Trash2, X } from "lucide-react";
 
 interface EventCardActionsProps {
   isCreator: boolean;
@@ -43,23 +43,23 @@ export function EventCardActions({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Handle button state for event participation
-  let buttonText = "Join Event";
-  let buttonClasses = "bg-[#7f1184] hover:bg-[#671073] text-white";
-  let buttonIcon = <Plus className="w-4 h-4 mr-1" />;
+  let buttonText = isParticipating ? "Leave Event" : "Join Event";
+  let buttonClasses = isParticipating 
+    ? "bg-[#e5deff] hover:bg-[#d8cefd] text-[#7f1184]" 
+    : "bg-[#7f1184] hover:bg-[#671073] text-white";
+  let buttonIcon = isParticipating 
+    ? <X className="w-4 h-4 mr-1" /> 
+    : <Plus className="w-4 h-4 mr-1" />;
   
   if (isProcessing) {
-    buttonText = "Joining...";
+    buttonText = isParticipating ? "Leaving..." : "Joining...";
     buttonClasses = "bg-gray-300 text-gray-600 cursor-wait";
     buttonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
-  } else if (isParticipating) {
-    buttonText = "Joined";
-    buttonClasses = "bg-[#e5deff] hover:bg-[#d8cefd] text-[#7f1184]"; // Much lighter purple with purple text
-    buttonIcon = <Check className="w-4 h-4 mr-1" />;
   } else if (isPastEvent) {
     buttonText = "Event Ended";
     buttonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
     buttonIcon = null;
-  } else if (maxParticipants !== 0 && displayedParticipants >= maxParticipants) {
+  } else if (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants) {
     buttonText = "Full";
     buttonClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
     buttonIcon = null;

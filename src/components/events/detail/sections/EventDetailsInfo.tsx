@@ -2,7 +2,7 @@
 import { Event } from "@/types/events";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link2, MapPin } from "lucide-react";
+import { Link2, MapPin, X } from "lucide-react";
 
 interface EventDetailsInfoProps {
   event: Event;
@@ -43,6 +43,13 @@ export function EventDetailsInfo({
   };
 
   const displayCategory = categoryTranslationMap[event.category] || event.category;
+  
+  // Determine button text and styling based on participation status
+  const buttonText = isParticipating ? "Leave Event" : "Join Event";
+  const buttonVariant = isParticipating ? "outline" : "default";
+  const buttonClass = isParticipating 
+    ? "bg-[#e5deff] text-[#7f1184] hover:bg-[#d8cefd] hover:text-[#7f1184]" 
+    : "";
 
   return (
     <>
@@ -86,16 +93,16 @@ export function EventDetailsInfo({
             {displayCategory}
           </Badge>
           
-          {/* Join button for non-creators */}
+          {/* Join/Leave button for non-creators */}
           {!isCreator && onParticipate && (
             <Button
               onClick={() => onParticipate(event.id, event.title)}
               disabled={isProcessing}
-              variant={isParticipating ? "outline" : "default"}
-              className={`${isParticipating ? "bg-[#e5deff] text-[#7f1184] hover:bg-[#d8cefd] hover:text-[#7f1184]" : ""}`}
+              variant={buttonVariant}
+              className={buttonClass}
               size="sm"
             >
-              {isProcessing ? "Processing..." : isParticipating ? "Joined" : "Join Event"}
+              {isProcessing ? "Processing..." : buttonText}
             </Button>
           )}
         </div>

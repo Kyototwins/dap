@@ -20,29 +20,35 @@ export async function handleJoinEvent(
     // Get current participation status
     const isCurrentlyParticipating = !!participations[eventId];
     
-    // If already participating, do nothing
-    if (isCurrentlyParticipating) {
-      return;
-    }
-    
     // Set processing state
     setProcessingEventId(eventId);
     
     // Call backend to update participation
-    const isParticipatingNow = await joinEvent(eventId, eventTitle, eventToJoin.current_participants);
+    const isParticipatingNow = await joinEvent(eventId, eventTitle);
     
-    console.log("Join event result:", isParticipatingNow, "for event", eventId);
+    console.log("Join/leave event result:", isParticipatingNow, "for event", eventId);
     
     // Update participation status in local state
     const updatedParticipations = { ...participations };
-    updatedParticipations[eventId] = true;
+    if (isParticipatingNow) {
+      updatedParticipations[eventId] = true;
+    } else {
+      delete updatedParticipations[eventId];
+    }
     setParticipations(updatedParticipations);
     
     // Show toast notification with correct message
-    showToast({
-      title: "Joined the event",
-      description: `You've joined "${eventTitle}".`
-    });
+    if (isParticipatingNow) {
+      showToast({
+        title: "Joined the event",
+        description: `You've joined "${eventTitle}".`
+      });
+    } else {
+      showToast({
+        title: "Left the event",
+        description: `You've left "${eventTitle}".`
+      });
+    }
     
     // Refresh participation status and events data from server
     await fetchUserParticipations();
@@ -51,24 +57,27 @@ export async function handleJoinEvent(
     // the database has processed the participation update
     await fetchEvents();
     
-    // Store in localStorage that this user has joined this event
-    // This helps with persistence between page loads
+    // Update localStorage
     try {
       // Get existing joined events or initialize empty object
       const joinedEventsStr = localStorage.getItem('joined_events') || '{}';
       const joinedEvents = JSON.parse(joinedEventsStr);
       
-      // Mark this event as joined
-      joinedEvents[eventId] = true;
+      if (isParticipatingNow) {
+        // Mark this event as joined
+        joinedEvents[eventId] = true;
+      } else {
+        // Remove this event from joined events
+        delete joinedEvents[eventId];
+      }
       
       // Save back to localStorage
       localStorage.setItem('joined_events', JSON.stringify(joinedEvents));
     } catch (storageError) {
-      console.error("Error storing joined event in localStorage:", storageError);
-      // Non-critical error, we can continue
+      console.error("Error storing joined event status in localStorage:", storageError);
     }
   } catch (error: any) {
-    console.error("Join event error:", error);
+    console.error("Join/leave event error:", error);
     // Show error message
     showToast({
       title: "Error occurred",
