@@ -28,7 +28,7 @@ export async function joinEvent(eventId: string, eventTitle: string): Promise<bo
         .rpc('join_event', {
           p_event_id: eventId,
           p_user_id: user.id
-        });
+        } as { p_event_id: string; p_user_id: string });
       
       if (joinError) {
         console.error("Error joining event:", joinError);
