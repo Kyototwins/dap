@@ -24,9 +24,9 @@ export async function joinEvent(eventId: string, eventTitle: string): Promise<bo
     if (existingParticipation) {
       // Call the RPC function to cancel participation
       const { error: cancelError } = await supabase
-        .rpc('cancel_event_participation', { 
-          p_event_id: eventId, 
-          p_user_id: user.id 
+        .rpc('cancel_event_participation', {
+          p_event_id: eventId,
+          p_user_id: user.id
         });
       
       if (cancelError) {
@@ -38,9 +38,9 @@ export async function joinEvent(eventId: string, eventTitle: string): Promise<bo
     } else {
       // Call the RPC function to join the event
       const { error: joinError } = await supabase
-        .rpc('join_event', { 
-          p_event_id: eventId, 
-          p_user_id: user.id 
+        .rpc('join_event', {
+          p_event_id: eventId,
+          p_user_id: user.id
         });
       
       if (joinError) {
