@@ -45,7 +45,7 @@ export function EventCardActions({
   // Handle button state for event participation
   let buttonText = isParticipating ? "Joined" : "Join Event";
   let buttonClasses = isParticipating 
-    ? "bg-[#e5deff] hover:bg-[#d8cefd] text-[#7f1184]" 
+    ? "bg-[#e5deff] hover:bg-[#e5deff] text-[#7f1184] cursor-default" 
     : "bg-[#7f1184] hover:bg-[#671073] text-white";
   let buttonIcon = isParticipating 
     ? <Check className="w-4 h-4 mr-1" /> 
@@ -81,7 +81,7 @@ export function EventCardActions({
       <div className="mt-4 flex gap-2">
         <Button
           className={`flex-1 rounded-xl ${buttonClasses}`}
-          disabled={isDisabled || isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants) || isParticipating}
+          disabled={isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants) || isProcessing || isParticipating}
           onClick={onJoin}
           aria-label={buttonText}
         >
