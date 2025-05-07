@@ -90,10 +90,12 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
     if (!isDisabled && !effectiveIsParticipating) {
       onJoin(event.id, event.title);
       
-      // Optimistically update the displayed participant count and save to localStorage
+      // Optimistically update the displayed participant count
       const newCount = displayedParticipants + 1;
       setDisplayedParticipants(newCount);
-      localStorage.setItem(`event_${event.id}_count`, String(newCount));
+      
+      // Update local participation visually - the backend call will make it official
+      setEffectiveIsParticipating(true);
     }
   };
 
