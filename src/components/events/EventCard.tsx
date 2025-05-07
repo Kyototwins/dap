@@ -27,24 +27,27 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
   
   // Update displayed participants when the event data changes
   useEffect(() => {
-    // Check for locally stored count first (which might be higher due to optimistic updates)
+    // Get stored count from localStorage (if any)
     const storedCount = localStorage.getItem(`event_${event.id}_count`);
+    // Use whichever is higher - server count or stored count
     if (storedCount) {
-      const count = parseInt(storedCount, 10);
-      if (count > event.current_participants) {
-        setDisplayedParticipants(count);
+      const parsedCount = parseInt(storedCount, 10);
+      if (parsedCount > event.current_participants) {
+        setDisplayedParticipants(parsedCount);
       } else {
         setDisplayedParticipants(event.current_participants);
+        // Update localStorage with new count if it's higher
         localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
       }
     } else {
       setDisplayedParticipants(event.current_participants);
+      // Initialize localStorage with current count
       localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
     }
   }, [event.id, event.current_participants]);
   
+  // Check if user is creator and update participation status
   useEffect(() => {
-    // Check if the current user is the creator of this event
     const checkIfCreator = async () => {
       const { data } = await supabase.auth.getUser();
       if (data.user && event.creator_id === data.user.id) {
@@ -59,6 +62,13 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
     checkIfCreator();
   }, [event.creator_id, isParticipating]);
 
+  // Update when isParticipating prop changes
+  useEffect(() => {
+    if (!isCreator) {
+      setEffectiveIsParticipating(isParticipating);
+    }
+  }, [isParticipating, isCreator]);
+
   const displayCategory = categoryTranslationMap[event.category] || event.category;
   const eventDate = new Date(event.date);
   const currentDate = new Date();
@@ -67,7 +77,8 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
   // Determine if the button should be disabled
   const isDisabled = isProcessing || 
     isPastEvent || 
-    (!effectiveIsParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants);
+    (!effectiveIsParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants) ||
+    effectiveIsParticipating;  // Disable if already participating
   
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -79,12 +90,10 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
     if (!isDisabled && !effectiveIsParticipating) {
       onJoin(event.id, event.title);
       
-      // Optimistically update the displayed participant count
-      if (!isProcessing) {
-        const newCount = displayedParticipants + 1;
-        setDisplayedParticipants(newCount);
-        localStorage.setItem(`event_${event.id}_count`, String(newCount));
-      }
+      // Optimistically update the displayed participant count and save to localStorage
+      const newCount = displayedParticipants + 1;
+      setDisplayedParticipants(newCount);
+      localStorage.setItem(`event_${event.id}_count`, String(newCount));
     }
   };
 
@@ -122,6 +131,7 @@ export function EventCard({ event, isParticipating, onJoin, onCardClick, isProce
           location={event.location}
           currentParticipants={displayedParticipants}
           maxParticipants={event.max_participants}
+          mapLink={event.map_link}
         />
         
         <EventCardActions 

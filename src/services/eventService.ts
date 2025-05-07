@@ -1,6 +1,5 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { JoinEventResponse } from "@/types/events";
 
 export async function joinEvent(eventId: string, eventTitle: string): Promise<boolean> {
   const { data: { user } } = await supabase.auth.getUser();
@@ -20,23 +19,11 @@ export async function joinEvent(eventId: string, eventTitle: string): Promise<bo
       throw checkError;
     }
 
-    // If already participating, we'll leave the event
+    // If already participating, do nothing and return true
     if (existingParticipation) {
-      // Call the RPC function to cancel participation
-      const { error: cancelError } = await supabase
-        .rpc('cancel_event_participation', {
-          p_event_id: eventId,
-          p_user_id: user.id
-        });
-      
-      if (cancelError) {
-        console.error("Error canceling participation:", cancelError);
-        throw cancelError;
-      }
-      
-      return false; // User is no longer participating
+      return true;
     } else {
-      // Call the RPC function to join the event
+      // Call the join_event function with parameters as an object
       const { error: joinError } = await supabase
         .rpc('join_event', {
           p_event_id: eventId,

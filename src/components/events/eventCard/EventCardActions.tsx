@@ -53,7 +53,7 @@ export function EventCardActions({
     buttonIcon = <Loader2 className="w-4 h-4 mr-1 animate-spin" />;
   } else if (isParticipating) {
     buttonText = "Joined";
-    buttonClasses = "bg-[#e5deff] hover:bg-[#d8cefd] text-[#7f1184]"; // Much lighter purple with purple text
+    buttonClasses = "bg-[#e5deff] hover:bg-[#e5deff] text-[#7f1184] cursor-default"; // Make it non-interactive
     buttonIcon = <Check className="w-4 h-4 mr-1" />;
   } else if (isPastEvent) {
     buttonText = "Event Ended";
@@ -82,7 +82,7 @@ export function EventCardActions({
       <div className="mt-4 flex gap-2">
         <Button
           className={`flex-1 rounded-xl ${buttonClasses}`}
-          disabled={isDisabled || isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants) || isParticipating}
+          disabled={isDisabled}
           onClick={onJoin}
           aria-label={buttonText}
         >

@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from "react";
 import { Event } from "@/types/events";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { fetchEvents } from "@/services/eventDataService";
 
 /**
@@ -19,24 +19,21 @@ export function useEventCore() {
       const eventsData = await fetchEvents();
       
       // Apply any stored participant counts from localStorage
-      eventsData.forEach(event => {
+      const processedEvents = eventsData.map(event => {
         const storedCount = localStorage.getItem(`event_${event.id}_count`);
         if (storedCount) {
           const count = parseInt(storedCount, 10);
           // Only use the stored count if it's higher than the current count
           if (count > event.current_participants) {
-            event.current_participants = count;
-          } else {
-            // Update localStorage with the current count if it's higher
-            localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
+            return { ...event, current_participants: count };
           }
-        } else {
-          // Initialize localStorage with the current count
-          localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
         }
+        // Update localStorage with the current count
+        localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
+        return event;
       });
       
-      setEvents(eventsData);
+      setEvents(processedEvents);
     } catch (error: any) {
       toast({
         title: "Error occurred",
@@ -53,28 +50,25 @@ export function useEventCore() {
       const eventsData = await fetchEvents();
       
       // Apply any stored participant counts from localStorage
-      eventsData.forEach(event => {
+      const processedEvents = eventsData.map(event => {
         const storedCount = localStorage.getItem(`event_${event.id}_count`);
         if (storedCount) {
           const count = parseInt(storedCount, 10);
           // Only use the stored count if it's higher than the current count
           if (count > event.current_participants) {
-            event.current_participants = count;
-          } else {
-            // Update localStorage with the current count if it's higher
-            localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
+            return { ...event, current_participants: count };
           }
-        } else {
-          // Initialize localStorage with the current count
-          localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
         }
+        // Update localStorage with the current count
+        localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
+        return event;
       });
       
-      setEvents(eventsData);
+      setEvents(processedEvents);
       
       // Update selected event if it exists
       if (selectedEvent) {
-        const updatedSelectedEvent = eventsData.find(event => event.id === selectedEvent.id);
+        const updatedSelectedEvent = processedEvents.find(event => event.id === selectedEvent.id);
         if (updatedSelectedEvent) {
           setSelectedEvent(updatedSelectedEvent);
         }
@@ -94,7 +88,6 @@ export function useEventCore() {
     selectedEvent,
     setSelectedEvent,
     loading,
-    setLoading,
     loadInitialData,
     refreshEvents
   };
