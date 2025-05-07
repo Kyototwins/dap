@@ -8,7 +8,7 @@ import { EventDetailsDialog } from "../detail/EventDetailsDialog";
 import { EventCalendarView } from "../calendar/EventCalendarView";
 import { CreateEventButton } from "../actions/CreateEventButton";
 import { useEvents } from "@/hooks/useEvents";
-import { handleJoinEvent } from "../actions/EventJoinHandler";
+import { handleJoinEvent } from "@/components/events/EventJoinHandler";
 
 export function EventsContainer() {
   const navigate = useNavigate();
