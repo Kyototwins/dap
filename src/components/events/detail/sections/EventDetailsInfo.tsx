@@ -9,7 +9,6 @@ interface EventDetailsInfoProps {
   isCreator: boolean;
   isParticipating?: boolean;
   isProcessing?: boolean;
-  onDeleteClick?: () => void;
   onParticipate?: (eventId: string, eventTitle: string) => void;
 }
 
@@ -34,7 +33,6 @@ export function EventDetailsInfo({
   isCreator, 
   isParticipating = false,
   isProcessing = false,
-  onDeleteClick,
   onParticipate
 }: EventDetailsInfoProps) {
   const formatEventDate = (dateString: string) => {
@@ -114,16 +112,7 @@ export function EventDetailsInfo({
             : `${event.current_participants}/${event.max_participants}`}
         </div>
         
-        {/* Delete button for creators */}
-        {isCreator && onDeleteClick && (
-          <Button 
-            onClick={onDeleteClick}
-            variant="destructive"
-            size="sm"
-          >
-            Delete Event
-          </Button>
-        )}
+        {/* Delete button removed from here */}
       </div>
     </>
   );
