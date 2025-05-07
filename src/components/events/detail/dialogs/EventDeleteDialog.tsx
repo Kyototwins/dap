@@ -25,15 +25,15 @@ export function EventDeleteDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogTitle>イベントを削除しますか？</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your event and remove all participants' access.
+            この操作は取り消せません。イベントを完全に削除し、すべての参加者のアクセスを削除します。
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>キャンセル</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirmDelete} className="bg-destructive text-destructive-foreground">
-            Delete
+            削除する
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
