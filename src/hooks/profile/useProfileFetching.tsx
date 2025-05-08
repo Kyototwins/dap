@@ -34,9 +34,10 @@ interface ProfileData {
   friend_activity: string | null;
   best_quality: string | null;
   hobby_photo_url: string | null;
-  favorite_food_photo_url: string | null;  // Changed from pet_photo_url
   hobby_photo_comment: string | null;
-  favorite_food_photo_comment: string | null;  // Changed from pet_photo_comment
+  // New fields for favorite food
+  favorite_food_photo_url: string | null;
+  favorite_food_photo_comment: string | null;
 }
 
 export function useProfileFetching() {
@@ -64,7 +65,9 @@ export function useProfileFetching() {
         .single();
 
       if (error) throw error;
-      const profile = data as ProfileData;
+      
+      // Cast data to our ProfileData type to ensure type safety
+      const profile = data as unknown as ProfileData;
 
       if (profile) {
         // Parse language levels JSON if it's stored as a string
@@ -97,7 +100,7 @@ export function useProfileFetching() {
           learning_languages: profile.learning_languages || [],
           photoComment: profile.photo_comment || "",
           hobbyPhotoComment: profile.hobby_photo_comment || "",
-          foodPhotoComment: profile.favorite_food_photo_comment || ""  // Changed from pet_photo_comment
+          foodPhotoComment: profile.favorite_food_photo_comment || ""
         });
 
         // Set additional data - map database fields to our frontend model
@@ -132,9 +135,9 @@ export function useProfileFetching() {
             preview: profile.hobby_photo_url || "",
             uploading: false
           },
-          food: {  // Changed from pet to food
+          food: {
             file: null,
-            preview: profile.favorite_food_photo_url || "",  // Changed from pet_photo_url
+            preview: profile.favorite_food_photo_url || "",
             uploading: false
           }
         });
