@@ -16,7 +16,7 @@ interface ProfileFormProps {
   images: ImageUploadState;
   onChange: (name: string, value: string | string[] | Record<string, number>) => void;
   onAdditionalChange: (name: string, value: string) => void;
-  onImageChange: (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2' | 'hobby' | 'pet') => void;
+  onImageChange: (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2' | 'hobby' | 'food') => void;
   onPhotoCommentChange: (field: string, comment: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   loading: boolean;
@@ -80,16 +80,16 @@ export function ProfileForm({
           loading={loading} 
         />
         
-        {/* Pet photo */}
+        {/* Favorite Food photo - changed from Pet photo */}
         <ImageUpload 
-          label="Photo of my pet/favorite animal" 
-          image={images.pet} 
-          onChange={(e) => onImageChange(e, 'pet')} 
+          label="Photo of my favorite food" 
+          image={images.food} 
+          onChange={(e) => onImageChange(e, 'food')} 
           loading={loading} 
         />
         <ProfilePhotoCaption 
-          caption={formData.petPhotoComment || ''} 
-          onChange={(text) => onPhotoCommentChange('petPhotoComment', text)} 
+          caption={formData.foodPhotoComment || ''} 
+          onChange={(text) => onPhotoCommentChange('foodPhotoComment', text)} 
           loading={loading} 
         />
       </div>

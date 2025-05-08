@@ -11,7 +11,7 @@ export interface ImageUploadState {
   image1: ImageUpload;
   image2: ImageUpload;
   hobby: ImageUpload;
-  pet: ImageUpload;
+  food: ImageUpload;  // Changed from pet to food
 }
 
 export interface ProfileFormData {
@@ -31,7 +31,7 @@ export interface ProfileFormData {
   learning_languages: string[];
   photoComment: string;
   hobbyPhotoComment: string;
-  petPhotoComment: string;
+  foodPhotoComment: string;  // Changed from petPhotoComment to foodPhotoComment
 }
 
 export interface AdditionalDataType {

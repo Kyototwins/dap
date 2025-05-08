@@ -114,18 +114,18 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
         </div>
       )}
       
-      {/* Pet Photo */}
-      {profile.pet_photo_url && (
+      {/* Favorite Food Photo - Changed from Pet Photo */}
+      {profile.favorite_food_photo_url && (
         <div className="p-6 border border-gray-200 rounded-lg mb-6">
-          <h2 className="text-xl font-bold mb-4">My Pet Photo</h2>
+          <h2 className="text-xl font-bold mb-4">My Favorite Food</h2>
           <div className="overflow-hidden rounded-lg">
             <img 
-              src={profile.pet_photo_url} 
-              alt="Pet Photo" 
+              src={profile.favorite_food_photo_url} 
+              alt="Favorite Food Photo" 
               className="w-full h-auto max-h-96 object-contain"
             />
-            {profile.pet_photo_comment && (
-              <p className="mt-3 text-gray-600 italic">{profile.pet_photo_comment}</p>
+            {profile.favorite_food_photo_comment && (
+              <p className="mt-3 text-gray-600 italic">{profile.favorite_food_photo_comment}</p>
             )}
           </div>
         </div>

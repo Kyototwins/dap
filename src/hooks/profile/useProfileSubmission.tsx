@@ -30,7 +30,7 @@ export function useProfileSubmission() {
       let imageUrl1 = images.image1.preview;
       let imageUrl2 = images.image2.preview;
       let hobbyPhotoUrl = images.hobby.preview;
-      let petPhotoUrl = images.pet.preview;
+      let foodPhotoUrl = images.food.preview;  // Changed from petPhotoUrl
 
       // Check if these are blob URLs which need to be uploaded
       const isBlobUrl = (url: string) => url.startsWith('blob:');
@@ -64,11 +64,11 @@ export function useProfileSubmission() {
         hobbyPhotoUrl = "";
       }
 
-      if (images.pet.file) {
-        const url = await uploadImage(images.pet.file, 'pets');
-        if (url) petPhotoUrl = url;
-      } else if (petPhotoUrl && isBlobUrl(petPhotoUrl)) {
-        petPhotoUrl = "";
+      if (images.food.file) {
+        const url = await uploadImage(images.food.file, 'foods');  // Changed from 'pets' to 'foods'
+        if (url) foodPhotoUrl = url;
+      } else if (foodPhotoUrl && isBlobUrl(foodPhotoUrl)) {
+        foodPhotoUrl = "";
       }
 
       await updateUserProfile(
@@ -79,7 +79,7 @@ export function useProfileSubmission() {
         imageUrl1,
         imageUrl2,
         hobbyPhotoUrl,
-        petPhotoUrl
+        foodPhotoUrl  // Changed from petPhotoUrl
       );
 
       navigate("/matches");
