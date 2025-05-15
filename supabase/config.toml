@@ -3,3 +3,10 @@ project_id = "yxacicvkyusnykivbmtg"
 
 [functions.delete-user]
 verify_jwt = false
+
+[functions.send-daily-digest]
+verify_jwt = false
+
+[functions.setup-daily-digest-cron]
+verify_jwt = false
+
