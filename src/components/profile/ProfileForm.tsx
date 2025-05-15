@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
 import { useProfileOperations } from "@/hooks/useProfileOperations";
@@ -23,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form";
 
 interface ProfileFormProps {
   profile?: any;
@@ -70,6 +72,7 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
   const { loading, handleSubmit } = useProfileOperations();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const form = useForm();
 
   useEffect(() => {
     if (profile) {
@@ -178,12 +181,15 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
     });
   };
 
-  const languageLevelOptions = [1, 2, 3, 4, 5];
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSubmit(e, formData, additionalData, images);
+  };
 
   return (
     <div className="container py-12 pb-32">
-      <Form
-        onSubmit={(e) => handleSubmit(e, formData, additionalData, images)}
+      <form 
+        onSubmit={onSubmitForm}
         className="space-y-8"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -191,185 +197,104 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
           <div className="space-y-4">
             <h2 className="text-2xl font-bold">基本情報</h2>
             <Separator />
-            <FormField
-              control={{}}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={{}}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Last Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={{}}
-              name="age"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Age</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      value={formData.age}
-                      onChange={handleInputChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={{}}
-              name="gender"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Gender</FormLabel>
-                  <Select onValueChange={(value) => handleSelectChange("gender", value)}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a gender" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={{}}
-              name="origin"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Origin</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      value={formData.origin}
-                      onChange={handleInputChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={{}}
-              name="sexuality"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Sexuality</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      value={formData.sexuality}
-                      onChange={handleInputChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div>
+              <FormLabel>First Name</FormLabel>
+              <Input
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <FormLabel>Last Name</FormLabel>
+              <Input
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <FormLabel>Age</FormLabel>
+              <Input
+                type="number"
+                name="age"
+                value={formData.age}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <FormLabel>Gender</FormLabel>
+              <Select onValueChange={(value) => handleSelectChange("gender", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <FormLabel>Origin</FormLabel>
+              <Input
+                name="origin"
+                value={formData.origin}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <FormLabel>Sexuality</FormLabel>
+              <Input
+                name="sexuality"
+                value={formData.sexuality}
+                onChange={handleInputChange}
+              />
+            </div>
           </div>
 
           {/* University Information */}
           <div className="space-y-4">
             <h2 className="text-2xl font-bold">学歴</h2>
             <Separator />
-            <FormField
-              control={{}}
-              name="university"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>University</FormLabel>
-                  <Select onValueChange={(value) => handleSelectChange("university", value)}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a university" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {universityOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={{}}
-              name="department"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Department</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      value={formData.department}
-                      onChange={handleInputChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={{}}
-              name="year"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Year</FormLabel>
-                  <Select onValueChange={(value) => handleSelectChange("year", value)}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a year" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {yearOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div>
+              <FormLabel>University</FormLabel>
+              <Select onValueChange={(value) => handleSelectChange("university", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a university" />
+                </SelectTrigger>
+                <SelectContent>
+                  {universityOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <FormLabel>Department</FormLabel>
+              <Input
+                name="department"
+                value={formData.department}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <FormLabel>Year</FormLabel>
+              <Select onValueChange={(value) => handleSelectChange("year", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {yearOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
@@ -377,25 +302,16 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold">自己紹介</h2>
           <Separator />
-          <FormField
-            control={{}}
-            name="aboutMe"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>About Me</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="resize-none"
-                    placeholder="Tell us about yourself"
-                    {...field}
-                    value={formData.aboutMe}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div>
+            <FormLabel>About Me</FormLabel>
+            <Textarea
+              className="resize-none"
+              placeholder="Tell us about yourself"
+              name="aboutMe"
+              value={formData.aboutMe}
+              onChange={handleInputChange}
+            />
+          </div>
         </div>
 
         {/* Hobbies and Languages */}
@@ -403,52 +319,38 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
           <div className="space-y-4">
             <h2 className="text-2xl font-bold">趣味</h2>
             <Separator />
-            <FormField
-              control={{}}
-              name="hobbies"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hobbies</FormLabel>
-                  <MultiSelect
-                    options={[
-                      { value: "reading", label: "読書" },
-                      { value: "sports", label: "スポーツ" },
-                      { value: "travel", label: "旅行" },
-                      { value: "music", label: "音楽" },
-                      { value: "movies", label: "映画" },
-                      { value: "gaming", label: "ゲーム" },
-                      { value: "cooking", label: "料理" },
-                      { value: "photography", label: "写真" },
-                      { value: "art", label: "アート" },
-                      { value: "coding", label: "プログラミング" },
-                    ]}
-                    value={formData.hobbies}
-                    onChange={(values) => handleMultiSelectChange("hobbies", values)}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div>
+              <FormLabel>Hobbies</FormLabel>
+              <MultiSelect
+                options={[
+                  { value: "reading", label: "読書" },
+                  { value: "sports", label: "スポーツ" },
+                  { value: "travel", label: "旅行" },
+                  { value: "music", label: "音楽" },
+                  { value: "movies", label: "映画" },
+                  { value: "gaming", label: "ゲーム" },
+                  { value: "cooking", label: "料理" },
+                  { value: "photography", label: "写真" },
+                  { value: "art", label: "アート" },
+                  { value: "coding", label: "プログラミング" },
+                ]}
+                value={formData.hobbies}
+                onChange={(values) => handleMultiSelectChange("hobbies", values)}
+              />
+            </div>
           </div>
 
           <div className="space-y-4">
             <h2 className="text-2xl font-bold">言語</h2>
             <Separator />
-            <FormField
-              control={{}}
-              name="languages"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Languages</FormLabel>
-                  <MultiSelect
-                    options={languageOptions}
-                    value={formData.languages}
-                    onChange={(values) => handleMultiSelectChange("languages", values)}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div>
+              <FormLabel>Languages</FormLabel>
+              <MultiSelect
+                options={languageOptions}
+                value={formData.languages}
+                onChange={(values) => handleMultiSelectChange("languages", values)}
+              />
+            </div>
           </div>
         </div>
 
@@ -477,21 +379,14 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold">学習中の言語</h2>
           <Separator />
-          <FormField
-            control={{}}
-            name="learning_languages"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Learning Languages</FormLabel>
-                <MultiSelect
-                  options={languageOptions}
-                  value={formData.learning_languages}
-                  onChange={(values) => handleMultiSelectChange("learning_languages", values)}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div>
+            <FormLabel>Learning Languages</FormLabel>
+            <MultiSelect
+              options={languageOptions}
+              value={formData.learning_languages}
+              onChange={(values) => handleMultiSelectChange("learning_languages", values)}
+            />
+          </div>
         </div>
 
         {/* Image Uploads */}
@@ -507,57 +402,30 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
 
         {/* Photo Comments */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormField
-            control={{}}
-            name="photoComment"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>写真コメント</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={formData.photoComment}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={{}}
-            name="hobbyPhotoComment"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>趣味写真コメント</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={formData.hobbyPhotoComment}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={{}}
-            name="petPhotoComment"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ペット写真コメント</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={formData.petPhotoComment}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div>
+            <FormLabel>写真コメント</FormLabel>
+            <Input
+              name="photoComment"
+              value={formData.photoComment}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <FormLabel>趣味写真コメント</FormLabel>
+            <Input
+              name="hobbyPhotoComment"
+              value={formData.hobbyPhotoComment}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <FormLabel>ペット写真コメント</FormLabel>
+            <Input
+              name="petPhotoComment"
+              value={formData.petPhotoComment}
+              onChange={handleInputChange}
+            />
+          </div>
         </div>
 
         {/* Additional Information */}
@@ -572,7 +440,7 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
             {loading ? "送信中..." : "送信"}
           </Button>
         </div>
-      </Form>
+      </form>
     </div>
   );
 }
