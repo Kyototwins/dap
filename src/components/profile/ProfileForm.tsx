@@ -27,7 +27,7 @@ import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 
 interface ProfileFormProps {
-  profile?: any;
+  profile: any;
   onCancel: () => void;
 }
 
@@ -169,8 +169,8 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
     setFormData(prev => ({ ...prev, [name]: values }));
   };
 
-  const handleAdditionalDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  // 修正：引数の型を変更
+  const handleAdditionalDataChange = (name: string, value: string) => {
     setAdditionalData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -184,6 +184,12 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
   const onSubmitForm = (e: React.FormEvent) => {
     e.preventDefault();
     handleSubmit(e, formData, additionalData, images);
+  };
+
+  // AdditionalInfoSectionに渡すハンドラーラッパー
+  const handleAdditionalInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    handleAdditionalDataChange(name, value);
   };
 
   return (
@@ -224,7 +230,10 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
             </div>
             <div>
               <FormLabel>Gender</FormLabel>
-              <Select onValueChange={(value) => handleSelectChange("gender", value)}>
+              <Select 
+                value={formData.gender} 
+                onValueChange={(value) => handleSelectChange("gender", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a gender" />
                 </SelectTrigger>
@@ -259,7 +268,10 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
             <Separator />
             <div>
               <FormLabel>University</FormLabel>
-              <Select onValueChange={(value) => handleSelectChange("university", value)}>
+              <Select 
+                value={formData.university} 
+                onValueChange={(value) => handleSelectChange("university", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a university" />
                 </SelectTrigger>
@@ -282,7 +294,10 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
             </div>
             <div>
               <FormLabel>Year</FormLabel>
-              <Select onValueChange={(value) => handleSelectChange("year", value)}>
+              <Select 
+                value={formData.year} 
+                onValueChange={(value) => handleSelectChange("year", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a year" />
                 </SelectTrigger>
@@ -429,7 +444,7 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
         </div>
 
         {/* Additional Information */}
-        <AdditionalInfoSection additionalData={additionalData} onChange={handleAdditionalDataChange} />
+        <AdditionalInfoSection additionalData={additionalData} onChange={handleAdditionalInfoChange} loading={loading} />
 
         {/* Submit and Cancel Buttons */}
         <div className="flex justify-between">

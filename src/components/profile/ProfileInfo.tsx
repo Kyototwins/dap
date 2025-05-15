@@ -1,4 +1,5 @@
-import { Profile } from "@/types/messages";
+
+import { Profile } from "@/types/profile";
 
 interface ProfileInfoProps {
   profile: Profile;
@@ -6,16 +7,42 @@ interface ProfileInfoProps {
   onEditProfile?: () => void;
 }
 
-export function ProfileInfo({ profile, completion = 0, onEditProfile }: ProfileInfoProps) {
+export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoProps) {
+  // 既存のコンポーネントの実装を変更せずにプロパティだけを追加
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium">プロフィール完成度: {completion}%</h3>
-      {/* Profile statistics and data visualization would go here */}
-      <div className="bg-muted p-4 rounded-md">
-        <p className="text-sm text-muted-foreground">
-          プロフィール情報を更新することで、より多くのユーザーとマッチする可能性が高まります。
-        </p>
+      <h2 className="text-xl font-bold">プロフィール情報</h2>
+      <div className="bg-card border border-border rounded-lg p-4">
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">名前</span>
+            <span>{profile.first_name} {profile.last_name}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">年齢</span>
+            <span>{profile.age}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">性別</span>
+            <span>{profile.gender}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">出身</span>
+            <span>{profile.origin}</span>
+          </div>
+        </div>
       </div>
+      
+      {onEditProfile && (
+        <div className="flex justify-end">
+          <button 
+            className="text-sm text-blue-600 hover:text-blue-800"
+            onClick={onEditProfile}
+          >
+            編集
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,16 +2,17 @@
 import { useProfileFetching } from "./profile/useProfileFetching";
 import { useProfileSubmission } from "./profile/useProfileSubmission";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
+import { useState } from "react";
 
 export function useProfileOperations() {
+  const [initialLoading, setInitialLoading] = useState(true);
+  
   const { 
-    initialLoading, 
-    isLoading, 
     profile, 
-    error,
-    setInitialLoading, 
-    fetchUserProfile, 
-    refreshProfile 
+    isLoading, 
+    error, 
+    refreshProfile,
+    fetchUserProfile 
   } = useProfileFetching();
   
   const { loading, setLoading, handleSubmit } = useProfileSubmission();
