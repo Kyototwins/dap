@@ -80,14 +80,28 @@ export function NotificationSettings() {
   const testDigestEmail = async () => {
     setLoading(true);
     try {
-      await fetch('https://yxacicvkyusnykivbmtg.supabase.co/functions/v1/send-daily-digest', {
+      // Get current user to include in the test request
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      // Send test request with the user's ID
+      const response = await fetch('https://yxacicvkyusnykivbmtg.supabase.co/functions/v1/send-daily-digest', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWNpY3ZreXVzbnlraXZibXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk4NDY3MTYsImV4cCI6MjA1NTQyMjcxNn0.FXjSvFChIG5t23cDV5VKHEkl82Ki-pnv64PWQjcd6jQ'
         },
-        body: JSON.stringify({ test: true })
+        body: JSON.stringify({ 
+          test: true,
+          user_id: user.id 
+        })
       });
+      
+      const result = await response.json();
+      
+      if (result.error) {
+        throw new Error(result.error);
+      }
       
       toast({
         title: "Test digest email sent",

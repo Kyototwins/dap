@@ -27,6 +27,34 @@ const handler = async (req: Request): Promise<Response> => {
   console.log("Starting daily digest email function");
 
   try {
+    const requestData = await req.json().catch(() => ({}));
+    const isTest = requestData.test === true;
+    const specificUserId = requestData.user_id;
+
+    if (isTest && specificUserId) {
+      console.log(`Processing test digest email for user ${specificUserId}`);
+      try {
+        await processUserDigest(specificUserId, true);
+        return new Response(JSON.stringify({ 
+          success: true, 
+          message: `Test digest email sent for user ${specificUserId}` 
+        }), {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...corsHeaders }
+        });
+      } catch (error) {
+        console.error(`Error processing test digest for user ${specificUserId}:`, error);
+        return new Response(JSON.stringify({ 
+          error: error.message,
+          success: false,
+          message: `Error sending test digest email: ${error.message}` 
+        }), {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      }
+    }
+
     // Get all users with complete profiles AND email digest enabled
     const { data: users, error: usersError } = await supabase
       .from("profiles")
@@ -70,7 +98,7 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 // Process digest data for a single user
-async function processUserDigest(userId: string): Promise<void> {
+async function processUserDigest(userId: string, isTest: boolean = false): Promise<void> {
   console.log(`Processing digest for user ${userId}`);
   
   // 1. Get user's email from auth
@@ -181,7 +209,7 @@ async function processUserDigest(userId: string): Promise<void> {
     (newEvents && newEvents.length > 0) || 
     (upcomingEvents && upcomingEvents.length > 0);
   
-  if (!hasNotifications) {
+  if (!hasNotifications && !isTest) {
     console.log(`No notifications for user ${userId}, skipping email`);
     return;
   }
@@ -190,11 +218,13 @@ async function processUserDigest(userId: string): Promise<void> {
   await sendDigestEmail({
     email: user.email,
     username: profile.first_name || "User",
+    userId: userId,
     newLikes: newLikes || [],
     newMessages: newMessages || [],
     newMatches: newMatches || [],
     newEvents: newEvents || [],
-    upcomingEvents: upcomingEvents || []
+    upcomingEvents: upcomingEvents || [],
+    isTest: isTest
   });
 }
 
@@ -208,21 +238,25 @@ function formatDate(dateString: string): string {
 async function sendDigestEmail({
   email,
   username,
+  userId,
   newLikes,
   newMessages,
   newMatches,
   newEvents,
-  upcomingEvents
+  upcomingEvents,
+  isTest = false
 }: {
   email: string;
   username: string;
+  userId: string;
   newLikes: any[];
   newMessages: any[];
   newMatches: any[];
   newEvents: any[];
   upcomingEvents: any[];
+  isTest?: boolean;
 }): Promise<void> {
-  console.log(`Sending digest email to ${email}`);
+  console.log(`Sending digest email to ${email} (isTest: ${isTest})`);
   
   // Generate the HTML content for the email
   const htmlContent = `
@@ -248,35 +282,35 @@ async function sendDigestEmail({
     <body>
       <h1>DAP デイリーアップデート</h1>
       <p>こんにちは、${username}さん</p>
-      <p>昨日から今日にかけての新しい活動やイベント情報をお届けします。</p>
+      <p>${isTest ? '✅ これはテスト通知です。' : '昨日から今日にかけての新しい活動やイベント情報をお届けします。'}</p>
       
-      ${newLikes.length > 0 ? `
+      ${newLikes.length > 0 || isTest ? `
         <div class="section">
-          <h2>新しいいいね <span class="badge">${newLikes.length}</span></h2>
+          <h2>新しいいいね <span class="badge">${newLikes.length || (isTest ? '1' : '0')}</span></h2>
           ${newLikes.map(like => `
             <div class="item">
               <span class="name">${like.user1.first_name || 'User'}</span>さんがあなたに興味を持っています！
             </div>
-          `).join('')}
+          `).join('') || (isTest ? '<div class="item"><span class="name">テストユーザー</span>さんがあなたに興味を持っています！</div>' : '')}
         </div>
       ` : ''}
       
-      ${newMessages.length > 0 ? `
+      ${newMessages.length > 0 || isTest ? `
         <div class="section">
-          <h2>新しいメッセージ <span class="badge">${newMessages.length}</span></h2>
+          <h2>新しいメッセージ <span class="badge">${newMessages.length || (isTest ? '1' : '0')}</span></h2>
           ${newMessages.map(msg => `
             <div class="item">
               <div class="name">${msg.sender.first_name || 'User'}</div>
               <div class="message">"${msg.content.substring(0, 100)}${msg.content.length > 100 ? '...' : ''}"</div>
               <div class="date">${formatDate(msg.created_at)}</div>
             </div>
-          `).join('')}
+          `).join('') || (isTest ? '<div class="item"><div class="name">テストユーザー</div><div class="message">"こんにちは！元気ですか？"</div><div class="date">2025/05/15</div></div>' : '')}
         </div>
       ` : ''}
       
-      ${newMatches.length > 0 ? `
+      ${newMatches.length > 0 || isTest ? `
         <div class="section">
-          <h2>新しいマッチ <span class="badge">${newMatches.length}</span></h2>
+          <h2>新しいマッチ <span class="badge">${newMatches.length || (isTest ? '1' : '0')}</span></h2>
           ${newMatches.map(match => {
             const otherUser = match.user1_id === userId ? match.user2 : match.user1;
             return `
@@ -284,13 +318,13 @@ async function sendDigestEmail({
                 <span class="name">${otherUser.first_name || 'User'}</span>さんとマッチしました！
               </div>
             `;
-          }).join('')}
+          }).join('') || (isTest ? '<div class="item"><span class="name">テストマッチ</span>さんとマッチしました！</div>' : '')}
         </div>
       ` : ''}
       
-      ${newEvents.length > 0 ? `
+      ${newEvents.length > 0 || isTest ? `
         <div class="section">
-          <h2>新しいイベント <span class="badge">${newEvents.length}</span></h2>
+          <h2>新しいイベント <span class="badge">${newEvents.length || (isTest ? '1' : '0')}</span></h2>
           ${newEvents.map(event => `
             <div class="event">
               <div class="event-title">${event.title}</div>
@@ -299,13 +333,13 @@ async function sendDigestEmail({
               <div>場所: ${event.location}</div>
               ${event.creator ? `<div>主催者: ${event.creator.first_name || 'User'}</div>` : ''}
             </div>
-          `).join('')}
+          `).join('') || (isTest ? '<div class="event"><div class="event-title">テストイベント</div><div>これはテストイベントの説明です。</div><div class="date">開催日: 2025/05/20</div><div>場所: テスト会場</div><div>主催者: テスト</div></div>' : '')}
         </div>
       ` : ''}
       
-      ${upcomingEvents.length > 0 ? `
+      ${upcomingEvents.length > 0 || isTest ? `
         <div class="section">
-          <h2>3日以内に開催されるイベント <span class="badge">${upcomingEvents.length}</span></h2>
+          <h2>3日以内に開催されるイベント <span class="badge">${upcomingEvents.length || (isTest ? '1' : '0')}</span></h2>
           ${upcomingEvents.map(event => `
             <div class="event">
               <div class="event-title">${event.title}</div>
@@ -313,7 +347,7 @@ async function sendDigestEmail({
               <div class="date">開催日: ${formatDate(event.date)}</div>
               <div>場所: ${event.location}</div>
             </div>
-          `).join('')}
+          `).join('') || (isTest ? '<div class="event"><div class="event-title">テスト近日イベント</div><div>これは近日開催予定のテストイベントです。</div><div class="date">開催日: 2025/05/17</div><div>場所: テスト会場2</div></div>' : '')}
         </div>
       ` : ''}
 
@@ -329,20 +363,25 @@ async function sendDigestEmail({
     </html>
   `;
 
-  // Send the email using Resend
-  const { data, error } = await resend.emails.send({
-    from: "DAP Notification <notifications@resend-domain.com>",  // Update with your verified domain
-    to: email,
-    subject: `${username}さんの DAP デイリーアップデート`,
-    html: htmlContent,
-  });
+  try {
+    // Send the email using Resend
+    const { data, error } = await resend.emails.send({
+      from: "DAP Notifications <onboarding@resend.dev>",  // Update with your verified domain
+      to: email,
+      subject: `${username}さんの DAP デイリーアップデート${isTest ? ' (テスト)' : ''}`,
+      html: htmlContent,
+    });
 
-  if (error) {
-    console.error(`Error sending email to ${email}:`, error);
+    if (error) {
+      console.error(`Error sending email to ${email}:`, error);
+      throw error;
+    }
+
+    console.log(`Successfully sent digest email to ${email}`, data);
+  } catch (error) {
+    console.error(`Failed to send email to ${email}:`, error);
     throw error;
   }
-
-  console.log(`Successfully sent digest email to ${email}`, data);
 }
 
 // Start the HTTP server

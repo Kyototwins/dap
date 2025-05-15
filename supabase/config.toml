@@ -9,4 +9,3 @@ verify_jwt = false
 
 [functions.setup-daily-digest-cron]
 verify_jwt = false
-

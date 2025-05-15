@@ -75,4 +75,5 @@ export interface Profile {
   friend_activity?: string;
   best_quality?: string;
   email_digest_enabled?: boolean;
+  created_at?: string;  // Added the created_at property
 }

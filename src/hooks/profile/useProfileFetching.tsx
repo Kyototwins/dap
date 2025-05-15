@@ -4,6 +4,7 @@ import { fetchUserProfile as apiFetchUserProfile } from "@/services/profileServi
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/types/profile";
 import { useAuth } from "@/hooks/useAuth";
+import { processLanguageLevels } from "@/utils/profileDataUtils";
 
 export function useProfileFetching() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -20,9 +21,18 @@ export function useProfileFetching() {
     try {
       setIsLoading(true);
       const profileData = await apiFetchUserProfile(user.id);
-      setProfile(profileData);
+      
+      // Process the profile data to ensure language_levels is correctly formatted
+      const processedProfile: Profile = {
+        ...profileData,
+        language_levels: profileData.language_levels 
+          ? processLanguageLevels(profileData.language_levels)
+          : {}
+      };
+      
+      setProfile(processedProfile);
       setIsLoading(false);
-      return profileData;
+      return processedProfile;
     } catch (error) {
       console.error("Error fetching profile:", error);
       setError(error as Error);
