@@ -11,7 +11,7 @@ export interface ImageUploadState {
   image1: ImageUpload;
   image2: ImageUpload;
   hobby: ImageUpload;
-  pet: ImageUpload;  // Changed back from food to pet
+  pet: ImageUpload;
 }
 
 export interface ProfileFormData {
@@ -31,7 +31,7 @@ export interface ProfileFormData {
   learning_languages: string[];
   photoComment: string;
   hobbyPhotoComment: string;
-  petPhotoComment: string;  // Changed back from foodPhotoComment
+  petPhotoComment: string;
 }
 
 export interface AdditionalDataType {
@@ -43,37 +43,37 @@ export interface AdditionalDataType {
   bestQuality: string;
 }
 
-// Add the missing Profile type that's being imported in ProfileInfo.tsx
+// Update the Profile interface to ensure it's compatible with the one in messages.ts
 export interface Profile {
-  id?: string;
-  first_name?: string;
-  last_name?: string;
-  age?: number;
-  gender?: string;
-  origin?: string;
-  sexuality?: string;
-  about_me?: string;
-  university?: string;
-  department?: string;
-  year?: string;
-  hobbies?: string[];
-  languages?: string[];
-  language_levels?: Record<string, number> | string;
-  learning_languages?: string[];
-  avatar_url?: string;
-  image_url_1?: string;
-  image_url_2?: string;
-  hobby_photo_url?: string;
-  pet_photo_url?: string;
-  photo_comment?: string;
-  hobby_photo_comment?: string;
-  pet_photo_comment?: string;
-  ideal_date?: string;
-  life_goal?: string;
-  superpower?: string;
-  worst_nightmare?: string;
-  friend_activity?: string;
-  best_quality?: string;
+  id: string; // Changed from optional to required
+  created_at: string; // Changed from optional to required
+  first_name?: string | null;
+  last_name?: string | null;
+  age?: number | null;
+  gender?: string | null;
+  origin?: string | null;
+  about_me?: string | null;
+  university?: string | null;
+  department?: string | null;
+  year?: string | null;
+  hobbies?: string[] | null;
+  languages?: string[] | null;
+  language_levels?: Record<string, number> | string | null;
+  learning_languages?: string[] | null;
+  avatar_url?: string | null;
+  image_url_1?: string | null;
+  image_url_2?: string | null;
+  hobby_photo_url?: string | null;
+  pet_photo_url?: string | null;
+  photo_comment?: string | null;
+  hobby_photo_comment?: string | null;
+  pet_photo_comment?: string | null;
+  ideal_date?: string | null;
+  life_goal?: string | null;
+  superpower?: string | null;
+  worst_nightmare?: string | null;
+  friend_activity?: string | null;
+  best_quality?: string | null;
+  sexuality?: string | null;
   email_digest_enabled?: boolean;
-  created_at?: string;  // Added the created_at property
 }

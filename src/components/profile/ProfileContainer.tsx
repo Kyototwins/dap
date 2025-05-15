@@ -12,6 +12,7 @@ import { Bell } from "lucide-react";
 import { NotificationSettings } from "@/components/profile/NotificationSettings";
 import { useProfileFetching } from "@/hooks/profile/useProfileFetching";
 import { useConnectionStatus } from "@/hooks/useConnectionStatus";
+import { Profile as MessageProfile } from "@/types/messages";
 
 export function ProfileContainer() {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -40,13 +41,20 @@ export function ProfileContainer() {
     );
   }
 
+  // Convert to the MessageProfile type to ensure compatibility with components
+  const messageProfile: MessageProfile = {
+    ...profile,
+    id: profile.id || "",
+    created_at: profile.created_at || new Date().toISOString()
+  };
+
   if (isEditMode) {
     return <ProfileForm profile={profile} onCancel={() => setIsEditMode(false)} />;
   }
 
   return (
     <div className="pb-32">
-      <ProfileHeader profile={profile} />
+      <ProfileHeader profile={messageProfile} />
       <div className="container px-4 mt-2">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full grid grid-cols-3">
@@ -59,11 +67,11 @@ export function ProfileContainer() {
           </TabsList>
 
           <TabsContent value="about" className="py-4">
-            <ProfileAboutTab profile={profile} />
+            <ProfileAboutTab profile={messageProfile} />
           </TabsContent>
 
           <TabsContent value="stats" className="py-4">
-            <ProfileInfo profile={profile} />
+            <ProfileInfo profile={messageProfile} />
           </TabsContent>
 
           <TabsContent value="notifications" className="py-4">
