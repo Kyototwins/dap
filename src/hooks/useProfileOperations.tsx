@@ -9,6 +9,7 @@ export function useProfileOperations() {
     isLoading,
     error,
     refreshProfile,
+    fetchUserProfile
   } = useProfileFetching();
   
   const { loading, setLoading, handleSubmit } = useProfileSubmission();
@@ -21,5 +22,6 @@ export function useProfileOperations() {
     error,
     refreshProfile,
     handleSubmit,
+    fetchUserProfile
   };
 }
