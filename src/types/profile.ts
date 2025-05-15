@@ -45,8 +45,8 @@ export interface AdditionalDataType {
 
 // Update the Profile interface to ensure it's compatible with the one in messages.ts
 export interface Profile {
-  id: string; // Changed from optional to required
-  created_at: string; // Changed from optional to required
+  id: string;
+  created_at: string;
   first_name?: string | null;
   last_name?: string | null;
   age?: number | null;

@@ -30,11 +30,12 @@ const handler = async (req: Request): Promise<Response> => {
     const requestData = await req.json().catch(() => ({}));
     const isTest = requestData.test === true;
     const specificUserId = requestData.user_id;
+    const specificEmail = requestData.email; // For test emails only
 
     if (isTest && specificUserId) {
       console.log(`Processing test digest email for user ${specificUserId}`);
       try {
-        await processUserDigest(specificUserId, true);
+        await processUserDigest(specificUserId, true, specificEmail);
         return new Response(JSON.stringify({ 
           success: true, 
           message: `Test digest email sent for user ${specificUserId}` 
@@ -98,7 +99,7 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 // Process digest data for a single user
-async function processUserDigest(userId: string, isTest: boolean = false): Promise<void> {
+async function processUserDigest(userId: string, isTest: boolean = false, testEmail?: string): Promise<void> {
   console.log(`Processing digest for user ${userId}`);
   
   // 1. Get user's email from auth
@@ -216,7 +217,7 @@ async function processUserDigest(userId: string, isTest: boolean = false): Promi
   
   // 9. Generate and send the email
   await sendDigestEmail({
-    email: user.email,
+    email: testEmail || user.email, // Use the explicitly passed email for test if available
     username: profile.first_name || "User",
     userId: userId,
     newLikes: newLikes || [],
@@ -277,10 +278,12 @@ async function sendDigestEmail({
         .footer { margin-top: 30px; font-size: 12px; color: #888; text-align: center; }
         .badge { display: inline-block; background-color: #e0eaff; color: #2754C5; padding: 2px 6px; border-radius: 10px; font-size: 12px; margin-left: 5px; }
         .divider { height: 1px; background-color: #eee; margin: 15px 0; }
+        .test-banner { background-color: #ffff99; color: #333; padding: 10px; border-radius: 4px; margin-bottom: 20px; text-align: center; font-weight: bold; }
       </style>
     </head>
     <body>
       <h1>DAP デイリーアップデート</h1>
+      ${isTest ? '<div class="test-banner">⚠️ これはテスト用メールです ⚠️</div>' : ''}
       <p>こんにちは、${username}さん</p>
       <p>${isTest ? '✅ これはテスト通知です。' : '昨日から今日にかけての新しい活動やイベント情報をお届けします。'}</p>
       
@@ -358,15 +361,19 @@ async function sendDigestEmail({
       <div class="footer">
         <p>このメールは通知設定に基づいて送信されています。<br>
         通知設定の変更は、アプリのプロフィール設定から行えます。</p>
+        ${isTest ? '<p><strong>これはテスト送信であり、実際の通知ではありません。</strong></p>' : ''}
       </div>
     </body>
     </html>
   `;
 
   try {
+    // For testing, modify the from address to match the requirements
+    const fromAddress = isTest ? "test@mail3.doshisha.ac.jp" : "DAP Notifications <onboarding@resend.dev>";
+
     // Send the email using Resend
     const { data, error } = await resend.emails.send({
-      from: "DAP Notifications <onboarding@resend.dev>",  // Update with your verified domain
+      from: fromAddress,
       to: email,
       subject: `${username}さんの DAP デイリーアップデート${isTest ? ' (テスト)' : ''}`,
       html: htmlContent,

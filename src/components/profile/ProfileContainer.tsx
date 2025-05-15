@@ -41,11 +41,24 @@ export function ProfileContainer() {
     );
   }
 
-  // Convert to the MessageProfile type to ensure compatibility with components
-  const messageProfile: MessageProfile = {
+  // Ensure the profile has required fields for MessageProfile compatibility
+  const messageProfile = {
     ...profile,
-    id: profile.id || "",
-    created_at: profile.created_at || new Date().toISOString()
+    id: profile.id,
+    created_at: profile.created_at,
+    first_name: profile.first_name || null,
+    last_name: profile.last_name || null,
+    age: profile.age || null,
+    gender: profile.gender || null,
+    origin: profile.origin || null,
+    about_me: profile.about_me || null,
+    university: profile.university || null,
+    department: profile.department || null,
+    year: profile.year || null,
+    hobbies: profile.hobbies || null,
+    languages: profile.languages || null,
+    language_levels: profile.language_levels || null,
+    learning_languages: profile.learning_languages || null,
   };
 
   if (isEditMode) {
@@ -54,7 +67,7 @@ export function ProfileContainer() {
 
   return (
     <div className="pb-32">
-      <ProfileHeader profile={messageProfile} />
+      <ProfileHeader profile={messageProfile as MessageProfile} />
       <div className="container px-4 mt-2">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full grid grid-cols-3">
@@ -67,11 +80,11 @@ export function ProfileContainer() {
           </TabsList>
 
           <TabsContent value="about" className="py-4">
-            <ProfileAboutTab profile={messageProfile} />
+            <ProfileAboutTab profile={messageProfile as MessageProfile} />
           </TabsContent>
 
           <TabsContent value="stats" className="py-4">
-            <ProfileInfo profile={messageProfile} />
+            <ProfileInfo profile={messageProfile as MessageProfile} />
           </TabsContent>
 
           <TabsContent value="notifications" className="py-4">

@@ -61,14 +61,14 @@ export function NotificationSettings() {
       if (error) throw error;
 
       toast({
-        title: "Settings saved",
-        description: "Your notification settings have been updated successfully.",
+        title: "設定を保存しました",
+        description: "通知設定が正常に更新されました。",
       });
     } catch (error) {
       console.error("Error saving notification settings:", error);
       toast({
-        title: "Error saving settings",
-        description: "There was a problem saving your notification settings.",
+        title: "設定の保存中にエラーが発生しました",
+        description: "通知設定の保存中に問題が発生しました。",
         variant: "destructive",
       });
     } finally {
@@ -93,9 +93,15 @@ export function NotificationSettings() {
         },
         body: JSON.stringify({ 
           test: true,
-          user_id: user.id 
+          user_id: user.id,
+          email: user.email // Explicitly pass the user email to avoid Resend API restrictions
         })
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "テスト通知の送信に失敗しました");
+      }
       
       const result = await response.json();
       
@@ -104,14 +110,14 @@ export function NotificationSettings() {
       }
       
       toast({
-        title: "Test digest email sent",
-        description: "Check your email inbox for the test digest.",
+        title: "テスト通知送信完了",
+        description: "メールの受信ボックスをチェックしてください。",
       });
     } catch (error) {
       console.error("Error sending test digest email:", error);
       toast({
-        title: "Error sending test email",
-        description: "There was a problem sending the test digest email.",
+        title: "テスト通知の送信エラー",
+        description: `${error.message || "テスト通知の送信に問題がありました"}`,
         variant: "destructive",
       });
     } finally {
@@ -154,7 +160,7 @@ export function NotificationSettings() {
             onClick={testDigestEmail}
             disabled={loading}
           >
-            テスト通知送信
+            {loading ? "送信中..." : "テスト通知送信"}
           </Button>
           <Button onClick={saveSettings} disabled={loading}>
             {loading ? "保存中..." : "変更を保存"}
