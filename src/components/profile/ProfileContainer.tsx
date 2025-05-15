@@ -10,20 +10,14 @@ import { ProfileLoading } from "@/components/profile/ProfileLoading";
 import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
 import { Bell } from "lucide-react";
 import { NotificationSettings } from "@/components/profile/NotificationSettings";
-import { useProfileOperations } from "@/hooks/useProfileOperations";
+import { useProfileFetching } from "@/hooks/profile/useProfileFetching";
 import { useConnectionStatus } from "@/hooks/useConnectionStatus";
 
 export function ProfileContainer() {
   const [isEditMode, setIsEditMode] = useState(false);
-  const { profile, isLoading, error, refreshProfile, initialLoading } = useProfileOperations();
+  const { profile, isLoading, error, refreshProfile } = useProfileFetching();
   const { connectionError, offline } = useConnectionStatus();
   const [activeTab, setActiveTab] = useState("about");
-
-  useEffect(() => {
-    // 初回レンダリング時にプロフィールを取得
-    refreshProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   
   useEffect(() => {
     // フォームを閉じた後にプロフィールを再取得
@@ -32,7 +26,7 @@ export function ProfileContainer() {
     }
   }, [isEditMode, refreshProfile]);
 
-  if (isLoading || initialLoading) {
+  if (isLoading) {
     return <ProfileLoading />;
   }
 
