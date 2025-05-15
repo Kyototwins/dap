@@ -5,6 +5,7 @@ import { useProfileOperations } from "@/hooks/useProfileOperations";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileLoading } from "@/components/profile/ProfileLoading";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function ProfileSetup() {
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -46,17 +47,79 @@ export default function ProfileSetup() {
 
   const { 
     loading, 
-    initialLoading, 
+    isLoading, 
     handleSubmit, 
-    fetchUserProfile 
+    profile,
+    refreshProfile
   } = useProfileOperations();
 
   // Fetch user profile data when component mounts
   useEffect(() => {
-    fetchUserProfile(setFormData, setAdditionalData, setImages);
-  }, []);
+    const fetchUserData = async () => {
+      try {
+        // First, refresh the profile to ensure we have the latest data
+        await refreshProfile();
+        
+        // If profile is available, populate the form fields
+        if (profile) {
+          // Parse language levels JSON if it's stored as a string
+          let languageLevels = {};
+          if (profile.language_levels) {
+            try {
+              languageLevels = typeof profile.language_levels === 'string'
+                ? JSON.parse(profile.language_levels)
+                : profile.language_levels;
+            } catch (e) {
+              console.error("Error parsing language levels:", e);
+            }
+          }
 
-  if (initialLoading) {
+          setFormData({
+            firstName: profile.first_name || "",
+            lastName: profile.last_name || "",
+            age: profile.age ? profile.age.toString() : "",
+            gender: profile.gender || "",
+            origin: profile.origin || "",
+            sexuality: profile.sexuality || "",
+            aboutMe: profile.about_me || "",
+            university: profile.university || "",
+            department: profile.department || "",
+            year: profile.year || "",
+            hobbies: profile.hobbies || [],
+            languages: profile.languages || [],
+            languageLevels: languageLevels,
+            learning_languages: profile.learning_languages || [],
+            photoComment: profile.photo_comment || "",
+            hobbyPhotoComment: profile.hobby_photo_comment || "",
+            petPhotoComment: profile.pet_photo_comment || ""
+          });
+
+          setAdditionalData({
+            idealDate: profile.ideal_date || "",
+            lifeGoal: profile.life_goal || "",
+            superpower: profile.superpower || "",
+            worstNightmare: profile.worst_nightmare || "",
+            friendActivity: profile.friend_activity || "",
+            bestQuality: profile.best_quality || ""
+          });
+
+          setImages({
+            avatar: { file: null, preview: profile.avatar_url || "", uploading: false },
+            image1: { file: null, preview: profile.image_url_1 || "", uploading: false },
+            image2: { file: null, preview: profile.image_url_2 || "", uploading: false },
+            hobby: { file: null, preview: profile.hobby_photo_url || "", uploading: false },
+            pet: { file: null, preview: profile.pet_photo_url || "", uploading: false }
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+    
+    fetchUserData();
+  }, [profile, refreshProfile]);
+
+  if (isLoading) {
     return <ProfileLoading />;
   }
 
