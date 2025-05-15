@@ -1,14 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
 import { useProfileOperations } from "@/hooks/useProfileOperations";
+import { useForm } from "react-hook-form";
 import {
   Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,11 +15,9 @@ import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { ImageUploadComponent } from "@/components/profile/ImageUploadComponent";
 import { AdditionalInfoSection } from "@/components/profile/AdditionalInfoSection";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { useForm } from "react-hook-form";
 
 interface ProfileFormProps {
   profile: any;
@@ -70,7 +64,6 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
 
   const { loading, handleSubmit } = useProfileOperations();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const form = useForm();
 
   useEffect(() => {
@@ -168,7 +161,6 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
     setFormData(prev => ({ ...prev, [name]: values }));
   };
 
-  // Update this function to accept an event instead of name and value separately
   const handleAdditionalDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setAdditionalData(prev => ({ ...prev, [name]: value }));
@@ -188,272 +180,274 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
 
   return (
     <div className="container py-12 pb-32">
-      <form 
-        onSubmit={onSubmitForm}
-        className="space-y-8"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Basic Information */}
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">基本情報</h2>
-            <Separator />
-            <div>
-              <FormLabel>First Name</FormLabel>
-              <Input
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <FormLabel>Last Name</FormLabel>
-              <Input
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <FormLabel>Age</FormLabel>
-              <Input
-                type="number"
-                name="age"
-                value={formData.age}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <FormLabel>Gender</FormLabel>
-              <Select 
-                value={formData.gender} 
-                onValueChange={(value) => handleSelectChange("gender", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <FormLabel>Origin</FormLabel>
-              <Input
-                name="origin"
-                value={formData.origin}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <FormLabel>Sexuality</FormLabel>
-              <Input
-                name="sexuality"
-                value={formData.sexuality}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-
-          {/* University Information */}
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">学歴</h2>
-            <Separator />
-            <div>
-              <FormLabel>University</FormLabel>
-              <Select 
-                value={formData.university} 
-                onValueChange={(value) => handleSelectChange("university", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a university" />
-                </SelectTrigger>
-                <SelectContent>
-                  {universityOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <FormLabel>Department</FormLabel>
-              <Input
-                name="department"
-                value={formData.department}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <FormLabel>Year</FormLabel>
-              <Select 
-                value={formData.year} 
-                onValueChange={(value) => handleSelectChange("year", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {yearOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        {/* About Me */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold">自己紹介</h2>
-          <Separator />
-          <div>
-            <FormLabel>About Me</FormLabel>
-            <Textarea
-              className="resize-none"
-              placeholder="Tell us about yourself"
-              name="aboutMe"
-              value={formData.aboutMe}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-
-        {/* Hobbies and Languages */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">趣味</h2>
-            <Separator />
-            <div>
-              <FormLabel>Hobbies</FormLabel>
-              <MultiSelect
-                options={[
-                  { value: "reading", label: "読書" },
-                  { value: "sports", label: "スポーツ" },
-                  { value: "travel", label: "旅行" },
-                  { value: "music", label: "音楽" },
-                  { value: "movies", label: "映画" },
-                  { value: "gaming", label: "ゲーム" },
-                  { value: "cooking", label: "料理" },
-                  { value: "photography", label: "写真" },
-                  { value: "art", label: "アート" },
-                  { value: "coding", label: "プログラミング" },
-                ]}
-                value={formData.hobbies}
-                onChange={(values) => handleMultiSelectChange("hobbies", values)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">言語</h2>
-            <Separator />
-            <div>
-              <FormLabel>Languages</FormLabel>
-              <MultiSelect
-                options={languageOptions}
-                value={formData.languages}
-                onChange={(values) => handleMultiSelectChange("languages", values)}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Language Levels */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold">言語レベル</h2>
-          <Separator />
-          {formData.languages.map((language) => (
-            <div key={language} className="space-y-2">
-              <Label htmlFor={`${language}-level`}>{languageOptions.find(opt => opt.value === language)?.label}</Label>
-              <div className="flex items-center space-x-4">
-                <Slider
-                  id={`${language}-level`}
-                  defaultValue={[formData.languageLevels[language] || 1]}
-                  max={5}
-                  step={1}
-                  onValueChange={(value) => handleLanguageLevelChange(language, value[0])}
+      <Form {...form}>
+        <form 
+          onSubmit={onSubmitForm}
+          className="space-y-8"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">基本情報</h2>
+              <Separator />
+              <div>
+                <Label>First Name</Label>
+                <Input
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
                 />
-                <span>{formData.languageLevels[language] || 1}</span>
+              </div>
+              <div>
+                <Label>Last Name</Label>
+                <Input
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <Label>Age</Label>
+                <Input
+                  type="number"
+                  name="age"
+                  value={formData.age}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <Label>Gender</Label>
+                <Select 
+                  value={formData.gender} 
+                  onValueChange={(value) => handleSelectChange("gender", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Origin</Label>
+                <Input
+                  name="origin"
+                  value={formData.origin}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <Label>Sexuality</Label>
+                <Input
+                  name="sexuality"
+                  value={formData.sexuality}
+                  onChange={handleInputChange}
+                />
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* Learning Languages */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold">学習中の言語</h2>
-          <Separator />
-          <div>
-            <FormLabel>Learning Languages</FormLabel>
-            <MultiSelect
-              options={languageOptions}
-              value={formData.learning_languages}
-              onChange={(values) => handleMultiSelectChange("learning_languages", values)}
-            />
+            {/* University Information */}
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">学歴</h2>
+              <Separator />
+              <div>
+                <Label>University</Label>
+                <Select 
+                  value={formData.university} 
+                  onValueChange={(value) => handleSelectChange("university", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a university" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {universityOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Department</Label>
+                <Input
+                  name="department"
+                  value={formData.department}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <Label>Year</Label>
+                <Select 
+                  value={formData.year} 
+                  onValueChange={(value) => handleSelectChange("year", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {yearOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Image Uploads */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold">写真</h2>
-          <Separator />
-          <AvatarUpload image={images.avatar} setImage={(img) => setImages(prev => ({ ...prev, avatar: img }))} />
-          <ImageUploadComponent label="Image 1" image={images.image1} setImage={(img) => setImages(prev => ({ ...prev, image1: img }))} />
-          <ImageUploadComponent label="Image 2" image={images.image2} setImage={(img) => setImages(prev => ({ ...prev, image2: img }))} />
-          <ImageUploadComponent label="Hobby Photo" image={images.hobby} setImage={(img) => setImages(prev => ({ ...prev, hobby: img }))} />
-          <ImageUploadComponent label="Pet Photo" image={images.pet} setImage={(img) => setImages(prev => ({ ...prev, pet: img }))} />
-        </div>
-
-        {/* Photo Comments */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <FormLabel>写真コメント</FormLabel>
-            <Input
-              name="photoComment"
-              value={formData.photoComment}
-              onChange={handleInputChange}
-            />
+          {/* About Me */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">自己紹介</h2>
+            <Separator />
+            <div>
+              <Label>About Me</Label>
+              <Textarea
+                className="resize-none"
+                placeholder="Tell us about yourself"
+                name="aboutMe"
+                value={formData.aboutMe}
+                onChange={handleInputChange}
+              />
+            </div>
           </div>
-          <div>
-            <FormLabel>趣味写真コメント</FormLabel>
-            <Input
-              name="hobbyPhotoComment"
-              value={formData.hobbyPhotoComment}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <FormLabel>ペット写真コメント</FormLabel>
-            <Input
-              name="petPhotoComment"
-              value={formData.petPhotoComment}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
 
-        {/* Additional Information - Update to pass event directly */}
-        <AdditionalInfoSection 
-          additionalData={additionalData} 
-          onChange={handleAdditionalDataChange} 
-          loading={loading} 
-        />
+          {/* Hobbies and Languages */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">趣味</h2>
+              <Separator />
+              <div>
+                <Label>Hobbies</Label>
+                <MultiSelect
+                  options={[
+                    { value: "reading", label: "読書" },
+                    { value: "sports", label: "スポーツ" },
+                    { value: "travel", label: "旅行" },
+                    { value: "music", label: "音楽" },
+                    { value: "movies", label: "映画" },
+                    { value: "gaming", label: "ゲーム" },
+                    { value: "cooking", label: "料理" },
+                    { value: "photography", label: "写真" },
+                    { value: "art", label: "アート" },
+                    { value: "coding", label: "プログラミング" },
+                  ]}
+                  value={formData.hobbies}
+                  onChange={(values) => handleMultiSelectChange("hobbies", values)}
+                />
+              </div>
+            </div>
 
-        {/* Submit and Cancel Buttons */}
-        <div className="flex justify-between">
-          <Button variant="outline" onClick={onCancel}>
-            キャンセル
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? "送信中..." : "送信"}
-          </Button>
-        </div>
-      </form>
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">言語</h2>
+              <Separator />
+              <div>
+                <Label>Languages</Label>
+                <MultiSelect
+                  options={languageOptions}
+                  value={formData.languages}
+                  onChange={(values) => handleMultiSelectChange("languages", values)}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Language Levels */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">言語レベル</h2>
+            <Separator />
+            {formData.languages.map((language) => (
+              <div key={language} className="space-y-2">
+                <Label htmlFor={`${language}-level`}>{languageOptions.find(opt => opt.value === language)?.label}</Label>
+                <div className="flex items-center space-x-4">
+                  <Slider
+                    id={`${language}-level`}
+                    defaultValue={[formData.languageLevels[language] || 1]}
+                    max={5}
+                    step={1}
+                    onValueChange={(value) => handleLanguageLevelChange(language, value[0])}
+                  />
+                  <span>{formData.languageLevels[language] || 1}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Learning Languages */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">学習中の言語</h2>
+            <Separator />
+            <div>
+              <Label>Learning Languages</Label>
+              <MultiSelect
+                options={languageOptions}
+                value={formData.learning_languages}
+                onChange={(values) => handleMultiSelectChange("learning_languages", values)}
+              />
+            </div>
+          </div>
+
+          {/* Image Uploads */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">写真</h2>
+            <Separator />
+            <AvatarUpload image={images.avatar} setImage={(img) => setImages(prev => ({ ...prev, avatar: img }))} />
+            <ImageUploadComponent label="Image 1" image={images.image1} setImage={(img) => setImages(prev => ({ ...prev, image1: img }))} />
+            <ImageUploadComponent label="Image 2" image={images.image2} setImage={(img) => setImages(prev => ({ ...prev, image2: img }))} />
+            <ImageUploadComponent label="Hobby Photo" image={images.hobby} setImage={(img) => setImages(prev => ({ ...prev, hobby: img }))} />
+            <ImageUploadComponent label="Pet Photo" image={images.pet} setImage={(img) => setImages(prev => ({ ...prev, pet: img }))} />
+          </div>
+
+          {/* Photo Comments */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <Label>写真コメント</Label>
+              <Input
+                name="photoComment"
+                value={formData.photoComment}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <Label>趣味写真コメント</Label>
+              <Input
+                name="hobbyPhotoComment"
+                value={formData.hobbyPhotoComment}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <Label>ペット写真コメント</Label>
+              <Input
+                name="petPhotoComment"
+                value={formData.petPhotoComment}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
+          {/* Additional Information */}
+          <AdditionalInfoSection 
+            additionalData={additionalData} 
+            onChange={handleAdditionalDataChange} 
+            loading={loading} 
+          />
+
+          {/* Submit and Cancel Buttons */}
+          <div className="flex justify-between">
+            <Button variant="outline" onClick={onCancel}>
+              キャンセル
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "送信中..." : "送信"}
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

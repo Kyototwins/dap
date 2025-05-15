@@ -1,144 +1,44 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { fetchUserProfile as apiFetchUserProfile } from "@/services/profileService";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
+import { Profile } from "@/types/profile";
+import { useAuth } from "@/hooks/useAuth";
 
 export function useProfileFetching() {
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const { toast } = useToast();
+  const { user } = useAuth();
 
-  // Fetch the user profile on component mount
+  const fetchUserProfile = useCallback(async () => {
+    if (!user?.id) {
+      setIsLoading(false);
+      return null;
+    }
+
+    try {
+      setIsLoading(true);
+      const profileData = await apiFetchUserProfile(user.id);
+      setProfile(profileData);
+      setIsLoading(false);
+      return profileData;
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setError(error as Error);
+      setIsLoading(false);
+      return null;
+    }
+  }, [user?.id]);
+
+  const refreshProfile = useCallback(async () => {
+    await fetchUserProfile();
+  }, [fetchUserProfile]);
+
+  // Initial profile fetch
   useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-
-      const { data, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (profileError) {
-        throw profileError;
-      }
-
-      setProfile(data);
-    } catch (err) {
-      console.error("Error fetching profile:", err);
-      setError(err as Error);
-      toast({
-        title: "Error",
-        description: "Failed to load profile data",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const refreshProfile = () => {
-    return fetchProfile();
-  };
-
-  const fetchUserProfile = async (
-    setFormData: (data: ProfileFormData) => void,
-    setAdditionalData: (data: AdditionalDataType) => void,
-    setImages: (data: ImageUploadState) => void
-  ) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-
-      const { data, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (profileError) {
-        throw profileError;
-      }
-
-      // Parse language levels JSON if it's stored as a string
-      let languageLevels = {};
-      if (data.language_levels) {
-        try {
-          languageLevels = typeof data.language_levels === 'string'
-            ? JSON.parse(data.language_levels)
-            : data.language_levels;
-        } catch (e) {
-          console.error("Error parsing language levels:", e);
-        }
-      }
-
-      setFormData({
-        firstName: data.first_name || "",
-        lastName: data.last_name || "",
-        age: data.age ? data.age.toString() : "",
-        gender: data.gender || "",
-        origin: data.origin || "",
-        sexuality: data.sexuality || "",
-        aboutMe: data.about_me || "",
-        university: data.university || "",
-        department: data.department || "",
-        year: data.year || "",
-        hobbies: data.hobbies || [],
-        languages: data.languages || [],
-        languageLevels: languageLevels,
-        learning_languages: data.learning_languages || [],
-        photoComment: data.photo_comment || "",
-        hobbyPhotoComment: data.hobby_photo_comment || "",
-        petPhotoComment: data.pet_photo_comment || ""
-      });
-
-      setAdditionalData({
-        idealDate: data.ideal_date || "",
-        lifeGoal: data.life_goal || "",
-        superpower: data.superpower || "",
-        worstNightmare: data.worst_nightmare || "",
-        friendActivity: data.friend_activity || "",
-        bestQuality: data.best_quality || ""
-      });
-
-      setImages({
-        avatar: { file: null, preview: data.avatar_url || "", uploading: false },
-        image1: { file: null, preview: data.image_url_1 || "", uploading: false },
-        image2: { file: null, preview: data.image_url_2 || "", uploading: false },
-        hobby: { file: null, preview: data.hobby_photo_url || "", uploading: false },
-        pet: { file: null, preview: data.pet_photo_url || "", uploading: false }
-      });
-      
-      setProfile(data);
-    } catch (err) {
-      console.error("Error fetching profile for form:", err);
-      setError(err as Error);
-      toast({
-        title: "Error",
-        description: "Failed to load profile data",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    fetchUserProfile();
+  }, [fetchUserProfile]);
 
   return { profile, isLoading, error, refreshProfile, fetchUserProfile };
 }
