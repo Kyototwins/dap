@@ -4,15 +4,28 @@ import { useProfileSubmission } from "./profile/useProfileSubmission";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
 
 export function useProfileOperations() {
-  const { initialLoading, setInitialLoading, fetchUserProfile } = useProfileFetching();
+  const { 
+    initialLoading, 
+    isLoading, 
+    profile, 
+    error,
+    setInitialLoading, 
+    fetchUserProfile, 
+    refreshProfile 
+  } = useProfileFetching();
+  
   const { loading, setLoading, handleSubmit } = useProfileSubmission();
 
   return {
     loading,
+    isLoading,
+    profile,
+    error,
     setLoading,
     initialLoading,
     setInitialLoading,
     handleSubmit,
-    fetchUserProfile
+    fetchUserProfile,
+    refreshProfile
   };
 }

@@ -336,6 +336,7 @@ export type Database = {
           best_quality: string | null
           created_at: string | null
           department: string | null
+          email_digest_enabled: boolean | null
           first_name: string | null
           friend_activity: string | null
           gender: string | null
@@ -368,6 +369,7 @@ export type Database = {
           best_quality?: string | null
           created_at?: string | null
           department?: string | null
+          email_digest_enabled?: boolean | null
           first_name?: string | null
           friend_activity?: string | null
           gender?: string | null
@@ -400,6 +402,7 @@ export type Database = {
           best_quality?: string | null
           created_at?: string | null
           department?: string | null
+          email_digest_enabled?: boolean | null
           first_name?: string | null
           friend_activity?: string | null
           gender?: string | null

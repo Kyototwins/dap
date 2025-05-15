@@ -1,77 +1,54 @@
 
-import { Edit } from "lucide-react";
-import { Profile } from "@/types/messages";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ProfileAboutTab } from "./ProfileAboutTab";
-import { ProfileCover } from "./ProfileCover";
+import { useState } from "react";
 
 interface ProfileInfoProps {
-  profile: Profile;
-  completion: number;
-  onEditProfile: () => void;
+  profile: any;
+  completion?: number;
+  onEditProfile?: () => void;
 }
 
-export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoProps) {
-  const universitySuffix = profile.university ? 
-    profile.department ? `, ${profile.department}` : "" : "";
+export function ProfileInfo({ profile, completion = 0, onEditProfile }: ProfileInfoProps) {
+  const [activeSection, setActiveSection] = useState('stats');
   
-  const universityText = profile.university ? 
-    `${profile.university}${universitySuffix}` : "University info not set";
-
   return (
-    <div className="pb-6">
-      {/* Cover image */}
-      <ProfileCover imageUrl={profile.image_url_1} />
-      
-      {/* Profile avatar */}
-      <div className="relative -mt-16 px-4 mb-4">
-        <Avatar className="w-32 h-32 border-4 border-white shadow-md">
-          <AvatarImage
-            src={profile.avatar_url || "/placeholder.svg"}
-            alt="Profile"
+    <div className="space-y-4">
+      <div className="bg-white p-4 rounded-lg shadow-sm">
+        <h3 className="text-lg font-medium mb-3">プロフィール完成度</h3>
+        <div className="bg-gray-200 h-2 rounded-full overflow-hidden">
+          <div 
+            className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full" 
+            style={{ width: `${completion}%` }}
           />
-          <AvatarFallback className="text-2xl">
-            {profile.first_name?.[0]}
-            {profile.last_name?.[0]}
-          </AvatarFallback>
-        </Avatar>
+        </div>
+        <div className="mt-1 text-right text-sm text-gray-600">{completion}%</div>
+        
+        <p className="mt-4 text-sm text-gray-600">
+          プロフィールを充実させると、より多くのマッチが見つかりやすくなります。
+        </p>
+        
+        {onEditProfile && (
+          <button 
+            onClick={onEditProfile} 
+            className="w-full mt-4 py-2 text-sm bg-indigo-50 text-indigo-600 rounded-md hover:bg-indigo-100"
+          >
+            プロフィールを編集する
+          </button>
+        )}
       </div>
       
-      {/* Profile information */}
-      <div className="px-4">
-        <h1 className="text-3xl font-bold mb-1">
-          {profile.first_name} {profile.last_name}
-        </h1>
-        <p className="text-gray-600 mb-4">{universityText}</p>
-        
-        {/* Action button - profile edit button only */}
-        <div className="flex mb-6">
-          <Button 
-            onClick={onEditProfile}
-            className="flex-1 gap-2 bg-[#7f1184] hover:bg-[#671073]"
-          >
-            <Edit className="w-4 h-4" />
-            <span>Edit Profile</span>
-          </Button>
-        </div>
-        
-        {/* Profile completion */}
-        <div className="mb-6">
-          <div className="flex justify-between mb-2">
-            <span className="text-sm text-gray-600">Profile completion: {completion}%</span>
+      <div className="bg-white p-4 rounded-lg shadow-sm">
+        <h3 className="text-lg font-medium mb-3">アカウント情報</h3>
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between py-1 border-b">
+            <span className="text-gray-500">作成日</span>
+            <span>
+              {profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '未設定'}
+            </span>
           </div>
-          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-[#7f1184]" 
-              style={{ width: `${completion}%` }}
-            />
+          <div className="flex justify-between py-1 border-b">
+            <span className="text-gray-500">最終更新</span>
+            <span>最近</span>
           </div>
-        </div>
-        
-        {/* Show profile content without "About" heading */}
-        <div className="w-full">
-          <ProfileAboutTab profile={profile} />
         </div>
       </div>
     </div>

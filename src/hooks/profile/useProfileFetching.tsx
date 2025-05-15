@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,17 +35,62 @@ interface ProfileData {
   best_quality: string | null;
   hobby_photo_url: string | null;
   hobby_photo_comment: string | null;
-  // Changed back to pet photo fields
   pet_photo_url: string | null;
   pet_photo_comment: string | null;
+  email_digest_enabled: boolean | null;
 }
 
 export function useProfileFetching() {
   const [initialLoading, setInitialLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const fetchProfile = async (
+  const fetchProfile = async () => {
+    try {
+      setIsLoading(true);
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      
+      // Cast data to our ProfileData type to ensure type safety
+      setProfile(data as unknown as ProfileData);
+    } catch (error: any) {
+      console.error("Error fetching profile:", error);
+      setError(error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to fetch profile information.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+      setInitialLoading(false);
+    }
+  };
+
+  const refreshProfile = useCallback(() => {
+    fetchProfile();
+  }, []);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchUserProfile = async (
     setFormData: (data: ProfileFormData) => void,
     setAdditionalData: (data: AdditionalDataType) => void,
     setImages: (data: ImageUploadState) => void
@@ -100,7 +145,7 @@ export function useProfileFetching() {
           learning_languages: profile.learning_languages || [],
           photoComment: profile.photo_comment || "",
           hobbyPhotoComment: profile.hobby_photo_comment || "",
-          petPhotoComment: profile.pet_photo_comment || ""  // Changed back from foodPhotoComment
+          petPhotoComment: profile.pet_photo_comment || ""
         });
 
         // Set additional data - map database fields to our frontend model
@@ -135,9 +180,9 @@ export function useProfileFetching() {
             preview: profile.hobby_photo_url || "",
             uploading: false
           },
-          pet: {  // Changed back from food
+          pet: {
             file: null,
-            preview: profile.pet_photo_url || "",  // Changed back from favorite_food_photo_url
+            preview: profile.pet_photo_url || "",
             uploading: false
           }
         });
@@ -156,7 +201,11 @@ export function useProfileFetching() {
 
   return {
     initialLoading,
+    isLoading,
+    profile,
+    error,
     setInitialLoading,
-    fetchUserProfile: fetchProfile
+    fetchUserProfile,
+    refreshProfile
   };
 }
