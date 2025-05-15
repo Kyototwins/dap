@@ -27,17 +27,18 @@ const handler = async (req: Request): Promise<Response> => {
   console.log("Starting daily digest email function");
 
   try {
-    // Get all users with complete profiles
+    // Get all users with complete profiles AND email digest enabled
     const { data: users, error: usersError } = await supabase
       .from("profiles")
-      .select("id, first_name, avatar_url")
-      .not("first_name", "is", null);
+      .select("id, first_name, avatar_url, email_digest_enabled")
+      .not("first_name", "is", null)
+      .eq("email_digest_enabled", true);
 
     if (usersError) {
       throw new Error(`Error fetching users: ${usersError.message}`);
     }
 
-    console.log(`Found ${users?.length || 0} users with profiles`);
+    console.log(`Found ${users?.length || 0} users with email digest enabled`);
     
     // Process each user to gather their digest data and send email
     for (const user of (users || [])) {

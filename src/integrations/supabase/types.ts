@@ -438,6 +438,10 @@ export type Database = {
           | { p_event_id: string; p_user_id: string }
         Returns: undefined
       }
+      setup_email_digest_job: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

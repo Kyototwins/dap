@@ -1,94 +1,78 @@
 
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { Profile as ProfileType } from "@/types/messages";
+import { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EditProfileButton } from "@/components/profile/EditProfileButton";
+import { ProfileForm } from "@/components/profile/ProfileForm";
+import { ProfileInfo } from "@/components/profile/ProfileInfo";
+import { ProfileHeader } from "@/components/profile/ProfileHeader";
+import { ProfileAboutTab } from "@/components/profile/ProfileAboutTab";
 import { ProfileLoading } from "@/components/profile/ProfileLoading";
 import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
-import { ProfileInfo } from "@/components/profile/ProfileInfo";
-// DeleteAccountButtonのimportを削除
+import { Bell } from "lucide-react";
+import { NotificationSettings } from "@/components/profile/NotificationSettings";
+import { useProfileFetching } from "@/hooks/profile/useProfileFetching";
+import { useConnectionStatus } from "@/hooks/useConnectionStatus";
 
 export function ProfileContainer() {
-  const [profile, setProfile] = useState<ProfileType | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [completion, setCompletion] = useState(0);
-  const { toast } = useToast();
-  const navigate = useNavigate();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const { profile, isLoading, error, refreshProfile } = useProfileFetching();
+  const { connectionError, offline } = useConnectionStatus();
+  const [activeTab, setActiveTab] = useState("about");
 
   useEffect(() => {
-    loadProfile();
-  }, []);
-
-  const loadProfile = async () => {
-    try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
-      if (!user) {
-        navigate("/login");
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (error) throw error;
-      setProfile(data as ProfileType);
-
-      // プロフィールの完成度を計算
-      if (data) {
-        calculateCompletion(data);
-      }
-    } catch (error: any) {
-      toast({
-        title: "エラーが発生しました",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+    // フォームを閉じた後にプロフィールを再取得
+    if (!isEditMode) {
+      refreshProfile();
     }
-  };
+  }, [isEditMode, refreshProfile]);
 
-  const calculateCompletion = (profile: any) => {
-    const fields = [
-      'first_name', 'last_name', 'age', 'gender', 'origin', 'university',
-      'department', 'about_me', 'avatar_url', 'languages'
-    ];
-
-    const completedFields = fields.filter(field => {
-      if (Array.isArray(profile[field])) {
-        return profile[field].length > 0;
-      }
-      return profile[field] !== null && profile[field] !== '';
-    });
-
-    setCompletion(Math.round((completedFields.length / fields.length) * 100));
-  };
-
-  const handleEditProfile = () => {
-    navigate("/profile/setup");
-  };
-
-  if (loading) {
+  if (isLoading) {
     return <ProfileLoading />;
   }
 
-  if (!profile) {
-    return <ProfileNotFound />;
+  if (error || !profile) {
+    return (
+      <ProfileNotFound
+        message="プロフィールの読み込みに失敗しました"
+        offline={offline}
+        connectionError={connectionError}
+      />
+    );
+  }
+
+  if (isEditMode) {
+    return <ProfileForm profile={profile} onCancel={() => setIsEditMode(false)} />;
   }
 
   return (
-    <div>
-      <ProfileInfo
-        profile={profile}
-        completion={completion}
-        onEditProfile={handleEditProfile}
-      />
-      {/* DeleteAccountButtonは削除 */}
+    <div className="pb-32">
+      <ProfileHeader profile={profile} />
+      <div className="container px-4 mt-2">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="w-full grid grid-cols-3">
+            <TabsTrigger value="about">About</TabsTrigger>
+            <TabsTrigger value="stats">統計</TabsTrigger>
+            <TabsTrigger value="notifications" className="flex gap-1.5 items-center">
+              <Bell size={16} />
+              <span>通知</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="about" className="py-4">
+            <ProfileAboutTab profile={profile} />
+          </TabsContent>
+
+          <TabsContent value="stats" className="py-4">
+            <ProfileInfo profile={profile} />
+          </TabsContent>
+
+          <TabsContent value="notifications" className="py-4">
+            <NotificationSettings />
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <EditProfileButton onClick={() => setIsEditMode(true)} />
     </div>
   );
 }
