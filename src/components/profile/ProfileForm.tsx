@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
 import { useProfileOperations } from "@/hooks/useProfileOperations";
@@ -169,8 +168,9 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
     setFormData(prev => ({ ...prev, [name]: values }));
   };
 
-  // 修正：引数の型を変更
-  const handleAdditionalDataChange = (name: string, value: string) => {
+  // Update this function to accept an event instead of name and value separately
+  const handleAdditionalDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
     setAdditionalData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -184,12 +184,6 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
   const onSubmitForm = (e: React.FormEvent) => {
     e.preventDefault();
     handleSubmit(e, formData, additionalData, images);
-  };
-
-  // AdditionalInfoSectionに渡すハンドラーラッパー
-  const handleAdditionalInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    handleAdditionalDataChange(name, value);
   };
 
   return (
@@ -443,8 +437,12 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
           </div>
         </div>
 
-        {/* Additional Information */}
-        <AdditionalInfoSection additionalData={additionalData} onChange={handleAdditionalInfoChange} loading={loading} />
+        {/* Additional Information - Update to pass event directly */}
+        <AdditionalInfoSection 
+          additionalData={additionalData} 
+          onChange={handleAdditionalDataChange} 
+          loading={loading} 
+        />
 
         {/* Submit and Cancel Buttons */}
         <div className="flex justify-between">

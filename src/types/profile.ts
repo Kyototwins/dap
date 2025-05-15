@@ -42,3 +42,37 @@ export interface AdditionalDataType {
   friendActivity: string;
   bestQuality: string;
 }
+
+// Add the missing Profile type that's being imported in ProfileInfo.tsx
+export interface Profile {
+  id?: string;
+  first_name?: string;
+  last_name?: string;
+  age?: number;
+  gender?: string;
+  origin?: string;
+  sexuality?: string;
+  about_me?: string;
+  university?: string;
+  department?: string;
+  year?: string;
+  hobbies?: string[];
+  languages?: string[];
+  language_levels?: Record<string, number> | string;
+  learning_languages?: string[];
+  avatar_url?: string;
+  image_url_1?: string;
+  image_url_2?: string;
+  hobby_photo_url?: string;
+  pet_photo_url?: string;
+  photo_comment?: string;
+  hobby_photo_comment?: string;
+  pet_photo_comment?: string;
+  ideal_date?: string;
+  life_goal?: string;
+  superpower?: string;
+  worst_nightmare?: string;
+  friend_activity?: string;
+  best_quality?: string;
+  email_digest_enabled?: boolean;
+}

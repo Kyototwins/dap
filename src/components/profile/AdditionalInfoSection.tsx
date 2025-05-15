@@ -12,7 +12,7 @@ interface AdditionalInfoSectionProps {
     friendActivity: string;
     bestQuality: string;
   };
-  onChange: (name: string, value: string) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   loading?: boolean;
 }
 
