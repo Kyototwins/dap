@@ -2,7 +2,7 @@
 import { useProfileFetching } from "./profile/useProfileFetching";
 import { useProfileSubmission } from "./profile/useProfileSubmission";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function useProfileOperations() {
   const [initialLoading, setInitialLoading] = useState(true);
@@ -16,6 +16,13 @@ export function useProfileOperations() {
   } = useProfileFetching();
   
   const { loading, setLoading, handleSubmit } = useProfileSubmission();
+
+  // Auto-set initialLoading to false once profile data is loaded
+  useEffect(() => {
+    if (!isLoading && profile) {
+      setInitialLoading(false);
+    }
+  }, [isLoading, profile]);
 
   return {
     loading,
