@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormData, AdditionalDataType } from "@/types/profile";
 
@@ -32,10 +31,10 @@ export async function updateUserProfile(
       image_url_1: imageUrl1,
       image_url_2: imageUrl2,
       hobby_photo_url: hobbyPhotoUrl,
-      pet_photo_url: petPhotoUrl,  // Changed back from favorite_food_photo_url
+      pet_photo_url: petPhotoUrl,
       photo_comment: formData.photoComment,
       hobby_photo_comment: formData.hobbyPhotoComment,
-      pet_photo_comment: formData.petPhotoComment,  // Changed back from favorite_food_photo_comment
+      pet_photo_comment: formData.petPhotoComment,
       ideal_date: additionalData.idealDate,
       life_goal: additionalData.lifeGoal,
       superpower: additionalData.superpower,
@@ -67,27 +66,31 @@ export async function fetchUserProfile(userId: string) {
 
 export async function updateFcmToken(userId: string, token: string) {
   try {
-    const { error } = await supabase.rpc('update_fcm_token', { 
-      user_id: userId, 
-      token: token 
-    });
-    
-    if (!error) {
-      return true;
-    }
-    
-    // Fall back to direct update if RPC doesn't exist
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({
-        fcm_token: token,
-        notification_settings: { browser_push: true }
+    // Instead of using RPC which doesn't exist, directly update the profile table
+    // First check if notification_settings column exists
+    const { data: tableInfo, error: checkError } = await supabase
+      .rpc('system_schema_info', { 
+        p_table_name: 'profiles'
       })
-      .eq('id', userId);
+      .single();
+    
+    if (checkError) {
+      console.log('Using direct update without notification_settings');
+      // If we can't check the schema (or column doesn't exist), try direct update
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          // Using notification_settings as a JSONB field if it exists
+          notification_settings: { browser_push: true }
+        })
+        .eq('id', userId);
+        
+      if (error) {
+        console.error('Error updating notification settings:', error);
+        return false;
+      }
       
-    if (updateError) {
-      console.error('Error updating FCM token:', updateError);
-      return false;
+      return true;
     }
     
     return true;

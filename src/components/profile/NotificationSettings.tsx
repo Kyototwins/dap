@@ -20,7 +20,7 @@ export function NotificationSettings() {
 
         const { data, error } = await supabase
           .from("profiles")
-          .select("email_digest_enabled, notification_email")
+          .select("*")
           .eq("id", user.id)
           .single();
 
@@ -30,6 +30,7 @@ export function NotificationSettings() {
         }
         
         if (data) {
+          // Safely access properties that may not exist in all database setups
           setEmailDigestEnabled(data.email_digest_enabled || false);
           setNotificationEmail(data.notification_email || user.email || "");
         }
