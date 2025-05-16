@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -119,7 +120,7 @@ export function PhotosSection({
           
           <div className="space-y-4">
             
-            <ImageUploadComponent label="Pet Photo" image={images.pet} setImage={newImage => setImages(prev => ({
+            <ImageUploadComponent label="Pet Photo or Food Photo" image={images.pet} setImage={newImage => setImages(prev => ({
             ...prev,
             pet: newImage
           }))} disabled={loading} />
