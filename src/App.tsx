@@ -45,50 +45,50 @@ function AuthenticatedApp() {
   }, [user, session, notificationsInitialized]);
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">読み込み中...</div>;
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   return (
     <Routes>
       {/* Public routes - accessible without authentication */}
-      <Route path="/" element={!loading && user ? <Navigate to="/matches" replace /> : <Landing />} />
-      <Route path="/login" element={!loading && user ? <Navigate to="/matches" replace /> : <Login />} />
-      <Route path="/signup" element={!loading && user ? <Navigate to="/matches" replace /> : <SignUp />} />
+      <Route path="/" element={user ? <Navigate to="/matches" replace /> : <Landing />} />
+      <Route path="/login" element={user ? <Navigate to="/matches" replace /> : <Login />} />
+      <Route path="/signup" element={user ? <Navigate to="/matches" replace /> : <SignUp />} />
       
       {/* Protected routes that require authentication */}
       <Route 
         path="/profile/setup" 
-        element={!loading && user ? <ProfileSetup /> : <Navigate to="/login" replace />} 
+        element={user ? <ProfileSetup /> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/help" 
-        element={!loading && user ? <Help /> : <Navigate to="/login" replace />} 
+        element={user ? <Help /> : <Navigate to="/login" replace />} 
       />
       
       {/* Protected routes - AppLayout wrapper */}
       <Route 
         path="/matches" 
-        element={!loading && user ? <AppLayout><Matches /></AppLayout> : <Navigate to="/login" replace />} 
+        element={user ? <AppLayout><Matches /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/messages" 
-        element={!loading && user ? <AppLayout><Messages /></AppLayout> : <Navigate to="/login" replace />} 
+        element={user ? <AppLayout><Messages /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/events" 
-        element={!loading && user ? <AppLayout><Events /></AppLayout> : <Navigate to="/login" replace />} 
+        element={user ? <AppLayout><Events /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/events/new" 
-        element={!loading && user ? <AppLayout><CreateEvent /></AppLayout> : <Navigate to="/login" replace />} 
+        element={user ? <AppLayout><CreateEvent /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/profile" 
-        element={!loading && user ? <AppLayout><Profile /></AppLayout> : <Navigate to="/login" replace />} 
+        element={user ? <AppLayout><Profile /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/profile/:id" 
-        element={!loading && user ? <AppLayout><UserProfile /></AppLayout> : <Navigate to="/login" replace />} 
+        element={user ? <AppLayout><UserProfile /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route path="*" element={<NotFound />} />
     </Routes>

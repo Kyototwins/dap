@@ -119,7 +119,6 @@ export function useAuthOperations() {
         description: "アプリへようこそ！",
       });
       
-      console.log("Login successful, user is now authenticated");
       return data;
     } catch (error: any) {
       console.error("Login error:", error);
@@ -143,9 +142,8 @@ export function useAuthOperations() {
         variant: "destructive",
       });
       
-      return Promise.reject(error);
+      throw error; // Re-throw so calling code can handle if needed
     } finally {
-      console.log("Login process completed, releasing loading state");
       setLoading(false);
     }
   };

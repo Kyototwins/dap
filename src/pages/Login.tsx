@@ -17,21 +17,17 @@ export default function Login() {
   const { loading, connectionError, offline, handleLogin, user } = useAuth();
   const navigate = useNavigate();
 
-  // A flag to prevent the redirection check during form submission
-  const [redirectChecked, setRedirectChecked] = useState(false);
-  
-  // Check for authenticated user and redirect only when not submitting
+  // Check for authenticated user and redirect
   useEffect(() => {
-    if (user && !isSubmitting && redirectChecked) {
-      console.log("User is authenticated, navigating to matches");
+    // Only redirect if we have finished loading auth state and the user is authenticated
+    if (!loading && user) {
+      console.log("User is authenticated in Login page, redirecting to matches");
       navigate("/matches", { replace: true });
-    } else {
-      setRedirectChecked(true);
     }
-  }, [user, isSubmitting, navigate, redirectChecked]);
+  }, [user, loading, navigate]);
 
   // If we're loading auth state, show a simple loading message
-  if (loading && !redirectChecked) {
+  if (loading && !isSubmitting) {
     return (
       <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
         <div className="animate-fade-up flex justify-center py-12">
@@ -61,12 +57,13 @@ export default function Login() {
       // Don't navigate here - let the auth state change handle it
     } catch (error) {
       console.error("Login submission error:", error);
+    } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Don't render login form if user is authenticated and we've checked redirect
-  if (user && redirectChecked && !isSubmitting) {
+  // Don't render login form if user is authenticated and not loading
+  if (!loading && user) {
     return null;
   }
 

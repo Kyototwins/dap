@@ -24,33 +24,45 @@ export function useAuth() {
     
     const setupAuth = async () => {
       try {
-        // First set up auth state change listener
-        const { data } = supabase.auth.onAuthStateChange(
-          (event, currentSession) => {
-            console.log("Auth state changed:", event, Boolean(currentSession));
-            
-            // Update session state
-            setSession(currentSession);
-            setUser(currentSession?.user || null);
-            
-            // Only update loading for events after initial setup
-            if (event !== 'INITIAL_SESSION') {
-              setLoading(false);
-            }
-          }
-        );
-        
-        authStateSubscription = data.subscription;
-        
-        // Then check for existing session
+        // First check for existing session to avoid unnecessary flickering
         console.log("Getting current session...");
-        const { data: sessionData } = await supabase.auth.getSession();
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Error getting session:", sessionError);
+          setLoading(false);
+          setInitialized(true);
+          return;
+        }
+        
+        // Set initial session and user state
+        console.log("Initial session check complete, user:", !!sessionData?.session?.user);
         
         // Important: Set both session and user atomically to prevent UI flickers
         setSession(sessionData.session);
         setUser(sessionData.session?.user || null);
         
-        console.log("Initial session check complete, user:", !!sessionData.session?.user);
+        // Then set up auth state change listener for future changes
+        const { data } = supabase.auth.onAuthStateChange((event, currentSession) => {
+          console.log("Auth state changed:", event, "User present:", !!currentSession?.user);
+          
+          if (event === 'SIGNED_OUT') {
+            // Clear state on sign out
+            setUser(null);
+            setSession(null);
+          } else if (currentSession) {
+            // Update state with new session
+            setSession(currentSession);
+            setUser(currentSession.user);
+          }
+          
+          // Only update loading for events after initial setup
+          if (event !== 'INITIAL_SESSION') {
+            setLoading(false);
+          }
+        });
+        
+        authStateSubscription = data.subscription;
         setLoading(false);
         setInitialized(true);
       } catch (error) {
@@ -73,11 +85,14 @@ export function useAuth() {
   // Clear auth state on logout
   const handleLogout = useCallback(async () => {
     try {
+      console.log("Logging out user");
+      setLoading(true);
       await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
+      // Note: State is updated through onAuthStateChange
     } catch (error) {
       console.error("Error during logout:", error);
+    } finally {
+      setLoading(false);
     }
   }, []);
   
