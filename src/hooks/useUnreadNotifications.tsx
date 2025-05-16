@@ -19,44 +19,68 @@ export function useUnreadNotifications() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // Check if there are any matches with unread messages
-        const { data: matchesWithUnread, error } = await supabase
+        // First, get all matches for the current user
+        const { data: matchesData, error: matchesError } = await supabase
           .from("matches")
           .select(`
             id,
             user1_id, 
-            user2_id,
-            last_message_at,
-            last_read_at
+            user2_id
           `)
-          .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
-          .not("last_message_at", "is", null);
+          .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
 
-        if (error) throw error;
+        if (matchesError) throw matchesError;
+        if (!matchesData || matchesData.length === 0) {
+          setHasUnreadMessages(false);
+          return;
+        }
 
-        // Filter matches where last_message_at > last_read_at or last_read_at is null
-        const unreadMatches = (matchesWithUnread || []).filter(match => {
-          // Determine if the current user is user1 or user2
+        // For each match, get the latest message
+        const matchPromises = matchesData.map(async (match) => {
+          // Get latest message for this match
+          const { data: latestMessage, error: messageError } = await supabase
+            .from("messages")
+            .select("id, match_id, sender_id, created_at")
+            .eq("match_id", match.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .single();
+
+          if (messageError || !latestMessage) return null;
+          
+          // Check if user is user1 or user2
           const isUser1 = match.user1_id === user.id;
-          const lastReadField = isUser1 ? "user1_last_read" : "user2_last_read";
+          const lastReadFieldKey = isUser1 ? "user1_last_read" : "user2_last_read";
           
-          if (!match[lastReadField] && match.last_message_at) {
-            return true;
+          // Get the last read timestamp for this user
+          const { data: lastReadData, error: lastReadError } = await supabase
+            .from("matches")
+            .select(lastReadFieldKey)
+            .eq("id", match.id)
+            .single();
+            
+          if (lastReadError) return null;
+          
+          const lastReadTimestamp = lastReadData && lastReadData[lastReadFieldKey];
+          
+          // If no last read timestamp or message is newer than last read
+          if (!lastReadTimestamp && latestMessage.sender_id !== user.id) {
+            return { unread: true, match_id: match.id };
+          } else if (lastReadTimestamp && latestMessage.created_at > lastReadTimestamp && latestMessage.sender_id !== user.id) {
+            return { unread: true, match_id: match.id };
           }
           
-          if (match[lastReadField] && match.last_message_at) {
-            const lastRead = new Date(match[lastReadField]);
-            const lastMessage = new Date(match.last_message_at);
-            return lastMessage > lastRead;
-          }
-          
-          return false;
+          return { unread: false, match_id: match.id };
         });
-
-        setHasUnreadMessages(unreadMatches.length > 0);
-        console.log(`Unread messages found: ${unreadMatches.length > 0}`);
+        
+        const results = await Promise.all(matchPromises);
+        const hasUnread = results.some(result => result && result.unread);
+        
+        setHasUnreadMessages(hasUnread);
+        console.log(`Unread messages found: ${hasUnread}`);
       } catch (error) {
         console.error("Error checking unread messages:", error);
+        setHasUnreadMessages(false);
       }
     };
 
