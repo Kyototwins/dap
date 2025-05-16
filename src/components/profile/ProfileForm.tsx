@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
 import { useProfileOperations } from "@/hooks/useProfileOperations";
@@ -180,233 +179,236 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
 
   return (
     <div className="container py-12 pb-32">
+      <h1 className="text-3xl font-bold text-center mb-2">Profile Setup</h1>
+      <p className="text-center text-gray-600 mb-8">Tell us about yourself</p>
+      
       <Form {...form}>
-        <form 
-          onSubmit={onSubmitForm}
-          className="space-y-8"
-        >
-          {/* Avatar Upload */}
-          <div className="flex justify-center mb-8">
-            <AvatarUpload image={images.avatar} setImage={(img) => setImages(prev => ({ ...prev, avatar: img }))} />
-          </div>
-
-          {/* Image Uploads */}
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">写真</h2>
+        <form onSubmit={onSubmitForm} className="space-y-8">
+          {/* Profile Photos Section */}
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold">Profile Photos</h2>
             <Separator />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ImageUploadComponent label="Image 1" image={images.image1} setImage={(img) => setImages(prev => ({ ...prev, image1: img }))} />
-              <ImageUploadComponent label="Image 2" image={images.image2} setImage={(img) => setImages(prev => ({ ...prev, image2: img }))} />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ImageUploadComponent label="Hobby Photo" image={images.hobby} setImage={(img) => setImages(prev => ({ ...prev, hobby: img }))} />
-              <ImageUploadComponent label="Pet Photo" image={images.pet} setImage={(img) => setImages(prev => ({ ...prev, pet: img }))} />
-            </div>
-          </div>
-
-          {/* Photo Comments */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <Label>写真コメント</Label>
-              <Input
-                name="photoComment"
-                value={formData.photoComment}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label>趣味写真コメント</Label>
-              <Input
-                name="hobbyPhotoComment"
-                value={formData.hobbyPhotoComment}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label>ペット写真コメント</Label>
-              <Input
-                name="petPhotoComment"
-                value={formData.petPhotoComment}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Basic Information */}
+            
+            {/* Profile Photo (Avatar) */}
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold">基本情報</h2>
-              <Separator />
+              <h3 className="text-lg font-medium">Profile Photo</h3>
+              <div className="flex justify-center">
+                <AvatarUpload 
+                  image={images.avatar} 
+                  setImage={(img) => setImages(prev => ({ ...prev, avatar: img }))} 
+                />
+              </div>
+            </div>
+            
+            {/* Other Photos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium">Header Photo</h3>
+                <ImageUploadComponent 
+                  label="Image 1" 
+                  image={images.image1} 
+                  setImage={(img) => setImages(prev => ({ ...prev, image1: img }))} 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium">Additional Photo 2</h3>
+                <ImageUploadComponent 
+                  label="Image 2" 
+                  image={images.image2} 
+                  setImage={(img) => setImages(prev => ({ ...prev, image2: img }))} 
+                />
+              </div>
+            </div>
+            
+            {/* Hobby Photo */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium">Photo of me enjoying my hobby</h3>
+              <ImageUploadComponent 
+                label="Hobby Photo" 
+                image={images.hobby} 
+                setImage={(img) => setImages(prev => ({ ...prev, hobby: img }))} 
+              />
+              
+              <div className="mt-3">
+                <Label>Photo Comment</Label>
+                <Textarea
+                  name="hobbyPhotoComment"
+                  placeholder="Share something about this photo..."
+                  value={formData.hobbyPhotoComment}
+                  onChange={handleInputChange}
+                  className="resize-none"
+                />
+              </div>
+            </div>
+            
+            {/* Pet Photo */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium">Photo of my pet</h3>
+              <ImageUploadComponent 
+                label="Pet Photo" 
+                image={images.pet} 
+                setImage={(img) => setImages(prev => ({ ...prev, pet: img }))} 
+              />
+              
+              <div className="mt-3">
+                <Label>Photo Comment</Label>
+                <Textarea
+                  name="petPhotoComment"
+                  placeholder="Share something about this photo..."
+                  value={formData.petPhotoComment}
+                  onChange={handleInputChange}
+                  className="resize-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Basic Information */}
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label>First Name</Label>
+                <Label>姓</Label>
                 <Input
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
+                  placeholder="山田"
                 />
               </div>
               <div>
-                <Label>Last Name</Label>
+                <Label>名</Label>
                 <Input
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label>Age</Label>
-                <Input
-                  type="number"
-                  name="age"
-                  value={formData.age}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label>Gender</Label>
-                <Select 
-                  value={formData.gender} 
-                  onValueChange={(value) => handleSelectChange("gender", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Origin</Label>
-                <Input
-                  name="origin"
-                  value={formData.origin}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label>Sexuality</Label>
-                <Input
-                  name="sexuality"
-                  value={formData.sexuality}
-                  onChange={handleInputChange}
+                  placeholder="太郎"
                 />
               </div>
             </div>
-
-            {/* University Information */}
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold">学歴</h2>
-              <Separator />
-              <div>
-                <Label>University</Label>
-                <Select 
-                  value={formData.university} 
-                  onValueChange={(value) => handleSelectChange("university", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a university" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {universityOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Department</Label>
-                <Input
-                  name="department"
-                  value={formData.department}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label>Year</Label>
-                <Select 
-                  value={formData.year} 
-                  onValueChange={(value) => handleSelectChange("year", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {yearOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            
+            <div>
+              <Label>大学</Label>
+              <Select 
+                value={formData.university} 
+                onValueChange={(value) => handleSelectChange("university", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="大学を選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  {universityOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </div>
-
-          {/* About Me */}
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">自己紹介</h2>
-            <Separator />
+            
+            <div>
+              <Label>学部</Label>
+              <Input
+                name="department"
+                value={formData.department}
+                onChange={handleInputChange}
+                placeholder="学部を入力"
+              />
+            </div>
+            
+            <div>
+              <Label>学年</Label>
+              <Select 
+                value={formData.year} 
+                onValueChange={(value) => handleSelectChange("year", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="学年を選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  {yearOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label>Age</Label>
+              <Input
+                type="number"
+                name="age"
+                value={formData.age}
+                onChange={handleInputChange}
+                placeholder="年齢を入力"
+              />
+            </div>
+            
+            <div>
+              <Label>Gender</Label>
+              <Select 
+                value={formData.gender} 
+                onValueChange={(value) => handleSelectChange("gender", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="性別を選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label>Origin</Label>
+              <Input
+                name="origin"
+                value={formData.origin}
+                onChange={handleInputChange}
+                placeholder="出身地を入力"
+              />
+            </div>
+            
+            <div>
+              <Label>Sexuality</Label>
+              <Input
+                name="sexuality"
+                value={formData.sexuality}
+                onChange={handleInputChange}
+                placeholder="性的指向を入力（任意）"
+              />
+            </div>
+            
             <div>
               <Label>About Me</Label>
               <Textarea
                 className="resize-none"
-                placeholder="Tell us about yourself"
+                placeholder="自己紹介を書いてください"
                 name="aboutMe"
                 value={formData.aboutMe}
                 onChange={handleInputChange}
               />
             </div>
           </div>
-
-          {/* Hobbies and Languages */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold">趣味</h2>
-              <Separator />
-              <div>
-                <Label>Hobbies</Label>
-                <MultiSelect
-                  options={[
-                    { value: "reading", label: "読書" },
-                    { value: "sports", label: "スポーツ" },
-                    { value: "travel", label: "旅行" },
-                    { value: "music", label: "音楽" },
-                    { value: "movies", label: "映画" },
-                    { value: "gaming", label: "ゲーム" },
-                    { value: "cooking", label: "料理" },
-                    { value: "photography", label: "写真" },
-                    { value: "art", label: "アート" },
-                    { value: "coding", label: "プログラミング" },
-                  ]}
-                  value={formData.hobbies}
-                  onChange={(values) => handleMultiSelectChange("hobbies", values)}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold">言語</h2>
-              <Separator />
-              <div>
-                <Label>Languages</Label>
-                <MultiSelect
-                  options={languageOptions}
-                  value={formData.languages}
-                  onChange={(values) => handleMultiSelectChange("languages", values)}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Language Levels */}
+          
+          {/* Language Skills */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">言語レベル</h2>
+            <h2 className="text-2xl font-bold">Language Skills</h2>
             <Separator />
+            
+            <div>
+              <Label>Languages</Label>
+              <MultiSelect
+                options={languageOptions}
+                value={formData.languages}
+                onChange={(values) => handleMultiSelectChange("languages", values)}
+              />
+            </div>
+            
             {formData.languages.map((language) => (
               <div key={language} className="space-y-2">
                 <Label htmlFor={`${language}-level`}>{languageOptions.find(opt => opt.value === language)?.label}</Label>
@@ -422,14 +424,9 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
                 </div>
               </div>
             ))}
-          </div>
-
-          {/* Learning Languages */}
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">学習中の言語</h2>
-            <Separator />
+            
             <div>
-              <Label>Learning Languages</Label>
+              <h3 className="text-lg font-medium mb-2">Currently Learning</h3>
               <MultiSelect
                 options={languageOptions}
                 value={formData.learning_languages}
@@ -437,21 +434,105 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
               />
             </div>
           </div>
+          
+          {/* Hobbies & Interests */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Hobbies & Interests</h2>
+            <Separator />
+            
+            <div>
+              <Label>Hobbies</Label>
+              <MultiSelect
+                options={[
+                  { value: "reading", label: "読書" },
+                  { value: "sports", label: "スポーツ" },
+                  { value: "travel", label: "旅行" },
+                  { value: "music", label: "音楽" },
+                  { value: "movies", label: "映画" },
+                  { value: "gaming", label: "ゲーム" },
+                  { value: "cooking", label: "料理" },
+                  { value: "photography", label: "写真" },
+                  { value: "art", label: "アート" },
+                  { value: "coding", label: "プログラミング" },
+                  { value: "hiking", label: "ハイキング" },
+                ]}
+                value={formData.hobbies}
+                onChange={(values) => handleMultiSelectChange("hobbies", values)}
+              />
+            </div>
+          </div>
 
           {/* Additional Information */}
-          <AdditionalInfoSection 
-            additionalData={additionalData} 
-            onChange={handleAdditionalDataChange} 
-            loading={loading} 
-          />
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Additional Information</h2>
+            <Separator />
+            
+            <div className="space-y-4">
+              <div>
+                <Label>My worst nightmare is...</Label>
+                <Textarea
+                  name="worstNightmare"
+                  placeholder="Tell us about your worst nightmare..."
+                  value={additionalData.worstNightmare}
+                  onChange={handleAdditionalDataChange}
+                  className="resize-none"
+                />
+              </div>
+              
+              <div>
+                <Label>If we become friends, I want to do...</Label>
+                <Textarea
+                  name="friendActivity"
+                  placeholder="What would you like us to do together as friends?"
+                  value={additionalData.friendActivity}
+                  onChange={handleAdditionalDataChange}
+                  className="resize-none"
+                />
+              </div>
+              
+              <div>
+                <Label>My best quality is...</Label>
+                <Textarea
+                  name="bestQuality"
+                  placeholder="Tell us about your best quality..."
+                  value={additionalData.bestQuality}
+                  onChange={handleAdditionalDataChange}
+                  className="resize-none"
+                />
+              </div>
+              
+              <div>
+                <Label>If you could have a superpower, what would it be?</Label>
+                <Textarea
+                  name="superpower"
+                  placeholder="Tell us about your desired superpower..."
+                  value={additionalData.superpower}
+                  onChange={handleAdditionalDataChange}
+                  className="resize-none"
+                />
+              </div>
+              
+              <div>
+                <Label>My life goal...</Label>
+                <Textarea
+                  name="lifeGoal"
+                  placeholder="Tell us about your life goal..."
+                  value={additionalData.lifeGoal}
+                  onChange={handleAdditionalDataChange}
+                  className="resize-none"
+                />
+              </div>
+            </div>
+          </div>
 
-          {/* Submit and Cancel Buttons */}
-          <div className="flex justify-between">
-            <Button variant="outline" onClick={onCancel}>
-              キャンセル
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "送信中..." : "送信"}
+          {/* Submit button */}
+          <div className="flex justify-end">
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="bg-purple-700 hover:bg-purple-800 text-white px-6 py-3 rounded-full"
+            >
+              {loading ? "送信中..." : "Save Profile"}
             </Button>
           </div>
         </form>
