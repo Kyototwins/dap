@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormData, AdditionalDataType } from "@/types/profile";
 
@@ -9,7 +10,7 @@ export async function updateUserProfile(
   imageUrl1: string | null,
   imageUrl2: string | null,
   hobbyPhotoUrl: string | null,
-  petPhotoUrl: string | null  // Changed back from foodPhotoUrl
+  petPhotoUrl: string | null
 ) {
   // Convert language levels to JSON string for storage
   const languageLevelsJson = JSON.stringify(formData.languageLevels);
@@ -44,8 +45,7 @@ export async function updateUserProfile(
       hobbies: formData.hobbies,
       languages: formData.languages,
       language_levels: languageLevelsJson,
-      learning_languages: formData.learning_languages,
-      notification_email: formData.notificationEmail
+      learning_languages: formData.learning_languages
     })
     .eq('id', userId);
 
@@ -67,67 +67,21 @@ export async function fetchUserProfile(userId: string) {
 export async function updateFcmToken(userId: string, token: string) {
   try {
     // Instead of using RPC which doesn't exist, directly update the profile table
-    // First check if notification_settings column exists
-    const { data: tableInfo, error: checkError } = await supabase
-      .rpc('system_schema_info', { 
-        p_table_name: 'profiles'
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        fcm_token: token
       })
-      .single();
-    
-    if (checkError) {
-      console.log('Using direct update without notification_settings');
-      // If we can't check the schema (or column doesn't exist), try direct update
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          // Using notification_settings as a JSONB field if it exists
-          notification_settings: { browser_push: true }
-        })
-        .eq('id', userId);
-        
-      if (error) {
-        console.error('Error updating notification settings:', error);
-        return false;
-      }
+      .eq('id', userId);
       
-      return true;
+    if (error) {
+      console.error('Error updating FCM token:', error);
+      return false;
     }
     
     return true;
   } catch (error) {
     console.error('Error in updateFcmToken:', error);
-    return false;
-  }
-}
-
-export async function updateNotificationSettings(
-  userId: string, 
-  settings: { 
-    browser_push?: boolean;
-    email?: boolean;
-    email_digest_enabled?: boolean;
-    notification_email?: string | null;
-  }
-) {
-  try {
-    const notificationSettingsObject = {
-      browser_push: settings.browser_push,
-      email: settings.email
-    };
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        notification_settings: notificationSettingsObject,
-        email_digest_enabled: settings.email_digest_enabled,
-        notification_email: settings.notification_email
-      })
-      .eq('id', userId);
-
-    if (error) throw error;
-    return true;
-  } catch (error) {
-    console.error('Error updating notification settings:', error);
     return false;
   }
 }

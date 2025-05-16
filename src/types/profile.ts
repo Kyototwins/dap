@@ -1,4 +1,3 @@
-
 // Define the ImageUpload type
 export interface ImageUpload {
   file: File | null;
@@ -32,7 +31,6 @@ export interface ProfileFormData {
   photoComment: string;
   hobbyPhotoComment: string;
   petPhotoComment: string;
-  notificationEmail?: string;
 }
 
 export interface AdditionalDataType {
@@ -76,12 +74,5 @@ export interface Profile {
   friend_activity?: string | null;
   best_quality?: string | null;
   sexuality?: string | null;
-  email_digest_enabled?: boolean;
-  notification_email?: string | null;
   fcm_token?: string | null;
-  notification_settings?: {
-    browser_push?: boolean;
-    email?: boolean;
-    in_app?: boolean;
-  } | null;
 }
