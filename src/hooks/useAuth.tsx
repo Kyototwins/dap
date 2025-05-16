@@ -35,8 +35,8 @@ export function useAuth() {
           return;
         }
         
-        // Set initial session and user state
-        console.log("Initial session check complete, user:", !!sessionData?.session?.user);
+        console.log("Initial session check complete, session exists:", !!sessionData?.session);
+        console.log("User data:", sessionData?.session?.user?.id || "No user");
         
         // Important: Set both session and user atomically to prevent UI flickers
         setSession(sessionData.session);
@@ -48,18 +48,18 @@ export function useAuth() {
           
           if (event === 'SIGNED_OUT') {
             // Clear state on sign out
+            console.log("User signed out, clearing state");
             setUser(null);
             setSession(null);
           } else if (currentSession) {
             // Update state with new session
+            console.log("Session updated, user ID:", currentSession.user.id);
             setSession(currentSession);
             setUser(currentSession.user);
           }
           
           // Only update loading for events after initial setup
-          if (event !== 'INITIAL_SESSION') {
-            setLoading(false);
-          }
+          setLoading(false);
         });
         
         authStateSubscription = data.subscription;
@@ -87,8 +87,16 @@ export function useAuth() {
     try {
       console.log("Logging out user");
       setLoading(true);
-      await supabase.auth.signOut();
-      // Note: State is updated through onAuthStateChange
+      
+      // Sign out the user
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error during logout:", error);
+        throw error;
+      }
+      
+      console.log("User logged out successfully");
+      // State is updated through onAuthStateChange
     } catch (error) {
       console.error("Error during logout:", error);
     } finally {

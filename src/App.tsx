@@ -27,13 +27,13 @@ import { initializeNotificationsIfNeeded } from "./initNotifications";
 const queryClient = new QueryClient();
 
 function AuthenticatedApp() {
-  const { user, session, loading } = useAuth();
+  const { user, session, loading, handleLogout } = useAuth();
   const [notificationsInitialized, setNotificationsInitialized] = useState(false);
 
   // Initialize notifications when authenticated
   useEffect(() => {
     if (user && session && !notificationsInitialized) {
-      console.log("Initializing notifications for authenticated user");
+      console.log("Initializing notifications for authenticated user", user.id);
       // Use timeout to avoid blocking the main rendering process
       const timer = setTimeout(() => {
         initializeNotificationsIfNeeded();
@@ -43,6 +43,17 @@ function AuthenticatedApp() {
       return () => clearTimeout(timer);
     }
   }, [user, session, notificationsInitialized]);
+
+  // Add explicit logout handler with navigation
+  const logout = async () => {
+    try {
+      await handleLogout();
+      // Navigation will be handled by auth state change in useAuth
+      console.log("Logout complete, auth state should change");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;

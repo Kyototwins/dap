@@ -119,6 +119,9 @@ export function useAuthOperations() {
         description: "アプリへようこそ！",
       });
       
+      // Explicitly navigate to matches page after successful login
+      navigate('/matches', { replace: true });
+      
       return data;
     } catch (error: any) {
       console.error("Login error:", error);

@@ -21,21 +21,10 @@ export default function Login() {
   useEffect(() => {
     // Only redirect if we have finished loading auth state and the user is authenticated
     if (!loading && user) {
-      console.log("User is authenticated in Login page, redirecting to matches");
+      console.log("User is authenticated in Login page, redirecting to matches", user.id);
       navigate("/matches", { replace: true });
     }
   }, [user, loading, navigate]);
-
-  // If we're loading auth state, show a simple loading message
-  if (loading && !isSubmitting) {
-    return (
-      <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
-        <div className="animate-fade-up flex justify-center py-12">
-          <p>Loading...</p>
-        </div>
-      </AuthLayout>
-    );
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +43,7 @@ export default function Login() {
     try {
       console.log("Attempting login with email:", email);
       await handleLogin({ email, password });
-      // Don't navigate here - let the auth state change handle it
+      // Navigation is handled in handleLogin
     } catch (error) {
       console.error("Login submission error:", error);
     } finally {
@@ -62,8 +51,20 @@ export default function Login() {
     }
   };
 
+  // If we're loading auth state, show a simple loading message
+  if (loading && !isSubmitting) {
+    return (
+      <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
+        <div className="animate-fade-up flex justify-center py-12">
+          <p>Loading...</p>
+        </div>
+      </AuthLayout>
+    );
+  }
+
   // Don't render login form if user is authenticated and not loading
   if (!loading && user) {
+    console.log("User authenticated, rendering null");
     return null;
   }
 
