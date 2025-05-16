@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -31,14 +31,16 @@ function AuthenticatedApp() {
 
   // Initialize notifications when authenticated
   useEffect(() => {
-    if (session?.user) {
+    if (user && session) {
       console.log("Initializing notifications for authenticated user");
       // Use timeout to avoid blocking the main rendering process
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         initializeNotificationsIfNeeded();
       }, 300);
+      
+      return () => clearTimeout(timer);
     }
-  }, [session]);
+  }, [user, session]);
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">読み込み中...</div>;

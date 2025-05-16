@@ -41,8 +41,11 @@ export function useAuthOperations() {
       });
 
       if (error) {
+        console.error("Signup API error:", error);
         throw error;
       }
+
+      console.log("Signup successful, data:", data);
 
       // Show success message
       toast({
@@ -139,6 +142,8 @@ export function useAuthOperations() {
         description: errorMessage,
         variant: "destructive",
       });
+      
+      return Promise.reject(error);
     } finally {
       console.log("Login process completed, releasing loading state");
       setLoading(false);
