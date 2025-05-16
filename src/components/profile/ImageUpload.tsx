@@ -1,6 +1,6 @@
 
+import React from "react";
 import { ImageIcon, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface ImageUpload {
@@ -32,7 +32,7 @@ export function ImageUpload({ label, image, onChange, loading }: ImageUploadProp
               <ImageIcon className="w-8 h-8 text-gray-400" />
             </div>
           )}
-          <Input
+          <input
             type="file"
             accept="image/*"
             onChange={onChange}

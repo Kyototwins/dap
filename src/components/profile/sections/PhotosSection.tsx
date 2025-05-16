@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { ImageUpload } from "@/components/profile/ImageUpload";
+import { ImageUploadComponent } from "@/components/profile/ImageUploadComponent";
+import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { ImageUploadState } from "@/types/profile";
 
 interface PhotosSectionProps {
@@ -55,14 +56,10 @@ export function PhotosSection({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-4">
             <Label>Profile Picture (used as avatar)</Label>
-            <ImageUpload
-              label="Profile Picture"
+            <AvatarUpload
               image={images.avatar}
-              onChange={(e) => {
-                const file = e.target.files?.[0] || null;
-                handleImageChange('avatar', file);
-              }}
-              loading={loading}
+              setImage={(newImage) => setImages(prev => ({ ...prev, avatar: newImage }))}
+              disabled={loading}
             />
 
             {/* Name fields below profile photo */}
@@ -109,27 +106,21 @@ export function PhotosSection({
           <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <Label>Additional Photo</Label>
-              <ImageUpload
+              <ImageUploadComponent
                 label="Additional Photo 1"
                 image={images.image1}
-                onChange={(e) => {
-                  const file = e.target.files?.[0] || null;
-                  handleImageChange('image1', file);
-                }}
-                loading={loading}
+                setImage={(newImage) => setImages(prev => ({ ...prev, image1: newImage }))}
+                disabled={loading}
               />
             </div>
             
             <div className="space-y-2">
               <Label>Additional Photo</Label>
-              <ImageUpload
+              <ImageUploadComponent
                 label="Additional Photo 2"
                 image={images.image2}
-                onChange={(e) => {
-                  const file = e.target.files?.[0] || null;
-                  handleImageChange('image2', file);
-                }}
-                loading={loading}
+                setImage={(newImage) => setImages(prev => ({ ...prev, image2: newImage }))}
+                disabled={loading}
               />
             </div>
           </div>
@@ -138,14 +129,11 @@ export function PhotosSection({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
           <div className="space-y-4">
             <Label>Hobby Photo</Label>
-            <ImageUpload
+            <ImageUploadComponent
               label="Hobby Photo"
               image={images.hobby}
-              onChange={(e) => {
-                const file = e.target.files?.[0] || null;
-                handleImageChange('hobby', file);
-              }}
-              loading={loading}
+              setImage={(newImage) => setImages(prev => ({ ...prev, hobby: newImage }))}
+              disabled={loading}
             />
             <div className="space-y-2">
               <Label htmlFor="hobbyPhotoComment">Photo Comment</Label>
@@ -162,14 +150,11 @@ export function PhotosSection({
           
           <div className="space-y-4">
             <Label>Pet Photo</Label>
-            <ImageUpload
+            <ImageUploadComponent
               label="Pet Photo"
               image={images.pet}
-              onChange={(e) => {
-                const file = e.target.files?.[0] || null;
-                handleImageChange('pet', file);
-              }}
-              loading={loading}
+              setImage={(newImage) => setImages(prev => ({ ...prev, pet: newImage }))}
+              disabled={loading}
             />
             <div className="space-y-2">
               <Label htmlFor="petPhotoComment">Photo Comment</Label>
