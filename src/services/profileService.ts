@@ -1,5 +1,4 @@
 
-
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormData, AdditionalDataType } from "@/types/profile";
 
@@ -67,9 +66,12 @@ export async function fetchUserProfile(userId: string) {
 
 export async function updateFcmToken(userId: string, token: string) {
   try {
+    // fcm_token カラムを追加
     const { error } = await supabase
       .from('profiles')
-      .update({ fcm_token: token })
+      .update({ 
+        fcm_token: token 
+      })
       .eq('id', userId);
       
     if (error) {
