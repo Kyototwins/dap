@@ -5,12 +5,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import Landing from "./pages/Landing";
-import Index from "./pages/Index";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import ProfileSetup from "./pages/ProfileSetup";
@@ -33,18 +31,7 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-      
-      // Initialize notifications if user is logged in
-      if (session) {
-        initializeNotificationsIfNeeded();
-      }
-    });
-
-    // Listen for auth changes
+    // Set up auth state listener FIRST
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -52,9 +39,28 @@ function App() {
       
       // Initialize notifications on sign in
       if (session) {
-        initializeNotificationsIfNeeded();
+        setTimeout(() => {
+          initializeNotificationsIfNeeded();
+        }, 0);
       }
     });
+
+    // THEN check current session
+    const getInitialSession = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        setSession(data.session);
+        
+        // Initialize notifications if user is logged in
+        if (data.session) {
+          initializeNotificationsIfNeeded();
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getInitialSession();
 
     return () => subscription.unsubscribe();
   }, []);
@@ -72,11 +78,11 @@ function App() {
           <BrowserRouter>
             <TooltipProvider>
               <Routes>
-                <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />
-                <Route path="/login" element={session ? <Navigate to="/matches" /> : <Login />} />
-                <Route path="/signup" element={session ? <Navigate to="/matches" /> : <SignUp />} />
-                <Route path="/profile/setup" element={session ? <ProfileSetup /> : <Navigate to="/login" />} />
-                <Route path="/help" element={session ? <Help /> : <Navigate to="/login" />} />
+                <Route path="/" element={session ? <Navigate to="/matches" replace /> : <Landing />} />
+                <Route path="/login" element={session ? <Navigate to="/matches" replace /> : <Login />} />
+                <Route path="/signup" element={session ? <Navigate to="/matches" replace /> : <SignUp />} />
+                <Route path="/profile/setup" element={session ? <ProfileSetup /> : <Navigate to="/login" replace />} />
+                <Route path="/help" element={session ? <Help /> : <Navigate to="/login" replace />} />
                 
                 {/* Protected routes - AppLayoutでラップ */}
                 <Route
@@ -87,7 +93,7 @@ function App() {
                         <Matches />
                       </AppLayout>
                     ) : (
-                      <Navigate to="/login" />
+                      <Navigate to="/login" replace />
                     )
                   }
                 />
@@ -99,7 +105,7 @@ function App() {
                         <Messages />
                       </AppLayout>
                     ) : (
-                      <Navigate to="/login" />
+                      <Navigate to="/login" replace />
                     )
                   }
                 />
@@ -111,7 +117,7 @@ function App() {
                         <Events />
                       </AppLayout>
                     ) : (
-                      <Navigate to="/login" />
+                      <Navigate to="/login" replace />
                     )
                   }
                 />
@@ -123,7 +129,7 @@ function App() {
                         <CreateEvent />
                       </AppLayout>
                     ) : (
-                      <Navigate to="/login" />
+                      <Navigate to="/login" replace />
                     )
                   }
                 />
@@ -135,7 +141,7 @@ function App() {
                         <Profile />
                       </AppLayout>
                     ) : (
-                      <Navigate to="/login" />
+                      <Navigate to="/login" replace />
                     )
                   }
                 />
@@ -147,7 +153,7 @@ function App() {
                         <UserProfile />
                       </AppLayout>
                     ) : (
-                      <Navigate to="/login" />
+                      <Navigate to="/login" replace />
                     )
                   }
                 />

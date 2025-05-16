@@ -9,22 +9,27 @@ export type { AuthFormData } from "@/types/auth";
 export function useAuth() {
   const authOperations = useAuthOperations();
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Get initial user state
-    const getCurrentUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    
-    getCurrentUser();
-    
-    // Set up auth listener for changes
+    // Set up auth listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user || null);
       }
     );
+    
+    // THEN check for existing user (このセッションチェックは1回だけ実行)
+    const getCurrentUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    getCurrentUser();
     
     // Cleanup subscription
     return () => {
@@ -34,6 +39,7 @@ export function useAuth() {
   
   return {
     ...authOperations,
-    user
+    user,
+    loading
   };
 }

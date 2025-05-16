@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,12 @@ import { toast } from "@/components/ui/use-toast";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { loading, connectionError, offline, handleLogin } = useAuth();
+  const { loading, connectionError, offline, handleLogin, user } = useAuth();
+
+  // ユーザーが既にログインしている場合はリダイレクト
+  if (user) {
+    return <Navigate to="/matches" replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

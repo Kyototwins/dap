@@ -112,26 +112,10 @@ export function useAuthOperations() {
       });
       
       // どちらか早い方を採用
-      const { data: authData, error: authError } = await Promise.race([loginPromise, timeoutPromise]) as any;
+      const { error: authError } = await Promise.race([loginPromise, timeoutPromise]) as any;
 
       if (authError) {
         throw authError;
-      }
-
-      if (!authData?.user) {
-        throw new Error("ユーザーデータを取得できませんでした。");
-      }
-
-      // プロフィール情報を取得
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('first_name, last_name')
-        .eq('id', authData.user.id)
-        .single();
-
-      if (profileError && profileError.code !== 'PGRST116') {
-        // PGRST116はレコードが見つからないエラー
-        throw profileError;
       }
 
       // ログイン成功のトースト表示
@@ -140,15 +124,7 @@ export function useAuthOperations() {
         description: "アプリへようこそ！",
       });
 
-      // プロフィールの設定状況に応じてリダイレクト
-      const hasProfile = profileData && profileData.first_name && profileData.last_name;
-      if (!hasProfile) {
-        // プロフィール未設定の場合はプロフィール設定画面へ
-        navigate("/profile/setup");
-      } else {
-        // プロフィール設定済みの場合はマッチング画面へ
-        navigate("/matches");
-      }
+      // ナビゲーションは現在、App.tsxで処理されているため、ここでは行わない
     } catch (error: any) {
       let errorMessage = "ログインに失敗しました。";
       
