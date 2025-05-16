@@ -56,9 +56,13 @@ export function PhotosSection({
           <div className="space-y-4">
             <Label>Profile Picture (used as avatar)</Label>
             <ImageUpload
-              imageUrl={images.avatar.preview}
-              onImageChange={(file) => handleImageChange('avatar', file)}
-              disabled={loading}
+              label="Profile Picture"
+              image={images.avatar}
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                handleImageChange('avatar', file);
+              }}
+              loading={loading}
             />
 
             {/* Name fields below profile photo */}
@@ -106,18 +110,26 @@ export function PhotosSection({
             <div className="space-y-2">
               <Label>Additional Photo</Label>
               <ImageUpload
-                imageUrl={images.image1.preview}
-                onImageChange={(file) => handleImageChange('image1', file)}
-                disabled={loading}
+                label="Additional Photo 1"
+                image={images.image1}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  handleImageChange('image1', file);
+                }}
+                loading={loading}
               />
             </div>
             
             <div className="space-y-2">
               <Label>Additional Photo</Label>
               <ImageUpload
-                imageUrl={images.image2.preview}
-                onImageChange={(file) => handleImageChange('image2', file)}
-                disabled={loading}
+                label="Additional Photo 2"
+                image={images.image2}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  handleImageChange('image2', file);
+                }}
+                loading={loading}
               />
             </div>
           </div>
@@ -127,9 +139,13 @@ export function PhotosSection({
           <div className="space-y-4">
             <Label>Hobby Photo</Label>
             <ImageUpload
-              imageUrl={images.hobby.preview}
-              onImageChange={(file) => handleImageChange('hobby', file)}
-              disabled={loading}
+              label="Hobby Photo"
+              image={images.hobby}
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                handleImageChange('hobby', file);
+              }}
+              loading={loading}
             />
             <div className="space-y-2">
               <Label htmlFor="hobbyPhotoComment">Photo Comment</Label>
@@ -147,9 +163,13 @@ export function PhotosSection({
           <div className="space-y-4">
             <Label>Pet Photo</Label>
             <ImageUpload
-              imageUrl={images.pet.preview}
-              onImageChange={(file) => handleImageChange('pet', file)}
-              disabled={loading}
+              label="Pet Photo"
+              image={images.pet}
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                handleImageChange('pet', file);
+              }}
+              loading={loading}
             />
             <div className="space-y-2">
               <Label htmlFor="petPhotoComment">Photo Comment</Label>
