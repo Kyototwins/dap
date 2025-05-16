@@ -185,6 +185,53 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
           onSubmit={onSubmitForm}
           className="space-y-8"
         >
+          {/* Avatar Upload */}
+          <div className="flex justify-center mb-8">
+            <AvatarUpload image={images.avatar} setImage={(img) => setImages(prev => ({ ...prev, avatar: img }))} />
+          </div>
+
+          {/* Image Uploads */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">写真</h2>
+            <Separator />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ImageUploadComponent label="Image 1" image={images.image1} setImage={(img) => setImages(prev => ({ ...prev, image1: img }))} />
+              <ImageUploadComponent label="Image 2" image={images.image2} setImage={(img) => setImages(prev => ({ ...prev, image2: img }))} />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ImageUploadComponent label="Hobby Photo" image={images.hobby} setImage={(img) => setImages(prev => ({ ...prev, hobby: img }))} />
+              <ImageUploadComponent label="Pet Photo" image={images.pet} setImage={(img) => setImages(prev => ({ ...prev, pet: img }))} />
+            </div>
+          </div>
+
+          {/* Photo Comments */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <Label>写真コメント</Label>
+              <Input
+                name="photoComment"
+                value={formData.photoComment}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <Label>趣味写真コメント</Label>
+              <Input
+                name="hobbyPhotoComment"
+                value={formData.hobbyPhotoComment}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <Label>ペット写真コメント</Label>
+              <Input
+                name="petPhotoComment"
+                value={formData.petPhotoComment}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Basic Information */}
             <div className="space-y-4">
@@ -387,45 +434,6 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
                 options={languageOptions}
                 value={formData.learning_languages}
                 onChange={(values) => handleMultiSelectChange("learning_languages", values)}
-              />
-            </div>
-          </div>
-
-          {/* Image Uploads */}
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">写真</h2>
-            <Separator />
-            <AvatarUpload image={images.avatar} setImage={(img) => setImages(prev => ({ ...prev, avatar: img }))} />
-            <ImageUploadComponent label="Image 1" image={images.image1} setImage={(img) => setImages(prev => ({ ...prev, image1: img }))} />
-            <ImageUploadComponent label="Image 2" image={images.image2} setImage={(img) => setImages(prev => ({ ...prev, image2: img }))} />
-            <ImageUploadComponent label="Hobby Photo" image={images.hobby} setImage={(img) => setImages(prev => ({ ...prev, hobby: img }))} />
-            <ImageUploadComponent label="Pet Photo" image={images.pet} setImage={(img) => setImages(prev => ({ ...prev, pet: img }))} />
-          </div>
-
-          {/* Photo Comments */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <Label>写真コメント</Label>
-              <Input
-                name="photoComment"
-                value={formData.photoComment}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label>趣味写真コメント</Label>
-              <Input
-                name="hobbyPhotoComment"
-                value={formData.hobbyPhotoComment}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label>ペット写真コメント</Label>
-              <Input
-                name="petPhotoComment"
-                value={formData.petPhotoComment}
-                onChange={handleInputChange}
               />
             </div>
           </div>

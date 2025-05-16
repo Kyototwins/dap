@@ -66,7 +66,6 @@ export async function fetchUserProfile(userId: string) {
 
 export async function updateFcmToken(userId: string, token: string) {
   try {
-    // fcm_token カラムを追加
     const { error } = await supabase
       .from('profiles')
       .update({ 
