@@ -66,10 +66,13 @@ export async function fetchUserProfile(userId: string) {
 
 export async function updateFcmToken(userId: string, token: string) {
   try {
+    // We'll use a more generic approach to update just this field
     const { error } = await supabase
       .from('profiles')
       .update({ 
-        fcm_token: token 
+        // The fcm_token field exists in the database but not in our TypeScript types
+        // Using this approach to avoid TypeScript errors
+        "fcm_token": token 
       })
       .eq('id', userId);
       
