@@ -10,6 +10,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Bell, Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { isValidEmail } from "@/lib/utils";
+import { PushNotificationSettings } from "./PushNotificationSettings";
 
 export function NotificationSettings() {
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,11 @@ export function NotificationSettings() {
           .single();
 
         if (error) {
+          // Handle the case where columns don't exist yet
+          if (error.code === '42703') {
+            console.log("Notification columns don't exist yet");
+            return;
+          }
           throw error;
         }
         
@@ -145,6 +151,10 @@ export function NotificationSettings() {
 
   return (
     <div className="space-y-6">
+      {/* Push Notification Settings */}
+      <PushNotificationSettings />
+      
+      {/* Email Notification Settings */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -224,3 +234,4 @@ export function NotificationSettings() {
     </div>
   );
 }
+

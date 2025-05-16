@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProfileOperations } from "@/hooks/useProfileOperations";
 import { ProfileForm } from "@/components/profile/ProfileForm";
@@ -11,9 +11,13 @@ export default function ProfileSetup() {
 
   // Fetch user profile data when component mounts
   useEffect(() => {
-    if (fetchUserProfile) {
-      fetchUserProfile();
-    }
+    const loadProfile = async () => {
+      if (fetchUserProfile) {
+        await fetchUserProfile();
+      }
+    };
+    
+    loadProfile();
   }, [fetchUserProfile]);
 
   if (isLoading) {

@@ -22,6 +22,8 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Help from "./pages/Help";
+import { initializeNotificationsIfNeeded } from "./initNotifications";
+import { NotificationProvider } from "./contexts/NotificationContext";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -35,6 +37,11 @@ function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
+      
+      // Initialize notifications if user is logged in
+      if (session) {
+        initializeNotificationsIfNeeded();
+      }
     });
 
     // Listen for auth changes
@@ -42,6 +49,11 @@ function App() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      
+      // Initialize notifications on sign in
+      if (session) {
+        initializeNotificationsIfNeeded();
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -54,94 +66,96 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <TooltipProvider>
-            <Routes>
-              <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />
-              <Route path="/login" element={session ? <Navigate to="/matches" /> : <Login />} />
-              <Route path="/signup" element={session ? <Navigate to="/matches" /> : <SignUp />} />
-              <Route path="/profile/setup" element={session ? <ProfileSetup /> : <Navigate to="/login" />} />
-              <Route path="/help" element={session ? <Help /> : <Navigate to="/login" />} />
-              
-              {/* Protected routes - AppLayoutでラップ */}
-              <Route
-                path="/matches"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <Matches />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/messages"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <Messages />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/events"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <Events />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/events/new"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <CreateEvent />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <Profile />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/profile/:id"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <UserProfile />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </TooltipProvider>
-        </BrowserRouter>
+        <NotificationProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <TooltipProvider>
+              <Routes>
+                <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />
+                <Route path="/login" element={session ? <Navigate to="/matches" /> : <Login />} />
+                <Route path="/signup" element={session ? <Navigate to="/matches" /> : <SignUp />} />
+                <Route path="/profile/setup" element={session ? <ProfileSetup /> : <Navigate to="/login" />} />
+                <Route path="/help" element={session ? <Help /> : <Navigate to="/login" />} />
+                
+                {/* Protected routes - AppLayoutでラップ */}
+                <Route
+                  path="/matches"
+                  element={
+                    session ? (
+                      <AppLayout>
+                        <Matches />
+                      </AppLayout>
+                    ) : (
+                      <Navigate to="/login" />
+                    )
+                  }
+                />
+                <Route
+                  path="/messages"
+                  element={
+                    session ? (
+                      <AppLayout>
+                        <Messages />
+                      </AppLayout>
+                    ) : (
+                      <Navigate to="/login" />
+                    )
+                  }
+                />
+                <Route
+                  path="/events"
+                  element={
+                    session ? (
+                      <AppLayout>
+                        <Events />
+                      </AppLayout>
+                    ) : (
+                      <Navigate to="/login" />
+                    )
+                  }
+                />
+                <Route
+                  path="/events/new"
+                  element={
+                    session ? (
+                      <AppLayout>
+                        <CreateEvent />
+                      </AppLayout>
+                    ) : (
+                      <Navigate to="/login" />
+                    )
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    session ? (
+                      <AppLayout>
+                        <Profile />
+                      </AppLayout>
+                    ) : (
+                      <Navigate to="/login" />
+                    )
+                  }
+                />
+                <Route
+                  path="/profile/:id"
+                  element={
+                    session ? (
+                      <AppLayout>
+                        <UserProfile />
+                      </AppLayout>
+                    ) : (
+                      <Navigate to="/login" />
+                    )
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </TooltipProvider>
+          </BrowserRouter>
+        </NotificationProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );

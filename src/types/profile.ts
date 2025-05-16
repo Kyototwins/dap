@@ -78,4 +78,11 @@ export interface Profile {
   sexuality?: string | null;
   email_digest_enabled?: boolean;
   notification_email?: string | null;
+  fcm_token?: string | null;
+  notification_settings?: {
+    browser_push?: boolean;
+    email?: boolean;
+    in_app?: boolean;
+  } | null;
 }
+

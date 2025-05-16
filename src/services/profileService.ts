@@ -64,3 +64,41 @@ export async function fetchUserProfile(userId: string) {
   if (error) throw error;
   return data;
 }
+
+export async function updateFcmToken(userId: string, token: string) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      fcm_token: token,
+      notification_settings: { browser_push: true }
+    })
+    .eq('id', userId);
+
+  if (error) throw error;
+  return true;
+}
+
+export async function updateNotificationSettings(
+  userId: string, 
+  settings: { 
+    browser_push?: boolean;
+    email?: boolean;
+    email_digest_enabled?: boolean;
+    notification_email?: string | null;
+  }
+) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      notification_settings: {
+        browser_push: settings.browser_push,
+        email: settings.email
+      },
+      email_digest_enabled: settings.email_digest_enabled,
+      notification_email: settings.notification_email
+    })
+    .eq('id', userId);
+
+  if (error) throw error;
+  return true;
+}
