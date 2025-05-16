@@ -135,7 +135,7 @@ export function LanguageSection({
             <Badge
               key={lang.value}
               variant={safeLearningLanguages.includes(lang.value) ? "default" : "outline"}
-              className={`cursor-pointer ${safeLearningLanguages.includes(lang.value) ? "bg-purple-600 hover:bg-purple-700" : ""}`}
+              className={`cursor-pointer ${safeLearningLanguages.includes(lang.value) ? "bg-[#7F1184] hover:bg-[#671073]" : ""}`}
               onClick={() => toggleLearningLanguage(lang.value)}
             >
               {lang.label}

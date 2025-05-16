@@ -7,7 +7,7 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
-// Import the new section components
+// Import the section components
 import { PhotosSection } from "./sections/PhotosSection";
 import { BasicInfoSection } from "./sections/BasicInfoSection";
 import { LanguageSection } from "./sections/LanguageSection";
@@ -214,7 +214,7 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
               disabled={loading}
               className="bg-[#7F1184] hover:bg-[#671073] text-white px-6 py-3 rounded-full"
             >
-              {loading ? "送信中..." : "Save Profile"}
+              {loading ? "Saving..." : "Save Profile"}
             </Button>
           </div>
         </form>

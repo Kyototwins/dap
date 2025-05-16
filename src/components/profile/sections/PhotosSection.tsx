@@ -1,11 +1,10 @@
-import React from "react";
-import { ImageUploadState } from "@/types/profile";
-import { AvatarUpload } from "@/components/profile/AvatarUpload";
-import { ImageUploadComponent } from "@/components/profile/ImageUploadComponent";
+import React, { useState } from "react";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
+import { ImageUpload } from "@/components/profile/ImageUpload";
+import { ImageUploadState } from "@/types/profile";
 
 interface PhotosSectionProps {
   images: ImageUploadState;
@@ -32,109 +31,140 @@ export function PhotosSection({
   onCommentChange,
   loading
 }: PhotosSectionProps) {
-  return <div className="space-y-6">
-      
-      <Separator />
-      
-      {/* Profile Photo (Avatar) */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Profile Photo</h3>
-        <div className="flex justify-center">
-          <AvatarUpload image={images.avatar} setImage={img => setImages(prev => ({
-          ...prev,
-          avatar: img
-        }))} disabled={loading} />
-        </div>
-      </div>
-      
-      {/* Name and About Me - Moved here */}
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="firstName">姓</Label>
-            <Input
-              id="firstName"
-              name="firstName"
-              placeholder="山田"
-              value={firstName}
-              onChange={onInputChange}
-              required
+  // Handler for image uploads
+  const handleImageChange = (imageType: keyof ImageUploadState, file: File | null) => {
+    setImages(prev => {
+      const newImages = { ...prev };
+      if (file) {
+        const preview = URL.createObjectURL(file);
+        newImages[imageType] = { file, preview, uploading: false };
+      } else {
+        // Keep the preview if no new file is selected
+        newImages[imageType] = { ...newImages[imageType], file: null };
+      }
+      return newImages;
+    });
+  };
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-2xl font-bold">Photos</h2>
+        <Separator className="my-4" />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <Label>Profile Picture (used as avatar)</Label>
+            <ImageUpload
+              imageUrl={images.avatar.preview}
+              onImageChange={(file) => handleImageChange('avatar', file)}
               disabled={loading}
             />
+
+            {/* Name fields below profile photo */}
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  value={firstName}
+                  onChange={onInputChange}
+                  placeholder="Enter your first name"
+                  disabled={loading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  value={lastName}
+                  onChange={onInputChange}
+                  placeholder="Enter your last name"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            {/* About Me field */}
+            <div className="space-y-2">
+              <Label htmlFor="aboutMe">About Me</Label>
+              <Textarea
+                id="aboutMe"
+                name="aboutMe"
+                value={aboutMe}
+                onChange={onInputChange}
+                placeholder="Tell us about yourself"
+                disabled={loading}
+                className="min-h-[100px]"
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="lastName">名</Label>
-            <Input
-              id="lastName"
-              name="lastName"
-              placeholder="太郎"
-              value={lastName}
-              onChange={onInputChange}
-              required
+
+          <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-2">
+              <Label>Additional Photo</Label>
+              <ImageUpload
+                imageUrl={images.image1.preview}
+                onImageChange={(file) => handleImageChange('image1', file)}
+                disabled={loading}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Additional Photo</Label>
+              <ImageUpload
+                imageUrl={images.image2.preview}
+                onImageChange={(file) => handleImageChange('image2', file)}
+                disabled={loading}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+          <div className="space-y-4">
+            <Label>Hobby Photo</Label>
+            <ImageUpload
+              imageUrl={images.hobby.preview}
+              onImageChange={(file) => handleImageChange('hobby', file)}
               disabled={loading}
             />
+            <div className="space-y-2">
+              <Label htmlFor="hobbyPhotoComment">Photo Comment</Label>
+              <Input
+                id="hobbyPhotoComment"
+                name="hobbyPhotoComment"
+                value={hobbyPhotoComment}
+                onChange={onCommentChange}
+                placeholder="Share something about this photo..."
+                disabled={loading}
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <Label>Pet Photo</Label>
+            <ImageUpload
+              imageUrl={images.pet.preview}
+              onImageChange={(file) => handleImageChange('pet', file)}
+              disabled={loading}
+            />
+            <div className="space-y-2">
+              <Label htmlFor="petPhotoComment">Photo Comment</Label>
+              <Input
+                id="petPhotoComment"
+                name="petPhotoComment"
+                value={petPhotoComment}
+                onChange={onCommentChange}
+                placeholder="Share something about this photo..."
+                disabled={loading}
+              />
+            </div>
           </div>
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="aboutMe">About Me</Label>
-          <Textarea
-            id="aboutMe"
-            name="aboutMe"
-            placeholder="自己紹介を書いてください"
-            value={aboutMe}
-            onChange={onInputChange}
-            className="resize-none min-h-[120px]"
-            disabled={loading}
-          />
-        </div>
       </div>
-      
-      {/* Other Photos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <h3 className="text-lg font-medium">Header Photo</h3>
-          <ImageUploadComponent label="Image 1" image={images.image1} setImage={img => setImages(prev => ({
-          ...prev,
-          image1: img
-        }))} disabled={loading} />
-        </div>
-        
-        <div className="space-y-2">
-          <h3 className="text-lg font-medium">Additional Photo 2</h3>
-          <ImageUploadComponent label="Image 2" image={images.image2} setImage={img => setImages(prev => ({
-          ...prev,
-          image2: img
-        }))} disabled={loading} />
-        </div>
-      </div>
-      
-      {/* Hobby Photo */}
-      <div className="space-y-2">
-        <h3 className="text-lg font-medium">Photo of me enjoying my hobby</h3>
-        <ImageUploadComponent label="Hobby Photo" image={images.hobby} setImage={img => setImages(prev => ({
-        ...prev,
-        hobby: img
-      }))} disabled={loading} />
-        
-        <div className="mt-3">
-          <Label>Photo Comment</Label>
-          <Textarea name="hobbyPhotoComment" placeholder="Share something about this photo..." value={hobbyPhotoComment} onChange={onCommentChange} className="resize-none" disabled={loading} />
-        </div>
-      </div>
-      
-      {/* Pet Photo */}
-      <div className="space-y-2">
-        <h3 className="text-lg font-medium">Photo of my pet</h3>
-        <ImageUploadComponent label="Pet Photo" image={images.pet} setImage={img => setImages(prev => ({
-        ...prev,
-        pet: img
-      }))} disabled={loading} />
-        
-        <div className="mt-3">
-          <Label>Photo Comment</Label>
-          <Textarea name="petPhotoComment" placeholder="Share something about this photo..." value={petPhotoComment} onChange={onCommentChange} className="resize-none" disabled={loading} />
-        </div>
-      </div>
-    </div>;
+    </div>
+  );
 }
