@@ -3,7 +3,14 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
-import { MultiSelect } from "@/components/ui/multi-select";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface LanguageSectionProps {
   languages: string[];
@@ -22,18 +29,30 @@ export function LanguageSection({
   onLanguageLevelChange,
   loading
 }: LanguageSectionProps) {
+  // Ensure arrays are safe
+  const safeLanguages = Array.isArray(languages) ? languages : [];
+  const safeLearningLanguages = Array.isArray(learningLanguages) ? learningLanguages : [];
+  
   const languageOptions = [
-    { value: "english", label: "英語" },
-    { value: "japanese", label: "日本語" },
-    { value: "spanish", label: "スペイン語" },
-    { value: "french", label: "フランス語" },
-    { value: "german", label: "ドイツ語" },
-    { value: "chinese", label: "中国語" },
-    { value: "korean", label: "韓国語" },
-    { value: "italian", label: "イタリア語" },
-    { value: "russian", label: "ロシア語" },
-    { value: "arabic", label: "アラビア語" },
+    { value: "english", label: "English" },
+    { value: "japanese", label: "Japanese" },
+    { value: "spanish", label: "Spanish" },
+    { value: "french", label: "French" },
+    { value: "german", label: "German" },
+    { value: "chinese", label: "Chinese" },
+    { value: "korean", label: "Korean" },
+    { value: "italian", label: "Italian" },
+    { value: "russian", label: "Russian" },
+    { value: "arabic", label: "Arabic" },
   ];
+
+  const toggleLearningLanguage = (language: string) => {
+    if (safeLearningLanguages.includes(language)) {
+      onMultiSelectChange("learning_languages", safeLearningLanguages.filter(l => l !== language));
+    } else {
+      onMultiSelectChange("learning_languages", [...safeLearningLanguages, language]);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -41,40 +60,88 @@ export function LanguageSection({
       <Separator />
       
       <div>
-        <Label>Languages</Label>
-        <MultiSelect
-          options={languageOptions}
-          value={languages}
-          onChange={(values) => onMultiSelectChange("languages", values)}
+        <Label>Language Skills</Label>
+        {safeLanguages.map((language) => (
+          <div key={language} className="space-y-2 p-3 border rounded-md mb-3">
+            <div className="flex justify-between items-center">
+              <span className="font-medium">{languageOptions.find(opt => opt.value === language)?.label || language}</span>
+              <Badge 
+                variant="outline" 
+                className="cursor-pointer"
+                onClick={() => {
+                  if (loading) return;
+                  const newLanguages = safeLanguages.filter(l => l !== language);
+                  onMultiSelectChange("languages", newLanguages);
+                }}
+              >
+                Remove
+              </Badge>
+            </div>
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Beginner</span>
+                <span>Intermediate</span>
+                <span>Advanced</span>
+                <span>Native</span>
+              </div>
+              <Slider
+                value={[languageLevels[language] || 1]}
+                min={1}
+                max={4}
+                step={1}
+                onValueChange={(value) => onLanguageLevelChange(language, value[0])}
+                disabled={loading}
+                className="bg-purple-100"
+              />
+              <div className="text-right text-sm">
+                {languageLevels[language] === 1 && "Beginner"}
+                {languageLevels[language] === 2 && "Intermediate"}
+                {languageLevels[language] === 3 && "Advanced"}
+                {languageLevels[language] === 4 && "Native"}
+              </div>
+            </div>
+          </div>
+        ))}
+        
+        <Select
+          onValueChange={(value) => {
+            if (!safeLanguages.includes(value)) {
+              onMultiSelectChange("languages", [...safeLanguages, value]);
+              onLanguageLevelChange(value, 1);
+            }
+          }}
           disabled={loading}
-        />
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Add a language" />
+          </SelectTrigger>
+          <SelectContent>
+            {languageOptions
+              .filter(lang => !safeLanguages.includes(lang.value))
+              .map((lang) => (
+                <SelectItem key={lang.value} value={lang.value}>
+                  {lang.label}
+                </SelectItem>
+              ))
+            }
+          </SelectContent>
+        </Select>
       </div>
       
-      {languages.map((language) => (
-        <div key={language} className="space-y-2">
-          <Label htmlFor={`${language}-level`}>{languageOptions.find(opt => opt.value === language)?.label}</Label>
-          <div className="flex items-center space-x-4">
-            <Slider
-              id={`${language}-level`}
-              defaultValue={[languageLevels[language] || 1]}
-              max={5}
-              step={1}
-              onValueChange={(value) => onLanguageLevelChange(language, value[0])}
-              disabled={loading}
-            />
-            <span>{languageLevels[language] || 1}</span>
-          </div>
+      <div className="space-y-2">
+        <h3 className="text-lg font-medium">Currently Learning</h3>
+        <div className="flex flex-wrap gap-2">
+          {languageOptions.map((lang) => (
+            <Badge
+              key={lang.value}
+              variant={safeLearningLanguages.includes(lang.value) ? "default" : "outline"}
+              className={`cursor-pointer ${safeLearningLanguages.includes(lang.value) ? "bg-purple-600 hover:bg-purple-700" : ""}`}
+              onClick={() => toggleLearningLanguage(lang.value)}
+            >
+              {lang.label}
+            </Badge>
+          ))}
         </div>
-      ))}
-      
-      <div>
-        <h3 className="text-lg font-medium mb-2">Currently Learning</h3>
-        <MultiSelect
-          options={languageOptions}
-          value={learningLanguages}
-          onChange={(values) => onMultiSelectChange("learning_languages", values)}
-          disabled={loading}
-        />
       </div>
     </div>
   );

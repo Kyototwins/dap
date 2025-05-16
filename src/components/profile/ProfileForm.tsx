@@ -206,12 +206,12 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
             loading={loading}
           />
 
-          {/* Submit button */}
+          {/* Submit button - Changed to purple */}
           <div className="flex justify-end">
             <Button 
               type="submit" 
               disabled={loading}
-              className="bg-purple-700 hover:bg-purple-800 text-white px-6 py-3 rounded-full"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full"
             >
               {loading ? "送信中..." : "Save Profile"}
             </Button>

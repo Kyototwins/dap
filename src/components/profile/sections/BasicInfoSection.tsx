@@ -37,13 +37,6 @@ export function BasicInfoSection({
   onSelectChange,
   loading
 }: BasicInfoSectionProps) {
-  const universityOptions = [
-    { value: "doshisha", label: "同志社大学" },
-    { value: "ritsumeikan", label: "立命館大学" },
-    { value: "kansai", label: "関西大学" },
-    { value: "kwangaku", label: "関西学院大学" },
-  ];
-
   const yearOptions = [
     { value: "1", label: "1回生" },
     { value: "2", label: "2回生" },
@@ -51,6 +44,18 @@ export function BasicInfoSection({
     { value: "4", label: "4回生" },
     { value: "graduate", label: "大学院生" },
     { value: "other", label: "その他" },
+  ];
+  
+  const sexualityOptions = [
+    { value: "straight", label: "Straight" },
+    { value: "gay", label: "Gay" },
+    { value: "lesbian", label: "Lesbian" },
+    { value: "bisexual", label: "Bisexual" },
+    { value: "pansexual", label: "Pansexual" },
+    { value: "asexual", label: "Asexual" },
+    { value: "queer", label: "Queer" },
+    { value: "other", label: "Other" },
+    { value: "prefer_not_to_say", label: "Prefer not to say" },
   ];
 
   return (
@@ -82,23 +87,26 @@ export function BasicInfoSection({
       </div>
       
       <div>
-        <Label>大学</Label>
-        <Select 
-          value={university} 
-          onValueChange={(value) => onSelectChange("university", value)}
+        <Label>About Me</Label>
+        <Textarea
+          className="resize-none min-h-[120px]"
+          placeholder="自己紹介を書いてください"
+          name="aboutMe"
+          value={aboutMe}
+          onChange={onInputChange}
           disabled={loading}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="大学を選択" />
-          </SelectTrigger>
-          <SelectContent>
-            {universityOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        />
+      </div>
+      
+      <div>
+        <Label>大学</Label>
+        <Input
+          name="university"
+          value={university}
+          onChange={onInputChange}
+          placeholder="大学名を入力"
+          disabled={loading}
+        />
       </div>
       
       <div>
@@ -175,25 +183,22 @@ export function BasicInfoSection({
       
       <div>
         <Label>Sexuality</Label>
-        <Input
-          name="sexuality"
-          value={sexuality}
-          onChange={onInputChange}
-          placeholder="性的指向を入力（任意）"
+        <Select 
+          value={sexuality} 
+          onValueChange={(value) => onSelectChange("sexuality", value)}
           disabled={loading}
-        />
-      </div>
-      
-      <div>
-        <Label>About Me</Label>
-        <Textarea
-          className="resize-none"
-          placeholder="自己紹介を書いてください"
-          name="aboutMe"
-          value={aboutMe}
-          onChange={onInputChange}
-          disabled={loading}
-        />
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="性的指向を選択（任意）" />
+          </SelectTrigger>
+          <SelectContent>
+            {sexualityOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
