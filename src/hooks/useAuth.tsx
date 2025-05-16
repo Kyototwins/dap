@@ -45,10 +45,12 @@ export function useAuth() {
         // Then check for existing session
         console.log("Getting current session...");
         const { data: sessionData } = await supabase.auth.getSession();
+        
+        // Important: Set both session and user atomically to prevent UI flickers
         setSession(sessionData.session);
         setUser(sessionData.session?.user || null);
         
-        console.log("Initial session check complete");
+        console.log("Initial session check complete, user:", !!sessionData.session?.user);
         setLoading(false);
         setInitialized(true);
       } catch (error) {

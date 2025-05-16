@@ -120,7 +120,7 @@ export function useAuthOperations() {
       });
       
       console.log("Login successful, user is now authenticated");
-      // Navigation will be handled by the auth state change listener in App.tsx
+      return data;
     } catch (error: any) {
       console.error("Login error:", error);
       let errorMessage = "ログインに失敗しました。";

@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -16,15 +17,21 @@ export default function Login() {
   const { loading, connectionError, offline, handleLogin, user } = useAuth();
   const navigate = useNavigate();
 
-  // If already authenticated, redirect to matches page
-  if (user && !isSubmitting) {
-    console.log("User is authenticated, navigating to matches");
-    navigate("/matches", { replace: true });
-    return null; // Don't render anything during redirect
-  }
+  // A flag to prevent the redirection check during form submission
+  const [redirectChecked, setRedirectChecked] = useState(false);
+  
+  // Check for authenticated user and redirect only when not submitting
+  useEffect(() => {
+    if (user && !isSubmitting && redirectChecked) {
+      console.log("User is authenticated, navigating to matches");
+      navigate("/matches", { replace: true });
+    } else {
+      setRedirectChecked(true);
+    }
+  }, [user, isSubmitting, navigate, redirectChecked]);
 
   // If we're loading auth state, show a simple loading message
-  if (loading) {
+  if (loading && !redirectChecked) {
     return (
       <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
         <div className="animate-fade-up flex justify-center py-12">
@@ -54,13 +61,14 @@ export default function Login() {
       // Don't navigate here - let the auth state change handle it
     } catch (error) {
       console.error("Login submission error:", error);
-    } finally {
-      // Keep submitting state for a bit to prevent flicker during auth state change
-      setTimeout(() => {
-        setIsSubmitting(false);
-      }, 1000);
+      setIsSubmitting(false);
     }
   };
+
+  // Don't render login form if user is authenticated and we've checked redirect
+  if (user && redirectChecked && !isSubmitting) {
+    return null;
+  }
 
   return (
     <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
