@@ -29,6 +29,9 @@ export function HobbiesSection({
     { value: "hiking", label: "ハイキング" },
   ];
 
+  // Ensure that hobbies is always an array
+  const safeHobbies = Array.isArray(hobbies) ? hobbies : [];
+
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">Hobbies & Interests</h2>
@@ -38,7 +41,7 @@ export function HobbiesSection({
         <Label>Hobbies</Label>
         <MultiSelect
           options={hobbyOptions}
-          value={hobbies}
+          value={safeHobbies}
           onChange={(values) => onMultiSelectChange("hobbies", values)}
           disabled={loading}
         />

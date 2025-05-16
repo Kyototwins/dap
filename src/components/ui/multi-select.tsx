@@ -32,15 +32,18 @@ interface MultiSelectProps {
 
 export function MultiSelect({
   options,
-  value,
+  value = [],
   onChange,
   placeholder = "Select options",
   disabled = false,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
+  
+  // Ensure value is always an array
+  const safeValue = Array.isArray(value) ? value : [];
 
   const handleUnselect = (item: string) => {
-    onChange(value.filter((i) => i !== item));
+    onChange(safeValue.filter((i) => i !== item));
   };
 
   return (
@@ -54,8 +57,8 @@ export function MultiSelect({
           className="w-full h-auto justify-between"
         >
           <div className="flex flex-wrap gap-1 py-1">
-            {value.length === 0 && placeholder}
-            {value.map((item) => {
+            {safeValue.length === 0 && placeholder}
+            {safeValue.map((item) => {
               const option = options.find((option) => option.value === item);
               return (
                 <Badge
@@ -103,9 +106,9 @@ export function MultiSelect({
                 key={option.value}
                 onSelect={() => {
                   onChange(
-                    value.includes(option.value)
-                      ? value.filter((item) => item !== option.value)
-                      : [...value, option.value]
+                    safeValue.includes(option.value)
+                      ? safeValue.filter((item) => item !== option.value)
+                      : [...safeValue, option.value]
                   );
                   setOpen(true);
                 }}
@@ -113,7 +116,7 @@ export function MultiSelect({
                 <div
                   className={cn(
                     "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                    value.includes(option.value)
+                    safeValue.includes(option.value)
                       ? "bg-primary text-primary-foreground"
                       : "opacity-50 [&_svg]:invisible"
                   )}
