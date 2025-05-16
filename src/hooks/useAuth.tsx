@@ -2,36 +2,47 @@
 import { useState, useEffect } from "react";
 import { useAuthOperations } from "./useAuthOperations";
 import { supabase } from "@/integrations/supabase/client";
-import { User } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 
 export type { AuthFormData } from "@/types/auth";
 
 export function useAuth() {
   const authOperations = useAuthOperations();
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Set up auth listener FIRST
+    // 認証状態のリスナーを設定（最初に実行）
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user || null);
+      (event, currentSession) => {
+        console.log("Auth state changed:", event);
+        setSession(currentSession);
+        setUser(currentSession?.user || null);
+        
+        // ローディング状態を更新（セッション取得後）
+        if (event !== 'INITIAL_SESSION') {
+          setLoading(false);
+        }
       }
     );
     
-    // THEN check for existing user (このセッションチェックは1回だけ実行)
-    const getCurrentUser = async () => {
+    // 既存のセッションを確認（1回だけ実行）
+    const getCurrentSession = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
+        console.log("Getting current session...");
+        const { data } = await supabase.auth.getSession();
+        setSession(data.session);
+        setUser(data.session?.user || null);
       } finally {
+        console.log("Initial session check complete");
         setLoading(false);
       }
     };
     
-    getCurrentUser();
+    getCurrentSession();
     
-    // Cleanup subscription
+    // クリーンアップ関数
     return () => {
       subscription.unsubscribe();
     };
@@ -40,6 +51,7 @@ export function useAuth() {
   return {
     ...authOperations,
     user,
+    session,
     loading
   };
 }

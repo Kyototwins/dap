@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,12 @@ import { toast } from "@/components/ui/use-toast";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { loading, connectionError, offline, handleLogin, user } = useAuth();
 
   // ユーザーが既にログインしている場合はリダイレクト
-  if (user) {
+  if (user && !isSubmitting) {
+    console.log("User is already logged in, redirecting to matches");
     return <Navigate to="/matches" replace />;
   }
 
@@ -32,7 +34,17 @@ export default function Login() {
       return;
     }
     
-    await handleLogin({ email, password });
+    setIsSubmitting(true);
+    
+    try {
+      await handleLogin({ email, password });
+    } finally {
+      // サーバーからのレスポンスを待っているうちにリダイレクトされないようにする
+      // ログインが成功したら、useAuth hookのuser状態更新によって自動的にリダイレクトされる
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 1000);
+    }
   };
 
   return (
@@ -71,7 +83,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={loading}
+                disabled={loading || isSubmitting}
                 className="pl-10 bg-white/70 backdrop-blur-sm border-gray-200 focus-visible:ring-[#7f1184]"
               />
             </div>
@@ -87,7 +99,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                disabled={loading}
+                disabled={loading || isSubmitting}
                 className="pl-10 bg-white/70 backdrop-blur-sm border-gray-200 focus-visible:ring-[#7f1184]"
               />
             </div>
@@ -96,9 +108,9 @@ export default function Login() {
           <Button 
             type="submit" 
             className="w-full transition-all duration-200 shadow-md hover:shadow-lg bg-[#7f1184] hover:bg-[#671073]" 
-            disabled={loading || offline || connectionError}
+            disabled={loading || offline || connectionError || isSubmitting}
           >
-            {loading ? "Processing..." : "Log In"}
+            {isSubmitting ? "Logging in..." : loading ? "Processing..." : "Log In"}
           </Button>
         </form>
         

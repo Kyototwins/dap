@@ -21,8 +21,11 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Help from "./pages/Help";
-import { initializeNotificationsIfNeeded } from "./initNotifications";
 import { NotificationProvider } from "./contexts/NotificationContext";
+
+// 通知の初期化関数を別ファイルからインポートするが、直接呼び出さない
+// （後でimportした関数を使う）
+import { initializeNotificationsIfNeeded } from "./initNotifications";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -32,30 +35,40 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    // 認証状態のリスナーを設定（最初に実行）
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+      console.log("App: Auth state changed", _event);
+      setSession(currentSession);
       
-      // Initialize notifications on sign in
-      if (session) {
+      // 通知の初期化をセッションがある場合のみ非同期で実行
+      if (currentSession) {
+        // 非同期処理を分離して、メインの認証ループを妨げないようにする
         setTimeout(() => {
+          console.log("Initializing notifications after auth change");
           initializeNotificationsIfNeeded();
-        }, 0);
+        }, 100);
       }
     });
 
-    // THEN check current session
+    // 既存のセッションを確認
     const getInitialSession = async () => {
       try {
+        console.log("App: Getting initial session");
         const { data } = await supabase.auth.getSession();
         setSession(data.session);
         
-        // Initialize notifications if user is logged in
+        // 通知の初期化をセッションがある場合のみ実行
         if (data.session) {
-          initializeNotificationsIfNeeded();
+          // 非同期処理を分離
+          setTimeout(() => {
+            console.log("Initializing notifications after initial session");
+            initializeNotificationsIfNeeded();
+          }, 100);
         }
+      } catch (error) {
+        console.error("Error getting session:", error);
       } finally {
         setLoading(false);
       }
@@ -67,7 +80,8 @@ function App() {
   }, []);
 
   if (loading) {
-    return null; // Or a loading spinner
+    // ローディング表示をより明確に
+    return <div className="flex items-center justify-center min-h-screen">読み込み中...</div>;
   }
 
   return (

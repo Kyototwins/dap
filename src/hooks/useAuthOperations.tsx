@@ -89,6 +89,8 @@ export function useAuthOperations() {
     setLoading(true);
 
     try {
+      console.log("Login attempt for:", email);
+      
       // オフライン状態のチェック
       if (offline) {
         throw new Error("インターネット接続がありません。ネットワーク接続を確認してください。");
@@ -123,9 +125,11 @@ export function useAuthOperations() {
         title: "ログインしました",
         description: "アプリへようこそ！",
       });
-
-      // ナビゲーションは現在、App.tsxで処理されているため、ここでは行わない
+      
+      console.log("Login successful");
+      // ナビゲーションは App.tsx の認証状態変更リスナーで処理される
     } catch (error: any) {
+      console.error("Login error:", error);
       let errorMessage = "ログインに失敗しました。";
       
       if (error instanceof Error) {
