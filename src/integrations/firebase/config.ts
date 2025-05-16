@@ -11,4 +11,4 @@ export const firebaseConfig = {
 };
 
 // Your VAPID key from Firebase console
-export const vapidKey = "YOUR_VAPID_KEY"; // Firebase Cloud Messagingからウェブプッシュ証明書のキーを取得して置き換えてください
+export const vapidKey = "BJqM9rfmtmLEgMbtb543aCRJ4hXPiV0_ScxZVpdieGD62sF477Qf6Y5JwCxnnIb487ru4SrVL95GGj-a5avVHgA";
