@@ -26,7 +26,7 @@ export default function ProfileSetup() {
 
   const handleCancel = () => {
     // Navigate back to profile if profile exists, otherwise to matches
-    navigate(profile ? "/profile" : "/matches");
+    navigate(profile ? "/profile" : "/matches", { replace: true });
   };
 
   return (

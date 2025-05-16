@@ -91,8 +91,11 @@ export function useProfileSubmission() {
         variant: "default",
       });
 
+      console.log("Profile updated successfully, navigating to /profile");
+      
       // Navigate to the profile page after successful submission
-      navigate("/profile");
+      // Using replace: true to prevent going back to the form
+      navigate("/profile", { replace: true });
 
     } catch (error: any) {
       console.error("Profile submission error:", error);

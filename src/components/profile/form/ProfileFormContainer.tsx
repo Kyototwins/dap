@@ -53,7 +53,13 @@ export function ProfileFormContainer({ profile, onCancel }: ProfileFormContainer
 
   const onSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    await handleSubmit(e, formData, additionalData, images);
+    try {
+      await handleSubmit(e, formData, additionalData, images);
+      console.log("Form submitted successfully");
+      // Profile redirect will be handled in the handleSubmit function
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   return (
@@ -119,8 +125,16 @@ export function ProfileFormContainer({ profile, onCancel }: ProfileFormContainer
             loading={loading}
           />
 
-          {/* Submit button - Updated to the specific purple color */}
-          <div className="flex justify-end">
+          {/* Submit and Cancel buttons */}
+          <div className="flex justify-between">
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={onCancel}
+              className="px-6 py-3 rounded-full"
+            >
+              Cancel
+            </Button>
             <Button 
               type="submit" 
               disabled={loading}
