@@ -91,7 +91,7 @@ export function useProfileSubmission() {
         variant: "default",
       });
 
-      // Navigate to the profile page
+      // Navigate to the profile page after successful submission
       navigate("/profile");
 
     } catch (error: any) {

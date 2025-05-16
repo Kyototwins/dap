@@ -1,4 +1,3 @@
-
 import { MessageSquare, User, Search, Calendar, Menu, HelpCircle, LogOut } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
