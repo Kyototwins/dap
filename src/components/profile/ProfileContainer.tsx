@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EditProfileButton } from "@/components/profile/EditProfileButton";
 import { ProfileForm } from "@/components/profile/ProfileForm";
-import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileAboutTab } from "@/components/profile/ProfileAboutTab";
 import { ProfileLoading } from "@/components/profile/ProfileLoading";
@@ -21,7 +20,7 @@ export function ProfileContainer() {
   const [activeTab, setActiveTab] = useState("about");
   
   useEffect(() => {
-    // フォームを閉じた後にプロフィールを再取得
+    // Refresh profile after closing the form
     if (!isEditMode) {
       refreshProfile();
     }
@@ -34,7 +33,7 @@ export function ProfileContainer() {
   if (error || !profile) {
     return (
       <ProfileNotFound
-        message="プロフィールの読み込みに失敗しました"
+        message="Failed to load profile"
         offline={offline}
         connectionError={connectionError}
       />
@@ -70,21 +69,16 @@ export function ProfileContainer() {
       <ProfileHeader profile={messageProfile as MessageProfile} />
       <div className="container px-4 mt-2">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full grid grid-cols-3">
+          <TabsList className="w-full grid grid-cols-2">
             <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="stats">統計</TabsTrigger>
             <TabsTrigger value="notifications" className="flex gap-1.5 items-center">
               <Bell size={16} />
-              <span>通知</span>
+              <span>Notifications</span>
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="about" className="py-4">
             <ProfileAboutTab profile={messageProfile as MessageProfile} />
-          </TabsContent>
-
-          <TabsContent value="stats" className="py-4">
-            <ProfileInfo profile={messageProfile as MessageProfile} />
           </TabsContent>
 
           <TabsContent value="notifications" className="py-4">

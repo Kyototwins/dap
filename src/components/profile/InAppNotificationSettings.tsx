@@ -8,15 +8,15 @@ export function InAppNotificationSettings() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          アプリ内通知
+          In-App Notifications
         </CardTitle>
         <CardDescription>
-          アプリ内の通知設定を管理します
+          Manage your in-app notification settings
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="p-4 bg-muted rounded-md text-sm text-muted-foreground">
-          現在、すべてのアプリ内通知はデフォルトで有効になっています。これらの設定は後日カスタマイズできるようになります。
+          Currently, all in-app notifications are enabled by default. These settings will be customizable in the future.
         </div>
       </CardContent>
     </Card>

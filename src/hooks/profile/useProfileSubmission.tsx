@@ -32,7 +32,7 @@ export function useProfileSubmission() {
       let imageUrl1 = images.image1.preview;
       let imageUrl2 = images.image2.preview;
       let hobbyPhotoUrl = images.hobby.preview;
-      let petPhotoUrl = images.pet.preview;  // Changed back from foodPhotoUrl
+      let petPhotoUrl = images.pet.preview;
 
       // Check if these are blob URLs which need to be uploaded
       const isBlobUrl = (url: string) => url.startsWith('blob:');
@@ -66,8 +66,8 @@ export function useProfileSubmission() {
         hobbyPhotoUrl = "";
       }
 
-      if (images.pet.file) {  // Changed back from food.file
-        const url = await uploadImage(images.pet.file, 'pets');  // Changed back from 'foods' to 'pets'
+      if (images.pet.file) {
+        const url = await uploadImage(images.pet.file, 'pets');
         if (url) petPhotoUrl = url;
       } else if (petPhotoUrl && isBlobUrl(petPhotoUrl)) {
         petPhotoUrl = "";
@@ -81,7 +81,7 @@ export function useProfileSubmission() {
         imageUrl1,
         imageUrl2,
         hobbyPhotoUrl,
-        petPhotoUrl  // Changed back from foodPhotoUrl
+        petPhotoUrl
       );
 
       // Show success message
@@ -91,7 +91,7 @@ export function useProfileSubmission() {
         variant: "default",
       });
 
-      // Navigate to the profile page instead of matches
+      // Navigate to the profile page
       navigate("/profile");
 
     } catch (error: any) {
