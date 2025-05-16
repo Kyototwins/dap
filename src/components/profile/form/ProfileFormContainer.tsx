@@ -54,8 +54,6 @@ export function ProfileFormContainer({ profile, onCancel }: ProfileFormContainer
   const onSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     await handleSubmit(e, formData, additionalData, images);
-    // Navigate to profile page after successful submission
-    navigate("/profile");
   };
 
   return (

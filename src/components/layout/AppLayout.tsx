@@ -107,7 +107,7 @@ export function AppLayout({ children }: LayoutProps) {
                   location.pathname === item.path && "text-doshisha-purple"
                 )} />
                 <span className="text-xs">{item.label}</span>
-                {item.hasNotification && <NotificationIndicator className="bg-doshisha-purple" />}
+                {item.hasNotification && <NotificationIndicator className="bg-blue-500" />}
               </button>
             ))}
           </div>

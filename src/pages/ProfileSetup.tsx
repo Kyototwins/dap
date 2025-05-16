@@ -24,10 +24,15 @@ export default function ProfileSetup() {
     return <ProfileLoading />;
   }
 
+  const handleCancel = () => {
+    // Navigate back to profile if profile exists, otherwise to matches
+    navigate(profile ? "/profile" : "/matches");
+  };
+
   return (
     <ProfileForm
       profile={profile}
-      onCancel={() => navigate("/")}
+      onCancel={handleCancel}
     />
   );
 }

@@ -45,9 +45,10 @@ export default function Matches() {
         n => n.type === NotificationType.NEW_MATCH && !n.read
       );
       
-      matchNotifications.forEach(notification => {
+      if (matchNotifications.length > 0) {
+        console.log("Marking like notifications as read");
         markAllAsRead();
-      });
+      }
     }
   }, [activeTab, notifications, markAllAsRead]);
 
