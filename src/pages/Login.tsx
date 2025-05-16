@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,44 +13,87 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userAuthenticated, setUserAuthenticated] = useState(false);
   const { loading, connectionError, offline, handleLogin, user } = useAuth();
+  const navigate = useNavigate();
 
-  // ユーザーが既にログインしている場合はリダイレクト
-  if (user && !isSubmitting) {
-    console.log("User is already logged in, redirecting to matches");
-    return <Navigate to="/matches" replace />;
+  // Prevent flickering by using a stable local state for redirection
+  useEffect(() => {
+    if (user && !isSubmitting) {
+      console.log("User is authenticated, preparing navigation to matches");
+      // Set local state to trigger a single navigation
+      setUserAuthenticated(true);
+    }
+  }, [user, isSubmitting]);
+
+  // Handle the navigation when authenticated
+  useEffect(() => {
+    if (userAuthenticated) {
+      console.log("Redirecting authenticated user to matches");
+      navigate("/matches", { replace: true });
+    }
+  }, [userAuthenticated, navigate]);
+
+  // If we're in process of submitting, just show the login form
+  if (isSubmitting) {
+    return (
+      <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
+        {renderLoginForm()}
+      </AuthLayout>
+    );
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !password) {
-      toast({
-        title: "Input Error",
-        description: "Please enter both email and password.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    try {
-      await handleLogin({ email, password });
-    } finally {
-      // サーバーからのレスポンスを待っているうちにリダイレクトされないようにする
-      // ログインが成功したら、useAuth hookのuser状態更新によって自動的にリダイレクトされる
-      setTimeout(() => {
-        setIsSubmitting(false);
-      }, 1000);
-    }
-  };
+  // If we're loading auth state, show a simple loading message
+  if (loading) {
+    return (
+      <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
+        <div className="animate-fade-up flex justify-center py-12">
+          <p>Loading...</p>
+        </div>
+      </AuthLayout>
+    );
+  }
 
+  // If user is already authenticated, the useEffect will handle redirection
+  // But render nothing here to prevent any flickering
+  if (userAuthenticated) {
+    return null;
+  }
+
+  // Otherwise, show the login form
   return (
-    <AuthLayout
-      title="Welcome Back"
-      subtitle="Start your international exchange journey"
-    >
+    <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
+      {renderLoginForm()}
+    </AuthLayout>
+  );
+
+  function renderLoginForm() {
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      
+      if (!email || !password) {
+        toast({
+          title: "Input Error",
+          description: "Please enter both email and password.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setIsSubmitting(true);
+      
+      try {
+        console.log("Attempting login with email:", email);
+        await handleLogin({ email, password });
+      } finally {
+        // Keep submitting state for a bit to prevent flicker during auth state change
+        setTimeout(() => {
+          setIsSubmitting(false);
+        }, 1000);
+      }
+    };
+
+    return (
       <div className="animate-fade-up">
         {offline && (
           <Alert variant="destructive" className="mb-6 border-red-400">
@@ -124,6 +166,6 @@ export default function Login() {
           </Link>
         </div>
       </div>
-    </AuthLayout>
-  );
+    );
+  }
 }

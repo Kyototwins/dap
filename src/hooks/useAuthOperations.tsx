@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useConnectionStatus } from "./useConnectionStatus";
 import { AuthFormData } from "@/types/auth";
@@ -17,19 +17,20 @@ export function useAuthOperations() {
     setLoading(true);
 
     try {
-      // オフライン状態のチェック
+      // Check offline status
       if (offline) {
         throw new Error("インターネット接続がありません。ネットワーク接続を確認してください。");
       }
 
-      // 接続テスト
+      // Test connection
       const isConnected = await testConnection();
       if (!isConnected) {
         throw new Error("サーバーに接続できません。ネットワーク接続を確認してください。");
       }
 
-      // サインアップ処理
-      const signUpPromise = supabase.auth.signUp({
+      // Signup process
+      console.log("Attempting to sign up user:", email);
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -38,28 +39,21 @@ export function useAuthOperations() {
           },
         },
       });
-      
-      // タイムアウト処理
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("登録処理がタイムアウトしました。後でもう一度お試しください。")), 15000);
-      });
-      
-      // どちらか早い方を採用
-      const { data, error } = await Promise.race([signUpPromise, timeoutPromise]) as any;
 
       if (error) {
         throw error;
       }
 
-      // メール送信成功のメッセージを表示
+      // Show success message
       toast({
         title: "確認メールを送信しました",
         description: "メールに記載されているリンクをクリックして、登録を完了してください。",
       });
 
-      // ログインページにリダイレクト
+      // Redirect to login page
       navigate("/login");
     } catch (error: any) {
+      console.error("Signup error:", error);
       let errorMessage = "アカウントの作成に失敗しました。";
       
       if (error instanceof Error) {
@@ -91,43 +85,39 @@ export function useAuthOperations() {
     try {
       console.log("Login attempt for:", email);
       
-      // オフライン状態のチェック
+      // Check offline status
       if (offline) {
         throw new Error("インターネット接続がありません。ネットワーク接続を確認してください。");
       }
 
-      // 接続テスト
+      // Test connection
       const isConnected = await testConnection();
       if (!isConnected) {
         throw new Error("サーバーに接続できません。ネットワーク接続を確認してください。");
       }
 
-      // ログイン処理
-      const loginPromise = supabase.auth.signInWithPassword({
+      // Login process with more verbose logging
+      console.log("Connection verified, attempting to authenticate...");
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      
-      // タイムアウト処理
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("ログイン処理がタイムアウトしました。後でもう一度お試しください。")), 15000);
-      });
-      
-      // どちらか早い方を採用
-      const { error: authError } = await Promise.race([loginPromise, timeoutPromise]) as any;
 
-      if (authError) {
-        throw authError;
+      if (error) {
+        console.error("Authentication error:", error);
+        throw error;
       }
-
-      // ログイン成功のトースト表示
+      
+      console.log("Authentication successful, session created:", !!data.session);
+      
+      // Login success toast
       toast({
         title: "ログインしました",
         description: "アプリへようこそ！",
       });
       
-      console.log("Login successful");
-      // ナビゲーションは App.tsx の認証状態変更リスナーで処理される
+      console.log("Login successful, user is now authenticated");
+      // Navigation will be handled by the auth state change listener in App.tsx
     } catch (error: any) {
       console.error("Login error:", error);
       let errorMessage = "ログインに失敗しました。";
@@ -150,6 +140,7 @@ export function useAuthOperations() {
         variant: "destructive",
       });
     } finally {
+      console.log("Login process completed, releasing loading state");
       setLoading(false);
     }
   };
