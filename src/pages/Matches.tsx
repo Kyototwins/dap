@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RefreshCw, Filter, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProfileFilter } from "@/hooks/useProfileFilter";
@@ -8,6 +8,8 @@ import { FilterSheet } from "@/components/matches/FilterSheet";
 import { ProfilesList } from "@/components/matches/ProfilesList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLikesReceived } from "@/hooks/useLikesReceived";
+import { useNotifications } from "@/contexts/NotificationContext";
+import { NotificationType } from "@/types/notifications";
 
 export default function Matches() {
   const [activeTab, setActiveTab] = useState("discover");
@@ -33,6 +35,21 @@ export default function Matches() {
     loadingMoreLikes,
     refreshLikes
   } = useLikesReceived();
+
+  const { notifications, markAllAsRead } = useNotifications();
+
+  // Mark match notifications as read when viewing the likes tab
+  useEffect(() => {
+    if (activeTab === "likes") {
+      const matchNotifications = notifications.filter(
+        n => n.type === NotificationType.NEW_MATCH && !n.read
+      );
+      
+      matchNotifications.forEach(notification => {
+        markAllAsRead();
+      });
+    }
+  }, [activeTab, notifications, markAllAsRead]);
 
   return (
     <div className="py-4">

@@ -6,6 +6,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { DapLogo } from "@/components/common/DapLogo";
+import { NotificationIndicator } from "@/components/common/NotificationIndicator";
+import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,12 +16,13 @@ interface LayoutProps {
 export function AppLayout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
 
   const navItems = [
-    { icon: Search, label: "Matching", path: "/matches" },
-    { icon: MessageSquare, label: "Messages", path: "/messages" },
-    { icon: Calendar, label: "Events", path: "/events" },
-    { icon: User, label: "Profile", path: "/profile" },
+    { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
+    { icon: MessageSquare, label: "Messages", path: "/messages", hasNotification: hasUnreadMessages },
+    { icon: Calendar, label: "Events", path: "/events", hasNotification: hasUnreadEvents },
+    { icon: User, label: "Profile", path: "/profile", hasNotification: false },
   ];
 
   const handleNavigation = (path: string) => {
@@ -91,7 +94,7 @@ export function AppLayout({ children }: LayoutProps) {
                 key={item.path}
                 onClick={() => handleNavigation(item.path)}
                 className={cn(
-                  "flex flex-col items-center justify-center w-full h-full gap-1",
+                  "flex flex-col items-center justify-center w-full h-full gap-1 relative",
                   "text-gray-500 hover:text-doshisha-purple transition-colors",
                   location.pathname === item.path && "text-doshisha-purple font-medium"
                 )}
@@ -101,6 +104,7 @@ export function AppLayout({ children }: LayoutProps) {
                   location.pathname === item.path && "text-doshisha-purple"
                 )} />
                 <span className="text-xs">{item.label}</span>
+                {item.hasNotification && <NotificationIndicator className="bg-doshisha-purple" />}
               </button>
             ))}
           </div>
