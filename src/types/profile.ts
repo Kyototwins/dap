@@ -1,3 +1,4 @@
+
 // Define the ImageUpload type
 export interface ImageUpload {
   file: File | null;

@@ -1,4 +1,5 @@
 
+
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormData, AdditionalDataType } from "@/types/profile";
 
@@ -66,12 +67,9 @@ export async function fetchUserProfile(userId: string) {
 
 export async function updateFcmToken(userId: string, token: string) {
   try {
-    // Instead of using RPC which doesn't exist, directly update the profile table
     const { error } = await supabase
       .from('profiles')
-      .update({
-        fcm_token: token
-      })
+      .update({ fcm_token: token })
       .eq('id', userId);
       
     if (error) {
