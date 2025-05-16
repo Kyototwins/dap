@@ -151,20 +151,22 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
       
       <Form {...form}>
         <form onSubmit={onSubmitForm} className="space-y-8">
-          {/* Photos Section */}
+          {/* Photos Section - now including name and about me */}
           <PhotosSection
             images={images}
             setImages={setImages}
             hobbyPhotoComment={formData.hobbyPhotoComment}
             petPhotoComment={formData.petPhotoComment}
+            firstName={formData.firstName}
+            lastName={formData.lastName}
+            aboutMe={formData.aboutMe}
+            onInputChange={handleInputChange}
             onCommentChange={handleInputChange}
             loading={loading}
           />
 
-          {/* Basic Information */}
+          {/* Basic Information - now without name and about me */}
           <BasicInfoSection
-            firstName={formData.firstName}
-            lastName={formData.lastName}
             university={formData.university}
             department={formData.department}
             year={formData.year}
@@ -172,7 +174,6 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
             gender={formData.gender}
             origin={formData.origin}
             sexuality={formData.sexuality}
-            aboutMe={formData.aboutMe}
             onInputChange={handleInputChange}
             onSelectChange={handleSelectChange}
             loading={loading}
@@ -206,12 +207,12 @@ export function ProfileForm({ profile, onCancel }: ProfileFormProps) {
             loading={loading}
           />
 
-          {/* Submit button - Changed to purple */}
+          {/* Submit button - Updated to the specific purple color */}
           <div className="flex justify-end">
             <Button 
               type="submit" 
               disabled={loading}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full"
+              className="bg-[#7F1184] hover:bg-[#671073] text-white px-6 py-3 rounded-full"
             >
               {loading ? "送信中..." : "Save Profile"}
             </Button>

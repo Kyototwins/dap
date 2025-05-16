@@ -2,13 +2,10 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface BasicInfoSectionProps {
-  firstName: string;
-  lastName: string;
   university: string;
   department: string;
   year: string;
@@ -16,15 +13,12 @@ interface BasicInfoSectionProps {
   gender: string;
   origin: string;
   sexuality: string;
-  aboutMe: string;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onSelectChange: (name: string, value: string) => void;
   loading?: boolean;
 }
 
 export function BasicInfoSection({
-  firstName,
-  lastName,
   university,
   department,
   year,
@@ -32,7 +26,6 @@ export function BasicInfoSection({
   gender,
   origin,
   sexuality,
-  aboutMe,
   onInputChange,
   onSelectChange,
   loading
@@ -62,41 +55,6 @@ export function BasicInfoSection({
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Basic Information</h2>
       <Separator />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <Label>姓</Label>
-          <Input
-            name="firstName"
-            value={firstName}
-            onChange={onInputChange}
-            placeholder="山田"
-            disabled={loading}
-          />
-        </div>
-        <div>
-          <Label>名</Label>
-          <Input
-            name="lastName"
-            value={lastName}
-            onChange={onInputChange}
-            placeholder="太郎"
-            disabled={loading}
-          />
-        </div>
-      </div>
-      
-      <div>
-        <Label>About Me</Label>
-        <Textarea
-          className="resize-none min-h-[120px]"
-          placeholder="自己紹介を書いてください"
-          name="aboutMe"
-          value={aboutMe}
-          onChange={onInputChange}
-          disabled={loading}
-        />
-      </div>
       
       <div>
         <Label>大学</Label>

@@ -15,8 +15,8 @@ export function FilterBadge({ label, isSelected, onClick }: FilterBadgeProps) {
       className={cn(
         "cursor-pointer",
         isSelected
-          ? "bg-[#7f1184] text-white hover:bg-[#671073]"
-          : "bg-white text-[#7f1184] hover:bg-[#f3e8ff]"
+          ? "bg-[#7F1184] text-white hover:bg-[#671073]"
+          : "bg-white text-[#7F1184] hover:bg-[#E5DEFF]"
       )}
       onClick={onClick}
     >
@@ -24,4 +24,3 @@ export function FilterBadge({ label, isSelected, onClick }: FilterBadgeProps) {
     </Badge>
   );
 }
-

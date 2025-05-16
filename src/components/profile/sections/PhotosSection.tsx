@@ -5,19 +5,30 @@ import { ImageUploadComponent } from "@/components/profile/ImageUploadComponent"
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+
 interface PhotosSectionProps {
   images: ImageUploadState;
   setImages: React.Dispatch<React.SetStateAction<ImageUploadState>>;
   hobbyPhotoComment: string;
   petPhotoComment: string;
+  firstName: string;
+  lastName: string;
+  aboutMe: string;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onCommentChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   loading?: boolean;
 }
+
 export function PhotosSection({
   images,
   setImages,
   hobbyPhotoComment,
   petPhotoComment,
+  firstName,
+  lastName,
+  aboutMe,
+  onInputChange,
   onCommentChange,
   loading
 }: PhotosSectionProps) {
@@ -33,6 +44,49 @@ export function PhotosSection({
           ...prev,
           avatar: img
         }))} disabled={loading} />
+        </div>
+      </div>
+      
+      {/* Name and About Me - Moved here */}
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="firstName">姓</Label>
+            <Input
+              id="firstName"
+              name="firstName"
+              placeholder="山田"
+              value={firstName}
+              onChange={onInputChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="lastName">名</Label>
+            <Input
+              id="lastName"
+              name="lastName"
+              placeholder="太郎"
+              value={lastName}
+              onChange={onInputChange}
+              required
+              disabled={loading}
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="aboutMe">About Me</Label>
+          <Textarea
+            id="aboutMe"
+            name="aboutMe"
+            placeholder="自己紹介を書いてください"
+            value={aboutMe}
+            onChange={onInputChange}
+            className="resize-none min-h-[120px]"
+            disabled={loading}
+          />
         </div>
       </div>
       

@@ -77,7 +77,7 @@ export function HobbiesSection({
             <Badge
               key={option.value}
               variant={safeHobbies.includes(option.value) ? "default" : "outline"}
-              className={`cursor-pointer ${safeHobbies.includes(option.value) ? "bg-purple-600 hover:bg-purple-700" : ""}`}
+              className={`cursor-pointer ${safeHobbies.includes(option.value) ? "bg-[#7F1184] hover:bg-[#671073]" : ""}`}
               onClick={() => toggleHobby(option.value)}
             >
               {option.label}
@@ -99,7 +99,7 @@ export function HobbiesSection({
                 <Badge
                   key={hobby}
                   variant="default"
-                  className="bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                  className="bg-[#7F1184] hover:bg-[#671073] cursor-pointer"
                   onClick={() => toggleHobby(hobby)}
                 >
                   {hobby} ×
