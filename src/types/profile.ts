@@ -85,4 +85,3 @@ export interface Profile {
     in_app?: boolean;
   } | null;
 }
-

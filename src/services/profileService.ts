@@ -66,16 +66,35 @@ export async function fetchUserProfile(userId: string) {
 }
 
 export async function updateFcmToken(userId: string, token: string) {
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      fcm_token: token,
-      notification_settings: { browser_push: true }
-    })
-    .eq('id', userId);
-
-  if (error) throw error;
-  return true;
+  try {
+    const { error } = await supabase.rpc('update_fcm_token', { 
+      user_id: userId, 
+      token: token 
+    });
+    
+    if (!error) {
+      return true;
+    }
+    
+    // Fall back to direct update if RPC doesn't exist
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        fcm_token: token,
+        notification_settings: { browser_push: true }
+      })
+      .eq('id', userId);
+      
+    if (updateError) {
+      console.error('Error updating FCM token:', updateError);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error in updateFcmToken:', error);
+    return false;
+  }
 }
 
 export async function updateNotificationSettings(
@@ -87,18 +106,25 @@ export async function updateNotificationSettings(
     notification_email?: string | null;
   }
 ) {
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      notification_settings: {
-        browser_push: settings.browser_push,
-        email: settings.email
-      },
-      email_digest_enabled: settings.email_digest_enabled,
-      notification_email: settings.notification_email
-    })
-    .eq('id', userId);
+  try {
+    const notificationSettingsObject = {
+      browser_push: settings.browser_push,
+      email: settings.email
+    };
 
-  if (error) throw error;
-  return true;
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        notification_settings: notificationSettingsObject,
+        email_digest_enabled: settings.email_digest_enabled,
+        notification_email: settings.notification_email
+      })
+      .eq('id', userId);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error updating notification settings:', error);
+    return false;
+  }
 }

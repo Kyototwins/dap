@@ -11,4 +11,3 @@ export const firebaseConfig = {
 
 // Your VAPID key from Firebase console
 export const vapidKey = "YOUR_VAPID_KEY";
-

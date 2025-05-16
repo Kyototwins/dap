@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { firebaseConfig, vapidKey } from "./config";
+import { updateFcmToken } from "@/services/profileService";
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -68,23 +69,11 @@ export async function saveFcmTokenToProfile(token: string): Promise<boolean> {
       return false;
     }
     
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        fcm_token: token,
-        notification_settings: { browser_push: true }
-      })
-      .eq('id', user.id);
-      
-    if (error) {
-      console.error('Error updating FCM token:', error);
-      return false;
-    }
-    
-    return true;
+    // Use the updateFcmToken service function instead of direct Supabase call
+    const success = await updateFcmToken(user.id, token);
+    return success;
   } catch (error) {
     console.error('Error saving FCM token to profile:', error);
     return false;
   }
 }
-

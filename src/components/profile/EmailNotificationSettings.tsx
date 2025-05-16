@@ -1,0 +1,186 @@
+
+import { useState } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "@/components/ui/use-toast";
+import { Mail } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { isValidEmail } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+
+interface EmailNotificationSettingsProps {
+  emailDigestEnabled: boolean;
+  notificationEmail: string;
+  onSave: () => void;
+}
+
+export function EmailNotificationSettings({ 
+  emailDigestEnabled: initialEmailDigestEnabled, 
+  notificationEmail: initialNotificationEmail,
+  onSave 
+}: EmailNotificationSettingsProps) {
+  const [loading, setLoading] = useState(false);
+  const [emailDigestEnabled, setEmailDigestEnabled] = useState(initialEmailDigestEnabled);
+  const [notificationEmail, setNotificationEmail] = useState(initialNotificationEmail);
+  const [emailError, setEmailError] = useState("");
+
+  // Save notification settings
+  const saveSettings = async () => {
+    // Validate email if provided
+    if (notificationEmail && !isValidEmail(notificationEmail)) {
+      setEmailError("有効なメールアドレスを入力してください");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          email_digest_enabled: emailDigestEnabled,
+          notification_email: notificationEmail || null
+        })
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "設定を保存しました",
+        description: "通知設定が正常に更新されました。",
+      });
+      setEmailError("");
+      onSave();
+    } catch (error) {
+      console.error("Error saving notification settings:", error);
+      toast({
+        title: "設定の保存中にエラーが発生しました",
+        description: "通知設定の保存中に問題が発生しました。",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Test sending a digest email
+  const testDigestEmail = async () => {
+    setLoading(true);
+    try {
+      // Get current user to include in the test request
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      // Send test request with the user's ID and custom email if set
+      const response = await fetch('https://yxacicvkyusnykivbmtg.supabase.co/functions/v1/send-daily-digest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4YWNpY3ZreXVzbnlraXZibXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk4NDY3MTYsImV4cCI6MjA1NTQyMjcxNn0.FXjSvFChIG5t23cDV5VKHEkl82Ki-pnv64PWQjcd6jQ'
+        },
+        body: JSON.stringify({ 
+          test: true,
+          user_id: user.id,
+          email: notificationEmail || user.email // Use custom email if available
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "テスト通知の送信に失敗しました");
+      }
+      
+      const result = await response.json();
+      
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      
+      toast({
+        title: "テスト通知送信完了",
+        description: `通知は ${notificationEmail || user.email} に送信されました。メールの受信ボックスをチェックしてください。`,
+      });
+    } catch (error) {
+      console.error("Error sending test digest email:", error);
+      toast({
+        title: "テスト通知の送信エラー",
+        description: `${error.message || "テスト通知の送信に問題がありました"}`,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEmailChange = (e) => {
+    setNotificationEmail(e.target.value);
+    setEmailError("");
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Mail className="h-5 w-5" />
+          メール通知
+        </CardTitle>
+        <CardDescription>
+          メールで受け取る通知を管理します
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between space-x-2">
+          <Label htmlFor="email-digest" className="flex flex-col gap-1">
+            <span>日次メールダイジェスト</span>
+            <span className="font-normal text-sm text-muted-foreground">
+              毎日のアクティビティの要約をメールで受け取る
+            </span>
+          </Label>
+          <Switch
+            id="email-digest"
+            checked={emailDigestEnabled}
+            onCheckedChange={setEmailDigestEnabled}
+            disabled={loading}
+          />
+        </div>
+        
+        <Separator />
+        
+        <div className="space-y-2">
+          <Label htmlFor="notification-email" className="flex flex-col gap-1">
+            <span>通知送信先メールアドレス</span>
+            <span className="font-normal text-sm text-muted-foreground">
+              通知を受け取るカスタムメールアドレスを設定（未設定の場合、アカウントのメールアドレスが使用されます）
+            </span>
+          </Label>
+          <Input
+            id="notification-email"
+            type="email"
+            placeholder="custom@example.com"
+            value={notificationEmail}
+            onChange={handleEmailChange}
+            disabled={loading}
+          />
+          {emailError && <p className="text-sm text-destructive">{emailError}</p>}
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button 
+          variant="outline" 
+          onClick={testDigestEmail}
+          disabled={loading}
+        >
+          {loading ? "送信中..." : "テスト通知送信"}
+        </Button>
+        <Button onClick={saveSettings} disabled={loading}>
+          {loading ? "保存中..." : "変更を保存"}
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
