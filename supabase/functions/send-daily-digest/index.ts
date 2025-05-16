@@ -46,9 +46,9 @@ const handler = async (req: Request): Promise<Response> => {
       } catch (error) {
         console.error(`Error processing test digest for user ${specificUserId}:`, error);
         return new Response(JSON.stringify({ 
-          error: error.message,
+          error: error.message || "Unknown error",
           success: false,
-          message: `Error sending test digest email: ${error.message}` 
+          message: `Error sending test digest email: ${error.message || "Unknown error"}` 
         }), {
           status: 500,
           headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -59,7 +59,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Get all users with complete profiles AND email digest enabled
     const { data: users, error: usersError } = await supabase
       .from("profiles")
-      .select("id, first_name, avatar_url, email_digest_enabled")
+      .select("id, first_name, avatar_url, email_digest_enabled, notification_email")
       .not("first_name", "is", null)
       .eq("email_digest_enabled", true);
 
@@ -89,7 +89,7 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error) {
     console.error("Error in daily digest function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || "Unknown error" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -102,13 +102,13 @@ const handler = async (req: Request): Promise<Response> => {
 async function processUserDigest(userId: string, isTest: boolean = false, testEmail?: string): Promise<void> {
   console.log(`Processing digest for user ${userId}`);
   
-  // 1. Get user's email from auth
+  // 1. Get user's auth data
   const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(userId);
   if (userError || !user) {
     throw new Error(`Error fetching user auth data: ${userError?.message || "User not found"}`);
   }
   
-  // 2. Get user profile
+  // 2. Get user profile including custom notification email
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("*")
@@ -117,6 +117,12 @@ async function processUserDigest(userId: string, isTest: boolean = false, testEm
   
   if (profileError || !profile) {
     throw new Error(`Error fetching profile: ${profileError?.message || "Profile not found"}`);
+  }
+
+  // Determine which email to use for notifications (priority: testEmail > notification_email > user.email)
+  const emailToUse = testEmail || profile.notification_email || user.email;
+  if (!emailToUse) {
+    throw new Error("No valid email address found for notifications");
   }
 
   // Get yesterday's date cutoff for "new" items
@@ -217,7 +223,7 @@ async function processUserDigest(userId: string, isTest: boolean = false, testEm
   
   // 9. Generate and send the email
   await sendDigestEmail({
-    email: testEmail || user.email, // Use the explicitly passed email for test if available
+    email: emailToUse,
     username: profile.first_name || "User",
     userId: userId,
     newLikes: newLikes || [],
@@ -368,8 +374,8 @@ async function sendDigestEmail({
   `;
 
   try {
-    // For testing, modify the from address to match the requirements
-    const fromAddress = isTest ? "test@mail3.doshisha.ac.jp" : "DAP Notifications <onboarding@resend.dev>";
+    // For testing, use onboarding@resend.dev to avoid domain verification issues
+    const fromAddress = "DAP Notifications <onboarding@resend.dev>";
 
     // Send the email using Resend
     const { data, error } = await resend.emails.send({

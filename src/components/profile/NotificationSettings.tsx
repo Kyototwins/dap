@@ -8,10 +8,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
 import { Bell, Mail } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { isValidEmail } from "@/lib/utils";
 
 export function NotificationSettings() {
   const [loading, setLoading] = useState(false);
   const [emailDigestEnabled, setEmailDigestEnabled] = useState(false);
+  const [notificationEmail, setNotificationEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   // Load user's current notification settings
   useEffect(() => {
@@ -23,7 +27,7 @@ export function NotificationSettings() {
 
         const { data, error } = await supabase
           .from("profiles")
-          .select("email_digest_enabled")
+          .select("email_digest_enabled, notification_email")
           .eq("id", user.id)
           .single();
 
@@ -33,6 +37,7 @@ export function NotificationSettings() {
         
         if (data) {
           setEmailDigestEnabled(data.email_digest_enabled || false);
+          setNotificationEmail(data.notification_email || user.email || "");
         }
       } catch (error) {
         console.error("Error fetching notification settings:", error);
@@ -46,6 +51,12 @@ export function NotificationSettings() {
 
   // Save notification settings
   const saveSettings = async () => {
+    // Validate email if provided
+    if (notificationEmail && !isValidEmail(notificationEmail)) {
+      setEmailError("有効なメールアドレスを入力してください");
+      return;
+    }
+
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -54,7 +65,8 @@ export function NotificationSettings() {
       const { error } = await supabase
         .from("profiles")
         .update({
-          email_digest_enabled: emailDigestEnabled
+          email_digest_enabled: emailDigestEnabled,
+          notification_email: notificationEmail || null
         })
         .eq("id", user.id);
 
@@ -64,6 +76,7 @@ export function NotificationSettings() {
         title: "設定を保存しました",
         description: "通知設定が正常に更新されました。",
       });
+      setEmailError("");
     } catch (error) {
       console.error("Error saving notification settings:", error);
       toast({
@@ -76,7 +89,7 @@ export function NotificationSettings() {
     }
   };
 
-  // Test sending a digest email (development only)
+  // Test sending a digest email
   const testDigestEmail = async () => {
     setLoading(true);
     try {
@@ -84,7 +97,7 @@ export function NotificationSettings() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // Send test request with the user's ID
+      // Send test request with the user's ID and custom email if set
       const response = await fetch('https://yxacicvkyusnykivbmtg.supabase.co/functions/v1/send-daily-digest', {
         method: 'POST',
         headers: {
@@ -94,7 +107,7 @@ export function NotificationSettings() {
         body: JSON.stringify({ 
           test: true,
           user_id: user.id,
-          email: user.email // Explicitly pass the user email to avoid Resend API restrictions
+          email: notificationEmail || user.email // Use custom email if available
         })
       });
       
@@ -111,7 +124,7 @@ export function NotificationSettings() {
       
       toast({
         title: "テスト通知送信完了",
-        description: "メールの受信ボックスをチェックしてください。",
+        description: `通知は ${notificationEmail || user.email} に送信されました。メールの受信ボックスをチェックしてください。`,
       });
     } catch (error) {
       console.error("Error sending test digest email:", error);
@@ -123,6 +136,11 @@ export function NotificationSettings() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEmailChange = (e) => {
+    setNotificationEmail(e.target.value);
+    setEmailError("");
   };
 
   return (
@@ -152,7 +170,26 @@ export function NotificationSettings() {
               disabled={loading}
             />
           </div>
+          
           <Separator />
+          
+          <div className="space-y-2">
+            <Label htmlFor="notification-email" className="flex flex-col gap-1">
+              <span>通知送信先メールアドレス</span>
+              <span className="font-normal text-sm text-muted-foreground">
+                通知を受け取るカスタムメールアドレスを設定（未設定の場合、アカウントのメールアドレスが使用されます）
+              </span>
+            </Label>
+            <Input
+              id="notification-email"
+              type="email"
+              placeholder="custom@example.com"
+              value={notificationEmail}
+              onChange={handleEmailChange}
+              disabled={loading}
+            />
+            {emailError && <p className="text-sm text-destructive">{emailError}</p>}
+          </div>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button 

@@ -32,6 +32,7 @@ export interface ProfileFormData {
   photoComment: string;
   hobbyPhotoComment: string;
   petPhotoComment: string;
+  notificationEmail?: string;
 }
 
 export interface AdditionalDataType {
@@ -76,4 +77,5 @@ export interface Profile {
   best_quality?: string | null;
   sexuality?: string | null;
   email_digest_enabled?: boolean;
+  notification_email?: string | null;
 }

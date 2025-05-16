@@ -45,7 +45,8 @@ export async function updateUserProfile(
       hobbies: formData.hobbies,
       languages: formData.languages,
       language_levels: languageLevelsJson,
-      learning_languages: formData.learning_languages
+      learning_languages: formData.learning_languages,
+      notification_email: formData.notificationEmail
     })
     .eq('id', userId);
 
