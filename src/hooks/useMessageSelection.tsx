@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useMatchMessages } from "@/hooks/useMatchMessages";
@@ -10,10 +10,12 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
   const { messages, setMessages, fetchMessages } = useMatchMessages();
   const { toast } = useToast();
   const [processingMatchSelection, setProcessingMatchSelection] = useState(false);
+  const processingRef = useRef(false);
 
   const handleSelectMatch = async (match: Match) => {
-    // Prevent multiple simultaneous selections
-    if (processingMatchSelection) {
+    // Prevent multiple simultaneous selections with both state and ref
+    // The ref helps with race conditions
+    if (processingRef.current || processingMatchSelection) {
       console.log("Match selection already in progress, skipping", match.id);
       return;
     }
@@ -25,7 +27,9 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
     }
     
     try {
+      processingRef.current = true;
       setProcessingMatchSelection(true);
+      
       console.log("Selecting match:", match.id);
       setSelectedMatch(match);
       
@@ -77,6 +81,7 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
       });
     } finally {
       setProcessingMatchSelection(false);
+      processingRef.current = false;
     }
   };
 

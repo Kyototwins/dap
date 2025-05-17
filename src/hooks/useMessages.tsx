@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useMatches } from "@/hooks/useMatches";
 import { useMessageSelection } from "@/hooks/useMessageSelection";
 import { useMessageSubscription } from "@/hooks/useMessageSubscription";
@@ -12,6 +12,7 @@ export function useMessages() {
   const { selectedMatch, messages, setMessages, handleSelectMatch } = useMessageSelection(fetchMatches);
   const location = useLocation();
   const [initComplete, setInitComplete] = useState(false);
+  const initInProgressRef = useRef(false);
   
   // Set up URL parameter handling
   useMessageUrlParams(matches, handleSelectMatch);
@@ -21,11 +22,17 @@ export function useMessages() {
 
   // Initialization effect - runs only once
   useEffect(() => {
-    if (!initComplete) {
-      console.log("Initializing useMessages hook", { pathname: location.pathname });
+    if (!initComplete && !initInProgressRef.current && !loading) {
+      initInProgressRef.current = true;
+      console.log("Initializing useMessages hook", { 
+        pathname: location.pathname,
+        matchCount: matches.length,
+        loading
+      });
       setInitComplete(true);
+      initInProgressRef.current = false;
     }
-  }, [initComplete, location.pathname]);
+  }, [initComplete, location.pathname, matches, loading]);
 
   // Mark messages as read when selecting a match
   useEffect(() => {
@@ -57,15 +64,22 @@ export function useMessages() {
     markMessagesAsRead();
   }, [selectedMatch]);
 
+  // Memoized fetch function to avoid unnecessary rerenders
+  const memoizedFetchMatches = useCallback(async () => {
+    console.log("Memoized fetchMatches called");
+    await fetchMatches();
+  }, [fetchMatches]);
+
   // Debug logging effect
   useEffect(() => {
     console.log("useMessages state updated", {
       matchCount: matches.length,
       hasSelectedMatch: !!selectedMatch,
       messageCount: messages.length,
-      isLoading: loading
+      isLoading: loading,
+      pathname: location.pathname
     });
-  }, [matches, selectedMatch, messages, loading]);
+  }, [matches, selectedMatch, messages, loading, location.pathname]);
 
   return {
     matches,
@@ -74,6 +88,6 @@ export function useMessages() {
     loading,
     handleSelectMatch,
     setMessages,
-    fetchMatches,
+    fetchMatches: memoizedFetchMatches,
   };
 }

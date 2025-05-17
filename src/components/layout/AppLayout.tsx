@@ -8,7 +8,7 @@ import { DapLogo } from "@/components/common/DapLogo";
 import { NotificationIndicator } from "@/components/common/NotificationIndicator";
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useAuth } from "@/hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,10 +20,12 @@ export function AppLayout({ children }: LayoutProps) {
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
   const { handleLogout } = useAuth();
   const [navigating, setNavigating] = useState(false);
+  const lastPathRef = useRef(location.pathname);
 
   // Monitor and log navigation
   useEffect(() => {
     console.log("AppLayout rendered at path:", location.pathname);
+    lastPathRef.current = location.pathname;
   }, [location.pathname]);
 
   const navItems = [
@@ -48,7 +50,7 @@ export function AppLayout({ children }: LayoutProps) {
       // Reset the navigating flag after a short delay
       setTimeout(() => {
         setNavigating(false);
-      }, 300);
+      }, 500);
     }
   };
 
@@ -118,6 +120,7 @@ export function AppLayout({ children }: LayoutProps) {
                   "text-gray-500 hover:text-doshisha-purple transition-colors",
                   location.pathname === item.path && "text-doshisha-purple font-medium"
                 )}
+                disabled={navigating}
               >
                 <item.icon className={cn(
                   "w-5 h-5",

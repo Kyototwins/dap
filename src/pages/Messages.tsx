@@ -19,16 +19,22 @@ export default function Messages() {
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchParams] = useSearchParams();
+  const [hasInitialized, setHasInitialized] = useState(false);
 
-  // Debug log
+  // Debug log and initialization effect
   useEffect(() => {
     console.log("Messages page rendered with state:", {
       matchesCount: matches.length,
       messagesCount: messages.length,
       hasSelectedMatch: !!selectedMatch,
-      userParam: searchParams.get('user')
+      userParam: searchParams.get('user'),
+      loading
     });
-  }, [matches, messages, selectedMatch, searchParams]);
+
+    if (!hasInitialized && !loading) {
+      setHasInitialized(true);
+    }
+  }, [matches, messages, selectedMatch, searchParams, loading, hasInitialized]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -42,7 +48,7 @@ export default function Messages() {
     }
   };
 
-  if (loading) {
+  if (loading && !hasInitialized) {
     return <LoadingState />;
   }
 
