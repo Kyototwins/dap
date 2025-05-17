@@ -119,7 +119,8 @@ export function useAuthOperations() {
         description: "アプリへようこそ！",
       });
       
-      // Explicitly navigate to matches page after successful login
+      console.log("Redirecting to matches page...");
+      // Use replace to prevent going back to login page
       navigate('/matches', { replace: true });
       
       return data;

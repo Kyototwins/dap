@@ -36,7 +36,9 @@ export function useAuth() {
         }
         
         console.log("Initial session check complete, session exists:", !!sessionData?.session);
-        console.log("User data:", sessionData?.session?.user?.id || "No user");
+        if (sessionData?.session?.user) {
+          console.log("User data:", sessionData.session.user.id);
+        }
         
         // Important: Set both session and user atomically to prevent UI flickers
         setSession(sessionData.session);

@@ -46,6 +46,7 @@ export default function Login() {
       // Navigation is handled in handleLogin
     } catch (error) {
       console.error("Login submission error:", error);
+      // Error is already handled in handleLogin
     } finally {
       setIsSubmitting(false);
     }
