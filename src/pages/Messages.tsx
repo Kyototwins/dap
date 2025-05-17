@@ -1,3 +1,4 @@
+
 import { useMessages } from "@/hooks/useMessages";
 import { MessageContainer } from "@/components/messages/MessageContainer";
 import { Button } from "@/components/ui/button";
@@ -21,24 +22,13 @@ export default function Messages() {
 
   // Debug log
   useEffect(() => {
-    logMessagesData();
+    console.log("Messages page rendered with state:", {
+      matchesCount: matches.length,
+      messagesCount: messages.length,
+      hasSelectedMatch: !!selectedMatch,
+      userParam: searchParams.get('user')
+    });
   }, [matches, messages, selectedMatch, searchParams]);
-
-  const logMessagesData = () => {
-    console.log("Messages page rendered");
-    console.log(`Matches available: ${matches.length}`);
-    if (matches.length > 0) {
-      matches.forEach((match, idx) => {
-        console.log(`Match ${idx+1}: ID=${match.id}, Status=${match.status}, User=${match.otherUser.first_name}`);
-      });
-    }
-    console.log(`Messages available: ${messages.length}`);
-    console.log(`Selected match: ${selectedMatch?.id || 'none'}`);
-    
-    // Check if there's a specific user to display from URL parameters
-    const userIdParam = searchParams.get('user');
-    console.log(`URL user param: ${userIdParam || 'none'}`);
-  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);

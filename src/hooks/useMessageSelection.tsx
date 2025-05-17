@@ -13,7 +13,16 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
 
   const handleSelectMatch = async (match: Match) => {
     // Prevent multiple simultaneous selections
-    if (processingMatchSelection) return;
+    if (processingMatchSelection) {
+      console.log("Match selection already in progress, skipping", match.id);
+      return;
+    }
+    
+    // Prevent reselecting the same match
+    if (selectedMatch && selectedMatch.id === match.id) {
+      console.log("Match already selected, skipping", match.id);
+      return;
+    }
     
     try {
       setProcessingMatchSelection(true);

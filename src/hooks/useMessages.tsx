@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMatches } from "@/hooks/useMatches";
 import { useMessageSelection } from "@/hooks/useMessageSelection";
 import { useMessageSubscription } from "@/hooks/useMessageSubscription";
@@ -11,6 +11,7 @@ export function useMessages() {
   const { matches, loading, fetchMatches } = useMatches();
   const { selectedMatch, messages, setMessages, handleSelectMatch } = useMessageSelection(fetchMatches);
   const location = useLocation();
+  const [initComplete, setInitComplete] = useState(false);
   
   // Set up URL parameter handling
   useMessageUrlParams(matches, handleSelectMatch);
@@ -18,11 +19,19 @@ export function useMessages() {
   // Set up realtime subscription
   useMessageSubscription(selectedMatch, setMessages);
 
+  // Initialization effect - runs only once
+  useEffect(() => {
+    if (!initComplete) {
+      console.log("Initializing useMessages hook", { pathname: location.pathname });
+      setInitComplete(true);
+    }
+  }, [initComplete, location.pathname]);
+
   // Mark messages as read when selecting a match
   useEffect(() => {
+    if (!selectedMatch) return;
+    
     const markMessagesAsRead = async () => {
-      if (!selectedMatch) return;
-      
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
@@ -48,14 +57,15 @@ export function useMessages() {
     markMessagesAsRead();
   }, [selectedMatch]);
 
-  // Log debugging information
+  // Debug logging effect
   useEffect(() => {
-    if (matches.length === 0 && !loading) {
-      console.log("No matches available");
-    } else if (matches.length > 0 && !selectedMatch) {
-      console.log(`${matches.length} matches available, none selected`);
-    }
-  }, [matches, selectedMatch, loading]);
+    console.log("useMessages state updated", {
+      matchCount: matches.length,
+      hasSelectedMatch: !!selectedMatch,
+      messageCount: messages.length,
+      isLoading: loading
+    });
+  }, [matches, selectedMatch, messages, loading]);
 
   return {
     matches,
