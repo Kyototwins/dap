@@ -8,11 +8,24 @@ import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 export function useMessages() {
-  const { matches, loading, fetchMatches } = useMatches();
-  const { selectedMatch, messages, setMessages, handleSelectMatch } = useMessageSelection(fetchMatches);
-  const location = useLocation();
+  const { matches, loading: matchesLoading, fetchMatches: fetchMatchesOriginal } = useMatches();
   const [initComplete, setInitComplete] = useState(false);
   const initInProgressRef = useRef(false);
+  const location = useLocation();
+  
+  // Memoize fetchMatches to avoid unnecessary rerenders and dependency changes
+  const memoizedFetchMatches = useCallback(async () => {
+    console.log("Memoized fetchMatches called");
+    await fetchMatchesOriginal();
+  }, [fetchMatchesOriginal]);
+  
+  // Set up message selection with the memoized fetch function
+  const { 
+    selectedMatch, 
+    messages, 
+    setMessages, 
+    handleSelectMatch 
+  } = useMessageSelection(memoizedFetchMatches);
   
   // Set up URL parameter handling
   useMessageUrlParams(matches, handleSelectMatch);
@@ -22,17 +35,17 @@ export function useMessages() {
 
   // Initialization effect - runs only once
   useEffect(() => {
-    if (!initComplete && !initInProgressRef.current && !loading) {
+    if (!initComplete && !initInProgressRef.current && !matchesLoading) {
       initInProgressRef.current = true;
       console.log("Initializing useMessages hook", { 
         pathname: location.pathname,
         matchCount: matches.length,
-        loading
+        loading: matchesLoading
       });
       setInitComplete(true);
       initInProgressRef.current = false;
     }
-  }, [initComplete, location.pathname, matches, loading]);
+  }, [initComplete, location.pathname, matches, matchesLoading]);
 
   // Mark messages as read when selecting a match
   useEffect(() => {
@@ -64,28 +77,22 @@ export function useMessages() {
     markMessagesAsRead();
   }, [selectedMatch]);
 
-  // Memoized fetch function to avoid unnecessary rerenders
-  const memoizedFetchMatches = useCallback(async () => {
-    console.log("Memoized fetchMatches called");
-    await fetchMatches();
-  }, [fetchMatches]);
-
   // Debug logging effect
   useEffect(() => {
     console.log("useMessages state updated", {
       matchCount: matches.length,
       hasSelectedMatch: !!selectedMatch,
       messageCount: messages.length,
-      isLoading: loading,
+      isLoading: matchesLoading,
       pathname: location.pathname
     });
-  }, [matches, selectedMatch, messages, loading, location.pathname]);
+  }, [matches, selectedMatch, messages, matchesLoading, location.pathname]);
 
   return {
     matches,
     selectedMatch,
     messages,
-    loading,
+    loading: matchesLoading,
     handleSelectMatch,
     setMessages,
     fetchMatches: memoizedFetchMatches,

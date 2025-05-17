@@ -8,15 +8,22 @@ export function useMessageUrlParams(
   handleSelectMatch: (match: Match) => Promise<void>
 ) {
   const [searchParams] = useSearchParams();
-  const [userIdProcessed, setUserIdProcessed] = useState<string | null>(null);
+  const [processedParams, setProcessedParams] = useState<Set<string>>(new Set());
   const processingRef = useRef(false);
+  const timeoutRef = useRef<number | null>(null);
   
   // Check for user query parameter
   useEffect(() => {
     const userId = searchParams.get('user');
     
-    // Skip if no userId, we're already processing, or we already processed this specific userId
-    if (!userId || processingRef.current || userId === userIdProcessed) {
+    // Skip if no userId or we're already processing
+    if (!userId || processingRef.current) {
+      return;
+    }
+    
+    // Skip if we've already processed this userId
+    if (processedParams.has(userId)) {
+      console.log(`Already processed user ID: ${userId}, skipping`);
       return;
     }
     
@@ -34,28 +41,44 @@ export function useMessageUrlParams(
         processingRef.current = true;
         
         console.log(`Found match with user ${userId}, selecting it`);
-        setUserIdProcessed(userId); // Mark this user ID as processed to prevent loops
         
-        // Select the match
-        handleSelectMatch(matchWithUser)
-          .then(() => {
-            console.log(`Successfully selected match with user ${userId}`);
-          })
-          .catch(err => {
-            console.error("Error selecting match:", err);
-          })
-          .finally(() => {
-            processingRef.current = false;
-          });
+        // Mark this user ID as processed
+        setProcessedParams(prev => new Set([...prev, userId]));
+        
+        // Add a small delay to prevent potential race conditions
+        if (timeoutRef.current) {
+          window.clearTimeout(timeoutRef.current);
+        }
+        
+        timeoutRef.current = window.setTimeout(() => {
+          // Select the match
+          handleSelectMatch(matchWithUser)
+            .then(() => {
+              console.log(`Successfully selected match with user ${userId}`);
+            })
+            .catch(err => {
+              console.error("Error selecting match:", err);
+            })
+            .finally(() => {
+              processingRef.current = false;
+              timeoutRef.current = null;
+            });
+        }, 100) as unknown as number;
       } else {
         console.log(`No match found with user ${userId}`);
         // Still mark this userId as processed to prevent repeated attempts
-        setUserIdProcessed(userId);
+        setProcessedParams(prev => new Set([...prev, userId]));
       }
     }
-  }, [matches, searchParams, handleSelectMatch, userIdProcessed]);
+    
+    return () => {
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [matches, searchParams, handleSelectMatch, processedParams]);
   
   return {
-    userIdProcessed
+    processedParams
   };
 }

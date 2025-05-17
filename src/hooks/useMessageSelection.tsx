@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useMatchMessages } from "@/hooks/useMatchMessages";
@@ -11,26 +11,36 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
   const { toast } = useToast();
   const [processingMatchSelection, setProcessingMatchSelection] = useState(false);
   const processingRef = useRef(false);
+  const currentMatchIdRef = useRef<string | null>(null);
+  const selectionTimeoutRef = useRef<number | null>(null);
 
-  const handleSelectMatch = async (match: Match) => {
+  const handleSelectMatch = useCallback(async (match: Match) => {
     // Prevent multiple simultaneous selections with both state and ref
-    // The ref helps with race conditions
     if (processingRef.current || processingMatchSelection) {
       console.log("Match selection already in progress, skipping", match.id);
       return;
     }
     
     // Prevent reselecting the same match
-    if (selectedMatch && selectedMatch.id === match.id) {
+    if (currentMatchIdRef.current === match.id) {
       console.log("Match already selected, skipping", match.id);
       return;
     }
     
     try {
+      // Update processing state
       processingRef.current = true;
       setProcessingMatchSelection(true);
       
+      // Clear any existing selection timeout
+      if (selectionTimeoutRef.current) {
+        window.clearTimeout(selectionTimeoutRef.current);
+      }
+      
       console.log("Selecting match:", match.id);
+      
+      // Update the current match ID ref immediately
+      currentMatchIdRef.current = match.id;
       setSelectedMatch(match);
       
       // Fetch messages for this match
@@ -66,7 +76,7 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
       }
       
       // Mark messages as read if needed
-      if (match.unreadCount > 0) {
+      if (match.unreadCount && match.unreadCount > 0) {
         console.log(`Marking ${match.unreadCount} messages as read`);
         
         // Refresh matches to update UI
@@ -74,16 +84,23 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
       }
     } catch (error) {
       console.error("Error in handleSelectMatch:", error);
+      // Reset current match ID ref on error
+      currentMatchIdRef.current = selectedMatch?.id || null;
+      
       toast({
         title: "エラー",
         description: "メッセージの読み込みに失敗しました",
         variant: "destructive",
       });
     } finally {
-      setProcessingMatchSelection(false);
-      processingRef.current = false;
+      // Reset processing state with a small delay to prevent race conditions
+      selectionTimeoutRef.current = window.setTimeout(() => {
+        setProcessingMatchSelection(false);
+        processingRef.current = false;
+        selectionTimeoutRef.current = null;
+      }, 300) as unknown as number;
     }
-  };
+  }, [selectedMatch, fetchMessages, fetchMatches, processingMatchSelection, toast]);
 
   return {
     selectedMatch,

@@ -24,10 +24,17 @@ import Help from "./pages/Help";
 import { initializeNotificationsIfNeeded } from "./initNotifications";
 
 // Create a client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 30000,
+    },
+  },
+});
 
 function AuthenticatedApp() {
-  const { user, session, loading, handleLogout } = useAuth();
+  const { user, session, loading } = useAuth();
   const [notificationsInitialized, setNotificationsInitialized] = useState(false);
 
   // Initialize notifications when authenticated

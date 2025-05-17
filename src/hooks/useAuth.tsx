@@ -19,12 +19,9 @@ export function useAuth() {
     
     console.log("Setting up auth state listener");
     
-    // Track subscriptions to prevent memory leaks
-    let authStateSubscription: { unsubscribe: () => void } | null = null;
-    
+    // First check for existing session to avoid unnecessary flickering
     const setupAuth = async () => {
       try {
-        // First check for existing session to avoid unnecessary flickering
         console.log("Getting current session...");
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         
@@ -40,7 +37,7 @@ export function useAuth() {
           console.log("User data:", sessionData.session.user.id);
         }
         
-        // Important: Set both session and user atomically to prevent UI flickers
+        // Set session and user state
         setSession(sessionData.session);
         setUser(sessionData.session?.user || null);
         
@@ -59,14 +56,14 @@ export function useAuth() {
             setSession(currentSession);
             setUser(currentSession.user);
           }
-          
-          // Only update loading for events after initial setup
-          setLoading(false);
         });
         
-        authStateSubscription = data.subscription;
         setLoading(false);
         setInitialized(true);
+        
+        return () => {
+          data.subscription.unsubscribe();
+        };
       } catch (error) {
         console.error("Auth initialization error:", error);
         setLoading(false);
@@ -75,13 +72,6 @@ export function useAuth() {
     };
     
     setupAuth();
-    
-    // Cleanup function
-    return () => {
-      if (authStateSubscription) {
-        authStateSubscription.unsubscribe();
-      }
-    };
   }, [initialized]);
 
   // Clear auth state on logout

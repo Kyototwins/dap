@@ -18,14 +18,22 @@ export function AppLayout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
-  const { handleLogout } = useAuth();
+  const { handleLogout, isAuthenticated } = useAuth();
   const [navigating, setNavigating] = useState(false);
+  const navigationTimeoutRef = useRef<number | null>(null);
   const lastPathRef = useRef(location.pathname);
 
   // Monitor and log navigation
   useEffect(() => {
     console.log("AppLayout rendered at path:", location.pathname);
     lastPathRef.current = location.pathname;
+    
+    // Clean up any pending navigation timeouts
+    return () => {
+      if (navigationTimeoutRef.current) {
+        window.clearTimeout(navigationTimeoutRef.current);
+      }
+    };
   }, [location.pathname]);
 
   const navItems = [
@@ -36,7 +44,7 @@ export function AppLayout({ children }: LayoutProps) {
   ];
 
   const handleNavigation = (path: string) => {
-    // Prevent navigation if we're already navigating or already on the page
+    // Prevent navigation if already navigating or already on the page
     if (navigating || path === location.pathname) {
       console.log(`Skipping navigation to ${path} - Already navigating or on that page`);
       return;
@@ -46,11 +54,19 @@ export function AppLayout({ children }: LayoutProps) {
       setNavigating(true);
       console.log(`Navigating to: ${path}`);
       navigate(path);
-    } finally {
+      
       // Reset the navigating flag after a short delay
-      setTimeout(() => {
+      if (navigationTimeoutRef.current) {
+        window.clearTimeout(navigationTimeoutRef.current);
+      }
+      
+      navigationTimeoutRef.current = window.setTimeout(() => {
         setNavigating(false);
-      }, 500);
+        navigationTimeoutRef.current = null;
+      }, 500) as unknown as number;
+    } catch (error) {
+      console.error("Navigation error:", error);
+      setNavigating(false);
     }
   };
 
@@ -64,6 +80,14 @@ export function AppLayout({ children }: LayoutProps) {
       console.error("Error logging out:", error);
     }
   };
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated && !location.pathname.startsWith('/login') && !location.pathname.startsWith('/signup')) {
+      console.log("User not authenticated, redirecting to login");
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthenticated, navigate, location.pathname]);
 
   return (
     <div className="min-h-screen pb-16">
