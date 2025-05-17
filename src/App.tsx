@@ -44,17 +44,6 @@ function AuthenticatedApp() {
     }
   }, [user, session, notificationsInitialized]);
 
-  // Add explicit logout handler with navigation
-  const logout = async () => {
-    try {
-      await handleLogout();
-      // Navigation will be handled by auth state change in useAuth
-      console.log("Logout complete, auth state should change");
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }
-  };
-
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }

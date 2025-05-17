@@ -84,7 +84,7 @@ export function useAuth() {
     };
   }, [initialized]);
 
-  // Clear auth state on logout
+  // Clear auth state on logout and navigate to login page
   const handleLogout = useCallback(async () => {
     try {
       console.log("Logging out user");
@@ -99,6 +99,9 @@ export function useAuth() {
       
       console.log("User logged out successfully");
       // State is updated through onAuthStateChange
+      
+      // Navigation will happen in components that use this hook
+      // The AppLayout component will handle the redirect
     } catch (error) {
       console.error("Error during logout:", error);
     } finally {
