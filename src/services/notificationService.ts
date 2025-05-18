@@ -1,85 +1,78 @@
+import { supabase } from "@/integrations/supabase/client";
 
-import { toast } from "@/components/ui/use-toast";
-import { 
-  requestNotificationPermission, 
-  setupForegroundMessageHandler,
-  saveFcmTokenToProfile
-} from "@/integrations/firebase/client";
+// Function to send a push notification
+export const sendPushNotification = async (
+  fcmToken: string,
+  title: string,
+  body: string,
+  data?: any
+) => {
+  const message = {
+    to: fcmToken,
+    notification: {
+      title,
+      body,
+    },
+    data: data,
+  };
 
-/**
- * Initialize push notifications
- */
-export async function initializePushNotifications(): Promise<boolean> {
   try {
-    // Check if service workers are supported
-    if (!('serviceWorker' in navigator)) {
-      console.warn('Service workers are not supported in this browser');
-      return false;
+    const response = await fetch("https://fcm.googleapis.com/fcm/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `key=${process.env.NEXT_PUBLIC_FIREBASE_SERVER_KEY}`,
+      },
+      body: JSON.stringify(message),
+    });
+
+    const responseData = await response.json();
+    console.log("FCM Response:", responseData);
+
+    if (responseData.failure > 0) {
+      console.error("FCM Error:", responseData.results);
+      return { error: "Failed to send push notification" };
     }
 
-    // Check if notification API is supported
-    if (!('Notification' in window)) {
-      console.warn('This browser does not support notifications');
-      return false;
-    }
-
-    // Register service worker
-    await registerServiceWorker();
-
-    // Request permission and get token
-    const token = await requestNotificationPermission();
-    if (!token) {
-      return false;
-    }
-
-    // Save token to user profile
-    const saved = await saveFcmTokenToProfile(token);
-    if (saved) {
-      console.log('FCM token saved successfully');
-    }
-
-    return true;
+    return { success: true };
   } catch (error) {
-    console.error('Error initializing push notifications:', error);
-    return false;
+    console.error("Error sending push notification:", error);
+    return { error };
   }
-}
+};
 
-/**
- * Register the FCM service worker
- */
-async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
+// Update FCM token in user profile
+export const updateFcmToken = async (token: string) => {
   try {
-    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-      scope: '/'
-    });
-    console.log('Service Worker registered with scope:', registration.scope);
-    return registration;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Not authenticated" };
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ fcm_token: token })
+      .eq("id", user.id);
+
+    if (error) throw error;
+    return { success: true };
   } catch (error) {
-    console.error('Service Worker registration failed:', error);
-    return null;
+    console.error("Error updating FCM token:", error);
+    return { error };
   }
-}
+};
 
-/**
- * Set up notification handlers
- */
-export function setupNotificationHandlers() {
-  // Handle foreground messages
-  setupForegroundMessageHandler((payload) => {
-    // Show toast for foreground messages
-    toast({
-      title: payload.notification?.title || 'New Notification',
-      description: payload.notification?.body || 'You have received a new notification',
-      duration: 5000,
-    });
-  });
-}
+// Get FCM token from user profile
+export const getFcmToken = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("fcm_token")
+      .eq("id", userId)
+      .single();
 
-/**
- * Check if notifications are enabled
- */
-export function areNotificationsEnabled(): boolean {
-  return Notification.permission === 'granted';
-}
-
+    if (error) throw error;
+    return { token: data?.fcm_token || null };
+  } catch (error) {
+    console.error("Error getting FCM token:", error);
+    return { error };
+  }
+};
