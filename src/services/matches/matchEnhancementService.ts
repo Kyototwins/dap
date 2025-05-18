@@ -10,6 +10,16 @@ export type EnhancedMatch = {
   otherUserId: string;
   status: string;
   otherUser: Partial<SimplifiedProfile>;
+  // Add lastMessage property to fix the TypeScript error
+  lastMessage?: {
+    id: string;
+    content: string;
+    created_at: string;
+    sender_id: string;
+    match_id: string;
+  };
+  // Add unreadCount property for consistency
+  unreadCount?: number;
 };
 
 /**
