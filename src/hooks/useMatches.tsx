@@ -34,14 +34,7 @@ export function useMatches() {
           status: "active",
           user1_last_read: new Date().toISOString(),
           user2_last_read: new Date().toISOString(),
-          user1: {
-            id: "mock-user-id",
-            created_at: new Date().toISOString(),
-            first_name: "太郎",
-            last_name: "同志社",
-            avatar_url: "/lovable-uploads/dcec855f-513e-4a70-aae4-fa4c16529c99.png",
-          },
-          user2: {
+          otherUser: {
             id: "mock-match-user-1",
             created_at: new Date().toISOString(),
             first_name: "花子",
@@ -65,14 +58,7 @@ export function useMatches() {
           status: "active",
           user1_last_read: new Date().toISOString(),
           user2_last_read: new Date().toISOString(),
-          user1: {
-            id: "mock-user-id",
-            created_at: new Date().toISOString(),
-            first_name: "太郎",
-            last_name: "同志社",
-            avatar_url: "/lovable-uploads/dcec855f-513e-4a70-aae4-fa4c16529c99.png",
-          },
-          user2: {
+          otherUser: {
             id: "mock-match-user-2",
             created_at: new Date().toISOString(),
             first_name: "John",

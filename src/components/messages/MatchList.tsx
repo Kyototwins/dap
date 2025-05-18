@@ -47,7 +47,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
     if (matches.length > 0) {
       console.log('First match sample:', {
         id: matches[0].id,
-        user: `${matches[0].otherUser.first_name} ${matches[0].otherUser.last_name}`,
+        user: matches[0].otherUser ? `${matches[0].otherUser.first_name} ${matches[0].otherUser.last_name}` : 'No other user data',
         hasLastMessage: !!matches[0].lastMessage,
         status: matches[0].status
       });
@@ -59,61 +59,70 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
       <ScrollArea className="w-full h-full">
         <div className="flex flex-col p-2 space-y-2">
           {matches.length > 0 ? (
-            matches.map((match) => (
-              <Card
-                key={match.id}
-                className={`p-3 cursor-pointer hover:bg-accent transition-colors ${
-                  selectedMatch?.id === match.id ? "bg-accent" : ""
-                }`}
-                onClick={() => onSelectMatch(match)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage
-                        src={match.otherUser.avatar_url || "/placeholder.svg"}
-                        alt={`${match.otherUser.first_name}のアバター`}
-                      />
-                      <AvatarFallback>
-                        {match.otherUser.first_name?.[0] || '?'}
-                        {match.otherUser.last_name?.[0] || ''}
-                      </AvatarFallback>
-                    </Avatar>
+            matches.map((match) => {
+              // Safely extract other user data or provide fallback
+              const otherUser = match.otherUser || {
+                first_name: 'Unknown',
+                last_name: 'User',
+                avatar_url: null
+              };
+              
+              return (
+                <Card
+                  key={match.id}
+                  className={`p-3 cursor-pointer hover:bg-accent transition-colors ${
+                    selectedMatch?.id === match.id ? "bg-accent" : ""
+                  }`}
+                  onClick={() => onSelectMatch(match)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage
+                          src={otherUser.avatar_url || "/placeholder.svg"}
+                          alt={`${otherUser.first_name}のアバター`}
+                        />
+                        <AvatarFallback>
+                          {otherUser.first_name?.[0] || '?'}
+                          {otherUser.last_name?.[0] || ''}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      {/* Only show unread badge if there are unread messages */}
+                      {match.unreadCount > 0 && (
+                        <Badge className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-blue-500">
+                          <span className="text-xs">{match.unreadCount}</span>
+                        </Badge>
+                      )}
+                    </div>
                     
-                    {/* Only show unread badge if there are unread messages */}
-                    {match.unreadCount > 0 && (
-                      <Badge className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-blue-500">
-                        <span className="text-xs">{match.unreadCount}</span>
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 overflow-hidden">
-                    <div className="flex justify-between items-center mb-1">
-                      <p className="font-medium text-base truncate">
-                        {match.otherUser.first_name} {match.otherUser.last_name}
-                      </p>
-                      {match.lastMessage && (
-                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-1">
-                          {formatMessageTime(match.lastMessage.created_at)}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      {match.lastMessage ? (
-                        <p className="text-sm text-muted-foreground truncate">
-                          {match.lastMessage.content}
+                    <div className="flex-1 overflow-hidden">
+                      <div className="flex justify-between items-center mb-1">
+                        <p className="font-medium text-base truncate">
+                          {otherUser.first_name} {otherUser.last_name}
                         </p>
-                      ) : (
-                        <p className="text-sm text-muted-foreground italic">
-                          まだメッセージがありません
-                        </p>
-                      )}
+                        {match.lastMessage && (
+                          <span className="text-xs text-muted-foreground whitespace-nowrap ml-1">
+                            {formatMessageTime(match.lastMessage.created_at)}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        {match.lastMessage ? (
+                          <p className="text-sm text-muted-foreground truncate">
+                            {match.lastMessage.content}
+                          </p>
+                        ) : (
+                          <p className="text-sm text-muted-foreground italic">
+                            まだメッセージがありません
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))
+                </Card>
+              );
+            })
           ) : (
             <p className="text-center text-muted-foreground py-4">
               マッチングユーザーがまだ読み込まれていません
