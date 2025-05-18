@@ -100,10 +100,15 @@ export const translations = {
   }
 };
 
-export function LanguageProvider({ children }: LanguageProviderProps) {
+// Fix: Define LanguageProvider properly as a React function component
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('app-language');
-    return (saved === 'ja' || saved === 'en') ? saved : 'en';
+    // Get from localStorage on client-side only
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('app-language');
+      return (saved === 'ja' || saved === 'en') ? saved : 'en';
+    }
+    return 'en';
   });
 
   useEffect(() => {
@@ -123,4 +128,4 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       {children}
     </LanguageContext.Provider>
   );
-}
+};

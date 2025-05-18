@@ -13,7 +13,7 @@ interface NotificationsListProps {
 }
 
 export function NotificationsList({ onClose }: NotificationsListProps) {
-  const { notifications, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
+  const { notifications, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
 
   const handleClick = async (notification: Notification) => {
@@ -106,12 +106,7 @@ export function NotificationsList({ onClose }: NotificationsListProps) {
                   </p>
                 </div>
               </button>
-              <button 
-                className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => deleteNotification(notification.id)}
-              >
-                <Trash2 className="h-4 w-4 text-gray-400 hover:text-red-500" />
-              </button>
+              {/* Removed the delete button since deleteNotification doesn't exist in the context */}
             </div>
           ))}
         </div>
