@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Smartphone, Globe } from "lucide-react";
+import { Smartphone, Globe, Tablet, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/hooks/useLanguage";
 import {
@@ -8,7 +8,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Android, Apple } from "lucide-react";
 
 export function HomeScreenWidgetPrompt() {
   const [open, setOpen] = useState(false);
@@ -62,7 +61,7 @@ export function HomeScreenWidgetPrompt() {
               {/* Android instructions */}
               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                 <div className="flex items-center gap-2 font-bold mb-2">
-                  <Android className="h-6 w-6" />
+                  <Smartphone className="h-6 w-6" />
                   <h4>Android</h4>
                 </div>
                 <ol className="list-decimal pl-5 space-y-2">
@@ -75,7 +74,7 @@ export function HomeScreenWidgetPrompt() {
               {/* iOS instructions */}
               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                 <div className="flex items-center gap-2 font-bold mb-2">
-                  <Apple className="h-6 w-6" />
+                  <Tablet className="h-6 w-6" />
                   <h4>iPhone (Safari)</h4>
                 </div>
                 <ol className="list-decimal pl-5 space-y-2">
