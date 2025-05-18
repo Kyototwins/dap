@@ -41,7 +41,7 @@ export interface Profile {
   language_levels: Record<string, number> | string | null;
   pet_photo_url: string | null;
   pet_photo_comment: string | null;
-  fcm_token?: string | null;
+  fcm_token: string | null;
 }
 
 export interface Match {
