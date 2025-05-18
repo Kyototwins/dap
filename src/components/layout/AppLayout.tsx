@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { DapLogo } from "@/components/common/DapLogo";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -48,6 +49,7 @@ export function AppLayout({ children }: LayoutProps) {
             <DapLogo />
           </div>
           <div className="flex items-center gap-2">
+            <NotificationBell />
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
