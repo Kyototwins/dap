@@ -13,7 +13,6 @@ export function useHomeScreenPrompt() {
   useEffect(() => {
     // Check if we should show the prompt
     const hasShownPrompt = localStorage.getItem("hasShownHomeScreenPrompt");
-    const hasShownWidgetPrompt = localStorage.getItem("hasShownWidgetPrompt");
     
     if (!hasShownPrompt) {
       // Small delay to ensure it appears after app has loaded
@@ -41,10 +40,8 @@ export function useHomeScreenPrompt() {
       return () => clearTimeout(timer);
     }
     
-    // Check if we should show the widget prompt
-    if (!hasShownWidgetPrompt) {
-      setShouldShowWidgetPrompt(true);
-    }
+    // We're no longer showing the widget prompt
+    setShouldShowWidgetPrompt(false);
   }, []);
   
   // Return the appropriate component based on device type
@@ -55,8 +52,6 @@ export function useHomeScreenPrompt() {
   return { 
     shouldShowPrompt,
     setShouldShowPrompt,
-    shouldShowWidgetPrompt,
-    HomeScreenPromptComponent,
-    HomeScreenWidgetPrompt
+    HomeScreenPromptComponent
   };
 }

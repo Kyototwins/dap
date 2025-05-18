@@ -24,7 +24,6 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Help from "./pages/Help";
-import { HomeScreenWidgetPrompt } from '@/components/common/HomeScreenWidgetPrompt';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -32,7 +31,7 @@ const queryClient = new QueryClient();
 function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const { HomeScreenPromptComponent, shouldShowPrompt, shouldShowWidgetPrompt, HomeScreenWidgetPrompt } = useHomeScreenPrompt();
+  const { HomeScreenPromptComponent, shouldShowPrompt } = useHomeScreenPrompt();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -68,9 +67,6 @@ function App() {
               
               {/* Show home screen prompt for logged in users */}
               {session && shouldShowPrompt && <HomeScreenPromptComponent />}
-              
-              {/* Show widget prompt for logged in users */}
-              {session && shouldShowWidgetPrompt && <HomeScreenWidgetPrompt />}
               
               <Routes>
                 <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />
