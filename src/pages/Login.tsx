@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -16,11 +16,16 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { loading, authReady, connectionError, offline, handleLogin, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const redirectedRef = useRef(false);
   
-  // Track authentication state and handle redirections
+  // Track authentication state and handle redirections - only redirect once
   useEffect(() => {
     if (!authReady) {
       console.log("Auth not ready yet, waiting...");
+      return;
+    }
+    
+    if (redirectedRef.current) {
       return;
     }
     
@@ -31,8 +36,9 @@ export default function Login() {
     });
     
     // Simple, clean redirection logic - if authenticated, go to matches
-    if (isAuthenticated && authReady && !isSubmitting) {
+    if (isAuthenticated && !isSubmitting) {
       console.log("User is authenticated, redirecting to matches", user?.id);
+      redirectedRef.current = true;
       navigate("/matches", { replace: true });
     }
   }, [isAuthenticated, user, navigate, isSubmitting, authReady]);

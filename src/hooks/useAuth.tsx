@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuthOperations } from "./useAuthOperations";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export type { AuthFormData } from "@/types/auth";
 
@@ -15,6 +15,7 @@ export function useAuth() {
   const [initialized, setInitialized] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const initializingRef = useRef(false);
+  const authChangedRef = useRef(0);
   
   // Set up auth state listener
   useEffect(() => {
@@ -27,6 +28,7 @@ export function useAuth() {
     // First set up auth state change listener for future changes
     const { data } = supabase.auth.onAuthStateChange((event, currentSession) => {
       console.log("Auth state changed:", event, "User present:", !!currentSession?.user);
+      authChangedRef.current += 1;
       
       if (event === 'SIGNED_OUT') {
         // Clear state on sign out
@@ -49,10 +51,7 @@ export function useAuth() {
         
         if (sessionError) {
           console.error("Error getting session:", sessionError);
-          setLoading(false);
-          setInitialized(true);
-          setAuthReady(true);
-          initializingRef.current = false;
+          finishSetup();
           return;
         }
         
@@ -65,18 +64,22 @@ export function useAuth() {
         setSession(sessionData.session);
         setUser(sessionData.session?.user || null);
         
-        // Set auth ready state immediately after updating user and session
-        setLoading(false);
-        setInitialized(true);
-        setAuthReady(true);
-        initializingRef.current = false;
+        // Finish setup with a slight delay to ensure state is updated
+        finishSetup();
       } catch (error) {
         console.error("Auth initialization error:", error);
+        finishSetup();
+      }
+    };
+    
+    const finishSetup = () => {
+      // Set auth ready state after a short delay to ensure state updates have propagated
+      setTimeout(() => {
         setLoading(false);
         setInitialized(true);
         setAuthReady(true);
         initializingRef.current = false;
-      }
+      }, 50);
     };
     
     setupAuth();

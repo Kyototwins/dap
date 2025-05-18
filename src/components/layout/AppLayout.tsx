@@ -8,7 +8,7 @@ import { DapLogo } from "@/components/common/DapLogo";
 import { NotificationIndicator } from "@/components/common/NotificationIndicator";
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useAuth } from "@/hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "@/hooks/use-toast"; // Fixed import path
 
 interface LayoutProps {
@@ -21,11 +21,11 @@ export function AppLayout({ children }: LayoutProps) {
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
   const { handleLogout, isAuthenticated, loading, authReady } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [redirectChecked, setRedirectChecked] = useState(false);
+  const authCheckedRef = useRef(false);
   
-  // Check authentication and redirect if needed - only once when auth is ready
+  // Check authentication and redirect only once when auth is ready
   useEffect(() => {
-    if (!authReady || redirectChecked) return;
+    if (!authReady || authCheckedRef.current) return;
     
     console.log("AppLayout auth check:", { isAuthenticated, authReady, path: location.pathname });
     
@@ -34,8 +34,8 @@ export function AppLayout({ children }: LayoutProps) {
       navigate("/login", { replace: true });
     }
     
-    setRedirectChecked(true);
-  }, [isAuthenticated, authReady, navigate, location.pathname, redirectChecked]);
+    authCheckedRef.current = true;
+  }, [isAuthenticated, authReady, navigate, location.pathname]);
 
   const navItems = [
     { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
