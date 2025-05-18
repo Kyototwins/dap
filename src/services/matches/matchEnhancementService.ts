@@ -60,7 +60,8 @@ export async function getEnhancedMatches(matches: Match[], userProfiles: Map<str
   
   for (const match of matches) {
     // For the Match type from the API, determine the other user ID
-    const otherUserId = match.user1_id || match.user_id_1 || match.user2_id || match.user_id_2 || "";
+    // Update this to use user1_id and user2_id instead of user_id_1 and user_id_2
+    const otherUserId = match.user1_id || match.user2_id || "";
     let otherUserProfile = userProfiles.get(otherUserId);
     
     // If profile is not in the provided map, create a placeholder

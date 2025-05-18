@@ -106,7 +106,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
                         </p>
                       ) : (
                         <p className="text-sm text-muted-foreground italic">
-                          まだメッセージがありません
+                          新しい会話を始めましょう
                         </p>
                       )}
                     </div>
