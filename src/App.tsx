@@ -25,7 +25,7 @@ import Help from "./pages/Help";
 import { initializeNotificationsIfNeeded } from "./initNotifications";
 import { NotificationProvider } from "./contexts/NotificationContext";
 
-// Create a client
+// Create a client outside of the component
 const queryClient = new QueryClient();
 
 function App() {
