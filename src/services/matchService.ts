@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Match } from '@/types/matches';
 import { Profile } from '@/types/messages';
@@ -63,8 +64,17 @@ export const getMatchById = async (matchId: string): Promise<Match | null> => {
   }
 };
 
-// Fixed to prevent infinite recursion
+// Completely rewritten to prevent infinite recursion
 export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: string): Promise<Match> => {
+  // Create a new object without reference to the original match to avoid potential recursion issues
+  const enhancedMatch: Match = {
+    ...match,
+    otherUser: null,
+    lastMessage: null,
+    unreadCount: 0,
+    status: match.status || 'pending'
+  };
+  
   try {
     // Get the other user's profile
     const otherUserId = match.user1_id === currentUserId ? match.user2_id : match.user1_id;
@@ -76,7 +86,9 @@ export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: s
       .single();
     
     // Process profile to ensure language_levels is handled correctly
-    const otherUser = profileData ? processProfile(profileData) : null;
+    if (profileData) {
+      enhancedMatch.otherUser = processProfile(profileData);
+    }
     
     // Get the last message for this match
     const { data: messagesData } = await supabase
@@ -86,7 +98,9 @@ export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: s
       .order('created_at', { ascending: false })
       .limit(1);
   
-    const lastMessage = messagesData && messagesData.length > 0 ? messagesData[0] : null;
+    if (messagesData && messagesData.length > 0) {
+      enhancedMatch.lastMessage = messagesData[0];
+    }
   
     // Count unread messages
     const { count } = await supabase
@@ -96,28 +110,22 @@ export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: s
       .eq('sender_id', otherUserId)
       .eq('read', false);
   
+    enhancedMatch.unreadCount = count || 0;
+  
     // Determine match status
-    let status = 'pending';
     if (match.status === 'matched') {
-      status = 'matched';
+      enhancedMatch.status = 'matched';
     } else if (
       (match.user1_id === currentUserId && match.status === 'pending') ||
       (match.user2_id === currentUserId && match.status === 'pending')
     ) {
-      status = 'waiting';
+      enhancedMatch.status = 'waiting';
     }
   
-    // Return enhanced match object without any recursive calls
-    return {
-      ...match,
-      otherUser,
-      lastMessage,
-      unreadCount: count || 0,
-      status
-    };
+    return enhancedMatch;
   } catch (error) {
     console.error('Error enhancing match with user profile:', error);
-    return match; // Return original match if enhancement fails
+    return enhancedMatch; // Return partially enhanced match if enhancement fails
   }
 };
 
