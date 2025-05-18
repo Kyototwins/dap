@@ -3,10 +3,10 @@ import { useMessages } from "@/hooks/useMessages";
 import { MessageContainer } from "@/components/messages/MessageContainer";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
-import { useState, useEffect, useRef, memo } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
-// Define the Messages component as a function that can be memoized
-function MessagesComponent() {
+export default function Messages() {
   const {
     matches,
     selectedMatch,
@@ -18,43 +18,30 @@ function MessagesComponent() {
   } = useMessages();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [hasInitialized, setHasInitialized] = useState(false);
-  const initialRenderRef = useRef(true);
+  const [searchParams] = useSearchParams();
 
-  // Debug log and initialization effect with cleanup to prevent memory leaks
+  // Debug log
   useEffect(() => {
-    if (initialRenderRef.current) {
-      console.log("Messages page mounted", {
-        matchesCount: matches.length,
-        loading
+    logMessagesData();
+  }, [matches, messages, selectedMatch, searchParams]);
+
+  const logMessagesData = () => {
+    console.log("Messages page rendered");
+    console.log(`Matches available: ${matches.length}`);
+    if (matches.length > 0) {
+      matches.forEach((match, idx) => {
+        console.log(`Match ${idx+1}: ID=${match.id}, Status=${match.status}, User=${match.otherUser.first_name}`);
       });
-      initialRenderRef.current = false;
     }
+    console.log(`Messages available: ${messages.length}`);
+    console.log(`Selected match: ${selectedMatch?.id || 'none'}`);
     
-    console.log("Messages page rendered with state:", {
-      matchesCount: matches.length,
-      messagesCount: messages.length,
-      hasSelectedMatch: !!selectedMatch,
-      loading,
-      hasInitialized
-    });
-
-    // Set initialization flag once loading is complete
-    if (!hasInitialized && !loading && !initialRenderRef.current) {
-      console.log("Messages page initialization complete");
-      setHasInitialized(true);
-    }
-
-    // Cleanup function
-    return () => {
-      console.log("Messages page unmounting");
-      // Ensure any pending operations are properly cleaned up
-    };
-  }, [matches, messages, selectedMatch, loading, hasInitialized]);
+    // Check if there's a specific user to display from URL parameters
+    const userIdParam = searchParams.get('user');
+    console.log(`URL user param: ${userIdParam || 'none'}`);
+  };
 
   const handleRefresh = async () => {
-    if (isRefreshing) return;
-    
     setIsRefreshing(true);
     console.log("Refreshing messages page");
     try {
@@ -66,7 +53,7 @@ function MessagesComponent() {
     }
   };
 
-  if (loading && !hasInitialized) {
+  if (loading) {
     return <LoadingState />;
   }
 
@@ -121,9 +108,3 @@ function RefreshButton({ onClick, isRefreshing }: { onClick: () => void, isRefre
     </Button>
   );
 }
-
-// Create a memoized version of the Messages component
-const Messages = memo(MessagesComponent);
-
-// Export the memoized component as default
-export default Messages;

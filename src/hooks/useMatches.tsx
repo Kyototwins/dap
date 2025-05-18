@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { Match } from "@/types/messages";
@@ -9,19 +8,13 @@ export function useMatches() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const isLoadingRef = useRef(false);
-  const initialFetchDoneRef = useRef(false);
 
-  // Use memoized version for better reference stability
-  const fetchMatches = useCallback(async () => {
-    // Prevent concurrent fetches
-    if (isLoadingRef.current) {
-      console.log("Already fetching matches, skipping duplicate request");
-      return;
-    }
+  useEffect(() => {
+    fetchMatches();
+  }, []);
 
+  const fetchMatches = async () => {
     try {
-      isLoadingRef.current = true;
       setLoading(true);
       console.log("Fetching matches...");
       
@@ -51,7 +44,6 @@ export function useMatches() {
 
       console.log(`Processed ${sortedMatches.length} valid matches`);
       setMatches(sortedMatches);
-      initialFetchDoneRef.current = true;
     } catch (error: any) {
       console.error("Error fetching matches:", error);
       toast({
@@ -63,16 +55,8 @@ export function useMatches() {
       setMatches([]);
     } finally {
       setLoading(false);
-      isLoadingRef.current = false;
     }
-  }, [toast]);
-
-  // Initial fetch effect
-  useEffect(() => {
-    if (!initialFetchDoneRef.current) {
-      fetchMatches();
-    }
-  }, [fetchMatches]);
+  };
 
   return {
     matches,
