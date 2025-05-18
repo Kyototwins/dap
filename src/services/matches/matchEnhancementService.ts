@@ -11,10 +11,7 @@ export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: s
     user1_id: match.user1_id,
     user2_id: match.user2_id,
     created_at: match.created_at,
-    status: match.status || 'pending',
-    otherUser: null,
-    lastMessage: null,
-    unreadCount: 0
+    status: match.status || 'pending'
   };
   
   try {
