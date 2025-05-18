@@ -19,7 +19,7 @@ export function AppLayout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
-  const { handleLogout, isAuthenticated, loading: authLoading } = useAuth();
+  const { handleLogout, isAuthenticated } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const lastPathRef = useRef(location.pathname);
 
@@ -29,13 +29,8 @@ export function AppLayout({ children }: LayoutProps) {
     lastPathRef.current = location.pathname;
   }, [location.pathname]);
 
-  // Auth redirect logic - separate from navigation logic
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated && !location.pathname.startsWith('/login') && !location.pathname.startsWith('/signup')) {
-      console.log("User not authenticated, redirecting to login");
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, authLoading, navigate, location.pathname]);
+  // Auth redirect logic is now handled at the route level in App.tsx
+  // This component will only render if the user is authenticated
 
   const navItems = [
     { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
@@ -95,11 +90,6 @@ export function AppLayout({ children }: LayoutProps) {
       setIsLoggingOut(false);
     }
   };
-
-  // Don't render the AppLayout until auth is determined
-  if (authLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
 
   return (
     <div className="min-h-screen pb-16">
