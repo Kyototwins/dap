@@ -35,7 +35,7 @@ export function useProfileSubmission() {
       let petPhotoUrl = images.pet.preview;
 
       // Check if these are blob URLs which need to be uploaded
-      const isBlobUrl = (url: string) => url?.startsWith('blob:');
+      const isBlobUrl = (url: string) => url.startsWith('blob:');
 
       // Upload any new images
       if (images.avatar.file) {

@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect } from "react";
 import { useMatches } from "@/hooks/useMatches";
 import { useMessageSelection } from "@/hooks/useMessageSelection";
 import { useMessageSubscription } from "@/hooks/useMessageSubscription";
@@ -11,8 +11,6 @@ export function useMessages() {
   const { matches, loading, fetchMatches } = useMatches();
   const { selectedMatch, messages, setMessages, handleSelectMatch } = useMessageSelection(fetchMatches);
   const location = useLocation();
-  const [initComplete, setInitComplete] = useState(false);
-  const initInProgressRef = useRef(false);
   
   // Set up URL parameter handling
   useMessageUrlParams(matches, handleSelectMatch);
@@ -20,25 +18,11 @@ export function useMessages() {
   // Set up realtime subscription
   useMessageSubscription(selectedMatch, setMessages);
 
-  // Initialization effect - runs only once
-  useEffect(() => {
-    if (!initComplete && !initInProgressRef.current && !loading) {
-      initInProgressRef.current = true;
-      console.log("Initializing useMessages hook", { 
-        pathname: location.pathname,
-        matchCount: matches.length,
-        loading
-      });
-      setInitComplete(true);
-      initInProgressRef.current = false;
-    }
-  }, [initComplete, location.pathname, matches, loading]);
-
   // Mark messages as read when selecting a match
   useEffect(() => {
-    if (!selectedMatch) return;
-    
     const markMessagesAsRead = async () => {
+      if (!selectedMatch) return;
+      
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
@@ -64,22 +48,14 @@ export function useMessages() {
     markMessagesAsRead();
   }, [selectedMatch]);
 
-  // Memoized fetch function to avoid unnecessary rerenders
-  const memoizedFetchMatches = useCallback(async () => {
-    console.log("Memoized fetchMatches called");
-    await fetchMatches();
-  }, [fetchMatches]);
-
-  // Debug logging effect
+  // Log debugging information
   useEffect(() => {
-    console.log("useMessages state updated", {
-      matchCount: matches.length,
-      hasSelectedMatch: !!selectedMatch,
-      messageCount: messages.length,
-      isLoading: loading,
-      pathname: location.pathname
-    });
-  }, [matches, selectedMatch, messages, loading, location.pathname]);
+    if (matches.length === 0 && !loading) {
+      console.log("No matches available");
+    } else if (matches.length > 0 && !selectedMatch) {
+      console.log(`${matches.length} matches available, none selected`);
+    }
+  }, [matches, selectedMatch, loading]);
 
   return {
     matches,
@@ -88,6 +64,6 @@ export function useMessages() {
     loading,
     handleSelectMatch,
     setMessages,
-    fetchMatches: memoizedFetchMatches,
+    fetchMatches,
   };
 }

@@ -8,7 +8,6 @@ import { DapLogo } from "@/components/common/DapLogo";
 import { NotificationIndicator } from "@/components/common/NotificationIndicator";
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useAuth } from "@/hooks/useAuth";
-import { useState, useEffect, useRef } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -19,14 +18,6 @@ export function AppLayout({ children }: LayoutProps) {
   const location = useLocation();
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
   const { handleLogout } = useAuth();
-  const [navigating, setNavigating] = useState(false);
-  const lastPathRef = useRef(location.pathname);
-
-  // Monitor and log navigation
-  useEffect(() => {
-    console.log("AppLayout rendered at path:", location.pathname);
-    lastPathRef.current = location.pathname;
-  }, [location.pathname]);
 
   const navItems = [
     { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
@@ -36,28 +27,18 @@ export function AppLayout({ children }: LayoutProps) {
   ];
 
   const handleNavigation = (path: string) => {
-    // Prevent navigation if we're already navigating or already on the page
-    if (navigating || path === location.pathname) {
-      console.log(`Skipping navigation to ${path} - Already navigating or on that page`);
-      return;
-    }
-
-    try {
-      setNavigating(true);
-      console.log(`Navigating to: ${path}`);
-      navigate(path);
-    } finally {
-      // Reset the navigating flag after a short delay
-      setTimeout(() => {
-        setNavigating(false);
-      }, 500);
+    if (path === "/messages") {
+      navigate("/messages", { replace: true });
+      console.log("Navigating to messages list view");
+    } else {
+      navigate(path, { replace: true });
     }
   };
 
   const handleLogoutClick = async () => {
     try {
       await handleLogout();
-      // Explicitly navigate to login page after logout with replace to prevent navigation history issues
+      // Explicitly navigate to login page after logout
       navigate('/login', { replace: true });
       console.log("Logged out and redirected to login");
     } catch (error) {
@@ -120,7 +101,6 @@ export function AppLayout({ children }: LayoutProps) {
                   "text-gray-500 hover:text-doshisha-purple transition-colors",
                   location.pathname === item.path && "text-doshisha-purple font-medium"
                 )}
-                disabled={navigating}
               >
                 <item.icon className={cn(
                   "w-5 h-5",

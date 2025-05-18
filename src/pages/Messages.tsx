@@ -1,4 +1,3 @@
-
 import { useMessages } from "@/hooks/useMessages";
 import { MessageContainer } from "@/components/messages/MessageContainer";
 import { Button } from "@/components/ui/button";
@@ -19,22 +18,27 @@ export default function Messages() {
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchParams] = useSearchParams();
-  const [hasInitialized, setHasInitialized] = useState(false);
 
-  // Debug log and initialization effect
+  // Debug log
   useEffect(() => {
-    console.log("Messages page rendered with state:", {
-      matchesCount: matches.length,
-      messagesCount: messages.length,
-      hasSelectedMatch: !!selectedMatch,
-      userParam: searchParams.get('user'),
-      loading
-    });
+    logMessagesData();
+  }, [matches, messages, selectedMatch, searchParams]);
 
-    if (!hasInitialized && !loading) {
-      setHasInitialized(true);
+  const logMessagesData = () => {
+    console.log("Messages page rendered");
+    console.log(`Matches available: ${matches.length}`);
+    if (matches.length > 0) {
+      matches.forEach((match, idx) => {
+        console.log(`Match ${idx+1}: ID=${match.id}, Status=${match.status}, User=${match.otherUser.first_name}`);
+      });
     }
-  }, [matches, messages, selectedMatch, searchParams, loading, hasInitialized]);
+    console.log(`Messages available: ${messages.length}`);
+    console.log(`Selected match: ${selectedMatch?.id || 'none'}`);
+    
+    // Check if there's a specific user to display from URL parameters
+    const userIdParam = searchParams.get('user');
+    console.log(`URL user param: ${userIdParam || 'none'}`);
+  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -48,7 +52,7 @@ export default function Messages() {
     }
   };
 
-  if (loading && !hasInitialized) {
+  if (loading) {
     return <LoadingState />;
   }
 
