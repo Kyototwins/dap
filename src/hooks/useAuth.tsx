@@ -98,7 +98,11 @@ export function useAuth() {
       }
       
       console.log("User logged out successfully");
-      // State is updated through onAuthStateChange
+      // Clear state explicitly
+      setUser(null);
+      setSession(null);
+      
+      // State is also updated through onAuthStateChange
     } catch (error) {
       console.error("Error during logout:", error);
     } finally {

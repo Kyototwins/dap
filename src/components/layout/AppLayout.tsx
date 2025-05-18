@@ -57,7 +57,7 @@ export function AppLayout({ children }: LayoutProps) {
   const handleLogoutClick = async () => {
     try {
       await handleLogout();
-      // Explicitly navigate to login page after logout
+      // Explicitly navigate to login page after logout with replace to prevent navigation history issues
       navigate('/login', { replace: true });
       console.log("Logged out and redirected to login");
     } catch (error) {

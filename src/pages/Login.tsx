@@ -43,7 +43,7 @@ export default function Login() {
     try {
       console.log("Attempting login with email:", email);
       await handleLogin({ email, password });
-      // Navigation is handled in handleLogin
+      // Navigation is handled in handleLogin and the useEffect above
     } catch (error) {
       console.error("Login submission error:", error);
       // Error is already handled in handleLogin
@@ -51,23 +51,6 @@ export default function Login() {
       setIsSubmitting(false);
     }
   };
-
-  // If we're loading auth state, show a simple loading message
-  if (loading && !isSubmitting) {
-    return (
-      <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
-        <div className="animate-fade-up flex justify-center py-12">
-          <p>Loading...</p>
-        </div>
-      </AuthLayout>
-    );
-  }
-
-  // Don't render login form if user is authenticated and not loading
-  if (!loading && user) {
-    console.log("User authenticated, rendering null");
-    return null;
-  }
 
   return (
     <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
