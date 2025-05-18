@@ -76,4 +76,5 @@ export interface Profile {
   best_quality?: string | null;
   sexuality?: string | null;
   fcm_token?: string | null;
+  email_digest_enabled?: boolean | null;
 }
