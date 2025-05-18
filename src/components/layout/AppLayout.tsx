@@ -19,15 +19,27 @@ export function AppLayout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
-  const { handleLogout, isAuthenticated } = useAuth();
+  const { handleLogout, isAuthenticated, loading } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const lastPathRef = useRef(location.pathname);
+  const hasCheckedAuthRef = useRef(false);
 
   // Monitor and log navigation
   useEffect(() => {
     console.log("AppLayout rendered at path:", location.pathname);
     lastPathRef.current = location.pathname;
   }, [location.pathname]);
+
+  // Check authentication and redirect if needed
+  useEffect(() => {
+    if (loading) return;
+    
+    if (!isAuthenticated && !hasCheckedAuthRef.current) {
+      console.log("User is not authenticated in AppLayout, redirecting to login");
+      hasCheckedAuthRef.current = true;
+      navigate("/login", { replace: true });
+    }
+  }, [isAuthenticated, loading, navigate]);
 
   const navItems = [
     { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
@@ -83,7 +95,16 @@ export function AppLayout({ children }: LayoutProps) {
     }
   };
 
-  // Return early if not authenticated - this prevents layout from attempting to render
+  // Return loading indicator while checking auth state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-doshisha-purple"></div>
+      </div>
+    );
+  }
+
+  // Return null if not authenticated - this prevents layout from attempting to render
   // when user should be redirected
   if (!isAuthenticated) {
     return null;

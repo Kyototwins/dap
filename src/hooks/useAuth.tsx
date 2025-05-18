@@ -83,15 +83,26 @@ export function useAuth() {
 
   // Handle login with better state management
   const handleLogin = useCallback(async (formData: {email: string, password: string}) => {
-    const result = await authOperations.handleLogin(formData);
-    
-    // Update state immediately after successful login to prevent redirect loops
-    if (result?.session && result?.user) {
-      setSession(result.session);
-      setUser(result.user);
+    try {
+      const result = await authOperations.handleLogin(formData);
+      
+      // Update state immediately after successful login to prevent redirect loops
+      if (result?.session && result?.user) {
+        setSession(result.session);
+        setUser(result.user);
+        
+        // Add debug information
+        console.log("Login successful, updated auth state:", {
+          user: result.user.id,
+          session: !!result.session,
+        });
+      }
+      
+      return result;
+    } catch (error) {
+      console.error("Login error in useAuth:", error);
+      throw error; // Re-throw to let Login component handle UI feedback
     }
-    
-    return result;
   }, [authOperations]);
 
   // Clear auth state on logout
@@ -137,7 +148,7 @@ export function useAuth() {
     user,
     session,
     loading,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !!session,
     handleLogin,
     handleLogout
   };

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -16,13 +16,20 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { loading, connectionError, offline, handleLogin, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const hasRedirectedRef = useRef(false);
 
   // Check for authenticated user and redirect only once when component mounts or auth state changes
   useEffect(() => {
     // Only redirect if we have a valid authenticated state and we're not in the middle of logging in
     if (isAuthenticated && !isSubmitting) {
-      console.log("User is authenticated in Login page, redirecting to matches", user?.id);
-      navigate("/matches", { replace: true });
+      if (!hasRedirectedRef.current) {
+        console.log("User is authenticated in Login page, redirecting to matches", user?.id);
+        hasRedirectedRef.current = true; // Prevent multiple redirects
+        navigate("/matches", { replace: true });
+      }
+    } else {
+      // Reset the flag if user is not authenticated
+      hasRedirectedRef.current = false;
     }
   }, [isAuthenticated, user, navigate, isSubmitting]);
 
@@ -42,15 +49,21 @@ export default function Login() {
     
     try {
       console.log("Attempting login with email:", email);
-      await handleLogin({ email, password });
+      const result = await handleLogin({ email, password });
       
-      // Show success toast
-      toast({
-        title: "ログイン成功",
-        description: "おかえりなさい！",
-      });
-      
-      // Navigate is handled in the useEffect based on authentication state
+      if (result?.user) {
+        // Show success toast
+        toast({
+          title: "ログイン成功",
+          description: "おかえりなさい！",
+        });
+        
+        console.log("Login successful, user ID:", result.user.id);
+        
+        // Navigate is handled in the useEffect based on authentication state
+        // But we'll force it here as well to be extra sure
+        navigate("/matches", { replace: true });
+      }
     } catch (error: any) {
       console.error("Login submission error:", error);
       // Error handling is already in handleLogin but we can add more specific feedback
@@ -79,11 +92,6 @@ export default function Login() {
         </div>
       </AuthLayout>
     );
-  }
-
-  // Don't render login form if user is authenticated and not loading
-  if (isAuthenticated && !isSubmitting) {
-    return null;
   }
 
   return (
