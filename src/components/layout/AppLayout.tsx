@@ -1,4 +1,3 @@
-
 import { MessageSquare, User, Search, Calendar, Menu, HelpCircle, LogOut } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -9,7 +8,7 @@ import { NotificationIndicator } from "@/components/common/NotificationIndicator
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect, useRef } from "react";
-import { toast } from "@/hooks/use-toast"; // Fixed import path
+import { toast } from "@/hooks/use-toast"; // Correct import path
 
 interface LayoutProps {
   children: React.ReactNode;

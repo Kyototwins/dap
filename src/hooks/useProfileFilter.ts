@@ -1,22 +1,22 @@
-import { useState, useRef, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
+
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Profile } from "@/types/messages";
-import type { FilterState } from "@/types/matches";
+import { FilterState } from "@/types/matches";
+import { useConnectionStatus } from "@/hooks/useConnectionStatus";
 
 export function useProfileFilter() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
   const [visibleProfiles, setVisibleProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
   const [loadingMore, setLoadingMore] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-  const pageSize = 10;
-  const pageRef = useRef(1);
-  const { toast } = useToast();
-  
-  // Filter states
+  const initialLoadDone = useRef(false);
+  const { online } = useConnectionStatus();
+
+  // Default filter state
   const [filters, setFilters] = useState<FilterState>({
     ageRange: [18, 50],
     speakingLanguages: [],
@@ -27,194 +27,175 @@ export function useProfileFilter() {
     sortOption: "recent"
   });
 
-  // Fetch profile data
-  const fetchProfiles = async () => {
-    setLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+  // Fetch profiles on component mount
+  useEffect(() => {
+    if (!online || initialLoadDone.current) return;
+    
+    fetchProfiles();
+  }, [online]);
 
+  // Fetch profiles from Supabase
+  const fetchProfiles = async () => {
+    try {
+      console.log("Fetching profiles...");
+      setLoading(true);
+      
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.error("User not authenticated");
+        setLoading(false);
+        return;
+      }
+
+      // Fetch all profiles except current user's
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
         .neq("id", user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching profiles:", error);
+        setLoading(false);
+        return;
+      }
+
+      console.log(`Fetched ${data?.length || 0} profiles`);
       
-      // Map the data to match the Profile type with all required fields
-      const typedProfiles = data?.map(profile => ({
-        id: profile.id,
-        first_name: profile.first_name || '',
-        last_name: profile.last_name || '',
-        avatar_url: profile.avatar_url || null,
-        about_me: profile.about_me || null,
-        age: profile.age || null,
-        gender: profile.gender || null,
-        university: profile.university || null,
-        department: profile.department || '',
-        year: profile.year || '',
-        hobbies: profile.hobbies || [],
-        languages: profile.languages || [],
-        language_levels: profile.language_levels as Record<string, number>,
-        superpower: profile.superpower || '',
-        learning_languages: profile.learning_languages || [],
-        origin: profile.origin || null,
-        sexuality: profile.sexuality || null,
-        ideal_date: profile.ideal_date || null,
-        life_goal: profile.life_goal || null,
-        image_url_1: profile.image_url_1 || null,
-        image_url_2: profile.image_url_2 || null,
-        created_at: profile.created_at || '',
-        photo_comment: profile.photo_comment || null,
-        worst_nightmare: profile.worst_nightmare || null,
-        friend_activity: profile.friend_activity || null,
-        best_quality: profile.best_quality || null,
-        hobby_photo_url: null,
-        pet_photo_url: null,
-        hobby_photo_comment: null,
-        pet_photo_comment: null
-      })) || [];
-      
-      setProfiles(typedProfiles);
-      applyFilters(typedProfiles, searchQuery, filters);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
+      // Process profiles to ensure they have all required properties
+      const validProfiles = (data || []).map(profile => {
+        return {
+          id: profile.id,
+          firstName: profile.first_name || "Anonymous",
+          lastName: profile.last_name || "",
+          age: profile.age || 0,
+          avatarUrl: profile.avatar_url || "",
+          bio: profile.about_me || "",
+          university: profile.university || "Unknown University",
+          department: profile.department || "",
+          year: profile.year || "",
+          hobbies: profile.hobbies || [],
+          languages: profile.languages || [],
+          learningLanguages: profile.learning_languages || [],
+          origin: profile.origin || "",
+          photos: [
+            profile.avatar_url,
+            profile.image_url_1,
+            profile.image_url_2
+          ].filter(Boolean) as string[]
+        };
       });
+
+      // Update state
+      setProfiles(validProfiles);
+      setFilteredProfiles(validProfiles);
+      setVisibleProfiles(validProfiles.slice(0, 10)); // Show first 10 profiles initially
+      
+      initialLoadDone.current = true;
+    } catch (error) {
+      console.error("Error in fetchProfiles:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Apply search and filters
-  const applyFilters = (data: Profile[], query: string, filterState: FilterState) => {
-    let result = [...data];
-
-    // Filter by search query
-    if (query) {
-      const searchLower = query.toLowerCase();
-      result = result.filter((profile) => {
-        return (
-          profile.first_name?.toLowerCase().includes(searchLower) ||
-          profile.last_name?.toLowerCase().includes(searchLower) ||
-          profile.about_me?.toLowerCase().includes(searchLower) ||
-          profile.university?.toLowerCase().includes(searchLower) ||
-          profile.department?.toLowerCase().includes(searchLower)
+  // Search and filter profiles based on user input
+  useEffect(() => {
+    if (profiles.length === 0) return;
+    
+    const filtered = profiles.filter(profile => {
+      // Filter by search query
+      const searchMatches = 
+        searchQuery === "" || 
+        `${profile.firstName} ${profile.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (profile.languages || []).some(lang => 
+          lang.toLowerCase().includes(searchQuery.toLowerCase())
+        ) ||
+        (profile.learningLanguages || []).some(lang => 
+          lang.toLowerCase().includes(searchQuery.toLowerCase())
+        ) ||
+        (profile.hobbies || []).some(hobby => 
+          hobby.toLowerCase().includes(searchQuery.toLowerCase())
+        ) ||
+        (profile.university || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (profile.origin || "").toLowerCase().includes(searchQuery.toLowerCase());
+      
+      if (!searchMatches) return false;
+      
+      // Filter by age
+      const ageMatches = profile.age >= filters.ageRange[0] && profile.age <= filters.ageRange[1];
+      if (!ageMatches) return false;
+      
+      // Filter by speaking languages
+      const speakingLanguagesMatch = filters.speakingLanguages.length === 0 || 
+        filters.speakingLanguages.some(lang => 
+          profile.languages?.includes(lang)
         );
-      });
-    }
-
-    // Age filtering
-    result = result.filter(profile => {
-      if (!profile.age) return true;
-      return profile.age >= filterState.ageRange[0] && profile.age <= filterState.ageRange[1];
-    });
-
-    // Origin filtering
-    if (filterState.countries.length > 0) {
-      result = result.filter(profile => 
-        !profile.origin || filterState.countries.includes(profile.origin)
-      );
-    }
-
-    // Speaking languages filtering
-    if (filterState.speakingLanguages.length > 0) {
-      result = result.filter(profile => {
-        if (!profile.languages || profile.languages.length === 0) return false;
-        
-        return filterState.speakingLanguages.some(lang => {
-          const hasLanguage = profile.languages?.includes(lang);
-          if (!hasLanguage) return false;
-          
-          if (profile.language_levels && typeof profile.language_levels === 'object') {
-            const level = profile.language_levels[lang];
-            return level >= filterState.minLanguageLevel;
-          }
-          return true;
-        });
-      });
-    }
-
-    // Learning languages filtering
-    if (filterState.learningLanguages.length > 0) {
-      result = result.filter(profile => {
-        if (!profile.learning_languages || profile.learning_languages.length === 0) return false;
-        return filterState.learningLanguages.some(lang => 
-          profile.learning_languages?.includes(lang)
+      if (!speakingLanguagesMatch) return false;
+      
+      // Filter by learning languages
+      const learningLanguagesMatch = filters.learningLanguages.length === 0 || 
+        filters.learningLanguages.some(lang => 
+          profile.learningLanguages?.includes(lang)
         );
-      });
-    }
-
-    // Hobbies filtering
-    if (filterState.hobbies.length > 0) {
-      result = result.filter(profile => {
-        if (!profile.hobbies || profile.hobbies.length === 0) return false;
-        return filterState.hobbies.some(hobby => 
+      if (!learningLanguagesMatch) return false;
+      
+      // Filter by hobbies
+      const hobbiesMatch = filters.hobbies.length === 0 || 
+        filters.hobbies.some(hobby => 
           profile.hobbies?.includes(hobby)
         );
-      });
-    }
+      if (!hobbiesMatch) return false;
+      
+      // Filter by countries
+      const countriesMatch = filters.countries.length === 0 || 
+        filters.countries.includes(profile.origin || "");
+      if (!countriesMatch) return false;
+      
+      return true;
+    });
+    
+    // Sort profiles based on selected option
+    const sortedProfiles = [...filtered].sort((a, b) => {
+      if (filters.sortOption === "recent") {
+        return 0; // Default order (most recent first)
+      } else if (filters.sortOption === "age_asc") {
+        return (a.age || 0) - (b.age || 0);
+      } else if (filters.sortOption === "age_desc") {
+        return (b.age || 0) - (a.age || 0);
+      } else if (filters.sortOption === "name_asc") {
+        return a.firstName.localeCompare(b.firstName);
+      }
+      return 0;
+    });
+    
+    setFilteredProfiles(sortedProfiles);
+    setVisibleProfiles(sortedProfiles.slice(0, 10)); // Reset visible profiles to first 10
+  }, [searchQuery, filters, profiles]);
 
-    // Sorting
-    if (filterState.sortOption === "recent") {
-      result.sort((a, b) => {
-        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-        return dateB - dateA;
-      });
-    } else if (filterState.sortOption === "active") {
-      result.sort((a, b) => {
-        const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
-        const nameB = `${b.first_name || ''} ${a.last_name || ''}`;
-        return nameA.localeCompare(nameB);
-      });
-    }
-
-    setFilteredProfiles(result);
-    pageRef.current = 1;
-    setVisibleProfiles(result.slice(0, pageSize));
-  };
-
-  // Initial load
-  useEffect(() => {
-    fetchProfiles();
+  // Handle search input change
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   }, []);
 
-  // Apply filters when they change
-  useEffect(() => {
-    if (profiles.length > 0) {
-      applyFilters(profiles, searchQuery, filters);
-    }
-  }, [searchQuery, filters]);
-
-  // Search handler
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  // Load more handler
-  const handleLoadMore = () => {
-    setLoadingMore(true);
-    const nextPage = pageRef.current + 1;
-    const start = (nextPage - 1) * pageSize;
-    const end = nextPage * pageSize;
+  // Load more profiles
+  const handleLoadMore = useCallback(() => {
+    if (loadingMore || visibleProfiles.length >= filteredProfiles.length) return;
     
+    setLoadingMore(true);
     setTimeout(() => {
       setVisibleProfiles(prev => [
-        ...prev, 
-        ...filteredProfiles.slice(start, end)
+        ...prev,
+        ...filteredProfiles.slice(prev.length, prev.length + 10)
       ]);
-      pageRef.current = nextPage;
       setLoadingMore(false);
-    }, 500);
-  };
+    }, 500); // Add slight delay for better UX
+  }, [filteredProfiles, visibleProfiles, loadingMore]);
 
-  // Refresh data handler
-  const handleRefresh = () => {
+  // Refresh profiles
+  const handleRefresh = useCallback(() => {
     fetchProfiles();
-  };
+  }, []);
 
   return {
     profiles,
@@ -229,6 +210,6 @@ export function useProfileFilter() {
     setIsFilterSheetOpen,
     handleSearchChange,
     handleLoadMore,
-    handleRefresh,
+    handleRefresh
   };
 }
