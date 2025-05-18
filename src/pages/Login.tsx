@@ -14,17 +14,20 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [redirecting, setRedirecting] = useState(false); // New state to prevent redirect loops
   const { loading, connectionError, offline, handleLogin, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // Check for authenticated user and redirect
   useEffect(() => {
     // Only redirect if we have finished loading auth state and the user is authenticated
-    if (!loading && isAuthenticated) {
+    // Also make sure we're not already submitting a login to prevent race conditions
+    if (!loading && isAuthenticated && !isSubmitting && !redirecting) {
       console.log("User is authenticated in Login page, redirecting to matches");
+      setRedirecting(true);
       navigate("/matches", { replace: true });
     }
-  }, [isAuthenticated, loading, navigate]);
+  }, [isAuthenticated, loading, navigate, isSubmitting, redirecting]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,10 +65,15 @@ export default function Login() {
     );
   }
 
-  // Don't render login form if user is authenticated and not loading
-  if (!loading && isAuthenticated) {
-    console.log("User authenticated, rendering null");
-    return null;
+  // If user is authenticated and navigating, show loading state
+  if (redirecting || (isAuthenticated && !loading)) {
+    return (
+      <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
+        <div className="animate-fade-up flex justify-center py-12">
+          <p>Redirecting to app...</p>
+        </div>
+      </AuthLayout>
+    );
   }
 
   return (
