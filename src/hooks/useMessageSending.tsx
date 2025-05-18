@@ -14,7 +14,7 @@ export function useMessageSending(
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom on messages change
+  // Scroll to bottom when messages change or a new message is sent
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
