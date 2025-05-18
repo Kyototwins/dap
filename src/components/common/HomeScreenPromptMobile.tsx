@@ -23,7 +23,9 @@ export function HomeScreenPromptMobile() {
         
         // Check if it's not a Windows Phone
         const ua = navigator.userAgent;
-        const isWindowsPhone = ua.indexOf("Windows Phone") !== -1 || (typeof window.MSStream !== 'undefined');
+        const isWindowsPhone = ua.indexOf("Windows Phone") !== -1 || 
+          // Use type assertion to safely check for MSStream
+          (typeof (window as any).MSStream !== 'undefined');
         
         // Only show if it's a relevant mobile device that's not in standalone mode and not Windows Phone
         if (isMobile && !isStandalone && !isWindowsPhone && (isIOS || isAndroid)) {
