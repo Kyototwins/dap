@@ -2,10 +2,10 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { EventParticipation } from "@/types/events";
+import { EventParticipation, EventParticipationMap } from "@/types/events";
 
 export function useEventParticipations() {
-  const [participations, setParticipations] = useState<EventParticipation[]>([]);
+  const [participations, setParticipations] = useState<EventParticipationMap>({});
   const { toast } = useToast();
 
   const loadParticipations = useCallback(async () => {
@@ -13,7 +13,7 @@ export function useEventParticipations() {
       console.log("Loading event participations...");
       
       // モックユーザーのイベント参加データ
-      const mockParticipations: EventParticipation[] = [
+      const mockParticipationsArray: EventParticipation[] = [
         {
           id: "mock-participation-1",
           event_id: "mock-event-1",
@@ -23,10 +23,16 @@ export function useEventParticipations() {
         }
       ];
       
-      console.log(`Generated ${mockParticipations.length} mock participations`);
-      setParticipations(mockParticipations);
+      // Convert array to map object with event_id as keys
+      const participationsMap: EventParticipationMap = {};
+      mockParticipationsArray.forEach(participation => {
+        participationsMap[participation.event_id] = participation.status === "joined";
+      });
       
-      return mockParticipations;
+      console.log(`Generated ${mockParticipationsArray.length} mock participations`);
+      setParticipations(participationsMap);
+      
+      return participationsMap;
     } catch (error: any) {
       console.error("Error loading participations:", error);
       toast({
@@ -34,7 +40,7 @@ export function useEventParticipations() {
         description: "イベント参加情報の取得に失敗しました",
         variant: "destructive",
       });
-      return [];
+      return {};
     }
   }, [toast]);
 
