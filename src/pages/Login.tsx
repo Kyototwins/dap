@@ -17,21 +17,22 @@ export default function Login() {
   const { loading, connectionError, offline, handleLogin, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  // Check for authenticated user and redirect
+  // Check for authenticated user and redirect only once when component mounts or auth state changes
   useEffect(() => {
-    if (isAuthenticated) {
+    // Only redirect if we have a valid authenticated state and we're not in the middle of logging in
+    if (isAuthenticated && !isSubmitting) {
       console.log("User is authenticated in Login page, redirecting to matches", user?.id);
       navigate("/matches", { replace: true });
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, navigate, isSubmitting]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
       toast({
-        title: "Input Error",
-        description: "Please enter both email and password.",
+        title: "入力エラー",
+        description: "メールアドレスとパスワードを入力してください。",
         variant: "destructive",
       });
       return;
@@ -45,22 +46,22 @@ export default function Login() {
       
       // Show success toast
       toast({
-        title: "Login successful",
-        description: "Welcome back!",
+        title: "ログイン成功",
+        description: "おかえりなさい！",
       });
       
       // Navigate is handled in the useEffect based on authentication state
     } catch (error: any) {
       console.error("Login submission error:", error);
       // Error handling is already in handleLogin but we can add more specific feedback
-      let errorMessage = "Login failed. Please check your credentials and try again.";
+      let errorMessage = "ログインに失敗しました。認証情報を確認してください。";
       
       if (error.message) {
         errorMessage = error.message;
       }
       
       toast({
-        title: "Login Error",
+        title: "ログインエラー",
         description: errorMessage,
         variant: "destructive",
       });
@@ -74,15 +75,14 @@ export default function Login() {
     return (
       <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
         <div className="animate-fade-up flex justify-center py-12">
-          <p>Loading...</p>
+          <p>読み込み中...</p>
         </div>
       </AuthLayout>
     );
   }
 
   // Don't render login form if user is authenticated and not loading
-  if (isAuthenticated) {
-    console.log("User authenticated, rendering null");
+  if (isAuthenticated && !isSubmitting) {
     return null;
   }
 
@@ -93,7 +93,7 @@ export default function Login() {
           <Alert variant="destructive" className="mb-6 border-red-400">
             <WifiOff className="h-4 w-4" />
             <AlertDescription>
-              No internet connection. Please check your network.
+              インターネット接続がありません。ネットワーク接続を確認してください。
             </AlertDescription>
           </Alert>
         )}
@@ -102,7 +102,7 @@ export default function Login() {
           <Alert variant="destructive" className="mb-6 border-red-400">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Could not connect to the server. Please check your network.
+              サーバーに接続できませんでした。ネットワーク接続を確認してください。
             </AlertDescription>
           </Alert>
         )}
@@ -146,17 +146,17 @@ export default function Login() {
             className="w-full transition-all duration-200 shadow-md hover:shadow-lg bg-[#7f1184] hover:bg-[#671073]" 
             disabled={loading || offline || connectionError || isSubmitting}
           >
-            {isSubmitting ? "Logging in..." : loading ? "Processing..." : "Log In"}
+            {isSubmitting ? "ログイン中..." : loading ? "処理中..." : "ログイン"}
           </Button>
         </form>
         
         <div className="mt-8 text-center">
-          <span className="text-muted-foreground text-sm">Don't have an account? </span> 
+          <span className="text-muted-foreground text-sm">アカウントをお持ちでないですか？ </span> 
           <Link
             to="/signup"
             className="text-[#7f1184] font-medium hover:underline hover-lift inline-block transition-all"
           >
-            Sign Up
+            登録する
           </Link>
         </div>
       </div>

@@ -29,9 +29,6 @@ export function AppLayout({ children }: LayoutProps) {
     lastPathRef.current = location.pathname;
   }, [location.pathname]);
 
-  // Auth redirect logic is now handled at the route level in App.tsx
-  // This component will only render if the user is authenticated
-
   const navItems = [
     { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
     { icon: MessageSquare, label: "Messages", path: "/messages", hasNotification: hasUnreadMessages },
@@ -40,6 +37,8 @@ export function AppLayout({ children }: LayoutProps) {
   ];
 
   const handleNavigation = (path: string) => {
+    if (location.pathname === path) return; // Don't navigate if already on the path
+    
     console.log(`Navigating to: ${path} from: ${location.pathname}`);
     
     try {
@@ -63,18 +62,11 @@ export function AppLayout({ children }: LayoutProps) {
       
       // Show toast for feedback
       toast({
-        title: "Logging out...",
+        title: "ログアウト中...",
         duration: 2000,
       });
       
       await handleLogout();
-      
-      // Success toast
-      toast({
-        title: "Successfully logged out",
-        description: "Redirecting to login page...",
-        duration: 3000,
-      });
       
       // Explicitly navigate to login page after logout
       navigate('/login', { replace: true });
@@ -82,14 +74,20 @@ export function AppLayout({ children }: LayoutProps) {
     } catch (error) {
       console.error("Error logging out:", error);
       toast({
-        title: "Logout failed",
-        description: "Please try again",
+        title: "ログアウトに失敗しました",
+        description: "もう一度お試しください",
         variant: "destructive",
       });
     } finally {
       setIsLoggingOut(false);
     }
   };
+
+  // Return early if not authenticated - this prevents layout from attempting to render
+  // when user should be redirected
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen pb-16">
@@ -122,7 +120,7 @@ export function AppLayout({ children }: LayoutProps) {
                     disabled={isLoggingOut}
                   >
                     <LogOut className="mr-2 h-5 w-5" />
-                    {isLoggingOut ? "Logging out..." : "Logout"}
+                    {isLoggingOut ? "ログアウト中..." : "ログアウト"}
                   </Button>
                 </div>
               </SheetContent>

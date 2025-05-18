@@ -81,6 +81,19 @@ export function useAuth() {
     };
   }, [initialized]);
 
+  // Handle login with better state management
+  const handleLogin = useCallback(async (formData: {email: string, password: string}) => {
+    const result = await authOperations.handleLogin(formData);
+    
+    // Update state immediately after successful login to prevent redirect loops
+    if (result?.session && result?.user) {
+      setSession(result.session);
+      setUser(result.user);
+    }
+    
+    return result;
+  }, [authOperations]);
+
   // Clear auth state on logout
   const handleLogout = useCallback(async () => {
     try {
@@ -92,15 +105,25 @@ export function useAuth() {
       if (error) {
         console.error("Error during logout:", error);
         toast({
-          title: "Logout failed",
+          title: "ログアウトに失敗しました",
           description: error.message,
           variant: "destructive",
         });
         throw error;
       }
       
+      // Clear state immediately to prevent any race conditions
+      setUser(null);
+      setSession(null);
+      
       console.log("User logged out successfully");
-      // State is updated through onAuthStateChange
+      
+      // Success toast
+      toast({
+        title: "ログアウト成功",
+        description: "ログイン画面に移動します...",
+        duration: 3000,
+      });
     } catch (error) {
       console.error("Error during logout:", error);
       throw error;
@@ -115,6 +138,7 @@ export function useAuth() {
     session,
     loading,
     isAuthenticated: !!user,
+    handleLogin,
     handleLogout
   };
 }
