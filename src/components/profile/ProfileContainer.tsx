@@ -6,7 +6,6 @@ import { Profile as ProfileType } from "@/types/messages";
 import { ProfileLoading } from "@/components/profile/ProfileLoading";
 import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
-// DeleteAccountButtonのimportを削除
 
 export function ProfileContainer() {
   const [profile, setProfile] = useState<ProfileType | null>(null);
@@ -37,7 +36,19 @@ export function ProfileContainer() {
       if (error) throw error;
       
       // Create a complete profile object with all required fields
-      // including fcm_token which might not be in the database yet
+      // Parse language_levels properly to handle both string and Record<string, number>
+      let parsedLanguageLevels: Record<string, number> | string | null = data.language_levels;
+      
+      // If language_levels is a string, try to parse it
+      if (typeof data.language_levels === 'string') {
+        try {
+          parsedLanguageLevels = JSON.parse(data.language_levels);
+        } catch (e) {
+          console.error("Error parsing language levels:", e);
+          parsedLanguageLevels = data.language_levels;
+        }
+      }
+      
       const completeProfile: ProfileType = {
         id: data.id,
         created_at: data.created_at,
@@ -66,15 +77,15 @@ export function ProfileContainer() {
         hobbies: data.hobbies,
         languages: data.languages,
         learning_languages: data.learning_languages,
-        language_levels: data.language_levels,
+        language_levels: parsedLanguageLevels,
         pet_photo_url: data.pet_photo_url,
         pet_photo_comment: data.pet_photo_comment,
-        fcm_token: (data as any).fcm_token || null // Add FCM token with fallback
+        fcm_token: data.fcm_token
       };
       
       setProfile(completeProfile);
 
-      // プロフィールの完成度を計算
+      // Calculate profile completion
       if (data) {
         calculateCompletion(data);
       }

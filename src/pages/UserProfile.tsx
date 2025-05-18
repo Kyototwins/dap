@@ -1,122 +1,104 @@
-
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/types/messages";
-import { UserProfileHeader } from "@/components/profile/UserProfileHeader";
-import { UserProfileAboutTab } from "@/components/profile/UserProfileAboutTab";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlaneIcon } from "lucide-react";
+import { ProfileLoading } from "@/components/profile/ProfileLoading";
+import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
+import { UserProfileInfo } from "@/components/profile/UserProfileInfo";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function UserProfile() {
+  const { id } = useParams<{ id: string }>();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const { id } = useParams<{ id: string }>();
-  const { toast } = useToast();
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  useEffect(() => {
-    if (id) {
-      fetchProfile(id);
-    }
-  }, [id]);
-
-  const fetchProfile = async (profileId: string) => {
+  const fetchUserProfile = useCallback(async (userId: string) => {
+    setLoading(true);
+    
     try {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", profileId)
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
         .single();
-
+        
       if (error) throw error;
-
-      // Create a complete profile object with required fields
-      const completeProfile: Profile = {
-        id: data.id,
-        created_at: data.created_at,
-        first_name: data.first_name,
-        last_name: data.last_name,
-        age: data.age,
-        gender: data.gender,
-        origin: data.origin,
-        about_me: data.about_me,
-        avatar_url: data.avatar_url,
-        sexuality: data.sexuality,
-        university: data.university,
-        department: data.department,
-        year: data.year,
-        image_url_1: data.image_url_1,
-        image_url_2: data.image_url_2,
-        ideal_date: data.ideal_date,
-        life_goal: data.life_goal,
-        superpower: data.superpower,
-        worst_nightmare: data.worst_nightmare,
-        friend_activity: data.friend_activity,
-        best_quality: data.best_quality,
-        photo_comment: data.photo_comment,
-        hobby_photo_url: data.hobby_photo_url,
-        hobby_photo_comment: data.hobby_photo_comment,
-        hobbies: data.hobbies,
-        languages: data.languages,
-        learning_languages: data.learning_languages,
-        language_levels: data.language_levels,
-        pet_photo_url: data.pet_photo_url,
-        pet_photo_comment: data.pet_photo_comment,
-        fcm_token: data.fcm_token || null // Add FCM token with fallback
-      };
       
-      setProfile(completeProfile);
-    } catch (error: any) {
-      console.error("Error fetching profile:", error);
+      if (data) {
+        // Process language_levels field
+        let parsedLanguageLevels = data.language_levels;
+        if (typeof data.language_levels === 'string') {
+          try {
+            parsedLanguageLevels = JSON.parse(data.language_levels);
+          } catch (e) {
+            console.error("Error parsing language levels:", e);
+            // Keep as is if parsing fails
+          }
+        }
+        
+        // Create profile object with the correct types
+        const profileData: Profile = {
+          ...data,
+          language_levels: parsedLanguageLevels,
+          fcm_token: data.fcm_token ?? null
+        };
+        
+        setProfile(profileData);
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      setError("プロフィールの読み込み中にエラーが発生しました。");
       toast({
-        title: "Error",
-        description: "Failed to load user profile",
+        title: "エラーが発生しました",
+        description: "プロフィールの読み込みに失敗しました。",
         variant: "destructive",
       });
-      navigate("/matches");
     } finally {
       setLoading(false);
     }
+  }, [toast]);
+
+  useEffect(() => {
+    if (id) {
+      fetchUserProfile(id);
+    } else {
+      setError("ユーザーIDが指定されていません。");
+      setLoading(false);
+    }
+  }, [id, fetchUserProfile]);
+
+  const handleGoBack = () => {
+    navigate(-1);
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-1 items-center justify-center p-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-doshisha-purple mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading profile...</p>
-        </div>
-      </div>
-    );
+    return <ProfileLoading />;
   }
 
-  if (!profile) {
-    return (
-      <div className="flex flex-1 items-center justify-center p-4">
-        <div className="text-center">
-          <PlaneIcon className="h-12 w-12 mx-auto text-gray-400" />
-          <h2 className="mt-2 text-xl font-semibold">Profile Not Found</h2>
-          <p className="mt-1 text-gray-600">This user profile doesn't exist or has been removed.</p>
-        </div>
-      </div>
-    );
+  if (error || !profile) {
+    return <ProfileNotFound />;
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <UserProfileHeader profile={profile} />
-      
-      <Tabs defaultValue="about" className="w-full flex-1">
-        <TabsList className="grid w-full grid-cols-1 bg-gray-100 p-1 sticky top-0 z-10">
-          <TabsTrigger value="about">About</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="about" className="pt-2 flex-1">
-          <UserProfileAboutTab profile={profile} />
-        </TabsContent>
-      </Tabs>
+    <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex items-center text-gray-600"
+          onClick={handleGoBack}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          戻る
+        </Button>
+      </div>
+
+      <UserProfileInfo profile={profile} />
     </div>
   );
 }

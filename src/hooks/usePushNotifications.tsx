@@ -6,8 +6,10 @@ import {
   requestNotificationPermission,
   disableNotifications,
   setupNotificationHandlers,
-  areNotificationsEnabled
-} from '@/services/notificationService';
+  areNotificationsEnabled,
+  isNotificationSupported,
+  getNotificationPermission
+} from '@/services/notifications';
 
 export function usePushNotifications() {
   const [isSupported, setIsSupported] = useState<boolean | null>(null);
@@ -20,19 +22,24 @@ export function usePushNotifications() {
   useEffect(() => {
     const checkSupport = async () => {
       try {
-        const supported = await initializePushNotifications();
+        // Check browser support
+        const supported = isNotificationSupported();
         setIsSupported(supported);
         
         if (supported) {
+          // Initialize Firebase
+          await initializePushNotifications();
+          
           // Set up notification handlers
           setupNotificationHandlers();
+          
+          // Check current permission
+          setPermission(getNotificationPermission());
           
           // Check if notifications already enabled
           const enabled = await areNotificationsEnabled();
           if (enabled) {
             setPermission('granted');
-          } else {
-            setPermission(Notification.permission as NotificationPermission);
           }
         }
       } catch (error) {

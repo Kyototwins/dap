@@ -1,6 +1,10 @@
 
 import { supabase } from './integrations/supabase/client';
-import { areNotificationsEnabled, initializePushNotifications, setupNotificationHandlers } from './services/notificationService';
+import { 
+  areNotificationsEnabled, 
+  initializePushNotifications, 
+  setupNotificationHandlers 
+} from './services/notifications';
 
 // Initialize notifications when the app starts
 export const initializeNotifications = async () => {

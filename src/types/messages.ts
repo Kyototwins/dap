@@ -1,4 +1,3 @@
-
 // Define the message type
 export interface Message {
   id: string;
@@ -6,7 +5,7 @@ export interface Message {
   content: string;
   sender_id: string;
   receiver_id?: string; // Make this optional since it's not used everywhere
-  match_id?: string;    // Add match_id and make it optional
+  match_id?: string;    // Make match_id optional for compatibility with both DB schema formats
 }
 
 export interface Profile {
@@ -40,7 +39,7 @@ export interface Profile {
   language_levels: Record<string, number> | string | null;
   pet_photo_url: string | null;
   pet_photo_comment: string | null;
-  fcm_token: string | null; // Add FCM token field
+  fcm_token: string | null; // Keep FCM token field
 }
 
 export interface Match {

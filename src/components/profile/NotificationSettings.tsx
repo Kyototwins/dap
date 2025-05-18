@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Bell, BellOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,11 +26,11 @@ export function NotificationSettings() {
           // Use raw query result to handle potential missing column
           const { data } = await supabase
             .from('profiles')
-            .select('*')
+            .select('fcm_token')
             .eq('id', user.id)
             .single();
           
-          // Access fcm_token safely with type assertion
+          // Access fcm_token safely
           const hasToken = !!(data && data.fcm_token);
           setNotificationsEnabled(hasToken);
         }

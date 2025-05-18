@@ -1,6 +1,10 @@
 
 import { useEffect } from 'react';
-import { initializePushNotifications, areNotificationsEnabled, setupNotificationHandlers } from '@/services/notificationService';
+import { 
+  initializePushNotifications,
+  areNotificationsEnabled, 
+  setupNotificationHandlers 
+} from '@/services/notifications';
 
 export function FirebaseInitializer() {
   // Initialize Firebase when the component mounts

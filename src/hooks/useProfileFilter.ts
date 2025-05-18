@@ -1,240 +1,166 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Profile } from '@/types/messages';
 
-import { useState, useRef, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import type { Profile } from "@/types/messages";
-import type { FilterState } from "@/types/matches";
-
-export function useProfileFilter() {
+export const useProfileFilter = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
-  const [visibleProfiles, setVisibleProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-  const pageSize = 10;
-  const pageRef = useRef(1);
-  const { toast } = useToast();
-  
-  // Filter states
-  const [filters, setFilters] = useState<FilterState>({
-    ageRange: [18, 50],
-    speakingLanguages: [],
-    learningLanguages: [],
-    minLanguageLevel: 1,
-    hobbies: [],
-    countries: [],
-    sortOption: "recent"
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [filters, setFilters] = useState({
+    gender: '',
+    minAge: '',
+    maxAge: '',
+    origin: '',
+    university: '',
+    department: '',
+    languages: [] as string[],
+    hobbies: [] as string[],
   });
 
-  // Fetch profile data
-  const fetchProfiles = async () => {
-    setLoading(true);
-    try {
+  useEffect(() => {
+    const getCurrentUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (user) {
+        setCurrentUserId(user.id);
+      }
+    };
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .neq("id", user.id);
+    getCurrentUser();
+    loadProfiles();
+  }, []);
 
-      if (error) throw error;
+  useEffect(() => {
+    applyFilters();
+  }, [filters, profiles]);
+
+  const loadProfiles = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const currentUserId = user?.id;
+
+    try {
+      let { data, error, status } = await supabase
+        .from('profiles')
+        .select('*')
+        .neq('id', currentUserId || '');
       
-      // Map the data to match the Profile type with all required fields
-      const typedProfiles = data?.map(profile => {
-        // Create a complete profile object with fcm_token
-        const completeProfile: Profile = {
-          id: profile.id,
-          first_name: profile.first_name || null,
-          last_name: profile.last_name || null,
-          avatar_url: profile.avatar_url || null,
-          about_me: profile.about_me || null,
-          age: profile.age || null,
-          gender: profile.gender || null,
-          university: profile.university || null,
-          department: profile.department || null,
-          year: profile.year || null,
-          hobbies: profile.hobbies || null,
-          languages: profile.languages || null,
-          language_levels: profile.language_levels || null,
-          superpower: profile.superpower || null,
-          learning_languages: profile.learning_languages || null,
-          origin: profile.origin || null,
-          sexuality: profile.sexuality || null,
-          ideal_date: profile.ideal_date || null,
-          life_goal: profile.life_goal || null,
-          worst_nightmare: profile.worst_nightmare || null,
-          friend_activity: profile.friend_activity || null,
-          best_quality: profile.best_quality || null,
-          image_url_1: profile.image_url_1 || null,
-          image_url_2: profile.image_url_2 || null,
-          created_at: profile.created_at || '',
-          photo_comment: profile.photo_comment || null,
-          hobby_photo_url: profile.hobby_photo_url || null,
-          hobby_photo_comment: profile.hobby_photo_comment || null,
-          pet_photo_url: profile.pet_photo_url || null,
-          pet_photo_comment: profile.pet_photo_comment || null,
-          fcm_token: profile.fcm_token || null
-        };
-        return completeProfile;
-      }) || [];
-      
-      setProfiles(typedProfiles);
-      applyFilters(typedProfiles, searchQuery, filters);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      if (error && status !== 406) {
+        throw error;
+      }
+
+      if (data) {
+        // Process the profiles to ensure they conform to the Profile type
+        // Especially handle language_levels which might be stored as JSON string
+        const processedProfiles = data.map(profile => {
+          // Parse language_levels if it's a string
+          let processedLanguageLevels = profile.language_levels;
+          if (typeof profile.language_levels === 'string') {
+            try {
+              processedLanguageLevels = JSON.parse(profile.language_levels);
+            } catch (e) {
+              console.error("Error parsing language levels:", e);
+              // Keep it as is if parsing fails
+            }
+          }
+          
+          return {
+            ...profile,
+            language_levels: processedLanguageLevels,
+            // Ensure fcm_token exists to satisfy TypeScript
+            fcm_token: profile.fcm_token ?? null
+          } as Profile;
+        });
+
+        setProfiles(processedProfiles);
+        setFilteredProfiles(processedProfiles);
+      }
+    } catch (error) {
+      console.error('Error fetching profiles:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Apply search and filters
-  const applyFilters = (data: Profile[], query: string, filterState: FilterState) => {
-    let result = [...data];
+  const applyFilters = () => {
+    let result = [...profiles];
 
-    // Filter by search query
-    if (query) {
-      const searchLower = query.toLowerCase();
-      result = result.filter((profile) => {
-        return (
-          profile.first_name?.toLowerCase().includes(searchLower) ||
-          profile.last_name?.toLowerCase().includes(searchLower) ||
-          profile.about_me?.toLowerCase().includes(searchLower) ||
-          profile.university?.toLowerCase().includes(searchLower) ||
-          profile.department?.toLowerCase().includes(searchLower)
-        );
-      });
+    // Filter by gender
+    if (filters.gender) {
+      result = result.filter(profile => profile.gender === filters.gender);
     }
 
-    // Age filtering
-    result = result.filter(profile => {
-      if (!profile.age) return true;
-      return profile.age >= filterState.ageRange[0] && profile.age <= filterState.ageRange[1];
-    });
+    // Filter by age range
+    if (filters.minAge) {
+      const minAge = parseInt(filters.minAge);
+      result = result.filter(profile => profile.age !== null && profile.age >= minAge);
+    }
 
-    // Origin filtering
-    if (filterState.countries.length > 0) {
+    if (filters.maxAge) {
+      const maxAge = parseInt(filters.maxAge);
+      result = result.filter(profile => profile.age !== null && profile.age <= maxAge);
+    }
+
+    // Filter by origin
+    if (filters.origin) {
+      result = result.filter(profile => profile.origin === filters.origin);
+    }
+
+    // Filter by university
+    if (filters.university) {
+      result = result.filter(profile => profile.university === filters.university);
+    }
+
+    // Filter by department
+    if (filters.department) {
+      result = result.filter(profile => profile.department === filters.department);
+    }
+
+    // Filter by languages
+    if (filters.languages.length > 0) {
       result = result.filter(profile => 
-        !profile.origin || filterState.countries.includes(profile.origin)
+        profile.languages !== null && 
+        filters.languages.every(lang => profile.languages!.includes(lang))
       );
     }
 
-    // Speaking languages filtering
-    if (filterState.speakingLanguages.length > 0) {
-      result = result.filter(profile => {
-        if (!profile.languages || profile.languages.length === 0) return false;
-        
-        return filterState.speakingLanguages.some(lang => {
-          const hasLanguage = profile.languages?.includes(lang);
-          if (!hasLanguage) return false;
-          
-          if (profile.language_levels && typeof profile.language_levels === 'object') {
-            const level = profile.language_levels[lang];
-            return level >= filterState.minLanguageLevel;
-          }
-          return true;
-        });
-      });
-    }
-
-    // Learning languages filtering
-    if (filterState.learningLanguages.length > 0) {
-      result = result.filter(profile => {
-        if (!profile.learning_languages || profile.learning_languages.length === 0) return false;
-        return filterState.learningLanguages.some(lang => 
-          profile.learning_languages?.includes(lang)
-        );
-      });
-    }
-
-    // Hobbies filtering
-    if (filterState.hobbies.length > 0) {
-      result = result.filter(profile => {
-        if (!profile.hobbies || profile.hobbies.length === 0) return false;
-        return filterState.hobbies.some(hobby => 
-          profile.hobbies?.includes(hobby)
-        );
-      });
-    }
-
-    // Sorting
-    if (filterState.sortOption === "recent") {
-      result.sort((a, b) => {
-        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-        return dateB - dateA;
-      });
-    } else if (filterState.sortOption === "active") {
-      result.sort((a, b) => {
-        const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
-        const nameB = `${b.first_name || ''} ${a.last_name || ''}`;
-        return nameA.localeCompare(nameB);
-      });
+    // Filter by hobbies
+    if (filters.hobbies.length > 0) {
+      result = result.filter(profile => 
+        profile.hobbies !== null && 
+        filters.hobbies.some(hobby => profile.hobbies!.includes(hobby))
+      );
     }
 
     setFilteredProfiles(result);
-    pageRef.current = 1;
-    setVisibleProfiles(result.slice(0, pageSize));
   };
 
-  // Initial load
-  useEffect(() => {
-    fetchProfiles();
-  }, []);
-
-  // Apply filters when they change
-  useEffect(() => {
-    if (profiles.length > 0) {
-      applyFilters(profiles, searchQuery, filters);
-    }
-  }, [searchQuery, filters]);
-
-  // Search handler
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  const updateFilter = (filterName: string, value: string | string[]) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterName]: value
+    }));
   };
 
-  // Load more handler
-  const handleLoadMore = () => {
-    setLoadingMore(true);
-    const nextPage = pageRef.current + 1;
-    const start = (nextPage - 1) * pageSize;
-    const end = nextPage * pageSize;
-    
-    setTimeout(() => {
-      setVisibleProfiles(prev => [
-        ...prev, 
-        ...filteredProfiles.slice(start, end)
-      ]);
-      pageRef.current = nextPage;
-      setLoadingMore(false);
-    }, 500);
-  };
-
-  // Refresh data handler
-  const handleRefresh = () => {
-    fetchProfiles();
+  const resetFilters = () => {
+    setFilters({
+      gender: '',
+      minAge: '',
+      maxAge: '',
+      origin: '',
+      university: '',
+      department: '',
+      languages: [],
+      hobbies: [],
+    });
   };
 
   return {
-    profiles,
-    filteredProfiles,
-    visibleProfiles,
+    profiles: filteredProfiles,
     loading,
-    loadingMore,
-    searchQuery,
     filters,
-    isFilterSheetOpen,
-    setFilters,
-    setIsFilterSheetOpen,
-    handleSearchChange,
-    handleLoadMore,
-    handleRefresh,
+    updateFilter,
+    resetFilters,
+    totalCount: profiles.length,
+    filteredCount: filteredProfiles.length
   };
-}
+};
