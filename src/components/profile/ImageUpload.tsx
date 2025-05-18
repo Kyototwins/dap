@@ -19,6 +19,7 @@ interface ImageUploadProps {
 export function ImageUpload({ label, image, onChange, loading }: ImageUploadProps) {
   return (
     <div className="space-y-2">
+      <Label>{label}</Label>
       <div className="flex items-center gap-4">
         <label className="relative w-32 h-32 border-2 border-dashed border-gray-300 rounded-md overflow-hidden cursor-pointer hover:border-gray-400 transition-colors">
           {image.preview ? (

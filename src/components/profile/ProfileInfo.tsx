@@ -8,25 +8,26 @@ interface ProfileInfoProps {
 }
 
 export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoProps) {
+  // 既存のコンポーネントの実装を変更せずにプロパティだけを追加
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold">Profile Information</h2>
+      <h2 className="text-xl font-bold">プロフィール情報</h2>
       <div className="bg-card border border-border rounded-lg p-4">
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Name</span>
+            <span className="text-muted-foreground">名前</span>
             <span>{profile.first_name} {profile.last_name}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Age</span>
-            <span>{profile.age} years old</span>
+            <span className="text-muted-foreground">年齢</span>
+            <span>{profile.age}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Gender</span>
+            <span className="text-muted-foreground">性別</span>
             <span>{profile.gender}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Origin</span>
+            <span className="text-muted-foreground">出身</span>
             <span>{profile.origin}</span>
           </div>
         </div>
@@ -38,7 +39,7 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
             className="text-sm text-blue-600 hover:text-blue-800"
             onClick={onEditProfile}
           >
-            Edit
+            編集
           </button>
         </div>
       )}

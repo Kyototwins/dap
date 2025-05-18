@@ -35,8 +35,8 @@ export function PushNotificationSettings() {
   const handleTogglePushNotifications = async (enabled: boolean) => {
     if (!isPushSupported() || !user) {
       toast({
-        title: "Notification Error",
-        description: "Push notifications are not supported in this browser.",
+        title: "通知エラー",
+        description: "プッシュ通知はこのブラウザではサポートされていません。",
         variant: "destructive",
       });
       return;
@@ -52,8 +52,8 @@ export function PushNotificationSettings() {
         
         if (permission !== 'granted') {
           toast({
-            title: "Notification Permission",
-            description: "Notification permission was not granted. Please check your browser settings.",
+            title: "通知許可",
+            description: "通知権限が許可されていません。ブラウザの設定を確認してください。",
             variant: "destructive",
           });
           setPushEnabled(false);
@@ -62,20 +62,22 @@ export function PushNotificationSettings() {
         }
         
         // Save FCM token if permission was granted
+        // This is where we would register with Firebase and get a token
+        // For now, we'll use a placeholder
         const success = await updateFcmToken(user.id, "test-fcm-token");
         
         if (!success) {
           toast({
-            title: "Settings Error",
-            description: "Failed to update notification settings.",
+            title: "設定エラー",
+            description: "通知設定の更新に失敗しました。",
             variant: "destructive",
           });
           setPushEnabled(false);
         } else {
           setPushEnabled(true);
           toast({
-            title: "Settings Updated",
-            description: "Push notifications have been enabled.",
+            title: "設定完了",
+            description: "プッシュ通知が有効になりました。",
           });
         }
       } else {
@@ -84,23 +86,23 @@ export function PushNotificationSettings() {
         
         if (!success) {
           toast({
-            title: "Settings Error",
-            description: "Failed to update notification settings.",
+            title: "設定エラー",
+            description: "通知設定の更新に失敗しました。",
             variant: "destructive",
           });
         } else {
           setPushEnabled(false);
           toast({
-            title: "Settings Updated",
-            description: "Push notifications have been disabled.",
+            title: "設定完了",
+            description: "プッシュ通知が無効になりました。",
           });
         }
       }
     } catch (error) {
       console.error("Push notification error:", error);
       toast({
-        title: "Error",
-        description: "An error occurred while updating notification settings.",
+        title: "エラー",
+        description: "通知設定の更新中にエラーが発生しました。",
         variant: "destructive",
       });
     } finally {
@@ -113,25 +115,25 @@ export function PushNotificationSettings() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          Push Notifications
+          プッシュ通知
         </CardTitle>
         <CardDescription>
-          Receive important notifications as push notifications on your device
+          重要な通知をデバイスにプッシュ通知として受け取る設定
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {!isPushSupported() ? (
           <div className="p-4 bg-muted rounded-md text-sm text-muted-foreground">
-            Your browser does not support push notifications.
+            お使いのブラウザはプッシュ通知をサポートしていません。
           </div>
         ) : (
           <div className="flex items-center justify-between space-y-0 rounded-md border p-4">
             <div className="space-y-0.5">
-              <Label htmlFor="push-notifications">Push Notifications</Label>
+              <Label htmlFor="push-notifications">プッシュ通知</Label>
               <div className="text-sm text-muted-foreground">
                 {permissionStatus === 'granted' 
-                  ? 'Push notifications are enabled' 
-                  : 'Enable push notifications'}
+                  ? 'プッシュ通知は有効です' 
+                  : 'プッシュ通知を有効にする'}
               </div>
             </div>
             <Switch
@@ -145,7 +147,7 @@ export function PushNotificationSettings() {
         
         {permissionStatus === "denied" && (
           <div className="p-4 bg-amber-50 text-amber-800 rounded-md text-sm">
-            Notifications are blocked by your browser. To enable notifications, please update your browser settings.
+            通知がブラウザで拒否されています。通知を有効にするにはブラウザの設定から許可してください。
           </div>
         )}
       </CardContent>

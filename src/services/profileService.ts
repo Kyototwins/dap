@@ -66,15 +66,11 @@ export async function fetchUserProfile(userId: string) {
 
 export async function updateFcmToken(userId: string, token: string) {
   try {
-    // Use a type-safe approach with explicit casting to avoid TypeScript errors
-    // This uses the raw update method which bypasses type checking for the specific field
     const { error } = await supabase
       .from('profiles')
       .update({ 
-        // Using a record with an index signature to handle the fcm_token
-        // This works because the field exists in the database but not in our TypeScript types
         fcm_token: token 
-      } as any) // We use 'as any' here to bypass the TypeScript type checking
+      })
       .eq('id', userId);
       
     if (error) {

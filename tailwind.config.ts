@@ -22,11 +22,11 @@ export default {
       colors: {
         border: "#e4e4e7", // Lighter gray border
         input: "#000000",
-        ring: "#7F1184",
+        ring: "#7f1184",
         background: "#ffffff",
         foreground: "#000000",
         primary: {
-          DEFAULT: "#7F1184",
+          DEFAULT: "#7f1184",
           foreground: "#ffffff",
         },
         secondary: {
@@ -34,7 +34,7 @@ export default {
           foreground: "#ffffff",
         },
         destructive: {
-          DEFAULT: "#7F1184",
+          DEFAULT: "#7f1184",
           foreground: "#ffffff",
         },
         muted: {
@@ -42,7 +42,7 @@ export default {
           foreground: "#000000",
         },
         accent: {
-          DEFAULT: "#7F1184",
+          DEFAULT: "#7f1184",
           foreground: "#ffffff",
         },
         popover: {
@@ -53,10 +53,6 @@ export default {
           DEFAULT: "#ffffff",
           foreground: "#000000",
         },
-        "doshisha-purple": "#7F1184",
-        "doshisha-lightPurple": "#E5DEFF",
-        "doshisha-softPurple": "#F5F0FF",
-        "doshisha-darkPurple": "#671073",
       },
       borderRadius: {
         lg: "var(--radius)",
