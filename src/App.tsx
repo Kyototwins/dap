@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -37,9 +38,6 @@ function App() {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'SIGNED_IN') {
-          setShowPrompt(true); // ログイン時にプロンプトを表示
-        }
         setSession(session);
       }
     );
@@ -47,9 +45,6 @@ function App() {
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      if (session) {
-        setShowPrompt(true); // 既存のセッションがある場合もプロンプトを表示
-      }
       setLoading(false);
     });
 

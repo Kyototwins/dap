@@ -28,9 +28,9 @@ export function HomeScreenPrompt() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{t("homeScreen.title", "Add to Home Screen")}</DialogTitle>
+          <DialogTitle>{t("homeScreen.title")}</DialogTitle>
           <DialogDescription>
-            {t("homeScreen.subtitle", "Install this app on your device for quick access")}
+            {t("homeScreen.subtitle")}
           </DialogDescription>
         </DialogHeader>
         
@@ -38,20 +38,20 @@ export function HomeScreenPrompt() {
           <div className="space-y-2">
             <h4 className="font-semibold">📱 Android:</h4>
             <ol className="list-decimal pl-5 space-y-1">
-              <li>{t("homeScreen.android.step1", "Tap the menu icon (three dots) in Chrome")}</li>
-              <li>{t("homeScreen.android.step2", "Select 'Add to Home screen'")}</li>
-              <li>{t("homeScreen.android.step3", "Choose a name if you want")}</li>
-              <li>{t("homeScreen.android.step4", "Tap 'Add'")}</li>
+              <li>{t("homeScreen.android.step1")}</li>
+              <li>{t("homeScreen.android.step2")}</li>
+              <li>{t("homeScreen.android.step3")}</li>
+              <li>{t("homeScreen.android.step4")}</li>
             </ol>
           </div>
           
           <div className="space-y-2">
             <h4 className="font-semibold">🍎 iPhone (Safari):</h4>
             <ol className="list-decimal pl-5 space-y-1">
-              <li>{t("homeScreen.ios.step1", "Tap the share icon at the bottom")}</li>
-              <li>{t("homeScreen.ios.step2", "Scroll down and tap 'Add to Home Screen'")}</li>
-              <li>{t("homeScreen.ios.step3", "Choose a name if you want")}</li>
-              <li>{t("homeScreen.ios.step4", "Tap 'Add'")}</li>
+              <li>{t("homeScreen.ios.step1")}</li>
+              <li>{t("homeScreen.ios.step2")}</li>
+              <li>{t("homeScreen.ios.step3")}</li>
+              <li>{t("homeScreen.ios.step4")}</li>
             </ol>
           </div>
         </div>
@@ -61,12 +61,12 @@ export function HomeScreenPrompt() {
             variant="secondary"
             onClick={() => handleDismiss(true)}
           >
-            {t("homeScreen.dontShowAgain", "Don't show again")}
+            {t("homeScreen.dontShowAgain")}
           </Button>
           <Button
             onClick={() => handleDismiss()}
           >
-            {t("homeScreen.gotIt", "Got it")}
+            {t("homeScreen.gotIt")}
           </Button>
         </DialogFooter>
       </DialogContent>
