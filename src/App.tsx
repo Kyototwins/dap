@@ -8,6 +8,8 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Matches from "./pages/Matches";
+import Profile from "./pages/Profile";
+import UserProfile from "./pages/UserProfile";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -32,12 +34,30 @@ function App() {
                 {/* Always redirect to matches page */}
                 <Route path="/" element={<Navigate to="/matches" replace />} />
                 
-                {/* Only render matches page inside AppLayout */}
+                {/* Render pages inside AppLayout */}
                 <Route 
                   path="/matches" 
                   element={
                     <AppLayout>
                       <Matches />
+                    </AppLayout>
+                  } 
+                />
+                
+                <Route 
+                  path="/profile" 
+                  element={
+                    <AppLayout>
+                      <Profile />
+                    </AppLayout>
+                  } 
+                />
+                
+                <Route 
+                  path="/profile/:id" 
+                  element={
+                    <AppLayout>
+                      <UserProfile />
                     </AppLayout>
                   } 
                 />
