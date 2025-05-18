@@ -1,114 +1,60 @@
-
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
-import { AppLayout } from "@/components/layout/AppLayout";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import Landing from "./pages/Landing";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
-import ProfileSetup from "./pages/ProfileSetup";
-import Matches from "./pages/Matches";
-import Messages from "./pages/Messages";
-import Events from "./pages/Events";
-import CreateEvent from "./pages/CreateEvent";
-import NotFound from "./pages/NotFound";
-import Profile from "./pages/Profile";
-import UserProfile from "./pages/UserProfile";
-import Help from "./pages/Help";
-
-// Create a client
-const queryClient = new QueryClient();
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import { supabase } from './integrations/supabase/client';
+import Account from './pages/Account';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Matches from './pages/Matches';
+import Messages from './pages/Messages';
+import Profile from './pages/Profile';
+import Events from './pages/Events';
+import OfferedExperiences from './pages/OfferedExperiences';
+import { NotificationProvider } from "@/contexts/NotificationContext";
+import { Toaster } from "@/components/ui/toaster"
+import { FirebaseInitializer } from "@/components/notifications/FirebaseInitializer";
 
 function App() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState(null)
 
   useEffect(() => {
-    // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
+      setSession(session)
+    })
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (loading) {
-    return null; // Or a loading spinner
-  }
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  }, [])
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <TooltipProvider>
+    <>
+      {/* 非表示の Firebase 初期化コンポーネント */}
+      <FirebaseInitializer />
+
+      <NotificationProvider>
+        <Router>
+          <div className="container" style={{ padding: '50px 0 100px 0' }}>
             <Routes>
-              <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />
-              <Route path="/login" element={session ? <Navigate to="/matches" /> : <Login />} />
-              <Route path="/signup" element={session ? <Navigate to="/matches" /> : <SignUp />} />
-              <Route path="/profile/setup" element={session ? <ProfileSetup /> : <Navigate to="/login" />} />
-              <Route path="/help" element={session ? <Help /> : <Navigate to="/login" />} />
-              
-              {/* Protected routes - AppLayoutでラップ */}
+              <Route exact path="/" element={<Home />} />
+              <Route exact path="/events" element={<Events />} />
+              <Route exact path="/experiences" element={<OfferedExperiences />} />
               <Route
-                path="/matches"
+                path="/login"
                 element={
-                  session ? (
-                    <AppLayout>
-                      <Matches />
-                    </AppLayout>
+                  !session ? (
+                    <Login />
                   ) : (
-                    <Navigate to="/login" />
+                    <Navigate to="/account" />
                   )
                 }
               />
               <Route
-                path="/messages"
+                path="/account"
                 element={
                   session ? (
-                    <AppLayout>
-                      <Messages />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/events"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <Events />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/events/new"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <CreateEvent />
-                    </AppLayout>
+                    <Account session={session} />
                   ) : (
                     <Navigate to="/login" />
                   )
@@ -118,32 +64,48 @@ function App() {
                 path="/profile"
                 element={
                   session ? (
-                    <AppLayout>
-                      <Profile />
-                    </AppLayout>
+                    <Profile session={session} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+               <Route
+                path="/profile/:userId"
+                element={
+                  session ? (
+                    <Profile session={session} />
                   ) : (
                     <Navigate to="/login" />
                   )
                 }
               />
               <Route
-                path="/profile/:id"
+                path="/matches"
                 element={
                   session ? (
-                    <AppLayout>
-                      <UserProfile />
-                    </AppLayout>
+                    <Matches session={session} />
                   ) : (
                     <Navigate to="/login" />
                   )
                 }
               />
-              <Route path="*" element={<NotFound />} />
+              <Route
+                path="/messages"
+                element={
+                  session ? (
+                    <Messages session={session} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
             </Routes>
-          </TooltipProvider>
-        </BrowserRouter>
-      </LanguageProvider>
-    </QueryClientProvider>
+          </div>
+        </Router>
+        <Toaster />
+      </NotificationProvider>
+    </>
   );
 }
 
