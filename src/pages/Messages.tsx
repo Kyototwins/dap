@@ -3,9 +3,9 @@ import { useMessages } from "@/hooks/useMessages";
 import { MessageContainer } from "@/components/messages/MessageContainer";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 
-export default function Messages() {
+const Messages = memo(function Messages() {
   const {
     matches,
     selectedMatch,
@@ -20,7 +20,7 @@ export default function Messages() {
   const [hasInitialized, setHasInitialized] = useState(false);
   const initialRenderRef = useRef(true);
 
-  // Debug log and initialization effect
+  // Debug log and initialization effect with cleanup to prevent memory leaks
   useEffect(() => {
     if (initialRenderRef.current) {
       console.log("Messages page mounted", {
@@ -43,9 +43,17 @@ export default function Messages() {
       console.log("Messages page initialization complete");
       setHasInitialized(true);
     }
+
+    // Cleanup function
+    return () => {
+      console.log("Messages page unmounting");
+      // Ensure any pending operations are properly cleaned up
+    };
   }, [matches, messages, selectedMatch, loading, hasInitialized]);
 
   const handleRefresh = async () => {
+    if (isRefreshing) return;
+    
     setIsRefreshing(true);
     console.log("Refreshing messages page");
     try {
@@ -80,7 +88,7 @@ export default function Messages() {
       />
     </div>
   );
-}
+});
 
 function LoadingState() {
   return <div className="p-6 text-center">読み込み中...</div>;
@@ -112,3 +120,5 @@ function RefreshButton({ onClick, isRefreshing }: { onClick: () => void, isRefre
     </Button>
   );
 }
+
+export default Messages;

@@ -6,6 +6,7 @@ import { useMessageSubscription } from "@/hooks/useMessageSubscription";
 import { useMessageUrlParams } from "@/hooks/useMessageUrlParams";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 export function useMessages() {
   const { matches, loading: matchesLoading, fetchMatches } = useMatches();
@@ -14,6 +15,22 @@ export function useMessages() {
   const location = useLocation();
   const lastMatchesLengthRef = useRef(0);
   const initialLoadProcessedRef = useRef(false);
+  const pageActiveRef = useRef(true);
+  
+  // Memoize the fetchMatches function for better stability
+  const memoizedFetchMatches = useCallback(async () => {
+    console.log("useMessages: memoizedFetchMatches called");
+    try {
+      return await fetchMatches();
+    } catch (error) {
+      console.error("Error in memoizedFetchMatches:", error);
+      toast({
+        title: "エラー",
+        description: "マッチの取得に失敗しました",
+        variant: "destructive",
+      });
+    }
+  }, [fetchMatches]);
   
   // Set up message selection with the memoized fetch function
   const { 
@@ -22,13 +39,34 @@ export function useMessages() {
     setMessages, 
     handleSelectMatch,
     loading: selectionLoading
-  } = useMessageSelection(fetchMatches);
+  } = useMessageSelection(memoizedFetchMatches);
   
   // Set up URL parameter handling
   const { paramProcessing } = useMessageUrlParams(matches, handleSelectMatch);
   
   // Set up realtime subscription
   useMessageSubscription(selectedMatch, setMessages);
+
+  // Track page visibility
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      pageActiveRef.current = document.visibilityState === 'visible';
+      console.log("Page visibility changed:", pageActiveRef.current ? "visible" : "hidden");
+      
+      // Refresh data when becoming visible again
+      if (pageActiveRef.current && initialLoadProcessedRef.current) {
+        console.log("Page became visible, refreshing messages data");
+        memoizedFetchMatches().catch(console.error);
+      }
+    };
+    
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    pageActiveRef.current = document.visibilityState === 'visible';
+    
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [memoizedFetchMatches]);
 
   // Initialization effect - runs only once
   useEffect(() => {
@@ -104,6 +142,14 @@ export function useMessages() {
     });
   }, [matches, selectedMatch, messages, matchesLoading, selectionLoading, paramProcessing, location.pathname]);
 
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      console.log("useMessages hook unmounting");
+      // Any cleanup needed when component unmounts
+    };
+  }, []);
+
   return {
     matches,
     selectedMatch,
@@ -111,6 +157,6 @@ export function useMessages() {
     loading: matchesLoading || selectionLoading || !initComplete,
     handleSelectMatch,
     setMessages,
-    fetchMatches,
+    fetchMatches: memoizedFetchMatches,
   };
 }

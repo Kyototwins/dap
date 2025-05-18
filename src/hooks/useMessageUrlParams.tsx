@@ -13,19 +13,28 @@ export function useMessageUrlParams(
   const processingRef = useRef(false);
   const timeoutRef = useRef<number | null>(null);
   const lastProcessedRef = useRef<string | null>(null);
+  const matchesLoadedRef = useRef(false);
   
   // Check for user query parameter
   useEffect(() => {
     const userId = searchParams.get('user');
     
-    // Skip if we've already processed this exact userId or we're already processing
-    if (!userId || processingRef.current || processedParams.has(userId)) {
+    // Skip if we've already processed this exact userId
+    if (!userId || processedParams.has(userId)) {
       return;
     }
     
-    // Skip if matches aren't loaded yet
-    if (matches.length === 0) {
-      console.log("No matches loaded yet, will process URL params when matches are available");
+    // Update matches loaded ref when matches are available
+    if (matches.length > 0 && !matchesLoadedRef.current) {
+      console.log(`${matches.length} matches loaded, ready for URL parameter processing`);
+      matchesLoadedRef.current = true;
+    }
+    
+    // Skip if matches aren't loaded yet or we're already processing
+    if (matches.length === 0 || processingRef.current) {
+      if (matches.length === 0) {
+        console.log("No matches loaded yet, will process URL params when matches are available");
+      }
       return;
     }
     
@@ -63,16 +72,18 @@ export function useMessageUrlParams(
             setParamProcessing(false);
             timeoutRef.current = null;
           });
-      }, 100) as unknown as number;
+      }, 200) as unknown as number;
     } else {
       console.log(`No match found with user ${userId}`);
       // Still mark this userId as processed to prevent repeated attempts
       setProcessedParams(prev => new Set([...prev, userId]));
     }
     
+    // Cleanup function to clear any pending timeouts
     return () => {
       if (timeoutRef.current) {
         window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
   }, [matches, searchParams, handleSelectMatch, processedParams]);
