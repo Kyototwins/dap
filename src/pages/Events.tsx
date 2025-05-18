@@ -1,7 +1,6 @@
 
 import EventsPage from "@/components/events/EventsPage";
-import { memo } from "react";
 
-export default memo(function Events() {
+export default function Events() {
   return <EventsPage />;
-});
+}

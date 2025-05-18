@@ -14,7 +14,7 @@ interface AdditionalQuestionsData {
 
 interface AdditionalQuestionsProps {
   data: AdditionalQuestionsData;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onChange: (name: string, value: string) => void;
   loading?: boolean;
 }
 
@@ -25,9 +25,8 @@ export function AdditionalQuestions({ data, onChange, loading }: AdditionalQuest
         <Label>My worst nightmare is...</Label>
         <Textarea
           placeholder="Tell us about your worst nightmare..."
-          name="worstNightmare"
           value={data.worstNightmare || ""}
-          onChange={onChange}
+          onChange={(e) => onChange("worstNightmare", e.target.value)}
           className="min-h-[80px]"
           disabled={loading}
         />
@@ -37,9 +36,8 @@ export function AdditionalQuestions({ data, onChange, loading }: AdditionalQuest
         <Label>If we become friends, I want to do...</Label>
         <Textarea
           placeholder="What would you like us to do together as friends?"
-          name="friendActivity"
           value={data.friendActivity || ""}
-          onChange={onChange}
+          onChange={(e) => onChange("friendActivity", e.target.value)}
           className="min-h-[80px]"
           disabled={loading}
         />
@@ -49,9 +47,8 @@ export function AdditionalQuestions({ data, onChange, loading }: AdditionalQuest
         <Label>My best quality is...</Label>
         <Textarea
           placeholder="Tell us about your best quality..."
-          name="bestQuality"
           value={data.bestQuality || ""}
-          onChange={onChange}
+          onChange={(e) => onChange("bestQuality", e.target.value)}
           className="min-h-[80px]"
           disabled={loading}
         />
@@ -61,9 +58,8 @@ export function AdditionalQuestions({ data, onChange, loading }: AdditionalQuest
         <Label>If you could have a superpower, what would it be?</Label>
         <Textarea
           placeholder="Tell us about your desired superpower..."
-          name="superpower"
           value={data.superpower || ""}
-          onChange={onChange}
+          onChange={(e) => onChange("superpower", e.target.value)}
           className="min-h-[80px]"
           disabled={loading}
         />
@@ -73,9 +69,8 @@ export function AdditionalQuestions({ data, onChange, loading }: AdditionalQuest
         <Label>My life goal...</Label>
         <Textarea
           placeholder="Tell us about your life goal..."
-          name="lifeGoal"
           value={data.lifeGoal || ""}
-          onChange={onChange}
+          onChange={(e) => onChange("lifeGoal", e.target.value)}
           className="min-h-[80px]"
           disabled={loading}
         />

@@ -11,7 +11,7 @@ export interface ImageUploadState {
   image1: ImageUpload;
   image2: ImageUpload;
   hobby: ImageUpload;
-  pet: ImageUpload;
+  pet: ImageUpload;  // Changed back from food to pet
 }
 
 export interface ProfileFormData {
@@ -31,7 +31,7 @@ export interface ProfileFormData {
   learning_languages: string[];
   photoComment: string;
   hobbyPhotoComment: string;
-  petPhotoComment: string;
+  petPhotoComment: string;  // Changed back from foodPhotoComment
 }
 
 export interface AdditionalDataType {
@@ -41,40 +41,4 @@ export interface AdditionalDataType {
   worstNightmare: string;
   friendActivity: string;
   bestQuality: string;
-}
-
-// Update the Profile interface to ensure it's compatible with the one in messages.ts
-export interface Profile {
-  id: string;
-  created_at: string;
-  first_name?: string | null;
-  last_name?: string | null;
-  age?: number | null;
-  gender?: string | null;
-  origin?: string | null;
-  about_me?: string | null;
-  university?: string | null;
-  department?: string | null;
-  year?: string | null;
-  hobbies?: string[] | null;
-  languages?: string[] | null;
-  language_levels?: Record<string, number> | string | null;
-  learning_languages?: string[] | null;
-  avatar_url?: string | null;
-  image_url_1?: string | null;
-  image_url_2?: string | null;
-  hobby_photo_url?: string | null;
-  pet_photo_url?: string | null;
-  photo_comment?: string | null;
-  hobby_photo_comment?: string | null;
-  pet_photo_comment?: string | null;
-  ideal_date?: string | null;
-  life_goal?: string | null;
-  superpower?: string | null;
-  worst_nightmare?: string | null;
-  friend_activity?: string | null;
-  best_quality?: string | null;
-  sexuality?: string | null;
-  fcm_token?: string | null;
-  email_digest_enabled?: boolean | null;
 }
