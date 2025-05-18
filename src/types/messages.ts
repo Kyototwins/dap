@@ -50,8 +50,8 @@ export interface Profile {
   hobbies?: string[];
   languages?: string[];
   language_levels?: Record<string, number> | string;
-  superpower?: string;
   learning_languages?: string[];
+  superpower?: string;
   ideal_date?: string;
   life_goal?: string;
   avatar_url?: string | null;
