@@ -1,3 +1,4 @@
+
 import { MessageSquare, User, Search, Calendar, Menu, HelpCircle, LogOut } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -37,9 +38,9 @@ export function AppLayout({ children }: LayoutProps) {
   const handleLogoutClick = async () => {
     try {
       await handleLogout();
-      // Navigation will be handled by auth state change via redirect in AppLayout
-      navigate('/login');
-      console.log("Logged out and redirected to login");
+      // Redirect to landing page (/) after logout
+      navigate('/', { replace: true });
+      console.log("Logged out and redirected to home page");
     } catch (error) {
       console.error("Error logging out:", error);
     }
