@@ -1,4 +1,3 @@
-
 // Define the message type
 export interface Message {
   id: string;
@@ -39,6 +38,7 @@ export interface Profile {
   language_levels: Record<string, number> | string | null;
   pet_photo_url: string | null;  // Changed back from favorite_food_photo_url
   pet_photo_comment: string | null;  // Changed back from favorite_food_photo_comment
+  fcm_token: string | null;
 }
 
 export interface Match {
