@@ -10,6 +10,8 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import Matches from "./pages/Matches";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
+import Messages from "./pages/Messages";
+import Events from "./pages/Events";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -58,6 +60,24 @@ function App() {
                   element={
                     <AppLayout>
                       <UserProfile />
+                    </AppLayout>
+                  } 
+                />
+                
+                <Route 
+                  path="/messages" 
+                  element={
+                    <AppLayout>
+                      <Messages />
+                    </AppLayout>
+                  } 
+                />
+                
+                <Route 
+                  path="/events" 
+                  element={
+                    <AppLayout>
+                      <Events />
                     </AppLayout>
                   } 
                 />

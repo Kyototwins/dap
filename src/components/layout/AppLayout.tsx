@@ -26,7 +26,7 @@ export function AppLayout({ children }: LayoutProps) {
   const [shouldRender, setShouldRender] = useState(true);
 
   const navItems = [
-    { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
+    { icon: Search, label: "Matches", path: "/matches", hasNotification: hasUnreadLikes },
     { icon: MessageSquare, label: "Messages", path: "/messages", hasNotification: hasUnreadMessages },
     { icon: Calendar, label: "Events", path: "/events", hasNotification: hasUnreadEvents },
     { icon: User, label: "Profile", path: "/profile", hasNotification: false },

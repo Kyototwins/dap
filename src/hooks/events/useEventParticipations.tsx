@@ -1,75 +1,42 @@
 
-import { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { fetchUserParticipations } from "@/services/eventDataService";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { EventParticipation } from "@/types/events";
 
 export function useEventParticipations() {
-  const [participations, setParticipations] = useState<{[key: string]: boolean}>({});
+  const [participations, setParticipations] = useState<EventParticipation[]>([]);
   const { toast } = useToast();
 
-  // On mount, load from localStorage first for immediate UI feedback
-  useEffect(() => {
-    // Create a user-specific key for localStorage
-    const getUserKey = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) return;
-      
-      const userKey = `joined_events_${data.user.id}`;
-      try {
-        const storedParticipations = localStorage.getItem(userKey);
-        if (storedParticipations) {
-          setParticipations(JSON.parse(storedParticipations));
-        }
-      } catch (error) {
-        console.error("Failed to load participations from localStorage", error);
-      }
-    };
-    
-    getUserKey();
-  }, []);
-
-  const loadParticipations = async () => {
+  const loadParticipations = useCallback(async () => {
     try {
-      const participationsData = await fetchUserParticipations();
-      console.log("Loaded participations from server:", participationsData);
+      console.log("Loading event participations...");
       
-      // Get current user to create user-specific localStorage key
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) return {};
+      // モックユーザーのイベント参加データ
+      const mockParticipations: EventParticipation[] = [
+        {
+          id: "mock-participation-1",
+          event_id: "mock-event-1",
+          user_id: "mock-user-id",
+          status: "joined",
+          created_at: new Date().toISOString()
+        }
+      ];
       
-      const userKey = `joined_events_${data.user.id}`;
+      console.log(`Generated ${mockParticipations.length} mock participations`);
+      setParticipations(mockParticipations);
       
-      // Merge server data with localStorage data for persistence
-      try {
-        const storedParticipations = localStorage.getItem(userKey) || '{}';
-        const storedData = JSON.parse(storedParticipations);
-        
-        // Combine both sources, server data takes precedence
-        const mergedParticipations = { ...storedData, ...participationsData };
-        
-        // Update state
-        setParticipations(mergedParticipations);
-        
-        // Store back to localStorage for persistence
-        localStorage.setItem(userKey, JSON.stringify(mergedParticipations));
-      } catch (localError) {
-        console.error("Error handling localStorage:", localError);
-        // Fallback to just server data if localStorage fails
-        setParticipations(participationsData);
-      }
-      
-      return participationsData;
+      return mockParticipations;
     } catch (error: any) {
-      console.error("Failed to load participation status from server:", error);
+      console.error("Error loading participations:", error);
       toast({
-        title: "Error loading participations",
-        description: error.message,
+        title: "エラー",
+        description: "イベント参加情報の取得に失敗しました",
         variant: "destructive",
       });
-      return {};
+      return [];
     }
-  };
+  }, [toast]);
 
   return {
     participations,

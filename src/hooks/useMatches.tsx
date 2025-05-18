@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,32 +24,74 @@ export function useMatches() {
       setLoading(true);
       console.log("Fetching matches...");
       
-      const { matchesData, userId } = await fetchUserMatches();
-      console.log(`Total matches available: ${matchesData?.length || 0}`);
+      // モックデータの作成
+      const mockMatches = [
+        {
+          id: "mock-match-1",
+          user1_id: "mock-user-id",
+          user2_id: "mock-match-user-1",
+          created_at: new Date().toISOString(),
+          status: "active",
+          user1_last_read: new Date().toISOString(),
+          user2_last_read: new Date().toISOString(),
+          user1: {
+            id: "mock-user-id",
+            created_at: new Date().toISOString(),
+            first_name: "太郎",
+            last_name: "同志社",
+            avatar_url: "/lovable-uploads/dcec855f-513e-4a70-aae4-fa4c16529c99.png",
+          },
+          user2: {
+            id: "mock-match-user-1",
+            created_at: new Date().toISOString(),
+            first_name: "花子",
+            last_name: "京都",
+            avatar_url: "/lovable-uploads/dd8c0f48-e885-4658-8781-f1fb6bde0fd3.png",
+          },
+          lastMessage: {
+            id: "mock-msg-1",
+            content: "こんにちは！よろしくお願いします。",
+            created_at: new Date().toISOString(),
+            match_id: "mock-match-1",
+            sender_id: "mock-match-user-1",
+          },
+          unreadCount: 0,
+        },
+        {
+          id: "mock-match-2",
+          user1_id: "mock-user-id",
+          user2_id: "mock-match-user-2",
+          created_at: new Date().toISOString(),
+          status: "active",
+          user1_last_read: new Date().toISOString(),
+          user2_last_read: new Date().toISOString(),
+          user1: {
+            id: "mock-user-id",
+            created_at: new Date().toISOString(),
+            first_name: "太郎",
+            last_name: "同志社",
+            avatar_url: "/lovable-uploads/dcec855f-513e-4a70-aae4-fa4c16529c99.png",
+          },
+          user2: {
+            id: "mock-match-user-2",
+            created_at: new Date().toISOString(),
+            first_name: "John",
+            last_name: "Smith",
+            avatar_url: "/lovable-uploads/9797c959-5651-45e5-b6fc-2d1ff0c0b223.png",
+          },
+          lastMessage: {
+            id: "mock-msg-2",
+            content: "Hi there! Nice to meet you.",
+            created_at: new Date().toISOString(),
+            match_id: "mock-match-2",
+            sender_id: "mock-user-id",
+          },
+          unreadCount: 0,
+        }
+      ];
       
-      if ((matchesData || []).length > 0) {
-        console.log("Sample match data:", matchesData[0]);
-      } else {
-        console.log("No matches found");
-      }
-
-      // Process each match to get latest message and other details
-      const processedMatches = await Promise.all((matchesData || []).map(match => 
-        processMatch(match, userId)
-      ));
-
-      // Filter out any null matches (from processing errors)
-      const validMatches = processedMatches.filter(match => match !== null) as Match[];
-
-      // Sort matches by the last message's created_at timestamp (most recent first)
-      const sortedMatches = validMatches.sort((a, b) => {
-        const timeA = a.lastMessage?.created_at ? new Date(a.lastMessage.created_at).getTime() : 0;
-        const timeB = b.lastMessage?.created_at ? new Date(b.lastMessage.created_at).getTime() : 0;
-        return timeB - timeA; // Most recent first
-      });
-
-      console.log(`Processed ${sortedMatches.length} valid matches`);
-      setMatches(sortedMatches);
+      console.log(`Generated ${mockMatches.length} mock matches`);
+      setMatches(mockMatches as Match[]);
       initialFetchDoneRef.current = true;
     } catch (error: any) {
       console.error("Error fetching matches:", error);
