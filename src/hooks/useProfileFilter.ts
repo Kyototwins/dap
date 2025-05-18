@@ -76,7 +76,7 @@ export function useProfileFilter() {
           hobby_photo_comment: profile.hobby_photo_comment || null,
           pet_photo_url: profile.pet_photo_url || null,
           pet_photo_comment: profile.pet_photo_comment || null,
-          fcm_token: (profile as any).fcm_token || null
+          fcm_token: profile.fcm_token || null
         };
         return completeProfile;
       }) || [];

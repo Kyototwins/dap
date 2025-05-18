@@ -1,4 +1,3 @@
-
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { initializeApp } from 'firebase/app';
 import { supabase } from '@/integrations/supabase/client';
@@ -63,15 +62,9 @@ export const requestNotificationPermission = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           try {
-            // Since fcm_token might not exist in the database schema yet,
-            // use a raw update query instead
             const { data, error } = await supabase
               .from('profiles')
-              .update({ 
-                // Use explicit casting for TypeScript to pass type checking
-                // This will be processed correctly by Supabase API
-                "fcm_token": currentToken as any 
-              })
+              .update({ fcm_token: currentToken })
               .eq('id', user.id);
               
             if (error) {
@@ -112,12 +105,12 @@ export const areNotificationsEnabled = async () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')  // Use * instead of specific fields that might not exist yet
+        .select('fcm_token')
         .eq('id', user.id)
         .single();
         
       // Check if data exists and has the fcm_token property or field
-      return !!(data && (data as any).fcm_token);
+      return !!(data && data.fcm_token);
     } catch (err) {
       console.error('Error checking notification status:', err);
       return false;
@@ -137,10 +130,7 @@ export const disableNotifications = async () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ 
-          // Use explicit casting to pass TypeScript type checking
-          "fcm_token": null as any 
-        })
+        .update({ fcm_token: null })
         .eq('id', user.id);
         
       if (error) {

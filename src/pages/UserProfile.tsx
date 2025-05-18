@@ -3,98 +3,120 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Profile as ProfileType } from "@/types/messages";
-import { useAuth } from "@/hooks/useAuth";
-import { UserProfileCover } from "@/components/profile/UserProfileCover";
+import { Profile } from "@/types/messages";
 import { UserProfileHeader } from "@/components/profile/UserProfileHeader";
-import { UserProfileActions } from "@/components/profile/UserProfileActions";
-import { UserProfileProgress } from "@/components/profile/UserProfileProgress";
 import { UserProfileAboutTab } from "@/components/profile/UserProfileAboutTab";
-import { useUserMatchStatus } from "@/components/profile/hooks/useUserMatchStatus";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PlaneIcon } from "lucide-react";
 
 export default function UserProfile() {
-  const { id } = useParams();
-  const [profile, setProfile] = useState<ProfileType | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const authOperations = useAuth();
 
   useEffect(() => {
-    loadProfile();
+    if (id) {
+      fetchProfile(id);
+    }
   }, [id]);
 
-  const loadProfile = async () => {
+  const fetchProfile = async (profileId: string) => {
     try {
-      // Check if this is the current user's profile
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (user && id === user.id) {
-        setIsCurrentUser(true);
-      }
-
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", id)
+        .eq("id", profileId)
         .single();
 
       if (error) throw error;
-      setProfile(data as ProfileType);
+
+      // Create a complete profile object with required fields
+      const completeProfile: Profile = {
+        id: data.id,
+        created_at: data.created_at,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        age: data.age,
+        gender: data.gender,
+        origin: data.origin,
+        about_me: data.about_me,
+        avatar_url: data.avatar_url,
+        sexuality: data.sexuality,
+        university: data.university,
+        department: data.department,
+        year: data.year,
+        image_url_1: data.image_url_1,
+        image_url_2: data.image_url_2,
+        ideal_date: data.ideal_date,
+        life_goal: data.life_goal,
+        superpower: data.superpower,
+        worst_nightmare: data.worst_nightmare,
+        friend_activity: data.friend_activity,
+        best_quality: data.best_quality,
+        photo_comment: data.photo_comment,
+        hobby_photo_url: data.hobby_photo_url,
+        hobby_photo_comment: data.hobby_photo_comment,
+        hobbies: data.hobbies,
+        languages: data.languages,
+        learning_languages: data.learning_languages,
+        language_levels: data.language_levels,
+        pet_photo_url: data.pet_photo_url,
+        pet_photo_comment: data.pet_photo_comment,
+        fcm_token: data.fcm_token || null // Add FCM token with fallback
+      };
+      
+      setProfile(completeProfile);
     } catch (error: any) {
+      console.error("Error fetching profile:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: "Failed to load user profile",
         variant: "destructive",
       });
+      navigate("/matches");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleMessage = () => {
-    // Navigate to messages with this user
-    navigate("/messages");
-  };
-
-  const handleEditProfile = () => {
-    navigate("/profile/setup");
-  };
-
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-doshisha-purple"></div>
+      <div className="flex flex-1 items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-doshisha-purple mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading profile...</p>
+        </div>
       </div>
     );
   }
 
-  if (!profile || !id) {
+  if (!profile) {
     return (
-      <div className="p-6 text-center">
-        <p className="text-muted-foreground">Profile not found</p>
+      <div className="flex flex-1 items-center justify-center p-4">
+        <div className="text-center">
+          <PlaneIcon className="h-12 w-12 mx-auto text-gray-400" />
+          <h2 className="mt-2 text-xl font-semibold">Profile Not Found</h2>
+          <p className="mt-1 text-gray-600">This user profile doesn't exist or has been removed.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="pb-6">
-      <UserProfileCover imageUrl={profile.image_url_1} />
+    <div className="flex flex-col min-h-screen">
       <UserProfileHeader profile={profile} />
-      <div className="px-4">
-        <UserProfileActions
-          isCurrentUser={isCurrentUser}
-          profileId={id}
-          onEditProfileClick={handleEditProfile}
-        />
-        {isCurrentUser && (
-          <UserProfileProgress progress={90} />
-        )}
-        <div className="mt-6">
-          <h2 className="text-xl font-bold mb-4">About</h2>
+      
+      <Tabs defaultValue="about" className="w-full flex-1">
+        <TabsList className="grid w-full grid-cols-1 bg-gray-100 p-1 sticky top-0 z-10">
+          <TabsTrigger value="about">About</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="about" className="pt-2 flex-1">
           <UserProfileAboutTab profile={profile} />
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

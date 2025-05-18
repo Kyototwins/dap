@@ -32,7 +32,7 @@ export function NotificationSettings() {
             .single();
           
           // Access fcm_token safely with type assertion
-          const hasToken = !!(data && (data as any).fcm_token);
+          const hasToken = !!(data && data.fcm_token);
           setNotificationsEnabled(hasToken);
         }
       } catch (error) {

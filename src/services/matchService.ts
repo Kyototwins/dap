@@ -1,117 +1,118 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { Match } from "@/types/messages";
-import { createStandardizedUserObject, processLanguageLevels } from "@/utils/profileDataUtils";
+import type { Match, Profile } from "@/types/messages";
 
-/**
- * Fetches matches for the current authenticated user
- */
-export async function fetchUserMatches() {
-  // Get current user
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    console.error("User not authenticated");
-    throw new Error("Not authenticated");
-  }
+export const fetchUserMatches = async () => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
 
-  console.log("Authenticated user ID:", user.id);
+    const { data: matchesData, error } = await supabase
+      .from("matches")
+      .select("*")
+      .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
 
-  // Get matches where user is either user1 or user2
-  const { data: matchesData, error } = await supabase
-    .from("matches")
-    .select(`
-      id,
-      user1_id,
-      user2_id,
-      status,
-      created_at,
-      user1:profiles!matches_user1_id_fkey (*),
-      user2:profiles!matches_user2_id_fkey (*)
-    `)
-    .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+    if (error) throw error;
 
-  if (error) {
-    console.error("Database error fetching matches:", error);
+    return { matchesData, userId: user.id };
+  } catch (error) {
+    console.error("Error fetching matches:", error);
     throw error;
   }
-  
-  // Log all matches first to understand what's happening
-  console.log(`Retrieved ${matchesData?.length || 0} raw matches (all statuses) for user ${user.id}`);
-  if (matchesData && matchesData.length > 0) {
-    console.log("All matches statuses:", matchesData.map(m => m.status).join(', '));
-  }
-  
-  return { matchesData, userId: user.id };
-}
+};
 
-/**
- * Fetches the latest message for a given match
- */
-export async function fetchLatestMessage(matchId: string) {
-  const { data: latestMessages, error: messagesError } = await supabase
-    .from("messages")
-    .select("content, created_at, sender_id")
-    .eq("match_id", matchId)
-    .order("created_at", { ascending: false })
-    .limit(1);
+// Fix for matchService.ts to handle the Profile type correctly with fcm_token
+
+export const processMatch = async (match: any, userId: string) => {
+  try {
+    // Get other user in the match
+    const otherUserId = match.user1_id === userId ? match.user2_id : match.user1_id;
     
-  if (messagesError) {
-    console.error("Error fetching messages for match:", matchId, messagesError);
-  }
-  
-  return latestMessages && latestMessages.length > 0 ? latestMessages[0] : null;
-}
+    // Get other user profile
+    const { data: otherUserData, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', otherUserId)
+      .single();
+    
+    if (profileError || !otherUserData) {
+      console.error("Error fetching other user profile:", profileError);
+      return null;
+    }
+    
+    // Create proper Profile object with all required fields including fcm_token
+    const otherUser: Profile = {
+      id: otherUserData.id,
+      created_at: otherUserData.created_at,
+      first_name: otherUserData.first_name,
+      last_name: otherUserData.last_name,
+      age: otherUserData.age,
+      gender: otherUserData.gender,
+      origin: otherUserData.origin,
+      about_me: otherUserData.about_me,
+      avatar_url: otherUserData.avatar_url,
+      sexuality: otherUserData.sexuality,
+      university: otherUserData.university,
+      department: otherUserData.department,
+      year: otherUserData.year,
+      image_url_1: otherUserData.image_url_1,
+      image_url_2: otherUserData.image_url_2,
+      ideal_date: otherUserData.ideal_date,
+      life_goal: otherUserData.life_goal,
+      superpower: otherUserData.superpower,
+      worst_nightmare: otherUserData.worst_nightmare,
+      friend_activity: otherUserData.friend_activity,
+      best_quality: otherUserData.best_quality,
+      photo_comment: otherUserData.photo_comment,
+      hobby_photo_url: otherUserData.hobby_photo_url,
+      hobby_photo_comment: otherUserData.hobby_photo_comment,
+      hobbies: otherUserData.hobbies,
+      languages: otherUserData.languages,
+      learning_languages: otherUserData.learning_languages,
+      language_levels: otherUserData.language_levels,
+      pet_photo_url: otherUserData.pet_photo_url,
+      pet_photo_comment: otherUserData.pet_photo_comment,
+      fcm_token: otherUserData.fcm_token || null
+    };
+    
+    // Process the rest of match data
+    const enhancedMatch = {
+      ...match,
+      otherUser
+    };
 
-/**
- * Processes a match to create a standardized Match object
- */
-export async function processMatch(match: any, currentUserId: string): Promise<Match | null> {
-  // Determine which user is the "other" user
-  const otherUser = match.user1_id === currentUserId ? match.user2 : match.user1;
-  if (!otherUser) {
-    console.error(`Missing other user data for match ${match.id}`);
+    // Fetch the last message for this match
+    const { data: lastMessageData, error: lastMessageError } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('match_id', match.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (lastMessageError) {
+      console.error("Error fetching last message:", lastMessageError);
+    }
+
+    // Fetch unread message count
+    const { count: unreadCount, error: unreadCountError } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact' })
+      .eq('match_id', match.id)
+      .neq('sender_id', userId); // Assuming the current user is reading
+
+    if (unreadCountError) {
+      console.error("Error fetching unread message count:", unreadCountError);
+    }
+
+    const enhancedMatchWithLastMessage = {
+      ...enhancedMatch,
+      lastMessage: lastMessageData || null,
+      unreadCount: unreadCount || 0
+    };
+
+    return enhancedMatchWithLastMessage;
+  } catch (error) {
+    console.error("Error processing match:", error);
     return null;
   }
-  
-  console.log(`Processing match ${match.id} with other user:`, otherUser.id);
-  
-  // Fetch the most recent message for this match
-  const lastMessage = await fetchLatestMessage(match.id);
-  console.log(`Match ${match.id} last message:`, lastMessage || "No messages");
-  
-  // Count unread messages
-  let unreadCount = 0;
-  if (lastMessage && lastMessage.sender_id === otherUser.id) {
-    // For now just mark as 1 if the last message is from other user
-    unreadCount = 1;
-  }
-  
-  // Create standardized other user object
-  const otherUserWithRequiredProps = createStandardizedUserObject(otherUser);
-  if (!otherUserWithRequiredProps) return null;
-  
-  // Create a match object that conforms to our Match interface
-  const matchObj: Match = {
-    id: match.id,
-    created_at: match.created_at,
-    // Include both naming conventions
-    user_id_1: match.user1_id,
-    user_id_2: match.user2_id,
-    user1_id: match.user1_id,
-    user2_id: match.user2_id,
-    // Set default values for accepted fields
-    accepted_1: false,
-    accepted_2: false,
-    status: match.status,
-    otherUser: otherUserWithRequiredProps,
-    lastMessage: lastMessage ? {
-      id: '',  // Add this ID field
-      content: lastMessage.content,
-      created_at: lastMessage.created_at,
-      sender_id: lastMessage.sender_id
-    } : undefined,
-    unreadCount: unreadCount
-  };
-  
-  return matchObj;
-}
+};

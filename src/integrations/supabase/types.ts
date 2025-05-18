@@ -337,6 +337,7 @@ export type Database = {
           created_at: string | null
           department: string | null
           email_digest_enabled: boolean | null
+          fcm_token: string | null
           first_name: string | null
           friend_activity: string | null
           gender: string | null
@@ -370,6 +371,7 @@ export type Database = {
           created_at?: string | null
           department?: string | null
           email_digest_enabled?: boolean | null
+          fcm_token?: string | null
           first_name?: string | null
           friend_activity?: string | null
           gender?: string | null
@@ -403,6 +405,7 @@ export type Database = {
           created_at?: string | null
           department?: string | null
           email_digest_enabled?: boolean | null
+          fcm_token?: string | null
           first_name?: string | null
           friend_activity?: string | null
           gender?: string | null

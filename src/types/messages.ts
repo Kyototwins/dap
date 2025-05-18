@@ -1,3 +1,4 @@
+
 // Define the message type
 export interface Message {
   id: string;
