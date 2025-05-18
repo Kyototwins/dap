@@ -52,6 +52,18 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
         }
       }
       
+      // Update lastMessage in the match object if it doesn't exist or is outdated
+      if (!match.lastMessage && messages.length > 0) {
+        const latestMessage = messages[messages.length - 1];
+        match.lastMessage = {
+          id: latestMessage.id,
+          content: latestMessage.content,
+          created_at: latestMessage.created_at,
+          sender_id: latestMessage.sender_id,
+          match_id: match.id
+        };
+      }
+      
       // Mark messages as read if needed
       if (match.unreadCount && match.unreadCount > 0) {
         console.log(`Marking ${match.unreadCount} messages as read`);
