@@ -78,7 +78,7 @@ export function useAuth() {
         setInitialized(true);
         setAuthReady(true);
         initializingRef.current = false;
-      }, 100); // Increased from 50ms to 100ms for more reliable state update
+      }, 200); // Increased to 200ms for more reliable state updates
     };
     
     setupAuth();

@@ -17,6 +17,7 @@ export default function Login() {
   const { loading, authReady, connectionError, offline, handleLogin, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const redirectedRef = useRef(false);
+  const redirectionTimeoutRef = useRef<number | null>(null);
   
   // Track authentication state and handle redirections - only redirect once
   useEffect(() => {
@@ -40,8 +41,20 @@ export default function Login() {
     if (isAuthenticated && !isSubmitting) {
       console.log("User is authenticated, redirecting to matches", user?.id);
       redirectedRef.current = true;
-      navigate("/matches", { replace: true });
+      
+      // Use timeout to avoid race condition with state updates
+      redirectionTimeoutRef.current = window.setTimeout(() => {
+        console.log("Executing navigation to /matches");
+        navigate("/matches", { replace: true });
+      }, 100);
     }
+    
+    return () => {
+      // Clear timeout on unmount
+      if (redirectionTimeoutRef.current) {
+        clearTimeout(redirectionTimeoutRef.current);
+      }
+    };
   }, [isAuthenticated, user, navigate, isSubmitting, authReady]);
 
   const handleSubmit = async (e: React.FormEvent) => {

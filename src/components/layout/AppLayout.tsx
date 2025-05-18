@@ -19,10 +19,11 @@ export function AppLayout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
-  const { handleLogout, isAuthenticated, loading, authReady } = useAuth();
+  const { handleLogout, isAuthenticated, loading, authReady, user } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const authCheckedRef = useRef(false);
   const [shouldRender, setShouldRender] = useState(false);
+  const redirectTimeoutRef = useRef<number | null>(null);
   
   // Check authentication and redirect only once when auth is ready
   useEffect(() => {
@@ -35,24 +36,37 @@ export function AppLayout({ children }: LayoutProps) {
       isAuthenticated, 
       authReady, 
       path: location.pathname,
-      authCheckedRef: authCheckedRef.current
+      authCheckedRef: authCheckedRef.current,
+      userId: user?.id
     });
     
-    if (!isAuthenticated) {
-      console.log("User is not authenticated in AppLayout, redirecting to login");
-      if (!authCheckedRef.current) {
-        authCheckedRef.current = true;
+    // If not authenticated and we haven't redirected yet
+    if (!isAuthenticated && !authCheckedRef.current) {
+      console.log("User is not authenticated in AppLayout, scheduling redirect to login");
+      authCheckedRef.current = true;
+      
+      // Use timeout to prevent immediate redirect that could conflict with state updates
+      redirectTimeoutRef.current = window.setTimeout(() => {
+        console.log("Executing navigation to /login from AppLayout");
         navigate("/login", { replace: true });
-      }
+      }, 100);
       return;
     }
     
     // Only render content when authenticated
     if (isAuthenticated && !shouldRender) {
+      console.log("User authenticated in AppLayout, enabling render");
       setShouldRender(true);
       authCheckedRef.current = true;
     }
-  }, [isAuthenticated, authReady, navigate, location.pathname, shouldRender]);
+    
+    return () => {
+      // Clean up timeout
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
+  }, [isAuthenticated, authReady, navigate, location.pathname, shouldRender, user]);
 
   const navItems = [
     { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
@@ -84,6 +98,10 @@ export function AppLayout({ children }: LayoutProps) {
       });
       
       await handleLogout();
+      
+      // Reset refs to allow future auth checks
+      authCheckedRef.current = false;
+      setShouldRender(false);
       
       // Navigation will be handled by auth state change
     } catch (error) {
