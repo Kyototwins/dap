@@ -5,13 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormData, AdditionalDataType, ImageUploadState } from "@/types/profile";
 import { useProfileImageUpload } from "./useProfileImageUpload";
 import { updateUserProfile } from "@/services/profileService";
-import { useToast } from "@/components/ui/use-toast";
 
 export function useProfileSubmission() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { uploadImage } = useProfileImageUpload();
-  const { toast } = useToast();
 
   const handleSubmit = async (
     e: React.FormEvent, 
@@ -32,7 +30,7 @@ export function useProfileSubmission() {
       let imageUrl1 = images.image1.preview;
       let imageUrl2 = images.image2.preview;
       let hobbyPhotoUrl = images.hobby.preview;
-      let petPhotoUrl = images.pet.preview;  // Changed back from foodPhotoUrl
+      let foodPhotoUrl = images.food.preview;  // Changed from petPhotoUrl
 
       // Check if these are blob URLs which need to be uploaded
       const isBlobUrl = (url: string) => url.startsWith('blob:');
@@ -66,11 +64,11 @@ export function useProfileSubmission() {
         hobbyPhotoUrl = "";
       }
 
-      if (images.pet.file) {  // Changed back from food.file
-        const url = await uploadImage(images.pet.file, 'pets');  // Changed back from 'foods' to 'pets'
-        if (url) petPhotoUrl = url;
-      } else if (petPhotoUrl && isBlobUrl(petPhotoUrl)) {
-        petPhotoUrl = "";
+      if (images.food.file) {
+        const url = await uploadImage(images.food.file, 'foods');  // Changed from 'pets' to 'foods'
+        if (url) foodPhotoUrl = url;
+      } else if (foodPhotoUrl && isBlobUrl(foodPhotoUrl)) {
+        foodPhotoUrl = "";
       }
 
       await updateUserProfile(
@@ -81,26 +79,13 @@ export function useProfileSubmission() {
         imageUrl1,
         imageUrl2,
         hobbyPhotoUrl,
-        petPhotoUrl  // Changed back from foodPhotoUrl
+        foodPhotoUrl  // Changed from petPhotoUrl
       );
 
-      // Show success message
-      toast({
-        title: "Profile Updated",
-        description: "Your profile has been successfully updated.",
-        variant: "default",
-      });
-
-      // Navigate to the profile page instead of matches
-      navigate("/profile");
+      navigate("/matches");
 
     } catch (error: any) {
       console.error("Profile submission error:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update profile",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }

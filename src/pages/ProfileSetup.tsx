@@ -24,7 +24,7 @@ export default function ProfileSetup() {
     learning_languages: [],
     photoComment: "", // Keep this, but it won't be used
     hobbyPhotoComment: "",
-    petPhotoComment: "",  // Changed back from foodPhotoComment
+    foodPhotoComment: "",  // Changed from petPhotoComment
   });
   
   const [additionalData, setAdditionalData] = useState<AdditionalDataType>({
@@ -41,7 +41,7 @@ export default function ProfileSetup() {
     image1: { file: null, preview: "", uploading: false },
     image2: { file: null, preview: "", uploading: false },
     hobby: { file: null, preview: "", uploading: false },
-    pet: { file: null, preview: "", uploading: false }  // Changed back from food to pet
+    food: { file: null, preview: "", uploading: false }  // Changed from pet to food
   });
 
   const { 
@@ -56,7 +56,7 @@ export default function ProfileSetup() {
     fetchUserProfile(setFormData, setAdditionalData, setImages);
   }, []);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2' | 'hobby' | 'pet') => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'image1' | 'image2' | 'hobby' | 'food') => {
     const file = e.target.files?.[0];
     if (file) {
       console.log(`Selected file for ${type}:`, file.name, "File object:", file);
