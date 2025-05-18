@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { useProfileOperations } from "@/hooks/useProfileOperations";
@@ -23,7 +24,7 @@ export default function ProfileSetup() {
     learning_languages: [],
     photoComment: "", // Keep this, but it won't be used
     hobbyPhotoComment: "",
-    petPhotoComment: "",
+    petPhotoComment: "",  // Changed back from foodPhotoComment
   });
   
   const [additionalData, setAdditionalData] = useState<AdditionalDataType>({
@@ -40,7 +41,7 @@ export default function ProfileSetup() {
     image1: { file: null, preview: "", uploading: false },
     image2: { file: null, preview: "", uploading: false },
     hobby: { file: null, preview: "", uploading: false },
-    pet: { file: null, preview: "", uploading: false }
+    pet: { file: null, preview: "", uploading: false }  // Changed back from food to pet
   });
 
   const { 
