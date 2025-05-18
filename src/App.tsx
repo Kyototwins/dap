@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +24,7 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Help from "./pages/Help";
+import { HomeScreenWidgetPrompt } from '@/components/common/HomeScreenWidgetPrompt';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -32,7 +32,7 @@ const queryClient = new QueryClient();
 function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const { HomeScreenPromptComponent, shouldShowPrompt } = useHomeScreenPrompt();
+  const { HomeScreenPromptComponent, shouldShowPrompt, shouldShowWidgetPrompt, HomeScreenWidgetPrompt } = useHomeScreenPrompt();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -68,6 +68,9 @@ function App() {
               
               {/* Show home screen prompt for logged in users */}
               {session && shouldShowPrompt && <HomeScreenPromptComponent />}
+              
+              {/* Show widget prompt for logged in users */}
+              {session && shouldShowWidgetPrompt && <HomeScreenWidgetPrompt />}
               
               <Routes>
                 <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />

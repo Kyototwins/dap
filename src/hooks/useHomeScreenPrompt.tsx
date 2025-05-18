@@ -3,14 +3,18 @@ import { useState, useEffect } from 'react';
 import { useIsMobile } from './use-mobile';
 import { HomeScreenPrompt } from '@/components/common/HomeScreenPrompt';
 import { HomeScreenPromptMobile } from '@/components/common/HomeScreenPromptMobile';
+import { HomeScreenWidgetPrompt } from '@/components/common/HomeScreenWidgetPrompt';
 
 export function useHomeScreenPrompt() {
   const isMobile = useIsMobile();
   const [shouldShowPrompt, setShouldShowPrompt] = useState(false);
+  const [shouldShowWidgetPrompt, setShouldShowWidgetPrompt] = useState(false);
   
   useEffect(() => {
     // Check if we should show the prompt
     const hasShownPrompt = localStorage.getItem("hasShownHomeScreenPrompt");
+    const hasShownWidgetPrompt = localStorage.getItem("hasShownWidgetPrompt");
+    
     if (!hasShownPrompt) {
       // Small delay to ensure it appears after app has loaded
       const timer = setTimeout(() => {
@@ -36,6 +40,11 @@ export function useHomeScreenPrompt() {
       
       return () => clearTimeout(timer);
     }
+    
+    // Check if we should show the widget prompt
+    if (!hasShownWidgetPrompt) {
+      setShouldShowWidgetPrompt(true);
+    }
   }, []);
   
   // Return the appropriate component based on device type
@@ -46,6 +55,8 @@ export function useHomeScreenPrompt() {
   return { 
     shouldShowPrompt,
     setShouldShowPrompt,
-    HomeScreenPromptComponent 
+    shouldShowWidgetPrompt,
+    HomeScreenPromptComponent,
+    HomeScreenWidgetPrompt
   };
 }
