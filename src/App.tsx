@@ -1,16 +1,19 @@
-
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { supabase } from './integrations/supabase/client';
+import Account from './pages/Account';
+import Home from './pages/Home';
+import Login from './pages/Login';
 import Matches from './pages/Matches';
 import Messages from './pages/Messages';
 import Profile from './pages/Profile';
 import Events from './pages/Events';
+import OfferedExperiences from './pages/OfferedExperiences';
 import { NotificationProvider } from "@/contexts/NotificationContext";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/toaster"
 import { FirebaseInitializer } from "@/components/notifications/FirebaseInitializer";
-import Login from './pages/Login';
-import { AppLayout } from './components/layout/AppLayout';
 
 function App() {
   const [session, setSession] = useState(null)
@@ -34,23 +37,24 @@ function App() {
         <Router>
           <div className="container" style={{ padding: '50px 0 100px 0' }}>
             <Routes>
-              <Route path="/" element={<Navigate to="/matches" />} />
-              <Route path="/events" element={<Events />} />
+              <Route exact path="/" element={<Home />} />
+              <Route exact path="/events" element={<Events />} />
+              <Route exact path="/experiences" element={<OfferedExperiences />} />
               <Route
                 path="/login"
                 element={
                   !session ? (
                     <Login />
                   ) : (
-                    <Navigate to="/matches" />
+                    <Navigate to="/account" />
                   )
                 }
               />
               <Route
-                path="/matches"
+                path="/account"
                 element={
                   session ? (
-                    <AppLayout><Matches /></AppLayout>
+                    <Account session={session} />
                   ) : (
                     <Navigate to="/login" />
                   )
@@ -60,7 +64,7 @@ function App() {
                 path="/profile"
                 element={
                   session ? (
-                    <AppLayout><Profile /></AppLayout>
+                    <Profile session={session} />
                   ) : (
                     <Navigate to="/login" />
                   )
@@ -70,7 +74,17 @@ function App() {
                 path="/profile/:userId"
                 element={
                   session ? (
-                    <AppLayout><Profile /></AppLayout>
+                    <Profile session={session} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/matches"
+                element={
+                  session ? (
+                    <Matches session={session} />
                   ) : (
                     <Navigate to="/login" />
                   )
@@ -80,7 +94,7 @@ function App() {
                 path="/messages"
                 element={
                   session ? (
-                    <AppLayout><Messages /></AppLayout>
+                    <Messages session={session} />
                   ) : (
                     <Navigate to="/login" />
                   )

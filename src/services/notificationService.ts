@@ -11,7 +11,6 @@ export async function saveFcmToken(token: string) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("認証されていません");
     
-    // Make sure we're only updating the fcm_token field
     const { error } = await supabase
       .from('profiles')
       .update({ fcm_token: token })
