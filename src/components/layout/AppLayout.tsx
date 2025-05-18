@@ -4,11 +4,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import { DapLogo } from "@/components/common/DapLogo";
-import { NotificationIndicator } from "@/components/common/NotificationIndicator";
-import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
-import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,22 +14,12 @@ interface LayoutProps {
 export function AppLayout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
-  const { handleLogout, isAuthenticated, loading } = useAuth();
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      console.log("User not authenticated in AppLayout, redirecting to login");
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, loading, navigate]);
 
   const navItems = [
-    { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
-    { icon: MessageSquare, label: "Messages", path: "/messages", hasNotification: hasUnreadMessages },
-    { icon: Calendar, label: "Events", path: "/events", hasNotification: hasUnreadEvents },
-    { icon: User, label: "Profile", path: "/profile", hasNotification: false },
+    { icon: Search, label: "Matching", path: "/matches" },
+    { icon: MessageSquare, label: "Messages", path: "/messages" },
+    { icon: Calendar, label: "Events", path: "/events" },
+    { icon: User, label: "Profile", path: "/profile" },
   ];
 
   const handleNavigation = (path: string) => {
@@ -44,24 +31,14 @@ export function AppLayout({ children }: LayoutProps) {
     }
   };
 
-  const handleLogoutClick = async () => {
+  const handleLogout = async () => {
     try {
-      await handleLogout();
-      // Navigate to the home page after logout
-      navigate('/', { replace: true });
-      console.log("Logged out and redirected to home page");
+      await supabase.auth.signOut();
+      navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return null; // Don't render anything, the useEffect will handle redirection
-  }
 
   return (
     <div className="min-h-screen pb-16">
@@ -90,7 +67,7 @@ export function AppLayout({ children }: LayoutProps) {
                   <Button 
                     variant="ghost" 
                     className="justify-start text-red-600 hover:text-red-600 hover:bg-red-50" 
-                    onClick={handleLogoutClick}
+                    onClick={handleLogout}
                   >
                     <LogOut className="mr-2 h-5 w-5" />
                     Logout
@@ -114,7 +91,7 @@ export function AppLayout({ children }: LayoutProps) {
                 key={item.path}
                 onClick={() => handleNavigation(item.path)}
                 className={cn(
-                  "flex flex-col items-center justify-center w-full h-full gap-1 relative",
+                  "flex flex-col items-center justify-center w-full h-full gap-1",
                   "text-gray-500 hover:text-doshisha-purple transition-colors",
                   location.pathname === item.path && "text-doshisha-purple font-medium"
                 )}
@@ -124,7 +101,6 @@ export function AppLayout({ children }: LayoutProps) {
                   location.pathname === item.path && "text-doshisha-purple"
                 )} />
                 <span className="text-xs">{item.label}</span>
-                {item.hasNotification && <NotificationIndicator className="bg-blue-500" />}
               </button>
             ))}
           </div>

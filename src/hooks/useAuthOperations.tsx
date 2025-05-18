@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useConnectionStatus } from "./useConnectionStatus";
 import { AuthFormData } from "@/types/auth";
@@ -17,20 +17,19 @@ export function useAuthOperations() {
     setLoading(true);
 
     try {
-      // Check offline status
+      // オフライン状態のチェック
       if (offline) {
         throw new Error("インターネット接続がありません。ネットワーク接続を確認してください。");
       }
 
-      // Test connection
+      // 接続テスト
       const isConnected = await testConnection();
       if (!isConnected) {
         throw new Error("サーバーに接続できません。ネットワーク接続を確認してください。");
       }
 
-      // Signup process
-      console.log("Attempting to sign up user:", email);
-      const { data, error } = await supabase.auth.signUp({
+      // サインアップ処理
+      const signUpPromise = supabase.auth.signUp({
         email,
         password,
         options: {
@@ -39,24 +38,28 @@ export function useAuthOperations() {
           },
         },
       });
+      
+      // タイムアウト処理
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("登録処理がタイムアウトしました。後でもう一度お試しください。")), 15000);
+      });
+      
+      // どちらか早い方を採用
+      const { data, error } = await Promise.race([signUpPromise, timeoutPromise]) as any;
 
       if (error) {
-        console.error("Signup API error:", error);
         throw error;
       }
 
-      console.log("Signup successful, data:", data);
-
-      // Show success message
+      // メール送信成功のメッセージを表示
       toast({
         title: "確認メールを送信しました",
         description: "メールに記載されているリンクをクリックして、登録を完了してください。",
       });
 
-      // Redirect to login page
+      // ログインページにリダイレクト
       navigate("/login");
     } catch (error: any) {
-      console.error("Signup error:", error);
       let errorMessage = "アカウントの作成に失敗しました。";
       
       if (error instanceof Error) {
@@ -86,46 +89,67 @@ export function useAuthOperations() {
     setLoading(true);
 
     try {
-      console.log("Login attempt for:", email);
-      
-      // Check offline status
+      // オフライン状態のチェック
       if (offline) {
         throw new Error("インターネット接続がありません。ネットワーク接続を確認してください。");
       }
 
-      // Test connection
+      // 接続テスト
       const isConnected = await testConnection();
       if (!isConnected) {
         throw new Error("サーバーに接続できません。ネットワーク接続を確認してください。");
       }
 
-      // Login process with more verbose logging
-      console.log("Connection verified, attempting to authenticate...");
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // ログイン処理
+      const loginPromise = supabase.auth.signInWithPassword({
         email,
         password,
       });
+      
+      // タイムアウト処理
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("ログイン処理がタイムアウトしました。後でもう一度お試しください。")), 15000);
+      });
+      
+      // どちらか早い方を採用
+      const { data: authData, error: authError } = await Promise.race([loginPromise, timeoutPromise]) as any;
 
-      if (error) {
-        console.error("Authentication error:", error);
-        throw error;
+      if (authError) {
+        throw authError;
       }
-      
-      console.log("Authentication successful, session created:", !!data.session);
-      
-      // Login success toast
+
+      if (!authData?.user) {
+        throw new Error("ユーザーデータを取得できませんでした。");
+      }
+
+      // プロフィール情報を取得
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        // PGRST116はレコードが見つからないエラー
+        throw profileError;
+      }
+
+      // ログイン成功のトースト表示
       toast({
         title: "ログインしました",
         description: "アプリへようこそ！",
       });
-      
-      console.log("Redirecting to matches page...");
-      // Use replace to prevent going back to login page
-      navigate('/matches', { replace: true });
-      
-      return data;
+
+      // プロフィールの設定状況に応じてリダイレクト
+      const hasProfile = profileData && profileData.first_name && profileData.last_name;
+      if (!hasProfile) {
+        // プロフィール未設定の場合はプロフィール設定画面へ
+        navigate("/profile/setup");
+      } else {
+        // プロフィール設定済みの場合はマッチング画面へ
+        navigate("/matches");
+      }
     } catch (error: any) {
-      console.error("Login error:", error);
       let errorMessage = "ログインに失敗しました。";
       
       if (error instanceof Error) {
@@ -145,8 +169,6 @@ export function useAuthOperations() {
         description: errorMessage,
         variant: "destructive",
       });
-      
-      throw error; // Re-throw so calling code can handle if needed
     } finally {
       setLoading(false);
     }

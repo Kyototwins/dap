@@ -336,7 +336,6 @@ export type Database = {
           best_quality: string | null
           created_at: string | null
           department: string | null
-          email_digest_enabled: boolean | null
           first_name: string | null
           friend_activity: string | null
           gender: string | null
@@ -369,7 +368,6 @@ export type Database = {
           best_quality?: string | null
           created_at?: string | null
           department?: string | null
-          email_digest_enabled?: boolean | null
           first_name?: string | null
           friend_activity?: string | null
           gender?: string | null
@@ -402,7 +400,6 @@ export type Database = {
           best_quality?: string | null
           created_at?: string | null
           department?: string | null
-          email_digest_enabled?: boolean | null
           first_name?: string | null
           friend_activity?: string | null
           gender?: string | null
@@ -439,10 +436,6 @@ export type Database = {
         Args:
           | Record<PropertyKey, never>
           | { p_event_id: string; p_user_id: string }
-        Returns: undefined
-      }
-      setup_email_digest_job: {
-        Args: Record<PropertyKey, never>
         Returns: undefined
       }
     }
