@@ -5,13 +5,16 @@ import { processProfile } from './profileUtils';
 
 // Enhance match with user profile data
 export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: string): Promise<Match> => {
-  // Create a new object to avoid potential recursion issues
+  // Create a new object with only the essential match properties to avoid circular references
   const enhancedMatch: Match = {
-    ...match,
+    id: match.id,
+    user1_id: match.user1_id,
+    user2_id: match.user2_id,
+    created_at: match.created_at,
+    status: match.status || 'pending',
     otherUser: null,
     lastMessage: null,
-    unreadCount: 0,
-    status: match.status || 'pending'
+    unreadCount: 0
   };
   
   try {
