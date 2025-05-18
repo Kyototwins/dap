@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,8 +31,7 @@ const queryClient = new QueryClient();
 function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const { HomeScreenPromptComponent } = useHomeScreenPrompt();
-  const [showPrompt, setShowPrompt] = useState(false);
+  const { HomeScreenPromptComponent, shouldShowPrompt } = useHomeScreenPrompt();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -74,7 +72,7 @@ function App() {
               {session && <FirebaseInitializer />}
               
               {/* Show home screen prompt for logged in users */}
-              {session && showPrompt && <HomeScreenPromptComponent />}
+              {session && shouldShowPrompt && <HomeScreenPromptComponent />}
               
               <Routes>
                 <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />
