@@ -32,7 +32,8 @@ export default function Login() {
     console.log("Login page auth check:", { 
       isAuthenticated, 
       authReady,
-      isSubmitting
+      isSubmitting,
+      user: user?.id
     });
     
     // Simple, clean redirection logic - if authenticated, go to matches
@@ -59,7 +60,8 @@ export default function Login() {
     
     try {
       console.log("Attempting login with email:", email);
-      await handleLogin({ email, password });
+      const result = await handleLogin({ email, password });
+      console.log("Login result:", result ? "success" : "failed");
       
       // Success toast
       toast({

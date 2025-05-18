@@ -64,7 +64,6 @@ export function useAuth() {
         setSession(sessionData.session);
         setUser(sessionData.session?.user || null);
         
-        // Finish setup with a slight delay to ensure state is updated
         finishSetup();
       } catch (error) {
         console.error("Auth initialization error:", error);
@@ -79,7 +78,7 @@ export function useAuth() {
         setInitialized(true);
         setAuthReady(true);
         initializingRef.current = false;
-      }, 50);
+      }, 100); // Increased from 50ms to 100ms for more reliable state update
     };
     
     setupAuth();

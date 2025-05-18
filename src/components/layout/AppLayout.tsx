@@ -1,3 +1,4 @@
+
 import { MessageSquare, User, Search, Calendar, Menu, HelpCircle, LogOut } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -8,7 +9,7 @@ import { NotificationIndicator } from "@/components/common/NotificationIndicator
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect, useRef } from "react";
-import { toast } from "@/hooks/use-toast"; // Correct import path
+import { toast } from "@/hooks/use-toast";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,20 +22,37 @@ export function AppLayout({ children }: LayoutProps) {
   const { handleLogout, isAuthenticated, loading, authReady } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const authCheckedRef = useRef(false);
+  const [shouldRender, setShouldRender] = useState(false);
   
   // Check authentication and redirect only once when auth is ready
   useEffect(() => {
-    if (!authReady || authCheckedRef.current) return;
+    if (!authReady) {
+      console.log("AppLayout auth check waiting: Auth not ready yet");
+      return;
+    }
     
-    console.log("AppLayout auth check:", { isAuthenticated, authReady, path: location.pathname });
+    console.log("AppLayout auth check:", { 
+      isAuthenticated, 
+      authReady, 
+      path: location.pathname,
+      authCheckedRef: authCheckedRef.current
+    });
     
     if (!isAuthenticated) {
       console.log("User is not authenticated in AppLayout, redirecting to login");
-      navigate("/login", { replace: true });
+      if (!authCheckedRef.current) {
+        authCheckedRef.current = true;
+        navigate("/login", { replace: true });
+      }
+      return;
     }
     
-    authCheckedRef.current = true;
-  }, [isAuthenticated, authReady, navigate, location.pathname]);
+    // Only render content when authenticated
+    if (isAuthenticated && !shouldRender) {
+      setShouldRender(true);
+      authCheckedRef.current = true;
+    }
+  }, [isAuthenticated, authReady, navigate, location.pathname, shouldRender]);
 
   const navItems = [
     { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
@@ -80,18 +98,13 @@ export function AppLayout({ children }: LayoutProps) {
     }
   };
 
-  // Return loading indicator while checking auth state
-  if (loading || !authReady) {
+  // Return loading indicator while checking auth state or waiting for render decision
+  if (loading || !authReady || !shouldRender) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-doshisha-purple"></div>
       </div>
     );
-  }
-
-  // Do not render the layout if not authenticated - navigation will handle redirect
-  if (!isAuthenticated) {
-    return null;
   }
 
   return (
