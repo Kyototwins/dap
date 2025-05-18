@@ -8,6 +8,7 @@ import { DapLogo } from "@/components/common/DapLogo";
 import { NotificationIndicator } from "@/components/common/NotificationIndicator";
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,7 +18,15 @@ export function AppLayout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
-  const { handleLogout } = useAuth();
+  const { handleLogout, isAuthenticated, loading } = useAuth();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      console.log("User not authenticated in AppLayout, redirecting to login");
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthenticated, loading, navigate]);
 
   const navItems = [
     { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
@@ -39,12 +48,21 @@ export function AppLayout({ children }: LayoutProps) {
     try {
       await handleLogout();
       // Explicitly navigate to login page after logout
+      // We use replace to prevent back navigation after logout
       navigate('/login', { replace: true });
       console.log("Logged out and redirected to login");
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return null; // Don't render anything, the useEffect will handle redirection
+  }
 
   return (
     <div className="min-h-screen pb-16">
