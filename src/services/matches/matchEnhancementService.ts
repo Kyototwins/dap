@@ -1,150 +1,98 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { Match } from '@/types/matches';
-import { SimplifiedProfile } from '@/types/simplified-profile';
-import { processProfile } from './profileUtils';
+import { SimplifiedProfile } from "@/types/simplified-profile";
+import { Match } from "@/types/matches";
+import { UserProfile } from "@/types/profile";
+import { supabase } from "@/integrations/supabase/client";
 
-// Define a simplified return type to avoid circular references
-export interface EnhancedMatch {
+// Define a type for enhanced matches to avoid deep type instantiations
+export type EnhancedMatch = {
   id: string;
-  user1_id: string;
-  user2_id: string;
-  created_at: string;
+  createdAt: string;
+  otherUserId: string;
   status: string;
-  otherUser?: Partial<SimplifiedProfile>;
-  lastMessage?: {
-    id: string;
-    content: string;
-    created_at: string;
-    sender_id: string;
-    match_id?: string;
-  };
-  unreadCount?: number;
+  otherUser: Partial<SimplifiedProfile>;
+};
+
+/**
+ * Enhances matches with user profile information
+ */
+export async function getEnhancedMatches(matches: Match[], userProfiles: Map<string, SimplifiedProfile>): Promise<EnhancedMatch[]> {
+  const enhancedMatches: EnhancedMatch[] = [];
+  
+  for (const match of matches) {
+    const otherUserId = match.other_user_id;
+    let otherUserProfile = userProfiles.get(otherUserId);
+    
+    // If profile is not in the provided map, create a placeholder
+    if (!otherUserProfile) {
+      otherUserProfile = {
+        id: otherUserId,
+        first_name: 'User',
+        last_name: '',
+        profile_image_url: '',
+      };
+    }
+    
+    enhancedMatches.push({
+      id: match.id,
+      createdAt: match.created_at,
+      otherUserId: match.other_user_id,
+      status: match.status,
+      otherUser: otherUserProfile,
+    });
+  }
+  
+  return enhancedMatches;
 }
 
-// Enhance match with user profile data
-export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: string): Promise<EnhancedMatch> => {
-  // Create a new object with only the essential match properties to avoid circular references
-  const enhancedMatch: EnhancedMatch = {
-    id: match.id,
-    user1_id: match.user1_id,
-    user2_id: match.user2_id,
-    created_at: match.created_at,
-    status: match.status || 'pending'
-  };
+/**
+ * Fetches match data for a user
+ */
+export async function fetchMatches(userId: string) {
+  const { data: matches, error } = await supabase
+    .from('matches')
+    .select('*')
+    .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+    .order('created_at', { ascending: false });
   
-  try {
-    // Get the other user's profile
-    const otherUserId = match.user1_id === currentUserId ? match.user2_id : match.user1_id;
-    
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', otherUserId)
-      .single();
-    
-    // Process profile to ensure language_levels is handled correctly and convert to SimplifiedProfile
-    if (profileData) {
-      // Process the profile data and extract only the properties we need
-      const processedProfile = processProfile(profileData);
-      
-      // Create a simplified profile with only the essential properties
-      enhancedMatch.otherUser = {
-        id: processedProfile.id,
-        first_name: processedProfile.first_name,
-        last_name: processedProfile.last_name,
-        avatar_url: processedProfile.avatar_url,
-        age: processedProfile.age,
-        gender: processedProfile.gender,
-        origin: processedProfile.origin,
-        about_me: processedProfile.about_me,
-        university: processedProfile.university,
-        department: processedProfile.department,
-        languages: processedProfile.languages,
-        learning_languages: processedProfile.learning_languages,
-        language_levels: typeof processedProfile.language_levels === 'object' 
-          ? processedProfile.language_levels as Record<string, number>
-          : {},
-        hobbies: processedProfile.hobbies
-      };
-    }
-    
-    // Get the last message for this match
-    const { data: messagesData } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('match_id', match.id)
-      .order('created_at', { ascending: false })
-      .limit(1);
-  
-    if (messagesData && messagesData.length > 0) {
-      // Explicitly define the structure of lastMessage to avoid circular references
-      enhancedMatch.lastMessage = {
-        id: messagesData[0].id,
-        content: messagesData[0].content,
-        created_at: messagesData[0].created_at,
-        sender_id: messagesData[0].sender_id,
-        match_id: messagesData[0].match_id
-      };
-    }
-  
-    // Count unread messages
-    const { count } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .eq('match_id', match.id)
-      .eq('sender_id', otherUserId)
-      .eq('read', false);
-  
-    enhancedMatch.unreadCount = count || 0;
-  
-    // Determine match status
-    if (match.status === 'matched') {
-      enhancedMatch.status = 'matched';
-    } else if (
-      (match.user1_id === currentUserId && match.status === 'pending') ||
-      (match.user2_id === currentUserId && match.status === 'pending')
-    ) {
-      enhancedMatch.status = 'waiting';
-    }
-  
-    return enhancedMatch;
-  } catch (error) {
-    console.error('Error enhancing match with user profile:', error);
-    return enhancedMatch; // Return partially enhanced match if enhancement fails
-  }
-};
-
-// Get all enhanced matches for a user
-export const getEnhancedMatches = async (userId: string): Promise<EnhancedMatch[]> => {
-  try {
-    const { data: matches, error } = await supabase
-      .from('matches')
-      .select('*')
-      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
-      
-    if (error || !matches) {
-      console.error('Error fetching matches:', error);
-      return [];
-    }
-
-    // Break the type reference chain by using a simple object type
-    const matchesArray = matches as unknown as Array<{
-      id: string;
-      user1_id: string;
-      user2_id: string;
-      created_at: string;
-      status: string;
-    }>;
-    
-    // Process each match individually with simplified typing
-    const enhancedMatches = await Promise.all(
-      matchesArray.map(match => enhanceMatchWithUserProfile(match as Match, userId))
-    );
-    
-    return enhancedMatches;
-  } catch (error) {
-    console.error('Error in getEnhancedMatches:', error);
+  if (error) {
+    console.error('Error fetching matches:', error);
     return [];
   }
-};
+  
+  // Transform matches to have consistent structure
+  return matches.map(match => {
+    const isUser1 = match.user1_id === userId;
+    return {
+      id: match.id,
+      created_at: match.created_at,
+      status: match.status,
+      other_user_id: isUser1 ? match.user2_id : match.user1_id
+    };
+  });
+}
+
+/**
+ * Fetches profile data for multiple users
+ */
+export async function fetchProfilesForMatches(userIds: string[]) {
+  if (userIds.length === 0) return new Map<string, SimplifiedProfile>();
+  
+  const { data: profiles, error } = await supabase
+    .from('profiles')
+    .select('id, first_name, last_name, profile_image_url')
+    .in('id', userIds);
+  
+  if (error || !profiles) {
+    console.error('Error fetching profiles for matches:', error);
+    return new Map<string, SimplifiedProfile>();
+  }
+  
+  // Create a map for easy lookup
+  const profileMap = new Map<string, SimplifiedProfile>();
+  profiles.forEach(profile => {
+    profileMap.set(profile.id, profile as SimplifiedProfile);
+  });
+  
+  return profileMap;
+}

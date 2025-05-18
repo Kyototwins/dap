@@ -11,6 +11,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { FirebaseInitializer } from "@/components/notifications/FirebaseInitializer";
+import { useHomeScreenPrompt } from "@/hooks/useHomeScreenPrompt";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -31,6 +32,7 @@ const queryClient = new QueryClient();
 function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const { HomeScreenPromptComponent } = useHomeScreenPrompt();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -63,6 +65,9 @@ function App() {
             <TooltipProvider>
               {/* Initialize Firebase only if the user is logged in */}
               {session && <FirebaseInitializer />}
+              
+              {/* Show home screen prompt for logged in users */}
+              {session && <HomeScreenPromptComponent />}
               
               <Routes>
                 <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />
