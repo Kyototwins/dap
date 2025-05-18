@@ -23,6 +23,13 @@ export function useMessages() {
   // Set up realtime subscription
   useMessageSubscription(selectedMatch, setMessages);
 
+  // Refresh matches whenever a message is added
+  useEffect(() => {
+    if (messages.length > 0 && selectedMatch) {
+      fetchMatches();
+    }
+  }, [messages.length]);
+
   // Log debugging information
   useEffect(() => {
     if (matches.length === 0 && !loading) {

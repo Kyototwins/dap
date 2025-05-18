@@ -70,6 +70,17 @@ export function useMessageSending(
               }
               return [...prevMessages, enhancedMessage as unknown as Message];
             });
+            
+            // Update lastMessage in the match object
+            if (match) {
+              match.lastMessage = {
+                id: tempMessage.id,
+                content: tempMessage.content,
+                created_at: tempMessage.created_at,
+                sender_id: tempMessage.sender_id,
+                match_id: match.id
+              };
+            }
           }
         }
         

@@ -74,6 +74,17 @@ export function useMessageSubscription(
           console.log("Adding message to state:", enhancedMessage.id);
           return [...prev, enhancedMessage as unknown as Message];
         });
+        
+        // Update match.lastMessage in local state for display in the match list
+        if (selectedMatch) {
+          selectedMatch.lastMessage = {
+            id: newMessage.id,
+            content: newMessage.content,
+            created_at: newMessage.created_at,
+            sender_id: newMessage.sender_id,
+            match_id: selectedMatch.id
+          };
+        }
       })
       .subscribe();
       
