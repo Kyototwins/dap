@@ -21,22 +21,28 @@ export default function Login() {
 
   // Check for authenticated user and redirect only once
   useEffect(() => {
-    if (!authReady) return; // Wait until auth is ready
+    if (!authReady) {
+      console.log("Auth not ready yet, waiting...");
+      return; // Wait until auth is ready
+    }
     
     console.log("Login page auth check:", { 
-      isAuthenticated, 
-      isSubmitting, 
+      isAuthenticated: isAuthenticated, 
+      authReady: authReady,
+      isSubmitting: isSubmitting, 
       hasRedirected: hasRedirectedRef.current,
       loginProcessing: loginProcessingRef.current
     });
     
     // Only redirect if authenticated, not in login process, and not already redirected
-    if (isAuthenticated && !isSubmitting && !loginProcessingRef.current && !hasRedirectedRef.current) {
+    if (isAuthenticated && authReady && !loginProcessingRef.current && !hasRedirectedRef.current) {
       console.log("User is authenticated in Login page, redirecting to matches", user?.id);
       hasRedirectedRef.current = true;
+      
+      // Use a small delay to avoid race conditions
       setTimeout(() => {
         navigate("/matches", { replace: true });
-      }, 0);
+      }, 50);
     }
   }, [isAuthenticated, user, navigate, isSubmitting, authReady]);
 
@@ -71,11 +77,14 @@ export default function Login() {
         
         // Force redirect to matches page after successful login
         hasRedirectedRef.current = true;
-        navigate("/matches", { replace: true });
+        setTimeout(() => {
+          navigate("/matches", { replace: true });
+        }, 100);
       }
     } catch (error: any) {
       console.error("Login submission error:", error);
       loginProcessingRef.current = false;
+      hasRedirectedRef.current = false;
       
       let errorMessage = "ログインに失敗しました。認証情報を確認してください。";
       
@@ -97,7 +106,7 @@ export default function Login() {
   };
 
   // If we're loading auth state, show a simple loading message
-  if (loading && !isSubmitting && !authReady) {
+  if ((loading && !isSubmitting) || !authReady) {
     return (
       <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
         <div className="animate-fade-up flex justify-center py-12">

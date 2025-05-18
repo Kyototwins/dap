@@ -65,10 +65,13 @@ export function useAuth() {
         setSession(sessionData.session);
         setUser(sessionData.session?.user || null);
         
-        setLoading(false);
-        setInitialized(true);
-        setAuthReady(true);
-        initializingRef.current = false;
+        // Make sure authReady is set after user and session state are updated
+        setTimeout(() => {
+          setLoading(false);
+          setInitialized(true);
+          setAuthReady(true);
+          initializingRef.current = false;
+        }, 0);
       } catch (error) {
         console.error("Auth initialization error:", error);
         setLoading(false);
@@ -150,13 +153,16 @@ export function useAuth() {
     }
   }, []);
   
+  // Check if the user is authenticated
+  const isAuthenticated = !!(user && session);
+  
   return {
     ...authOperations,
     user,
     session,
     loading,
     authReady,
-    isAuthenticated: !!user && !!session,
+    isAuthenticated,
     handleLogin,
     handleLogout
   };
