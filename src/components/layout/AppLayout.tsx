@@ -9,7 +9,7 @@ import { NotificationIndicator } from "@/components/common/NotificationIndicator
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect } from "react";
-import { toast } from "@/components/ui/toast";
+import { toast } from "@/hooks/use-toast"; // Fixed import path
 
 interface LayoutProps {
   children: React.ReactNode;
