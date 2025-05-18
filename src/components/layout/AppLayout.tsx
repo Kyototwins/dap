@@ -9,7 +9,7 @@ import { NotificationIndicator } from "@/components/common/NotificationIndicator
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/toast";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,18 +21,21 @@ export function AppLayout({ children }: LayoutProps) {
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
   const { handleLogout, isAuthenticated, loading, authReady } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [redirectChecked, setRedirectChecked] = useState(false);
   
-  // Check authentication and redirect if needed
+  // Check authentication and redirect if needed - only once when auth is ready
   useEffect(() => {
-    if (!authReady) return; // Wait until auth system is ready
+    if (!authReady || redirectChecked) return;
+    
+    console.log("AppLayout auth check:", { isAuthenticated, authReady, path: location.pathname });
     
     if (!isAuthenticated) {
       console.log("User is not authenticated in AppLayout, redirecting to login");
       navigate("/login", { replace: true });
-    } else {
-      console.log("User is authenticated in AppLayout, current path:", location.pathname);
     }
-  }, [isAuthenticated, authReady, navigate, location.pathname]);
+    
+    setRedirectChecked(true);
+  }, [isAuthenticated, authReady, navigate, location.pathname, redirectChecked]);
 
   const navItems = [
     { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
@@ -65,9 +68,7 @@ export function AppLayout({ children }: LayoutProps) {
       
       await handleLogout();
       
-      // Explicitly navigate to login page after logout
-      navigate('/login', { replace: true });
-      console.log("Logged out and redirected to login");
+      // Navigation will be handled by auth state change
     } catch (error) {
       console.error("Error logging out:", error);
       toast({

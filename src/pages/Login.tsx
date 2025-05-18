@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -16,33 +16,24 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { loading, authReady, connectionError, offline, handleLogin, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const hasRedirectedRef = useRef(false);
-  const loginProcessingRef = useRef(false);
-
-  // Check for authenticated user and redirect only once
+  
+  // Track authentication state and handle redirections
   useEffect(() => {
     if (!authReady) {
       console.log("Auth not ready yet, waiting...");
-      return; // Wait until auth is ready
+      return;
     }
     
     console.log("Login page auth check:", { 
-      isAuthenticated: isAuthenticated, 
-      authReady: authReady,
-      isSubmitting: isSubmitting, 
-      hasRedirected: hasRedirectedRef.current,
-      loginProcessing: loginProcessingRef.current
+      isAuthenticated, 
+      authReady,
+      isSubmitting
     });
     
-    // Only redirect if authenticated, not in login process, and not already redirected
-    if (isAuthenticated && authReady && !loginProcessingRef.current && !hasRedirectedRef.current) {
-      console.log("User is authenticated in Login page, redirecting to matches", user?.id);
-      hasRedirectedRef.current = true;
-      
-      // Use a small delay to avoid race conditions
-      setTimeout(() => {
-        navigate("/matches", { replace: true });
-      }, 50);
+    // Simple, clean redirection logic - if authenticated, go to matches
+    if (isAuthenticated && authReady && !isSubmitting) {
+      console.log("User is authenticated, redirecting to matches", user?.id);
+      navigate("/matches", { replace: true });
     }
   }, [isAuthenticated, user, navigate, isSubmitting, authReady]);
 
@@ -59,32 +50,21 @@ export default function Login() {
     }
     
     setIsSubmitting(true);
-    loginProcessingRef.current = true;
-    hasRedirectedRef.current = false;
     
     try {
       console.log("Attempting login with email:", email);
-      const result = await handleLogin({ email, password });
+      await handleLogin({ email, password });
       
-      if (result?.user) {
-        // Show success toast
-        toast({
-          title: "ログイン成功",
-          description: "おかえりなさい！",
-        });
-        
-        console.log("Login successful, user ID:", result.user.id);
-        
-        // Force redirect to matches page after successful login
-        hasRedirectedRef.current = true;
-        setTimeout(() => {
-          navigate("/matches", { replace: true });
-        }, 100);
-      }
+      // Success toast
+      toast({
+        title: "ログイン成功",
+        description: "おかえりなさい！",
+      });
+      
+      // Navigation will be handled by the useEffect
+      
     } catch (error: any) {
       console.error("Login submission error:", error);
-      loginProcessingRef.current = false;
-      hasRedirectedRef.current = false;
       
       let errorMessage = "ログインに失敗しました。認証情報を確認してください。";
       
@@ -99,9 +79,6 @@ export default function Login() {
       });
     } finally {
       setIsSubmitting(false);
-      setTimeout(() => {
-        loginProcessingRef.current = false;
-      }, 500);
     }
   };
 
