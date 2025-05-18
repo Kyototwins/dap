@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Match } from '@/types/matches';
-import { Profile } from '@/types/messages';
+import { SimplifiedProfile } from '@/types/simplified-profile';
 import { processProfile } from './profileUtils';
 
 // Define a simplified return type to avoid circular references
@@ -11,7 +11,7 @@ export interface EnhancedMatch {
   user2_id: string;
   created_at: string;
   status: string;
-  otherUser?: Partial<Profile>;
+  otherUser?: Partial<SimplifiedProfile>;
   lastMessage?: {
     id: string;
     content: string;
@@ -43,9 +43,30 @@ export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: s
       .eq('id', otherUserId)
       .single();
     
-    // Process profile to ensure language_levels is handled correctly
+    // Process profile to ensure language_levels is handled correctly and convert to SimplifiedProfile
     if (profileData) {
-      enhancedMatch.otherUser = processProfile(profileData);
+      // Process the profile data and extract only the properties we need
+      const processedProfile = processProfile(profileData);
+      
+      // Create a simplified profile with only the essential properties
+      enhancedMatch.otherUser = {
+        id: processedProfile.id,
+        first_name: processedProfile.first_name,
+        last_name: processedProfile.last_name,
+        avatar_url: processedProfile.avatar_url,
+        age: processedProfile.age,
+        gender: processedProfile.gender,
+        origin: processedProfile.origin,
+        about_me: processedProfile.about_me,
+        university: processedProfile.university,
+        department: processedProfile.department,
+        languages: processedProfile.languages,
+        learning_languages: processedProfile.learning_languages,
+        language_levels: typeof processedProfile.language_levels === 'object' 
+          ? processedProfile.language_levels as Record<string, number>
+          : {},
+        hobbies: processedProfile.hobbies
+      };
     }
     
     // Get the last message for this match
@@ -107,10 +128,20 @@ export const getEnhancedMatches = async (userId: string): Promise<EnhancedMatch[
       return [];
     }
 
-    // Use type assertion to avoid type errors during mapping
+    // Break the type reference chain by using a simple object type
+    const matchesArray = matches as unknown as Array<{
+      id: string;
+      user1_id: string;
+      user2_id: string;
+      created_at: string;
+      status: string;
+    }>;
+    
+    // Process each match individually with simplified typing
     const enhancedMatches = await Promise.all(
-      matches.map(match => enhanceMatchWithUserProfile(match as Match, userId))
+      matchesArray.map(match => enhanceMatchWithUserProfile(match as Match, userId))
     );
+    
     return enhancedMatches;
   } catch (error) {
     console.error('Error in getEnhancedMatches:', error);
