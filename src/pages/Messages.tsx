@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useState, useEffect, useRef, memo } from "react";
 
-const Messages = memo(function Messages() {
+// Define the Messages component as a function that can be memoized
+function MessagesComponent() {
   const {
     matches,
     selectedMatch,
@@ -88,7 +89,7 @@ const Messages = memo(function Messages() {
       />
     </div>
   );
-});
+}
 
 function LoadingState() {
   return <div className="p-6 text-center">読み込み中...</div>;
@@ -121,4 +122,8 @@ function RefreshButton({ onClick, isRefreshing }: { onClick: () => void, isRefre
   );
 }
 
+// Create a memoized version of the Messages component
+const Messages = memo(MessagesComponent);
+
+// Export the memoized component as default
 export default Messages;
