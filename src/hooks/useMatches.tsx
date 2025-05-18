@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Match } from '@/types/matches';
 import { supabase } from '@/integrations/supabase/client';
-import { getUserMatches } from '@/services/matchService';
+import { getUserMatches, enhanceMatchWithUserProfile } from '@/services/matchService';
 
 export function useMatches() {
   const [matches, setMatches] = useState<Match[]>([]);
@@ -19,7 +19,13 @@ export function useMatches() {
       
       if (user) {
         const userMatches = await getUserMatches(user.id);
-        setMatches(userMatches);
+        
+        // Enhance matches with user profiles
+        const enhancedMatches = await Promise.all(
+          userMatches.map(match => enhanceMatchWithUserProfile(match, user.id))
+        );
+        
+        setMatches(enhancedMatches);
       }
     } catch (error) {
       console.error('Error fetching matches:', error);
