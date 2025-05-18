@@ -25,6 +25,27 @@ export function useMatches() {
           userMatches.map(match => enhanceMatchWithUserProfile(match, user.id))
         );
         
+        // Fetch the latest message for each match
+        for (const match of enhancedMatches) {
+          const { data: latestMessages } = await supabase
+            .from("messages")
+            .select("*")
+            .eq("match_id", match.id)
+            .order("created_at", { ascending: false })
+            .limit(1);
+          
+          if (latestMessages && latestMessages.length > 0) {
+            match.lastMessage = {
+              id: latestMessages[0].id,
+              content: latestMessages[0].content,
+              created_at: latestMessages[0].created_at,
+              sender_id: latestMessages[0].sender_id,
+              match_id: match.id
+            };
+          }
+        }
+        
+        console.log("Enhanced matches with latest messages:", enhancedMatches);
         setMatches(enhancedMatches);
       }
     } catch (error) {

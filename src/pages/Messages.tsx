@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Match as MessageMatch } from "@/types/messages";
 
 export default function Messages() {
   const {
@@ -26,12 +25,31 @@ export default function Messages() {
     logMessagesData();
   }, [matches, messages, selectedMatch, searchParams]);
 
+  // Auto refresh on first load and when returning to page
+  useEffect(() => {
+    handleRefresh();
+    
+    // Add visibility change listener to refresh when returning to the page
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log("Page became visible, refreshing messages");
+        handleRefresh();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   const logMessagesData = () => {
     console.log("Messages page rendered");
     console.log(`Matches available: ${matches.length}`);
     if (matches.length > 0) {
       matches.forEach((match, idx) => {
-        console.log(`Match ${idx+1}: ID=${match.id}, Status=${match.status}, User=${match.otherUser?.first_name || 'Unknown'}`);
+        console.log(`Match ${idx+1}: ID=${match.id}, Status=${match.status}, User=${match.otherUser?.first_name || 'Unknown'}, LastMessage=${match.lastMessage?.content || 'None'}`);
       });
     }
     console.log(`Messages available: ${messages.length}`);

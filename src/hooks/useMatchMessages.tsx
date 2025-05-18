@@ -59,6 +59,8 @@ export function useMatchMessages() {
 
       console.log(`Processed ${validMessages.length} valid messages`);
       setMessages(validMessages as Message[]);
+      
+      // Return the messages so they can be used by the caller
       return validMessages;
     } catch (error: any) {
       console.error("Error in fetchMessages:", error);

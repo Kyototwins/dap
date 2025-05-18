@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -45,11 +44,8 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
   useEffect(() => {
     console.log(`MatchList rendering with ${matches.length} matches`);
     if (matches.length > 0) {
-      console.log('First match sample:', {
-        id: matches[0].id,
-        user: `${matches[0].otherUser.first_name} ${matches[0].otherUser.last_name}`,
-        hasLastMessage: !!matches[0].lastMessage,
-        status: matches[0].status
+      matches.forEach((match, index) => {
+        console.log(`Match ${index} - ID: ${match.id} - Last message:`, match.lastMessage?.content || "No message");
       });
     }
   }, [matches]);
