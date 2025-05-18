@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -37,15 +38,19 @@ export function ProfileContainer() {
       
       // Create a complete profile object with all required fields
       // Parse language_levels properly to handle both string and Record<string, number>
-      let parsedLanguageLevels: Record<string, number> | string | null = data.language_levels;
+      let parsedLanguageLevels: Record<string, number> | null = null;
       
-      // If language_levels is a string, try to parse it
-      if (typeof data.language_levels === 'string') {
-        try {
-          parsedLanguageLevels = JSON.parse(data.language_levels);
-        } catch (e) {
-          console.error("Error parsing language levels:", e);
-          parsedLanguageLevels = data.language_levels;
+      // If language_levels exists, try to parse it
+      if (data.language_levels) {
+        if (typeof data.language_levels === 'string') {
+          try {
+            parsedLanguageLevels = JSON.parse(data.language_levels);
+          } catch (e) {
+            console.error("Error parsing language levels:", e);
+            parsedLanguageLevels = null;
+          }
+        } else if (typeof data.language_levels === 'object') {
+          parsedLanguageLevels = data.language_levels as Record<string, number>;
         }
       }
       

@@ -31,13 +31,18 @@ export default function UserProfile() {
       
       if (data) {
         // Process language_levels field
-        let parsedLanguageLevels = data.language_levels;
-        if (typeof data.language_levels === 'string') {
-          try {
-            parsedLanguageLevels = JSON.parse(data.language_levels);
-          } catch (e) {
-            console.error("Error parsing language levels:", e);
-            // Keep as is if parsing fails
+        let parsedLanguageLevels: Record<string, number> | null = null;
+        
+        if (data.language_levels) {
+          if (typeof data.language_levels === 'string') {
+            try {
+              parsedLanguageLevels = JSON.parse(data.language_levels);
+            } catch (e) {
+              console.error("Error parsing language levels:", e);
+              // Keep as is if parsing fails
+            }
+          } else if (typeof data.language_levels === 'object') {
+            parsedLanguageLevels = data.language_levels as Record<string, number>;
           }
         }
         
