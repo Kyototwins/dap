@@ -8,7 +8,7 @@ import { DapLogo } from "@/components/common/DapLogo";
 import { NotificationIndicator } from "@/components/common/NotificationIndicator";
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useAuth } from "@/hooks/useAuth";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 
 interface LayoutProps {
@@ -19,27 +19,20 @@ export function AppLayout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
-  const { handleLogout, isAuthenticated, loading } = useAuth();
+  const { handleLogout, isAuthenticated, loading, authReady } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const lastPathRef = useRef(location.pathname);
-  const hasCheckedAuthRef = useRef(false);
-
-  // Monitor and log navigation
-  useEffect(() => {
-    console.log("AppLayout rendered at path:", location.pathname);
-    lastPathRef.current = location.pathname;
-  }, [location.pathname]);
-
+  
   // Check authentication and redirect if needed
   useEffect(() => {
-    if (loading) return;
+    if (!authReady) return; // Wait until auth system is ready
     
-    if (!isAuthenticated && !hasCheckedAuthRef.current) {
+    if (!isAuthenticated) {
       console.log("User is not authenticated in AppLayout, redirecting to login");
-      hasCheckedAuthRef.current = true;
       navigate("/login", { replace: true });
+    } else {
+      console.log("User is authenticated in AppLayout, current path:", location.pathname);
     }
-  }, [isAuthenticated, loading, navigate]);
+  }, [isAuthenticated, authReady, navigate, location.pathname]);
 
   const navItems = [
     { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
@@ -50,18 +43,10 @@ export function AppLayout({ children }: LayoutProps) {
 
   const handleNavigation = (path: string) => {
     if (location.pathname === path) return; // Don't navigate if already on the path
-    
-    console.log(`Navigating to: ${path} from: ${location.pathname}`);
-    
-    try {
-      navigate(path);
-    } catch (error) {
-      console.error("Navigation error:", error);
-    }
+    navigate(path);
   };
 
   const handleHelpClick = () => {
-    console.log("Navigating to help page");
     navigate("/help");
   };
 
@@ -96,7 +81,7 @@ export function AppLayout({ children }: LayoutProps) {
   };
 
   // Return loading indicator while checking auth state
-  if (loading) {
+  if (loading || !authReady) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-doshisha-purple"></div>
@@ -104,8 +89,7 @@ export function AppLayout({ children }: LayoutProps) {
     );
   }
 
-  // Return null if not authenticated - this prevents layout from attempting to render
-  // when user should be redirected
+  // Do not render the layout if not authenticated - navigation will handle redirect
   if (!isAuthenticated) {
     return null;
   }

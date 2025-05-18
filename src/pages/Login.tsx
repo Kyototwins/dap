@@ -14,24 +14,31 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { loading, connectionError, offline, handleLogin, user, isAuthenticated } = useAuth();
+  const { loading, authReady, connectionError, offline, handleLogin, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const hasRedirectedRef = useRef(false);
+  const loginProcessingRef = useRef(false);
 
-  // Check for authenticated user and redirect only once when component mounts or auth state changes
+  // Check for authenticated user and redirect only once
   useEffect(() => {
-    // Only redirect if we have a valid authenticated state and we're not in the middle of logging in
-    if (isAuthenticated && !isSubmitting) {
-      if (!hasRedirectedRef.current) {
-        console.log("User is authenticated in Login page, redirecting to matches", user?.id);
-        hasRedirectedRef.current = true; // Prevent multiple redirects
+    if (!authReady) return; // Wait until auth is ready
+    
+    console.log("Login page auth check:", { 
+      isAuthenticated, 
+      isSubmitting, 
+      hasRedirected: hasRedirectedRef.current,
+      loginProcessing: loginProcessingRef.current
+    });
+    
+    // Only redirect if authenticated, not in login process, and not already redirected
+    if (isAuthenticated && !isSubmitting && !loginProcessingRef.current && !hasRedirectedRef.current) {
+      console.log("User is authenticated in Login page, redirecting to matches", user?.id);
+      hasRedirectedRef.current = true;
+      setTimeout(() => {
         navigate("/matches", { replace: true });
-      }
-    } else {
-      // Reset the flag if user is not authenticated
-      hasRedirectedRef.current = false;
+      }, 0);
     }
-  }, [isAuthenticated, user, navigate, isSubmitting]);
+  }, [isAuthenticated, user, navigate, isSubmitting, authReady]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +53,8 @@ export default function Login() {
     }
     
     setIsSubmitting(true);
+    loginProcessingRef.current = true;
+    hasRedirectedRef.current = false;
     
     try {
       console.log("Attempting login with email:", email);
@@ -60,13 +69,14 @@ export default function Login() {
         
         console.log("Login successful, user ID:", result.user.id);
         
-        // Navigate is handled in the useEffect based on authentication state
-        // But we'll force it here as well to be extra sure
+        // Force redirect to matches page after successful login
+        hasRedirectedRef.current = true;
         navigate("/matches", { replace: true });
       }
     } catch (error: any) {
       console.error("Login submission error:", error);
-      // Error handling is already in handleLogin but we can add more specific feedback
+      loginProcessingRef.current = false;
+      
       let errorMessage = "ログインに失敗しました。認証情報を確認してください。";
       
       if (error.message) {
@@ -80,11 +90,14 @@ export default function Login() {
       });
     } finally {
       setIsSubmitting(false);
+      setTimeout(() => {
+        loginProcessingRef.current = false;
+      }, 500);
     }
   };
 
   // If we're loading auth state, show a simple loading message
-  if (loading && !isSubmitting) {
+  if (loading && !isSubmitting && !authReady) {
     return (
       <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
         <div className="animate-fade-up flex justify-center py-12">

@@ -13,6 +13,7 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
   const initializingRef = useRef(false);
   
   // Set up auth state listener
@@ -50,6 +51,7 @@ export function useAuth() {
           console.error("Error getting session:", sessionError);
           setLoading(false);
           setInitialized(true);
+          setAuthReady(true);
           initializingRef.current = false;
           return;
         }
@@ -65,11 +67,13 @@ export function useAuth() {
         
         setLoading(false);
         setInitialized(true);
+        setAuthReady(true);
         initializingRef.current = false;
       } catch (error) {
         console.error("Auth initialization error:", error);
         setLoading(false);
         setInitialized(true);
+        setAuthReady(true);
         initializingRef.current = false;
       }
     };
@@ -84,6 +88,7 @@ export function useAuth() {
   // Handle login with better state management
   const handleLogin = useCallback(async (formData: {email: string, password: string}) => {
     try {
+      setLoading(true);
       const result = await authOperations.handleLogin(formData);
       
       // Update state immediately after successful login to prevent redirect loops
@@ -102,6 +107,8 @@ export function useAuth() {
     } catch (error) {
       console.error("Login error in useAuth:", error);
       throw error; // Re-throw to let Login component handle UI feedback
+    } finally {
+      setLoading(false);
     }
   }, [authOperations]);
 
@@ -148,6 +155,7 @@ export function useAuth() {
     user,
     session,
     loading,
+    authReady,
     isAuthenticated: !!user && !!session,
     handleLogin,
     handleLogout
