@@ -1,4 +1,6 @@
 
+import { supabase } from '@/integrations/supabase/client';
+
 /**
  * これはサーバーサイドで使用する関数例です。
  * 実際の使用時には、Edge FunctionなどのサーバーサイドJSファイルとして実装してください。
@@ -78,7 +80,7 @@ export async function sendMessageNotification(recipientId: string, senderId: str
     .eq('id', recipientId)
     .single();
   
-  if (error || !data.fcm_token) {
+  if (error || !data || !data.fcm_token) {
     console.error('FCMトークンが見つかりません:', error);
     return false;
   }
@@ -90,7 +92,7 @@ export async function sendMessageNotification(recipientId: string, senderId: str
     .eq('id', senderId)
     .single();
   
-  if (senderError) {
+  if (senderError || !senderData) {
     console.error('送信者の情報が見つかりません:', senderError);
     return false;
   }

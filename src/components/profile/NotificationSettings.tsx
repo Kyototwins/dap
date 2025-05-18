@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { Bell, BellOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
@@ -25,13 +24,16 @@ export function NotificationSettings() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
+          // Use raw query result to handle potential missing column
           const { data } = await supabase
             .from('profiles')
-            .select('fcm_token')
+            .select('*')
             .eq('id', user.id)
             .single();
           
-          setNotificationsEnabled(!!data?.fcm_token);
+          // Access fcm_token safely with type assertion
+          const hasToken = !!(data && (data as any).fcm_token);
+          setNotificationsEnabled(hasToken);
         }
       } catch (error) {
         console.error('Error checking notification status:', error);

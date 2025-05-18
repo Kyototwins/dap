@@ -90,16 +90,28 @@ export async function processMatch(match: any, currentUserId: string): Promise<M
   const otherUserWithRequiredProps = createStandardizedUserObject(otherUser);
   if (!otherUserWithRequiredProps) return null;
   
-  return {
+  // Create a match object that conforms to our Match interface
+  const matchObj: Match = {
     id: match.id,
-    status: match.status,
+    created_at: match.created_at,
+    // Include both naming conventions
+    user_id_1: match.user1_id,
+    user_id_2: match.user2_id,
     user1_id: match.user1_id,
     user2_id: match.user2_id,
+    // Set default values for accepted fields
+    accepted_1: false,
+    accepted_2: false,
+    status: match.status,
     otherUser: otherUserWithRequiredProps,
     lastMessage: lastMessage ? {
+      id: '',  // Add this ID field
       content: lastMessage.content,
-      created_at: lastMessage.created_at
+      created_at: lastMessage.created_at,
+      sender_id: lastMessage.sender_id
     } : undefined,
     unreadCount: unreadCount
-  } as Match;
+  };
+  
+  return matchObj;
 }

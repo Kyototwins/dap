@@ -36,7 +36,44 @@ export function ProfileContainer() {
         .single();
 
       if (error) throw error;
-      setProfile(data as ProfileType);
+      
+      // Create a complete profile object with all required fields
+      // including fcm_token which might not be in the database yet
+      const completeProfile: ProfileType = {
+        id: data.id,
+        created_at: data.created_at,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        age: data.age,
+        gender: data.gender,
+        origin: data.origin,
+        about_me: data.about_me,
+        avatar_url: data.avatar_url,
+        sexuality: data.sexuality,
+        university: data.university,
+        department: data.department,
+        year: data.year,
+        image_url_1: data.image_url_1,
+        image_url_2: data.image_url_2,
+        ideal_date: data.ideal_date,
+        life_goal: data.life_goal,
+        superpower: data.superpower,
+        worst_nightmare: data.worst_nightmare,
+        friend_activity: data.friend_activity,
+        best_quality: data.best_quality,
+        photo_comment: data.photo_comment,
+        hobby_photo_url: data.hobby_photo_url,
+        hobby_photo_comment: data.hobby_photo_comment,
+        hobbies: data.hobbies,
+        languages: data.languages,
+        learning_languages: data.learning_languages,
+        language_levels: data.language_levels,
+        pet_photo_url: data.pet_photo_url,
+        pet_photo_comment: data.pet_photo_comment,
+        fcm_token: (data as any).fcm_token || null // Add FCM token with fallback
+      };
+      
+      setProfile(completeProfile);
 
       // プロフィールの完成度を計算
       if (data) {
@@ -88,7 +125,6 @@ export function ProfileContainer() {
         completion={completion}
         onEditProfile={handleEditProfile}
       />
-      {/* DeleteAccountButtonは削除 */}
     </div>
   );
 }

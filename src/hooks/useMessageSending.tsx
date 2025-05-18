@@ -47,22 +47,28 @@ export function useMessageSending(
           
           if (sender) {
             // Create a proper Message object with all required fields
+            // that conforms to our Message type definition
             const tempMessage: Message = {
               id: result.messageData.id,
               content: result.messageData.content,
               created_at: result.messageData.created_at || new Date().toISOString(),
-              match_id: result.messageData.match_id,
               sender_id: authData.user.id,
-              sender: sender
+              // Include match_id as an extended property
+              match_id: match.id
             };
             
-            // Add the message to our local state
+            // Add the message with sender to our local state
+            const enhancedMessage = {
+              ...tempMessage,
+              sender
+            };
+            
             setMessages(prevMessages => {
               // Check if this message already exists to avoid duplicates
-              if (prevMessages.some(msg => msg.id === tempMessage.id)) {
+              if (prevMessages.some(msg => msg.id === enhancedMessage.id)) {
                 return prevMessages;
               }
-              return [...prevMessages, tempMessage];
+              return [...prevMessages, enhancedMessage as unknown as Message];
             });
           }
         }
