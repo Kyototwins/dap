@@ -1,6 +1,6 @@
 
-import React from "react";
 import { ImageIcon, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface ImageUpload {
@@ -19,6 +19,7 @@ interface ImageUploadProps {
 export function ImageUpload({ label, image, onChange, loading }: ImageUploadProps) {
   return (
     <div className="space-y-2">
+      <Label>{label}</Label>
       <div className="flex items-center gap-4">
         <label className="relative w-32 h-32 border-2 border-dashed border-gray-300 rounded-md overflow-hidden cursor-pointer hover:border-gray-400 transition-colors">
           {image.preview ? (
@@ -32,7 +33,7 @@ export function ImageUpload({ label, image, onChange, loading }: ImageUploadProp
               <ImageIcon className="w-8 h-8 text-gray-400" />
             </div>
           )}
-          <input
+          <Input
             type="file"
             accept="image/*"
             onChange={onChange}

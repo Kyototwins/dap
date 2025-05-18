@@ -9,14 +9,12 @@ import { EventCalendarView } from "../calendar/EventCalendarView";
 import { CreateEventButton } from "../actions/CreateEventButton";
 import { useEvents } from "@/hooks/useEvents";
 import { handleJoinEvent } from "@/components/events/EventJoinHandler";
-import { toast } from "@/hooks/use-toast";
 
 export function EventsContainer() {
   const navigate = useNavigate();
   const [calendarViewOpen, setCalendarViewOpen] = useState(false);
   const [hidePastEvents, setHidePastEvents] = useState(false);
   const [hasCreatedEvent, setHasCreatedEvent] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   
   const {
     filteredEvents,
@@ -44,16 +42,14 @@ export function EventsContainer() {
     refreshUserParticipations
   } = useEvents();
   
-  // 初回のみイベント作成状態をチェック
+  // Load participation status on component mount and when returning to this page
   useEffect(() => {
-    if (isInitialLoad) {
-      const createdEvent = localStorage.getItem('created_event');
-      if (createdEvent) {
-        setHasCreatedEvent(true);
-      }
-      setIsInitialLoad(false);
+    // Check if user has created an event
+    const createdEvent = localStorage.getItem('created_event');
+    if (createdEvent) {
+      setHasCreatedEvent(true);
     }
-  }, [isInitialLoad]);
+  }, []);
   
   // Filter out past events if the checkbox is checked
   let displayedEvents = filteredEvents;
@@ -100,27 +96,13 @@ export function EventsContainer() {
     } catch (error) {
       console.error("Error handling event action:", error);
       setProcessingEventId(null);
-      toast({
-        title: "エラー",
-        description: "イベント参加処理に失敗しました。",
-        variant: "destructive",
-      });
     }
   };
 
   const handleDeleteEvent = async (eventId: string) => {
-    try {
-      const success = await deleteEvent(eventId);
-      if (success && selectedEvent?.id === eventId) {
-        setSelectedEvent(null);
-      }
-    } catch (error) {
-      console.error("Error deleting event:", error);
-      toast({
-        title: "エラー",
-        description: "イベント削除に失敗しました。",
-        variant: "destructive",
-      });
+    const success = await deleteEvent(eventId);
+    if (success && selectedEvent?.id === eventId) {
+      setSelectedEvent(null);
     }
   };
   

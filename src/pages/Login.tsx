@@ -1,6 +1,5 @@
-
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,20 +12,7 @@ import { toast } from "@/components/ui/use-toast";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [redirecting, setRedirecting] = useState(false); // Add a redirecting state
-  const { loading, connectionError, offline, handleLogin, user } = useAuth();
-  const navigate = useNavigate();
-
-  // Check for authenticated user and redirect
-  useEffect(() => {
-    // Only redirect if we have finished loading auth state, the user is authenticated, and we're not already redirecting
-    if (!loading && user && !redirecting) {
-      console.log("User is authenticated in Login page, redirecting to matches", user.id);
-      setRedirecting(true); // Set redirecting to true to prevent infinite redirects
-      navigate("/matches", { replace: true });
-    }
-  }, [user, loading, navigate, redirecting]);
+  const { loading, connectionError, offline, handleLogin } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,39 +26,14 @@ export default function Login() {
       return;
     }
     
-    setIsSubmitting(true);
-    
-    try {
-      console.log("Attempting login with email:", email);
-      await handleLogin({ email, password });
-      // Do not navigate here - let the useEffect handle navigation after auth state update
-    } catch (error) {
-      console.error("Login submission error:", error);
-      // Error is already handled in handleLogin
-    } finally {
-      setIsSubmitting(false);
-    }
+    await handleLogin({ email, password });
   };
 
-  // If we're loading auth state, show a simple loading message
-  if (loading && !isSubmitting) {
-    return (
-      <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
-        <div className="animate-fade-up flex justify-center py-12">
-          <p>Loading...</p>
-        </div>
-      </AuthLayout>
-    );
-  }
-
-  // Don't render login form if user is authenticated or we're redirecting
-  if (!loading && (user || redirecting)) {
-    console.log("User authenticated or redirecting, rendering null");
-    return null;
-  }
-
   return (
-    <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
+    <AuthLayout
+      title="Welcome Back"
+      subtitle="Start your international exchange journey"
+    >
       <div className="animate-fade-up">
         {offline && (
           <Alert variant="destructive" className="mb-6 border-red-400">
@@ -104,7 +65,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={loading || isSubmitting}
+                disabled={loading}
                 className="pl-10 bg-white/70 backdrop-blur-sm border-gray-200 focus-visible:ring-[#7f1184]"
               />
             </div>
@@ -120,7 +81,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                disabled={loading || isSubmitting}
+                disabled={loading}
                 className="pl-10 bg-white/70 backdrop-blur-sm border-gray-200 focus-visible:ring-[#7f1184]"
               />
             </div>
@@ -129,9 +90,9 @@ export default function Login() {
           <Button 
             type="submit" 
             className="w-full transition-all duration-200 shadow-md hover:shadow-lg bg-[#7f1184] hover:bg-[#671073]" 
-            disabled={loading || offline || connectionError || isSubmitting}
+            disabled={loading || offline || connectionError}
           >
-            {isSubmitting ? "Logging in..." : loading ? "Processing..." : "Log In"}
+            {loading ? "Processing..." : "Log In"}
           </Button>
         </form>
         
