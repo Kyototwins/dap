@@ -2,7 +2,6 @@
 import { Event, EventParticipationMap } from "@/types/events";
 import { joinEvent } from "@/services/eventService";
 import { toast as showToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 export async function handleJoinEvent(
   eventId: string,
@@ -21,12 +20,6 @@ export async function handleJoinEvent(
     // Set processing state
     setProcessingEventId(eventId);
     
-    // Get current user
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw new Error("Not authenticated");
-    
-    const userId = data.user.id;
-    
     // Call backend to update participation
     const isJoined = await joinEvent(eventId, eventTitle);
     
@@ -44,13 +37,12 @@ export async function handleJoinEvent(
         description: `You've joined "${eventTitle}".`
       });
       
-      // Update localStorage with user-specific key
+      // Update localStorage
       try {
-        const userKey = `joined_events_${userId}`;
-        const joinedEventsStr = localStorage.getItem(userKey) || '{}';
+        const joinedEventsStr = localStorage.getItem('joined_events') || '{}';
         const joinedEvents = JSON.parse(joinedEventsStr);
         joinedEvents[eventId] = true;
-        localStorage.setItem(userKey, JSON.stringify(joinedEvents));
+        localStorage.setItem('joined_events', JSON.stringify(joinedEvents));
         
         // Save updated participant count
         const currentCount = eventToJoin.current_participants + 1;

@@ -3,13 +3,13 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Event } from "@/types/events";
-import { EventCard } from "@/components/events/list/EventCard";
+import { Event, EventParticipationMap } from "@/types/events";
+import { EventCard } from "./EventCard";
 
 interface EventListProps {
   events: Event[];
   loading: boolean;
-  participations: { [key: string]: boolean };
+  participations: EventParticipationMap;
   onJoinEvent: (eventId: string, eventTitle: string) => void;
   onDeleteEvent: (eventId: string) => void;
   onSelectEvent: (event: Event) => void;
@@ -52,13 +52,13 @@ export function EventList({
       <div className="text-center py-8 space-y-4">
         <p className="text-gray-500">
           {hasFilters
-            ? "No events found for these filters"
-            : "No upcoming events"}
+            ? "No events match your filters"
+            : "No events to display"}
         </p>
         <div className="flex justify-center">
           <Button onClick={() => navigate("/events/new")} className="bg-doshisha-purple hover:bg-doshisha-darkPurple">
             <Plus className="w-4 h-4 mr-2" />
-            Create
+            Create Event
           </Button>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { EventDetailsInfo } from "./sections/EventDetailsInfo";
 import { EventDetailsDescription } from "./sections/EventDetailsDescription";
 import { EventCommentSection } from "./sections/EventCommentSection";
 import { EventCommentsFullscreenDialog } from "./dialogs/EventCommentsFullscreenDialog";
+import { EventDeleteDialog } from "./dialogs/EventDeleteDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -44,6 +45,7 @@ export function EventDetailsDialog({
   const [editedDescription, setEditedDescription] = useState("");
   const [isCreator, setIsCreator] = useState(false);
   const [commentsFullscreen, setCommentsFullscreen] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -95,6 +97,18 @@ export function EventDetailsDialog({
     }
   };
 
+  const handleDeleteClick = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (event && onDeleteEvent) {
+      onDeleteEvent(event.id);
+      setShowDeleteDialog(false);
+      onOpenChange(false); // Close the details dialog
+    }
+  };
+
   return (
     <>
       {/* Main event details dialog */}
@@ -112,6 +126,7 @@ export function EventDetailsDialog({
                 isCreator={isCreator}
                 isParticipating={isParticipating}
                 isProcessing={isProcessing}
+                onDeleteClick={handleDeleteClick}
                 onParticipate={onParticipate}
               />
             </div>
@@ -151,6 +166,13 @@ export function EventDetailsDialog({
           onSubmitComment={onSubmitComment}
         />
       )}
+
+      {/* Delete confirmation dialog */}
+      <EventDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirmDelete={handleConfirmDelete}
+      />
     </>
   );
 }

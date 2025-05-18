@@ -433,9 +433,7 @@ export type Database = {
     }
     Functions: {
       join_event: {
-        Args:
-          | Record<PropertyKey, never>
-          | { p_event_id: string; p_user_id: string }
+        Args: { p_event_id: string; p_user_id: string }
         Returns: undefined
       }
     }

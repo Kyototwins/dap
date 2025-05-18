@@ -11,7 +11,6 @@ import { UserHobbiesSection } from "./user-sections/UserHobbiesSection";
 import { UserMoreAboutSection } from "./user-sections/UserMoreAboutSection";
 import { UserStatsSection } from "./user-sections/UserStatsSection";
 import { Card, CardContent } from "@/components/ui/card";
-import { useAuth } from "@/hooks/useAuth";
 
 interface UserProfileAboutTabProps {
   profile: Profile;
@@ -23,14 +22,10 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
     eventsCount: 0
   });
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
-  
-  // Check if the current profile belongs to the logged in user
-  const isCurrentUserProfile = user?.id === profile.id;
 
   useEffect(() => {
     const loadStats = async () => {
-      if (profile.id && isCurrentUserProfile) {
+      if (profile.id) {
         const userStats = await fetchUserStats(profile.id);
         setStats(userStats);
       }
@@ -38,7 +33,7 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
     };
     
     loadStats();
-  }, [profile.id, isCurrentUserProfile]);
+  }, [profile.id]);
 
   return (
     <div className="space-y-6">
@@ -73,7 +68,7 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
 
       <UserHobbiesSection profile={profile} title="Interests" />
 
-      {/* Pet Photo Section - Changed back from Favorite Food */}
+      {/* Pet Photo Section */}
       {profile.pet_photo_url && (
         <Card>
           <CardContent className="p-6">
@@ -97,9 +92,7 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
       )}
 
       <UserMoreAboutSection profile={profile} />
-      
-      {/* Only show stats if this is the current user's profile */}
-      {isCurrentUserProfile && <UserStatsSection stats={stats} loading={loading} />}
+      <UserStatsSection stats={stats} loading={loading} />
     </div>
   );
 }

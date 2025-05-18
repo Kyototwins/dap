@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from "react";
-import { Event } from "@/types/events";
-import { useToast } from "@/hooks/use-toast";
+import { Event, EventDeleteResult } from "@/types/events";
+import { toast } from "@/hooks/use-toast";
 import { deleteEventById } from "@/services/eventDataService";
 
 /**
@@ -9,12 +9,10 @@ import { deleteEventById } from "@/services/eventDataService";
  */
 export function useEventActions(setEvents: React.Dispatch<React.SetStateAction<Event[]>>) {
   const [processingEventId, setProcessingEventId] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const deleteEvent = useCallback(async (eventId: string): Promise<boolean> => {
     try {
-      setProcessingEventId(eventId);
-      const result = await deleteEventById(eventId);
+      await deleteEventById(eventId);
       
       // Remove the event from local state
       setEvents((prevEvents) => prevEvents.filter((event) => event.id !== eventId));
@@ -32,10 +30,8 @@ export function useEventActions(setEvents: React.Dispatch<React.SetStateAction<E
         variant: "destructive",
       });
       return false;
-    } finally {
-      setProcessingEventId(null);
     }
-  }, [setEvents, toast]);
+  }, [setEvents]);
 
   return {
     processingEventId,

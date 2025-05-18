@@ -45,7 +45,7 @@ export function EventCardActions({
   // Handle button state for event participation
   let buttonText = isParticipating ? "Joined" : "Join Event";
   let buttonClasses = isParticipating 
-    ? "bg-[#e5deff] hover:bg-[#e5deff] text-[#7f1184] cursor-default" 
+    ? "bg-[#e5deff] hover:bg-[#d8cefd] text-[#7f1184]" 
     : "bg-[#7f1184] hover:bg-[#671073] text-white";
   let buttonIcon = isParticipating 
     ? <Check className="w-4 h-4 mr-1" /> 
@@ -81,7 +81,7 @@ export function EventCardActions({
       <div className="mt-4 flex gap-2">
         <Button
           className={`flex-1 rounded-xl ${buttonClasses}`}
-          disabled={isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants) || isProcessing || isParticipating}
+          disabled={isDisabled || isPastEvent || (!isParticipating && maxParticipants !== 0 && displayedParticipants >= maxParticipants) || isParticipating}
           onClick={onJoin}
           aria-label={buttonText}
         >
@@ -119,17 +119,8 @@ export function EventCardActions({
         <AlertDialogContent onClick={e => e.stopPropagation()}>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Event</AlertDialogTitle>
-            <AlertDialogDescription className="space-y-4">
-              <p>Are you sure you want to delete this event? This action cannot be undone.</p>
-              
-              <div className="bg-amber-50 border border-amber-200 p-3 rounded-md text-amber-800 text-sm">
-                <p className="font-semibold">Before deleting this event:</p>
-                <ul className="mt-2 space-y-1 list-disc pl-4">
-                  <li>If others have already signed up, consider updating the description instead—like letting them know you can't attend but they can still meet up.</li>
-                  <li>Frequent deletions may affect your ability to host future events.</li>
-                  <li>Please remember: canceling last-minute can inconvenience those who planned to join.</li>
-                </ul>
-              </div>
+            <AlertDialogDescription>
+              Are you sure you want to delete this event? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

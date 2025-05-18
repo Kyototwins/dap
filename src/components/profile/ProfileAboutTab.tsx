@@ -114,7 +114,7 @@ export function ProfileAboutTab({ profile }: ProfileAboutTabProps) {
         </div>
       )}
       
-      {/* Pet Photo - Changed back from Favorite Food Photo */}
+      {/* Pet Photo */}
       {profile.pet_photo_url && (
         <div className="p-6 border border-gray-200 rounded-lg mb-6">
           <h2 className="text-xl font-bold mb-4">My Pet Photo</h2>

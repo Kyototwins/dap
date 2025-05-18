@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Event, EventParticipationMap } from "@/types/events";
 
@@ -67,21 +68,21 @@ export async function deleteEventById(eventId: string): Promise<void> {
       throw new Error("このイベントを削除する権限がありません");
     }
 
-    // First, delete all comments
-    const { error: deleteCommentsError } = await supabase
-      .from("event_comments")
-      .delete()
-      .eq("event_id", eventId);
-      
-    if (deleteCommentsError) throw deleteCommentsError;
-    
-    // Then, delete all participants
+    // First, delete all participants
     const { error: deleteParticipantsError } = await supabase
       .from("event_participants")
       .delete()
       .eq("event_id", eventId);
       
     if (deleteParticipantsError) throw deleteParticipantsError;
+    
+    // Then, delete all comments
+    const { error: deleteCommentsError } = await supabase
+      .from("event_comments")
+      .delete()
+      .eq("event_id", eventId);
+      
+    if (deleteCommentsError) throw deleteCommentsError;
     
     // Finally, delete the event
     const { error: deleteEventError } = await supabase
