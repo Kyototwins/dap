@@ -52,9 +52,9 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
         }
       }
       
-      // Update lastMessage in the match object if it doesn't exist or is outdated
-      if (!match.lastMessage && messages.length > 0) {
-        const latestMessage = messages[messages.length - 1];
+      // Update lastMessage in the match object if messages exist
+      if (fetchedMessages.length > 0) {
+        const latestMessage = fetchedMessages[fetchedMessages.length - 1];
         match.lastMessage = {
           id: latestMessage.id,
           content: latestMessage.content,

@@ -33,11 +33,15 @@ function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { HomeScreenPromptComponent } = useHomeScreenPrompt();
+  const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
+        if (event === 'SIGNED_IN') {
+          setShowPrompt(true); // ログイン時にプロンプトを表示
+        }
         setSession(session);
       }
     );
@@ -45,6 +49,9 @@ function App() {
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session) {
+        setShowPrompt(true); // 既存のセッションがある場合もプロンプトを表示
+      }
       setLoading(false);
     });
 
@@ -67,7 +74,7 @@ function App() {
               {session && <FirebaseInitializer />}
               
               {/* Show home screen prompt for logged in users */}
-              {session && <HomeScreenPromptComponent />}
+              {session && showPrompt && <HomeScreenPromptComponent />}
               
               <Routes>
                 <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />

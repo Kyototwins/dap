@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -100,7 +101,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground truncate">
-                        {match.lastMessage?.content || "こんにちは！よろしくお願いします。"}
+                        {match.lastMessage ? match.lastMessage.content : "新しい会話を始めましょう"}
                       </p>
                     </div>
                   </div>
