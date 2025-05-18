@@ -32,6 +32,7 @@ export interface ProfileFormData {
   photoComment: string;
   hobbyPhotoComment: string;
   petPhotoComment: string;  // Changed back from foodPhotoComment
+  fcm_token?: string;  // Added FCM token field
 }
 
 export interface AdditionalDataType {
