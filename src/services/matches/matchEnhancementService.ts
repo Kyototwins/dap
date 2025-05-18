@@ -3,10 +3,22 @@ import { supabase } from '@/integrations/supabase/client';
 import { Match } from '@/types/matches';
 import { processProfile } from './profileUtils';
 
+// Define a simplified return type to avoid circular references
+interface EnhancedMatch {
+  id: string;
+  user1_id: string;
+  user2_id: string;
+  created_at: string;
+  status: string;
+  otherUser?: any;
+  lastMessage?: any;
+  unreadCount?: number;
+}
+
 // Enhance match with user profile data
-export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: string): Promise<Match> => {
+export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: string): Promise<EnhancedMatch> => {
   // Create a new object with only the essential match properties to avoid circular references
-  const enhancedMatch: Match = {
+  const enhancedMatch: EnhancedMatch = {
     id: match.id,
     user1_id: match.user1_id,
     user2_id: match.user2_id,
@@ -69,7 +81,7 @@ export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: s
 };
 
 // Get all enhanced matches for a user
-export const getEnhancedMatches = async (userId: string): Promise<Match[]> => {
+export const getEnhancedMatches = async (userId: string): Promise<EnhancedMatch[]> => {
   try {
     const { data: matches, error } = await supabase
       .from('matches')
