@@ -14,17 +14,16 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { loading, connectionError, offline, handleLogin, user } = useAuth();
+  const { loading, connectionError, offline, handleLogin, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // Check for authenticated user and redirect
   useEffect(() => {
-    // Only redirect if we have finished loading auth state and the user is authenticated
-    if (!loading && user) {
-      console.log("User is authenticated in Login page, redirecting to matches", user.id);
+    if (isAuthenticated) {
+      console.log("User is authenticated in Login page, redirecting to matches", user?.id);
       navigate("/matches", { replace: true });
     }
-  }, [user, loading, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,10 +42,28 @@ export default function Login() {
     try {
       console.log("Attempting login with email:", email);
       await handleLogin({ email, password });
-      // Navigation is handled in handleLogin
-    } catch (error) {
+      
+      // Show success toast
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
+      
+      // Navigate is handled in the useEffect based on authentication state
+    } catch (error: any) {
       console.error("Login submission error:", error);
-      // Error is already handled in handleLogin
+      // Error handling is already in handleLogin but we can add more specific feedback
+      let errorMessage = "Login failed. Please check your credentials and try again.";
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "Login Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -64,7 +81,7 @@ export default function Login() {
   }
 
   // Don't render login form if user is authenticated and not loading
-  if (!loading && user) {
+  if (isAuthenticated) {
     console.log("User authenticated, rendering null");
     return null;
   }
