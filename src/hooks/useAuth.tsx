@@ -100,8 +100,8 @@ export function useAuth() {
       console.log("User logged out successfully");
       // State is updated through onAuthStateChange
       
-      // Note: We don't navigate here anymore. The navigation will happen in components using this hook
-      // based on the user's authentication state.
+      // Navigation will happen in components that use this hook
+      // The AppLayout component will handle the redirect
     } catch (error) {
       console.error("Error during logout:", error);
     } finally {

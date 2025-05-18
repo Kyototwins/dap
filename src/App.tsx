@@ -27,7 +27,7 @@ import { initializeNotificationsIfNeeded } from "./initNotifications";
 const queryClient = new QueryClient();
 
 function AuthenticatedApp() {
-  const { user, session, loading, isAuthenticated } = useAuth();
+  const { user, session, loading, handleLogout } = useAuth();
   const [notificationsInitialized, setNotificationsInitialized] = useState(false);
 
   // Initialize notifications when authenticated
@@ -51,44 +51,44 @@ function AuthenticatedApp() {
   return (
     <Routes>
       {/* Public routes - accessible without authentication */}
-      <Route path="/" element={isAuthenticated ? <Navigate to="/matches" replace /> : <Landing />} />
-      <Route path="/login" element={isAuthenticated ? <Navigate to="/matches" replace /> : <Login />} />
-      <Route path="/signup" element={isAuthenticated ? <Navigate to="/matches" replace /> : <SignUp />} />
+      <Route path="/" element={user ? <Navigate to="/matches" replace /> : <Landing />} />
+      <Route path="/login" element={user ? <Navigate to="/matches" replace /> : <Login />} />
+      <Route path="/signup" element={user ? <Navigate to="/matches" replace /> : <SignUp />} />
       
       {/* Protected routes that require authentication */}
       <Route 
         path="/profile/setup" 
-        element={isAuthenticated ? <ProfileSetup /> : <Navigate to="/login" replace />} 
+        element={user ? <ProfileSetup /> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/help" 
-        element={isAuthenticated ? <Help /> : <Navigate to="/login" replace />} 
+        element={user ? <Help /> : <Navigate to="/login" replace />} 
       />
       
       {/* Protected routes - AppLayout wrapper */}
       <Route 
         path="/matches" 
-        element={<AppLayout><Matches /></AppLayout>} 
+        element={user ? <AppLayout><Matches /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/messages" 
-        element={<AppLayout><Messages /></AppLayout>} 
+        element={user ? <AppLayout><Messages /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/events" 
-        element={<AppLayout><Events /></AppLayout>} 
+        element={user ? <AppLayout><Events /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/events/new" 
-        element={<AppLayout><CreateEvent /></AppLayout>} 
+        element={user ? <AppLayout><CreateEvent /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/profile" 
-        element={<AppLayout><Profile /></AppLayout>} 
+        element={user ? <AppLayout><Profile /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/profile/:id" 
-        element={<AppLayout><UserProfile /></AppLayout>} 
+        element={user ? <AppLayout><UserProfile /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route path="*" element={<NotFound />} />
     </Routes>

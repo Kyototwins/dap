@@ -14,17 +14,17 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { loading, connectionError, offline, handleLogin, isAuthenticated } = useAuth();
+  const { loading, connectionError, offline, handleLogin, user } = useAuth();
   const navigate = useNavigate();
 
   // Check for authenticated user and redirect
   useEffect(() => {
     // Only redirect if we have finished loading auth state and the user is authenticated
-    if (!loading && isAuthenticated) {
-      console.log("User is authenticated in Login page, redirecting to matches");
+    if (!loading && user) {
+      console.log("User is authenticated in Login page, redirecting to matches", user.id);
       navigate("/matches", { replace: true });
     }
-  }, [isAuthenticated, loading, navigate]);
+  }, [user, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,10 +43,11 @@ export default function Login() {
     try {
       console.log("Attempting login with email:", email);
       await handleLogin({ email, password });
-      // Navigation is handled in the useEffect above
+      // Navigation is handled in handleLogin
     } catch (error) {
       console.error("Login submission error:", error);
       // Error is already handled in handleLogin
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -63,7 +64,7 @@ export default function Login() {
   }
 
   // Don't render login form if user is authenticated and not loading
-  if (!loading && isAuthenticated) {
+  if (!loading && user) {
     console.log("User authenticated, rendering null");
     return null;
   }
