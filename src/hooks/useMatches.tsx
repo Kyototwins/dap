@@ -28,5 +28,6 @@ export function useMatches() {
     }
   };
 
-  return { matches, loading, refreshMatches: fetchMatches };
+  // Rename refreshMatches to fetchMatches to fix useMessages error
+  return { matches, loading, fetchMatches, refreshMatches: fetchMatches };
 }

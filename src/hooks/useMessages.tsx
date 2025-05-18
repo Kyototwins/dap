@@ -7,6 +7,7 @@ import { useMessageUrlParams } from "@/hooks/useMessageUrlParams";
 import { useLocation } from "react-router-dom";
 
 export function useMessages() {
+  // Use fetchMatches instead of refreshMatches
   const { matches, loading, fetchMatches } = useMatches();
   const { selectedMatch, messages, setMessages, handleSelectMatch } = useMessageSelection(fetchMatches);
   const location = useLocation();

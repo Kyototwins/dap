@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Match, Profile } from '@/types/messages';
+import { Match } from '@/types/matches';
+import { Profile } from '@/types/messages';
 
 // Process language_levels field to handle both string and Record format
 const processProfile = (profile: any): Profile => {
@@ -62,57 +63,62 @@ export const getMatchById = async (matchId: string): Promise<Match | null> => {
   }
 };
 
-// Enhance match with user profile information
-export const enhanceMatchWithUserProfile = async (match: any, currentUserId: string): Promise<Match> => {
-  // Get the other user's profile
-  const otherUserId = match.user1_id === currentUserId ? match.user2_id : match.user1_id;
+// Fixed to prevent infinite recursion
+export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: string): Promise<Match> => {
+  try {
+    // Get the other user's profile
+    const otherUserId = match.user1_id === currentUserId ? match.user2_id : match.user1_id;
+    
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', otherUserId)
+      .single();
+    
+    // Process profile to ensure language_levels is handled correctly
+    const otherUser = profileData ? processProfile(profileData) : null;
+    
+    // Get the last message for this match
+    const { data: messagesData } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('match_id', match.id)
+      .order('created_at', { ascending: false })
+      .limit(1);
   
-  const { data: profileData } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', otherUserId)
-    .single();
+    const lastMessage = messagesData && messagesData.length > 0 ? messagesData[0] : null;
   
-  // Process profile to ensure language_levels is handled correctly
-  const otherUser = profileData ? processProfile(profileData) : null;
+    // Count unread messages
+    const { count } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('match_id', match.id)
+      .eq('sender_id', otherUserId)
+      .eq('read', false);
   
-  // Get the last message for this match
-  const { data: messagesData } = await supabase
-    .from('messages')
-    .select('*')
-    .eq('match_id', match.id)
-    .order('created_at', { ascending: false })
-    .limit(1);
-
-  const lastMessage = messagesData && messagesData.length > 0 ? messagesData[0] : null;
-
-  // Count unread messages
-  const { count } = await supabase
-    .from('messages')
-    .select('*', { count: 'exact', head: true })
-    .eq('match_id', match.id)
-    .eq('sender_id', otherUserId)
-    .eq('read', false);
-
-  // Determine match status
-  let status = 'pending';
-  if (match.accepted_1 && match.accepted_2) {
-    status = 'matched';
-  } else if (
-    (match.user1_id === currentUserId && match.accepted_1) ||
-    (match.user2_id === currentUserId && match.accepted_2)
-  ) {
-    status = 'waiting';
+    // Determine match status
+    let status = 'pending';
+    if (match.status === 'matched') {
+      status = 'matched';
+    } else if (
+      (match.user1_id === currentUserId && match.status === 'pending') ||
+      (match.user2_id === currentUserId && match.status === 'pending')
+    ) {
+      status = 'waiting';
+    }
+  
+    // Return enhanced match object with proper type
+    return {
+      ...match,
+      otherUser,
+      lastMessage,
+      unreadCount: count || 0,
+      status
+    };
+  } catch (error) {
+    console.error('Error enhancing match with user profile:', error);
+    return match; // Return original match if enhancement fails
   }
-
-  // Return enhanced match object
-  return {
-    ...match,
-    otherUser,
-    lastMessage,
-    unreadCount: count || 0,
-    status
-  };
 };
 
 // Create a new match between two users
@@ -136,9 +142,7 @@ export const createMatch = async (user1Id: string, user2Id: string): Promise<Mat
       .insert([
         {
           user1_id: user1Id,
-          user2_id: user2Id,
-          accepted_1: false,
-          accepted_2: false
+          user2_id: user2Id
         }
       ])
       .select()
@@ -171,14 +175,10 @@ export const acceptMatch = async (matchId: string, userId: string): Promise<bool
       return false;
     }
 
-    // Determine which user is accepting
-    const isUser1 = match.user1_id === userId;
-    const updateField = isUser1 ? 'accepted_1' : 'accepted_2';
-
-    // Update the match
+    // Update match status to 'matched'
     const { error } = await supabase
       .from('matches')
-      .update({ [updateField]: true })
+      .update({ status: 'matched' })
       .eq('id', matchId);
 
     if (error) {

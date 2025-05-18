@@ -1,21 +1,27 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/messages';
+import { FilterState } from '@/types/matches';
 
 export const useProfileFilter = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
+  const [visibleProfiles, setVisibleProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [filters, setFilters] = useState({
-    gender: '',
-    minAge: '',
-    maxAge: '',
-    origin: '',
-    university: '',
-    department: '',
-    languages: [] as string[],
-    hobbies: [] as string[],
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+
+  // Updated filters structure to match FilterState interface
+  const [filters, setFilters] = useState<FilterState>({
+    ageRange: [18, 50],
+    speakingLanguages: [],
+    learningLanguages: [],
+    minLanguageLevel: 1,
+    hobbies: [],
+    countries: [],
+    sortOption: 'recent'
   });
 
   useEffect(() => {
@@ -32,7 +38,7 @@ export const useProfileFilter = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [filters, profiles]);
+  }, [filters, profiles, searchQuery]);
 
   const loadProfiles = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -73,6 +79,7 @@ export const useProfileFilter = () => {
 
         setProfiles(processedProfiles);
         setFilteredProfiles(processedProfiles);
+        setVisibleProfiles(processedProfiles.slice(0, 10)); // Initial visible profiles
       }
     } catch (error) {
       console.error('Error fetching profiles:', error);
@@ -84,82 +91,112 @@ export const useProfileFilter = () => {
   const applyFilters = () => {
     let result = [...profiles];
 
-    // Filter by gender
-    if (filters.gender) {
-      result = result.filter(profile => profile.gender === filters.gender);
+    // Apply search query filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(profile => {
+        const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`.toLowerCase();
+        const hasName = fullName.includes(query);
+        const hasLanguage = profile.languages?.some(lang => lang.toLowerCase().includes(query)) || false;
+        const hasHobby = profile.hobbies?.some(hobby => hobby.toLowerCase().includes(query)) || false;
+        return hasName || hasLanguage || hasHobby;
+      });
     }
 
-    // Filter by age range
-    if (filters.minAge) {
-      const minAge = parseInt(filters.minAge);
-      result = result.filter(profile => profile.age !== null && profile.age >= minAge);
-    }
+    // Apply filter by age range
+    result = result.filter(profile => 
+      profile.age !== null &&
+      profile.age >= filters.ageRange[0] && 
+      profile.age <= filters.ageRange[1]
+    );
 
-    if (filters.maxAge) {
-      const maxAge = parseInt(filters.maxAge);
-      result = result.filter(profile => profile.age !== null && profile.age <= maxAge);
-    }
-
-    // Filter by origin
-    if (filters.origin) {
-      result = result.filter(profile => profile.origin === filters.origin);
-    }
-
-    // Filter by university
-    if (filters.university) {
-      result = result.filter(profile => profile.university === filters.university);
-    }
-
-    // Filter by department
-    if (filters.department) {
-      result = result.filter(profile => profile.department === filters.department);
-    }
-
-    // Filter by languages
-    if (filters.languages.length > 0) {
+    // Apply filter by speaking languages
+    if (filters.speakingLanguages.length > 0) {
       result = result.filter(profile => 
-        profile.languages !== null && 
-        filters.languages.every(lang => profile.languages!.includes(lang))
+        profile.languages && 
+        filters.speakingLanguages.some(lang => profile.languages?.includes(lang))
       );
     }
 
-    // Filter by hobbies
+    // Apply filter by learning languages
+    if (filters.learningLanguages.length > 0) {
+      result = result.filter(profile => 
+        profile.learning_languages && 
+        filters.learningLanguages.some(lang => profile.learning_languages?.includes(lang))
+      );
+    }
+
+    // Apply filter by hobbies
     if (filters.hobbies.length > 0) {
       result = result.filter(profile => 
-        profile.hobbies !== null && 
-        filters.hobbies.some(hobby => profile.hobbies!.includes(hobby))
+        profile.hobbies && 
+        filters.hobbies.some(hobby => profile.hobbies?.includes(hobby))
+      );
+    }
+
+    // Apply filter by countries
+    if (filters.countries.length > 0) {
+      result = result.filter(profile => 
+        profile.origin && 
+        filters.countries.includes(profile.origin)
       );
     }
 
     setFilteredProfiles(result);
+    setVisibleProfiles(result.slice(0, 10)); // Reset visible profiles on filter change
   };
 
-  const updateFilter = (filterName: string, value: string | string[]) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterName]: value
-    }));
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
-  const resetFilters = () => {
-    setFilters({
-      gender: '',
-      minAge: '',
-      maxAge: '',
-      origin: '',
-      university: '',
-      department: '',
-      languages: [],
-      hobbies: [],
-    });
+  const handleLoadMore = () => {
+    setLoadingMore(true);
+    setTimeout(() => {
+      setVisibleProfiles(prev => [
+        ...prev, 
+        ...filteredProfiles.slice(prev.length, prev.length + 10)
+      ]);
+      setLoadingMore(false);
+    }, 500);
+  };
+
+  const handleRefresh = () => {
+    setLoading(true);
+    loadProfiles();
   };
 
   return {
-    profiles: filteredProfiles,
+    profiles, // Keep for backward compatibility
+    filteredProfiles,
+    visibleProfiles,
     loading,
+    loadingMore,
     filters,
-    updateFilter,
-    resetFilters,
+    searchQuery,
+    isFilterSheetOpen,
+    setFilters,
+    setIsFilterSheetOpen,
+    handleSearchChange,
+    handleLoadMore,
+    handleRefresh,
+    updateFilter: (filterName: string, value: string | string[]) => {
+      setFilters(prev => ({
+        ...prev,
+        [filterName]: value
+      }));
+    },
+    resetFilters: () => {
+      setFilters({
+        ageRange: [18, 50],
+        speakingLanguages: [],
+        learningLanguages: [],
+        minLanguageLevel: 1,
+        hobbies: [],
+        countries: [],
+        sortOption: 'recent'
+      });
+    },
     totalCount: profiles.length,
     filteredCount: filteredProfiles.length
   };
