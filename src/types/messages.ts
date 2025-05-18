@@ -57,7 +57,6 @@ export interface Profile {
   avatar_url?: string | null;
   image_url_1?: string | null;
   image_url_2?: string | null;
-  created_at?: string;
   photo_comment?: string | null;
   worst_nightmare?: string | null;
   friend_activity?: string | null;
