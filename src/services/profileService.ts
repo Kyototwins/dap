@@ -10,7 +10,7 @@ export async function updateUserProfile(
   imageUrl1: string | null,
   imageUrl2: string | null,
   hobbyPhotoUrl: string | null,
-  petPhotoUrl: string | null  // Changed back from foodPhotoUrl
+  petPhotoUrl: string | null
 ) {
   // Convert language levels to JSON string for storage
   const languageLevelsJson = JSON.stringify(formData.languageLevels);
@@ -32,10 +32,10 @@ export async function updateUserProfile(
       image_url_1: imageUrl1,
       image_url_2: imageUrl2,
       hobby_photo_url: hobbyPhotoUrl,
-      pet_photo_url: petPhotoUrl,  // Changed back from favorite_food_photo_url
+      pet_photo_url: petPhotoUrl,
       photo_comment: formData.photoComment,
       hobby_photo_comment: formData.hobbyPhotoComment,
-      pet_photo_comment: formData.petPhotoComment,  // Changed back from favorite_food_photo_comment
+      pet_photo_comment: formData.petPhotoComment,
       ideal_date: additionalData.idealDate,
       life_goal: additionalData.lifeGoal,
       superpower: additionalData.superpower,
@@ -62,4 +62,29 @@ export async function fetchUserProfile(userId: string) {
 
   if (error) throw error;
   return data;
+}
+
+export async function updateFcmToken(userId: string, token: string) {
+  try {
+    // Use a type-safe approach with explicit casting to avoid TypeScript errors
+    // This uses the raw update method which bypasses type checking for the specific field
+    const { error } = await supabase
+      .from('profiles')
+      .update({ 
+        // Using a record with an index signature to handle the fcm_token
+        // This works because the field exists in the database but not in our TypeScript types
+        fcm_token: token 
+      } as any) // We use 'as any' here to bypass the TypeScript type checking
+      .eq('id', userId);
+      
+    if (error) {
+      console.error('Error updating FCM token:', error);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error in updateFcmToken:', error);
+    return false;
+  }
 }

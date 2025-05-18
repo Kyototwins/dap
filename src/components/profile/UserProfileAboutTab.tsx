@@ -73,15 +73,15 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
 
       <UserHobbiesSection profile={profile} title="Interests" />
 
-      {/* Pet Photo Section - Changed back from Favorite Food */}
+      {/* Pet Photo Section - Changed to Pet Photo or Food Photo */}
       {profile.pet_photo_url && (
         <Card>
           <CardContent className="p-6">
-            <h3 className="font-medium text-lg mb-4">My Pet Photo</h3>
+            <h3 className="font-medium text-lg mb-4">My Pet Photo or Food Photo</h3>
             <div className="overflow-hidden rounded-lg">
               <img 
                 src={profile.pet_photo_url} 
-                alt="Pet" 
+                alt="Pet or Food Photo" 
                 className="w-full h-auto max-h-96 object-contain"
                 onError={(e) => {
                   console.error("Pet image load error:", e);

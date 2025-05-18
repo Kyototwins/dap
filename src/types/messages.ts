@@ -5,7 +5,9 @@ export interface Message {
   created_at: string;
   content: string;
   sender_id: string;
-  receiver_id: string;
+  receiver_id?: string;
+  match_id?: string;
+  sender?: Profile;
 }
 
 export interface Profile {
@@ -37,15 +39,20 @@ export interface Profile {
   languages: string[] | null;
   learning_languages: string[] | null;
   language_levels: Record<string, number> | string | null;
-  pet_photo_url: string | null;  // Changed back from favorite_food_photo_url
-  pet_photo_comment: string | null;  // Changed back from favorite_food_photo_comment
+  pet_photo_url: string | null;
+  pet_photo_comment: string | null;
 }
 
 export interface Match {
   id: string;
   created_at: string;
-  user_id_1: string;
-  user_id_2: string;
-  accepted_1: boolean;
-  accepted_2: boolean;
+  user1_id: string;
+  user2_id: string;
+  status?: string;
+  otherUser?: Profile;
+  lastMessage?: {
+    content: string;
+    created_at: string;
+  };
+  unreadCount?: number;
 }

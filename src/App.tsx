@@ -5,12 +5,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
+import { useAuth } from "@/hooks/useAuth";
 import Landing from "./pages/Landing";
-import Index from "./pages/Index";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import ProfileSetup from "./pages/ProfileSetup";
@@ -22,126 +21,104 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Help from "./pages/Help";
+import { initializeNotificationsIfNeeded } from "./initNotifications";
 
 // Create a client
 const queryClient = new QueryClient();
 
-function App() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+function AuthenticatedApp() {
+  const { user, session, loading, handleLogout } = useAuth();
+  const [notificationsInitialized, setNotificationsInitialized] = useState(false);
 
+  // Initialize notifications when authenticated
   useEffect(() => {
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
+    if (user && session && !notificationsInitialized) {
+      console.log("Initializing notifications for authenticated user", user.id);
+      // Use timeout to avoid blocking the main rendering process
+      const timer = setTimeout(() => {
+        initializeNotificationsIfNeeded();
+        setNotificationsInitialized(true);
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user, session, notificationsInitialized]);
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  // Add explicit logout handler with navigation
+  const logout = async () => {
+    try {
+      await handleLogout();
+      // Navigation will be handled by auth state change in useAuth
+      console.log("Logout complete, auth state should change");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
 
   if (loading) {
-    return null; // Or a loading spinner
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   return (
+    <Routes>
+      {/* Public routes - accessible without authentication */}
+      <Route path="/" element={user ? <Navigate to="/matches" replace /> : <Landing />} />
+      <Route path="/login" element={user ? <Navigate to="/matches" replace /> : <Login />} />
+      <Route path="/signup" element={user ? <Navigate to="/matches" replace /> : <SignUp />} />
+      
+      {/* Protected routes that require authentication */}
+      <Route 
+        path="/profile/setup" 
+        element={user ? <ProfileSetup /> : <Navigate to="/login" replace />} 
+      />
+      <Route 
+        path="/help" 
+        element={user ? <Help /> : <Navigate to="/login" replace />} 
+      />
+      
+      {/* Protected routes - AppLayout wrapper */}
+      <Route 
+        path="/matches" 
+        element={user ? <AppLayout><Matches /></AppLayout> : <Navigate to="/login" replace />} 
+      />
+      <Route 
+        path="/messages" 
+        element={user ? <AppLayout><Messages /></AppLayout> : <Navigate to="/login" replace />} 
+      />
+      <Route 
+        path="/events" 
+        element={user ? <AppLayout><Events /></AppLayout> : <Navigate to="/login" replace />} 
+      />
+      <Route 
+        path="/events/new" 
+        element={user ? <AppLayout><CreateEvent /></AppLayout> : <Navigate to="/login" replace />} 
+      />
+      <Route 
+        path="/profile" 
+        element={user ? <AppLayout><Profile /></AppLayout> : <Navigate to="/login" replace />} 
+      />
+      <Route 
+        path="/profile/:id" 
+        element={user ? <AppLayout><UserProfile /></AppLayout> : <Navigate to="/login" replace />} 
+      />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <TooltipProvider>
-            <Routes>
-              <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />
-              <Route path="/login" element={session ? <Navigate to="/matches" /> : <Login />} />
-              <Route path="/signup" element={session ? <Navigate to="/matches" /> : <SignUp />} />
-              <Route path="/profile/setup" element={session ? <ProfileSetup /> : <Navigate to="/login" />} />
-              <Route path="/help" element={session ? <Help /> : <Navigate to="/login" />} />
-              
-              {/* Protected routes - AppLayoutでラップ */}
-              <Route
-                path="/matches"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <Matches />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/messages"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <Messages />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/events"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <Events />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/events/new"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <CreateEvent />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <Profile />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/profile/:id"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <UserProfile />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </TooltipProvider>
-        </BrowserRouter>
+        <NotificationProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <TooltipProvider>
+              <AuthenticatedApp />
+            </TooltipProvider>
+          </BrowserRouter>
+        </NotificationProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );
