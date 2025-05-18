@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -36,6 +36,7 @@ const queryClient = new QueryClient({
 function AuthenticatedApp() {
   const { user, session, loading } = useAuth();
   const [notificationsInitialized, setNotificationsInitialized] = useState(false);
+  const initialCheckDone = useRef(false);
 
   // Initialize notifications when authenticated
   useEffect(() => {
@@ -50,6 +51,19 @@ function AuthenticatedApp() {
       return () => clearTimeout(timer);
     }
   }, [user, session, notificationsInitialized]);
+
+  // Log authentication status for debugging
+  useEffect(() => {
+    if (!initialCheckDone.current) {
+      console.log("Initial auth check in AuthenticatedApp:", {
+        isLoading: loading,
+        hasUser: !!user,
+        hasSession: !!session,
+        userId: user?.id
+      });
+      initialCheckDone.current = true;
+    }
+  }, [user, session, loading]);
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;

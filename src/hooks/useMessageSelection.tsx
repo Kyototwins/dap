@@ -9,14 +9,14 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const { messages, setMessages, fetchMessages } = useMatchMessages();
   const { toast } = useToast();
-  const [processingMatchSelection, setProcessingMatchSelection] = useState(false);
+  const [loading, setLoading] = useState(false);
   const processingRef = useRef(false);
   const currentMatchIdRef = useRef<string | null>(null);
   const selectionTimeoutRef = useRef<number | null>(null);
 
   const handleSelectMatch = useCallback(async (match: Match) => {
     // Prevent multiple simultaneous selections with both state and ref
-    if (processingRef.current || processingMatchSelection) {
+    if (processingRef.current || loading) {
       console.log("Match selection already in progress, skipping", match.id);
       return;
     }
@@ -30,7 +30,7 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
     try {
       // Update processing state
       processingRef.current = true;
-      setProcessingMatchSelection(true);
+      setLoading(true);
       
       // Clear any existing selection timeout
       if (selectionTimeoutRef.current) {
@@ -95,17 +95,18 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
     } finally {
       // Reset processing state with a small delay to prevent race conditions
       selectionTimeoutRef.current = window.setTimeout(() => {
-        setProcessingMatchSelection(false);
+        setLoading(false);
         processingRef.current = false;
         selectionTimeoutRef.current = null;
       }, 300) as unknown as number;
     }
-  }, [selectedMatch, fetchMessages, fetchMatches, processingMatchSelection, toast]);
+  }, [selectedMatch, fetchMessages, fetchMatches, loading, toast]);
 
   return {
     selectedMatch,
     messages,
     setMessages,
-    handleSelectMatch
+    handleSelectMatch,
+    loading
   };
 }

@@ -8,44 +8,60 @@ import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 export function useMessages() {
-  const { matches, loading: matchesLoading, fetchMatches: fetchMatchesOriginal } = useMatches();
+  const { matches, loading: matchesLoading, fetchMatches } = useMatches();
   const [initComplete, setInitComplete] = useState(false);
   const initInProgressRef = useRef(false);
   const location = useLocation();
-  
-  // Memoize fetchMatches to avoid unnecessary rerenders and dependency changes
-  const memoizedFetchMatches = useCallback(async () => {
-    console.log("Memoized fetchMatches called");
-    await fetchMatchesOriginal();
-  }, [fetchMatchesOriginal]);
+  const lastMatchesLengthRef = useRef(0);
+  const initialLoadProcessedRef = useRef(false);
   
   // Set up message selection with the memoized fetch function
   const { 
     selectedMatch, 
     messages, 
     setMessages, 
-    handleSelectMatch 
-  } = useMessageSelection(memoizedFetchMatches);
+    handleSelectMatch,
+    loading: selectionLoading
+  } = useMessageSelection(fetchMatches);
   
   // Set up URL parameter handling
-  useMessageUrlParams(matches, handleSelectMatch);
+  const { paramProcessing } = useMessageUrlParams(matches, handleSelectMatch);
   
   // Set up realtime subscription
   useMessageSubscription(selectedMatch, setMessages);
 
   // Initialization effect - runs only once
   useEffect(() => {
-    if (!initComplete && !initInProgressRef.current && !matchesLoading) {
-      initInProgressRef.current = true;
-      console.log("Initializing useMessages hook", { 
-        pathname: location.pathname,
-        matchCount: matches.length,
-        loading: matchesLoading
-      });
-      setInitComplete(true);
-      initInProgressRef.current = false;
+    // Skip if we're already initializing or already initialized
+    if (initInProgressRef.current || initialLoadProcessedRef.current) return;
+    
+    // Wait until we're not loading and have some matches data
+    if (matchesLoading) return;
+    
+    initInProgressRef.current = true;
+    console.log("Initializing useMessages hook", { 
+      pathname: location.pathname,
+      matchCount: matches.length,
+      loading: matchesLoading
+    });
+    
+    lastMatchesLengthRef.current = matches.length;
+    initialLoadProcessedRef.current = true;
+    setInitComplete(true);
+    initInProgressRef.current = false;
+  }, [matches, matchesLoading, location.pathname]);
+
+  // Track match changes
+  useEffect(() => {
+    // Skip initialization phase
+    if (!initialLoadProcessedRef.current) return;
+    
+    // Only process if matches count has changed (to avoid unnecessary processing)
+    if (matches.length !== lastMatchesLengthRef.current) {
+      console.log(`Matches count changed: ${lastMatchesLengthRef.current} -> ${matches.length}`);
+      lastMatchesLengthRef.current = matches.length;
     }
-  }, [initComplete, location.pathname, matches, matchesLoading]);
+  }, [matches]);
 
   // Mark messages as read when selecting a match
   useEffect(() => {
@@ -83,18 +99,18 @@ export function useMessages() {
       matchCount: matches.length,
       hasSelectedMatch: !!selectedMatch,
       messageCount: messages.length,
-      isLoading: matchesLoading,
+      isLoading: matchesLoading || selectionLoading || paramProcessing,
       pathname: location.pathname
     });
-  }, [matches, selectedMatch, messages, matchesLoading, location.pathname]);
+  }, [matches, selectedMatch, messages, matchesLoading, selectionLoading, paramProcessing, location.pathname]);
 
   return {
     matches,
     selectedMatch,
     messages,
-    loading: matchesLoading,
+    loading: matchesLoading || selectionLoading || !initComplete,
     handleSelectMatch,
     setMessages,
-    fetchMatches: memoizedFetchMatches,
+    fetchMatches,
   };
 }

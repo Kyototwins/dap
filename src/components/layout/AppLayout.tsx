@@ -18,10 +18,11 @@ export function AppLayout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
-  const { handleLogout, isAuthenticated } = useAuth();
+  const { handleLogout, isAuthenticated, loading: authLoading } = useAuth();
   const [navigating, setNavigating] = useState(false);
   const navigationTimeoutRef = useRef<number | null>(null);
   const lastPathRef = useRef(location.pathname);
+  const navigationBlockedUntil = useRef<number>(0);
 
   // Monitor and log navigation
   useEffect(() => {
@@ -36,6 +37,14 @@ export function AppLayout({ children }: LayoutProps) {
     };
   }, [location.pathname]);
 
+  // Auth redirect logic - separate from navigation logic
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated && !location.pathname.startsWith('/login') && !location.pathname.startsWith('/signup')) {
+      console.log("User not authenticated, redirecting to login");
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate, location.pathname]);
+
   const navItems = [
     { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
     { icon: MessageSquare, label: "Messages", path: "/messages", hasNotification: hasUnreadMessages },
@@ -44,15 +53,23 @@ export function AppLayout({ children }: LayoutProps) {
   ];
 
   const handleNavigation = (path: string) => {
-    // Prevent navigation if already navigating or already on the page
-    if (navigating || path === location.pathname) {
-      console.log(`Skipping navigation to ${path} - Already navigating or on that page`);
+    // Prevent navigation if already navigating or already on the page or if navigation is temporarily blocked
+    if (
+      navigating || 
+      path === location.pathname || 
+      Date.now() < navigationBlockedUntil.current
+    ) {
+      console.log(`Skipping navigation to ${path} - Already navigating, on that page, or navigation blocked`);
       return;
     }
 
     try {
       setNavigating(true);
       console.log(`Navigating to: ${path}`);
+      
+      // Block further navigation attempts for a short time to prevent rapid clicks
+      navigationBlockedUntil.current = Date.now() + 500;
+      
       navigate(path);
       
       // Reset the navigating flag after a short delay
@@ -81,13 +98,10 @@ export function AppLayout({ children }: LayoutProps) {
     }
   };
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated && !location.pathname.startsWith('/login') && !location.pathname.startsWith('/signup')) {
-      console.log("User not authenticated, redirecting to login");
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, navigate, location.pathname]);
+  // Don't render the AppLayout until auth is determined
+  if (authLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen pb-16">
@@ -109,6 +123,7 @@ export function AppLayout({ children }: LayoutProps) {
                     variant="ghost" 
                     className="justify-start" 
                     onClick={() => navigate("/help")}
+                    disabled={navigating}
                   >
                     <HelpCircle className="mr-2 h-5 w-5" />
                     Help
@@ -117,6 +132,7 @@ export function AppLayout({ children }: LayoutProps) {
                     variant="ghost" 
                     className="justify-start text-red-600 hover:text-red-600 hover:bg-red-50" 
                     onClick={handleLogoutClick}
+                    disabled={navigating}
                   >
                     <LogOut className="mr-2 h-5 w-5" />
                     Logout
@@ -144,7 +160,7 @@ export function AppLayout({ children }: LayoutProps) {
                   "text-gray-500 hover:text-doshisha-purple transition-colors",
                   location.pathname === item.path && "text-doshisha-purple font-medium"
                 )}
-                disabled={navigating}
+                disabled={navigating || authLoading}
               >
                 <item.icon className={cn(
                   "w-5 h-5",

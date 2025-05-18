@@ -3,8 +3,7 @@ import { useMessages } from "@/hooks/useMessages";
 import { MessageContainer } from "@/components/messages/MessageContainer";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 
 export default function Messages() {
   const {
@@ -18,23 +17,33 @@ export default function Messages() {
   } = useMessages();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [searchParams] = useSearchParams();
   const [hasInitialized, setHasInitialized] = useState(false);
+  const initialRenderRef = useRef(true);
 
   // Debug log and initialization effect
   useEffect(() => {
+    if (initialRenderRef.current) {
+      console.log("Messages page mounted", {
+        matchesCount: matches.length,
+        loading
+      });
+      initialRenderRef.current = false;
+    }
+    
     console.log("Messages page rendered with state:", {
       matchesCount: matches.length,
       messagesCount: messages.length,
       hasSelectedMatch: !!selectedMatch,
-      userParam: searchParams.get('user'),
-      loading
+      loading,
+      hasInitialized
     });
 
-    if (!hasInitialized && !loading) {
+    // Set initialization flag once loading is complete
+    if (!hasInitialized && !loading && !initialRenderRef.current) {
+      console.log("Messages page initialization complete");
       setHasInitialized(true);
     }
-  }, [matches, messages, selectedMatch, searchParams, loading, hasInitialized]);
+  }, [matches, messages, selectedMatch, loading, hasInitialized]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
