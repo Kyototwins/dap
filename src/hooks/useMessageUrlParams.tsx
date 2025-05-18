@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import type { Match } from "@/types/messages";
+import type { Match } from "@/types/messages"; // Specifically use the one from messages.ts
 
 export function useMessageUrlParams(
   matches: Match[], 
@@ -22,7 +22,7 @@ export function useMessageUrlParams(
     if (userId && matches.length > 0) {
       // Find match with specified user
       const matchWithUser = matches.find(match => 
-        match.otherUser.id === userId
+        match.otherUser && match.otherUser.id === userId
       );
       
       if (matchWithUser) {

@@ -107,7 +107,7 @@ export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: s
       status = 'waiting';
     }
   
-    // Return enhanced match object with proper type
+    // Return enhanced match object without any recursive calls
     return {
       ...match,
       otherUser,

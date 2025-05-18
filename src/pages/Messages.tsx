@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Match as MessageMatch } from "@/types/messages";
 
 export default function Messages() {
   const {
@@ -30,7 +31,7 @@ export default function Messages() {
     console.log(`Matches available: ${matches.length}`);
     if (matches.length > 0) {
       matches.forEach((match, idx) => {
-        console.log(`Match ${idx+1}: ID=${match.id}, Status=${match.status}, User=${match.otherUser.first_name}`);
+        console.log(`Match ${idx+1}: ID=${match.id}, Status=${match.status}, User=${match.otherUser?.first_name || 'Unknown'}`);
       });
     }
     console.log(`Messages available: ${messages.length}`);

@@ -9,13 +9,13 @@ export interface FilterState {
   sortOption: string;
 }
 
-// Add Match interface to fix the error in useMatches
+// Make Match type compatible with the one in messages.ts
 export interface Match {
   id: string;
   user1_id: string;
   user2_id: string;
+  created_at: string; // Changed from optional to required
   status: string;
-  created_at?: string;
   otherUser?: any;
   lastMessage?: any;
   unreadCount?: number;
