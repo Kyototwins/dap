@@ -33,38 +33,37 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check active session
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
+
+    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   if (loading) {
-    return null; // Or a loading spinner
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
 
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        {/* Initialize Firebase */}
-        <FirebaseInitializer />
-        
-        {/* Notification context provider */}
         <NotificationProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
             <TooltipProvider>
+              {/* Initialize Firebase only if the user is logged in */}
+              {session && <FirebaseInitializer />}
+              
               <Routes>
                 <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />
                 <Route path="/login" element={session ? <Navigate to="/matches" /> : <Login />} />

@@ -19,20 +19,25 @@ export function usePushNotifications() {
   // Check if push notifications are supported
   useEffect(() => {
     const checkSupport = async () => {
-      const supported = await initializePushNotifications();
-      setIsSupported(supported);
-      
-      if (supported) {
-        // Set up notification handlers
-        setupNotificationHandlers();
+      try {
+        const supported = await initializePushNotifications();
+        setIsSupported(supported);
         
-        // Check if notifications already enabled
-        const enabled = await areNotificationsEnabled();
-        if (enabled) {
-          setPermission('granted');
-        } else {
-          setPermission(Notification.permission as NotificationPermission);
+        if (supported) {
+          // Set up notification handlers
+          setupNotificationHandlers();
+          
+          // Check if notifications already enabled
+          const enabled = await areNotificationsEnabled();
+          if (enabled) {
+            setPermission('granted');
+          } else {
+            setPermission(Notification.permission as NotificationPermission);
+          }
         }
+      } catch (error) {
+        console.error('Error checking push notification support:', error);
+        setIsSupported(false);
       }
     };
     

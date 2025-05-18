@@ -1,106 +1,95 @@
 
-import { useEffect, useState } from 'react';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
-import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Bell, BellOff } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { BellRing, Info } from 'lucide-react';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { supabase } from '@/integrations/supabase/client';
 
 export function NotificationSettings() {
+  const [notificationsLoading, setNotificationsLoading] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const { 
     isSupported, 
     permission, 
-    loading, 
     enableNotifications, 
-    disableNotifications 
+    disableNotifications, 
+    loading 
   } = usePushNotifications();
-  
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
-  // Check if user has FCM token in profile
+  // Check current notification status when component mounts
   useEffect(() => {
-    const checkTokenExists = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('fcm_token')
-        .eq('id', user.id)
-        .single();
-        
-      if (!error && data && data.fcm_token) {
-        setNotificationsEnabled(true);
-      } else {
-        setNotificationsEnabled(false);
+    const checkNotificationStatus = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('fcm_token')
+            .eq('id', user.id)
+            .single();
+          
+          setNotificationsEnabled(!!data?.fcm_token);
+        }
+      } catch (error) {
+        console.error('Error checking notification status:', error);
+      } finally {
+        setNotificationsLoading(false);
       }
     };
-    
-    checkTokenExists();
+
+    checkNotificationStatus();
   }, []);
 
-  // Handle toggle change
-  const handleToggleNotifications = async (checked: boolean) => {
-    if (checked) {
-      const success = await enableNotifications();
-      setNotificationsEnabled(success);
-    } else {
+  // Handle toggle
+  const handleToggleNotifications = async () => {
+    if (notificationsEnabled) {
       const success = await disableNotifications();
-      setNotificationsEnabled(!success);
+      if (success) {
+        setNotificationsEnabled(false);
+      }
+    } else {
+      const success = await enableNotifications();
+      if (success) {
+        setNotificationsEnabled(true);
+      }
     }
   };
 
+  // If notifications are not supported, don't show anything
+  if (!isSupported) {
+    return null;
+  }
+
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BellRing className="h-5 w-5" />
-          通知設定
+    <Card className="mb-6 bg-white">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-md flex items-center">
+          <Bell className="mr-2 h-5 w-5 text-doshisha-purple" />
+          Notification Settings
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {isSupported === false && (
-          <div className="bg-amber-100 p-4 rounded-md flex items-center gap-2 text-amber-800 text-sm">
-            <Info className="h-5 w-5 flex-shrink-0" />
-            <p>お使いのブラウザはプッシュ通知をサポートしていません。</p>
+      <CardContent>
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-1">
+            <Label htmlFor="notifications" className="font-medium">
+              Push Notifications
+            </Label>
+            <span className="text-sm text-gray-500">
+              {notificationsEnabled 
+                ? "You'll receive notifications for new messages and matches"
+                : "Enable notifications to stay updated"}
+            </span>
           </div>
-        )}
-
-        {isSupported && (
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label htmlFor="notifications" className="font-medium">
-                プッシュ通知
-              </Label>
-              <p className="text-sm text-gray-500">
-                新しいメッセージやいいね、イベントの通知を受け取る
-              </p>
-            </div>
-            <Switch
-              id="notifications"
-              checked={notificationsEnabled}
-              onCheckedChange={handleToggleNotifications}
-              disabled={loading || isSupported === false}
-            />
-          </div>
-        )}
-
-        {permission === 'denied' && (
-          <div className="bg-red-100 p-4 rounded-md text-sm text-red-800">
-            <p className="font-medium mb-1">通知がブロックされています</p>
-            <p>ブラウザの設定から通知を許可してください。</p>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="mt-2"
-              onClick={() => window.open('https://support.google.com/chrome/answer/3220216?hl=ja', '_blank')}
-            >
-              設定方法を確認
-            </Button>
-          </div>
-        )}
+          <Switch
+            id="notifications"
+            checked={notificationsEnabled === true}
+            disabled={loading || notificationsLoading}
+            onCheckedChange={handleToggleNotifications}
+          />
+        </div>
       </CardContent>
     </Card>
   );
