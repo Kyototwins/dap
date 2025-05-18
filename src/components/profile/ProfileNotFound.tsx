@@ -1,5 +1,7 @@
 
-import { SearchX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { Wifi } from "lucide-react";
 
 interface ProfileNotFoundProps {
   message: string;
@@ -7,26 +9,30 @@ interface ProfileNotFoundProps {
   connectionError?: boolean;
 }
 
-export function ProfileNotFound({ message, offline, connectionError }: ProfileNotFoundProps) {
+export function ProfileNotFound({ message, offline = false, connectionError = false }: ProfileNotFoundProps) {
+  const navigate = useNavigate();
+
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      <div className="bg-gray-100 p-6 rounded-full mb-4">
-        <SearchX className="h-12 w-12 text-gray-400" />
+    <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
+      {(offline || connectionError) && (
+        <div className="mb-4 p-3 bg-amber-100 text-amber-800 rounded-lg flex items-center gap-2">
+          <Wifi className="h-5 w-5" />
+          <span>インターネット接続に問題があります</span>
+        </div>
+      )}
+      <img 
+        src="/placeholder.svg" 
+        alt="Profile not found" 
+        className="w-32 h-32 mb-6 opacity-30"
+      />
+      <h2 className="text-xl font-bold mb-2">プロフィールが見つかりません</h2>
+      <p className="text-muted-foreground mb-6">{message}</p>
+      <div className="space-x-4">
+        <Button onClick={() => navigate("/")}>ホームに戻る</Button>
+        <Button variant="outline" onClick={() => window.location.reload()}>
+          再読み込み
+        </Button>
       </div>
-      <h3 className="text-lg font-medium text-gray-900 mb-2">プロフィールが見つかりません</h3>
-      <p className="text-gray-500 max-w-md">{message}</p>
-      
-      {offline && (
-        <p className="mt-4 text-amber-600">
-          オフライン状態です。インターネット接続を確認してください。
-        </p>
-      )}
-      
-      {connectionError && !offline && (
-        <p className="mt-4 text-red-600">
-          サーバーに接続できません。しばらくしてからもう一度お試しください。
-        </p>
-      )}
     </div>
   );
 }

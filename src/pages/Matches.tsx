@@ -10,11 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLikesReceived } from "@/hooks/useLikesReceived";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { NotificationType } from "@/types/notifications";
-import { toast } from "@/hooks/use-toast";
 
 export default function Matches() {
   const [activeTab, setActiveTab] = useState("discover");
-  const [initialLoad, setInitialLoad] = useState(true);
   const {
     filteredProfiles,
     visibleProfiles,
@@ -40,42 +38,6 @@ export default function Matches() {
 
   const { notifications, markAllAsRead } = useNotifications();
 
-  // Debug information
-  useEffect(() => {
-    console.log("Matches page rendered", {
-      profilesCount: filteredProfiles.length,
-      visibleCount: visibleProfiles.length,
-      isLoading: loading,
-      activeTab
-    });
-    
-    // After initial render, set initial load to false
-    if (initialLoad) {
-      setTimeout(() => {
-        setInitialLoad(false);
-      }, 500);
-    }
-  }, [filteredProfiles, visibleProfiles, loading, activeTab, initialLoad]);
-
-  // Force refresh of profiles once when component mounts
-  useEffect(() => {
-    const performInitialRefresh = async () => {
-      try {
-        console.log("Performing initial profile refresh");
-        await handleRefresh();
-      } catch (error) {
-        console.error("Error refreshing profiles:", error);
-        toast({
-          title: "エラー",
-          description: "プロフィールの更新に失敗しました",
-          variant: "destructive",
-        });
-      }
-    };
-    
-    performInitialRefresh();
-  }, [handleRefresh]);
-
   // Mark match notifications as read when viewing the likes tab
   useEffect(() => {
     if (activeTab === "likes") {
@@ -89,17 +51,6 @@ export default function Matches() {
       }
     }
   }, [activeTab, notifications, markAllAsRead]);
-
-  if (initialLoad || loading) {
-    return (
-      <div className="py-4">
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-doshisha-purple mb-4"></div>
-          <p className="text-gray-500">プロフィールを読み込み中...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="py-4">

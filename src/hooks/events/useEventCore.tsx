@@ -1,78 +1,86 @@
 
 import { useState, useCallback } from "react";
 import { Event } from "@/types/events";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { fetchEvents } from "@/services/eventDataService";
 
+/**
+ * Core event functionality - events data, loading state, and selected event
+ */
 export function useEventCore() {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const loadInitialData = useCallback(async () => {
-    setLoading(true);
+  const loadInitialData = async () => {
     try {
-      console.log("Loading events...");
+      setLoading(true);
+      const eventsData = await fetchEvents();
       
-      // モックイベントデータを作成
-      const currentDate = new Date();
-      const tomorrow = new Date();
-      tomorrow.setDate(currentDate.getDate() + 1);
-      const nextWeek = new Date();
-      nextWeek.setDate(currentDate.getDate() + 7);
-      
-      const mockEvents: Event[] = [
-        {
-          id: "mock-event-1",
-          title: "京都観光ツアー",
-          description: "京都の有名な観光地を巡るツアーです。一緒に日本の伝統文化を体験しましょう！",
-          location: "京都駅中央口",
-          date: tomorrow.toISOString(),
-          max_participants: 10,
-          current_participants: 3,
-          creator_id: "mock-user-id",
-          created_at: currentDate.toISOString(),
-          category: "culture",
-          image_url: "/lovable-uploads/65f3a573-3b4d-4ec7-90e5-78fab77b800d.png",
-          status: "active",
-          map_link: "https://goo.gl/maps/abcdefg"
-        },
-        {
-          id: "mock-event-2",
-          title: "言語交換カフェ会",
-          description: "日本語と英語を練習したい方のためのカフェ会です。気軽に参加してください！",
-          location: "スターバックス 三条河原町店",
-          date: nextWeek.toISOString(),
-          max_participants: 8,
-          current_participants: 5,
-          creator_id: "other-user-id",
-          created_at: currentDate.toISOString(),
-          category: "language",
-          image_url: "/lovable-uploads/9797c959-5651-45e5-b6fc-2d1ff0c0b223.png",
-          status: "active",
-          map_link: "https://goo.gl/maps/hijklmn"
+      // Apply any stored participant counts from localStorage
+      const processedEvents = eventsData.map(event => {
+        const storedCount = localStorage.getItem(`event_${event.id}_count`);
+        if (storedCount) {
+          const count = parseInt(storedCount, 10);
+          // Only use the stored count if it's higher than the current count
+          if (count > event.current_participants) {
+            return { ...event, current_participants: count };
+          }
         }
-      ];
+        // Update localStorage with the current count
+        localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
+        return event;
+      });
       
-      console.log(`Generated ${mockEvents.length} mock events`);
-      setEvents(mockEvents);
+      setEvents(processedEvents);
     } catch (error: any) {
-      console.error("Error loading events:", error);
       toast({
-        title: "エラー",
-        description: "イベントの読み込みに失敗しました",
+        title: "Error occurred",
+        description: error.message,
         variant: "destructive",
       });
-      setEvents([]);
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  };
 
   const refreshEvents = useCallback(async () => {
-    return await loadInitialData();
-  }, [loadInitialData]);
+    try {
+      const eventsData = await fetchEvents();
+      
+      // Apply any stored participant counts from localStorage
+      const processedEvents = eventsData.map(event => {
+        const storedCount = localStorage.getItem(`event_${event.id}_count`);
+        if (storedCount) {
+          const count = parseInt(storedCount, 10);
+          // Only use the stored count if it's higher than the current count
+          if (count > event.current_participants) {
+            return { ...event, current_participants: count };
+          }
+        }
+        // Update localStorage with the current count
+        localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
+        return event;
+      });
+      
+      setEvents(processedEvents);
+      
+      // Update selected event if it exists
+      if (selectedEvent) {
+        const updatedSelectedEvent = processedEvents.find(event => event.id === selectedEvent.id);
+        if (updatedSelectedEvent) {
+          setSelectedEvent(updatedSelectedEvent);
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Failed to update events",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  }, [selectedEvent, toast]);
 
   return {
     events,

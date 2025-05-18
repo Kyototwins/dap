@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -14,56 +14,25 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { loading, authReady, connectionError, offline, handleLogin, user, isAuthenticated } = useAuth();
+  const { loading, connectionError, offline, handleLogin, user } = useAuth();
   const navigate = useNavigate();
-  const redirectedRef = useRef(false);
-  const redirectionTimeoutRef = useRef<number | null>(null);
-  
-  // Track authentication state and handle redirections - only redirect once
+
+  // Check for authenticated user and redirect
   useEffect(() => {
-    if (!authReady) {
-      console.log("Auth not ready yet, waiting...");
-      return;
+    // Only redirect if we have finished loading auth state and the user is authenticated
+    if (!loading && user) {
+      console.log("User is authenticated in Login page, redirecting to matches", user.id);
+      navigate("/matches", { replace: true });
     }
-    
-    if (redirectedRef.current) {
-      return;
-    }
-    
-    console.log("Login page auth check:", { 
-      isAuthenticated, 
-      authReady,
-      isSubmitting,
-      user: user?.id
-    });
-    
-    // Simple, clean redirection logic - if authenticated, go to matches
-    if (isAuthenticated && !isSubmitting) {
-      console.log("User is authenticated, redirecting to matches", user?.id);
-      redirectedRef.current = true;
-      
-      // Use timeout to avoid race condition with state updates
-      redirectionTimeoutRef.current = window.setTimeout(() => {
-        console.log("Executing navigation to /matches");
-        navigate("/matches", { replace: true });
-      }, 100);
-    }
-    
-    return () => {
-      // Clear timeout on unmount
-      if (redirectionTimeoutRef.current) {
-        clearTimeout(redirectionTimeoutRef.current);
-      }
-    };
-  }, [isAuthenticated, user, navigate, isSubmitting, authReady]);
+  }, [user, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
       toast({
-        title: "入力エラー",
-        description: "メールアドレスとパスワードを入力してください。",
+        title: "Input Error",
+        description: "Please enter both email and password.",
         variant: "destructive",
       });
       return;
@@ -73,45 +42,31 @@ export default function Login() {
     
     try {
       console.log("Attempting login with email:", email);
-      const result = await handleLogin({ email, password });
-      console.log("Login result:", result ? "success" : "failed");
-      
-      // Success toast
-      toast({
-        title: "ログイン成功",
-        description: "おかえりなさい！",
-      });
-      
-      // Navigation will be handled by the useEffect
-      
-    } catch (error: any) {
+      await handleLogin({ email, password });
+      // Navigation is handled in handleLogin
+    } catch (error) {
       console.error("Login submission error:", error);
-      
-      let errorMessage = "ログインに失敗しました。認証情報を確認してください。";
-      
-      if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      toast({
-        title: "ログインエラー",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      // Error is already handled in handleLogin
     } finally {
       setIsSubmitting(false);
     }
   };
 
   // If we're loading auth state, show a simple loading message
-  if ((loading && !isSubmitting) || !authReady) {
+  if (loading && !isSubmitting) {
     return (
       <AuthLayout title="Welcome Back" subtitle="Start your international exchange journey">
         <div className="animate-fade-up flex justify-center py-12">
-          <p>読み込み中...</p>
+          <p>Loading...</p>
         </div>
       </AuthLayout>
     );
+  }
+
+  // Don't render login form if user is authenticated and not loading
+  if (!loading && user) {
+    console.log("User authenticated, rendering null");
+    return null;
   }
 
   return (
@@ -121,7 +76,7 @@ export default function Login() {
           <Alert variant="destructive" className="mb-6 border-red-400">
             <WifiOff className="h-4 w-4" />
             <AlertDescription>
-              インターネット接続がありません。ネットワーク接続を確認してください。
+              No internet connection. Please check your network.
             </AlertDescription>
           </Alert>
         )}
@@ -130,7 +85,7 @@ export default function Login() {
           <Alert variant="destructive" className="mb-6 border-red-400">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              サーバーに接続できませんでした。ネットワーク接続を確認してください。
+              Could not connect to the server. Please check your network.
             </AlertDescription>
           </Alert>
         )}
@@ -174,17 +129,17 @@ export default function Login() {
             className="w-full transition-all duration-200 shadow-md hover:shadow-lg bg-[#7f1184] hover:bg-[#671073]" 
             disabled={loading || offline || connectionError || isSubmitting}
           >
-            {isSubmitting ? "ログイン中..." : loading ? "処理中..." : "ログイン"}
+            {isSubmitting ? "Logging in..." : loading ? "Processing..." : "Log In"}
           </Button>
         </form>
         
         <div className="mt-8 text-center">
-          <span className="text-muted-foreground text-sm">アカウントをお持ちでないですか？ </span> 
+          <span className="text-muted-foreground text-sm">Don't have an account? </span> 
           <Link
             to="/signup"
             className="text-[#7f1184] font-medium hover:underline hover-lift inline-block transition-all"
           >
-            登録する
+            Sign Up
           </Link>
         </div>
       </div>

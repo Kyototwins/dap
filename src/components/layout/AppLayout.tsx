@@ -8,8 +8,6 @@ import { DapLogo } from "@/components/common/DapLogo";
 import { NotificationIndicator } from "@/components/common/NotificationIndicator";
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useAuth } from "@/hooks/useAuth";
-import { useState, useEffect, useRef } from "react";
-import { toast } from "@/hooks/use-toast";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,50 +18,31 @@ export function AppLayout({ children }: LayoutProps) {
   const location = useLocation();
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
   const { handleLogout } = useAuth();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  
-  // Force render to true - no auth checks
-  const [shouldRender, setShouldRender] = useState(true);
 
   const navItems = [
-    { icon: Search, label: "Matches", path: "/matches", hasNotification: hasUnreadLikes },
+    { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
     { icon: MessageSquare, label: "Messages", path: "/messages", hasNotification: hasUnreadMessages },
     { icon: Calendar, label: "Events", path: "/events", hasNotification: hasUnreadEvents },
     { icon: User, label: "Profile", path: "/profile", hasNotification: false },
   ];
 
   const handleNavigation = (path: string) => {
-    if (location.pathname === path) return; // Don't navigate if already on the path
-    navigate(path);
-  };
-
-  const handleHelpClick = () => {
-    navigate("/help");
+    if (path === "/messages") {
+      navigate("/messages", { replace: true });
+      console.log("Navigating to messages list view");
+    } else {
+      navigate(path, { replace: true });
+    }
   };
 
   const handleLogoutClick = async () => {
-    if (isLoggingOut) return; // Prevent multiple clicks
-    
     try {
-      setIsLoggingOut(true);
-      console.log("Logging out...");
-      
-      // Show toast for feedback
-      toast({
-        title: "ログアウト中...",
-        duration: 2000,
-      });
-      
       await handleLogout();
+      // Explicitly navigate to login page after logout
+      navigate('/login', { replace: true });
+      console.log("Logged out and redirected to login");
     } catch (error) {
       console.error("Error logging out:", error);
-      toast({
-        title: "ログアウトに失敗しました",
-        description: "もう一度お試しください",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoggingOut(false);
     }
   };
 
@@ -86,7 +65,7 @@ export function AppLayout({ children }: LayoutProps) {
                   <Button 
                     variant="ghost" 
                     className="justify-start" 
-                    onClick={handleHelpClick}
+                    onClick={() => navigate("/help")}
                   >
                     <HelpCircle className="mr-2 h-5 w-5" />
                     Help
@@ -95,10 +74,9 @@ export function AppLayout({ children }: LayoutProps) {
                     variant="ghost" 
                     className="justify-start text-red-600 hover:text-red-600 hover:bg-red-50" 
                     onClick={handleLogoutClick}
-                    disabled={isLoggingOut}
                   >
                     <LogOut className="mr-2 h-5 w-5" />
-                    {isLoggingOut ? "ログアウト中..." : "ログアウト"}
+                    Logout
                   </Button>
                 </div>
               </SheetContent>

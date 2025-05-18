@@ -76,8 +76,6 @@ export function useAuthOperations() {
         description: errorMessage,
         variant: "destructive",
       });
-      
-      throw error; // Re-throw for component-level handling
     } finally {
       setLoading(false);
     }
@@ -110,17 +108,21 @@ export function useAuthOperations() {
 
       if (error) {
         console.error("Authentication error:", error);
-        
-        // Provide more user-friendly error messages
-        if (error.message.includes("Invalid login credentials")) {
-          throw new Error("メールアドレスまたはパスワードが正しくありません。");
-        }
         throw error;
       }
       
       console.log("Authentication successful, session created:", !!data.session);
       
-      // Let the caller handle navigation to avoid race conditions
+      // Login success toast
+      toast({
+        title: "ログインしました",
+        description: "アプリへようこそ！",
+      });
+      
+      console.log("Redirecting to matches page...");
+      // Use replace to prevent going back to login page
+      navigate('/matches', { replace: true });
+      
       return data;
     } catch (error: any) {
       console.error("Login error:", error);
@@ -139,7 +141,7 @@ export function useAuthOperations() {
       }
       
       toast({
-        title: "ログインエラー",
+        title: "エラーが発生しました",
         description: errorMessage,
         variant: "destructive",
       });

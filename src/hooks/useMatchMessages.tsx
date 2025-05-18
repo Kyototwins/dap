@@ -12,115 +12,44 @@ export function useMatchMessages() {
   const fetchMessages = async (matchId: string) => {
     try {
       console.log(`Fetching messages for match: ${matchId}`);
+      const { data, error } = await supabase
+        .from("messages")
+        .select(`
+          *,
+          sender:profiles!messages_sender_id_fkey (*)
+        `)
+        .eq("match_id", matchId)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching messages:", error);
+        throw error;
+      }
       
-      // モックメッセージを作成
-      if (matchId === "mock-match-1") {
-        const mockUser = {
-          id: "mock-user-id",
-          created_at: new Date().toISOString(),
-          first_name: "太郎",
-          last_name: "同志社",
-          avatar_url: "/lovable-uploads/dcec855f-513e-4a70-aae4-fa4c16529c99.png"
-        };
-        
-        const mockMatchUser = {
-          id: "mock-match-user-1",
-          created_at: new Date().toISOString(),
-          first_name: "花子",
-          last_name: "京都",
-          avatar_url: "/lovable-uploads/dd8c0f48-e885-4658-8781-f1fb6bde0fd3.png"
-        };
-        
-        const now = new Date();
-        const yesterday = new Date(now);
-        yesterday.setDate(now.getDate() - 1);
-        
-        const mockMessages: Message[] = [
-          {
-            id: "mock-msg-1-1",
-            content: "こんにちは！よろしくお願いします。",
-            created_at: yesterday.toISOString(),
-            match_id: matchId,
-            sender_id: "mock-match-user-1",
-            sender: createStandardizedUserObject(mockMatchUser)
-          },
-          {
-            id: "mock-msg-1-2",
-            content: "こんにちは！よろしくお願いします。同志社大学の学生です。",
-            created_at: yesterday.toISOString(),
-            match_id: matchId,
-            sender_id: "mock-user-id",
-            sender: createStandardizedUserObject(mockUser)
-          },
-          {
-            id: "mock-msg-1-3",
-            content: "私は京都大学の学生です。趣味は何ですか？",
-            created_at: now.toISOString(),
-            match_id: matchId,
-            sender_id: "mock-match-user-1",
-            sender: createStandardizedUserObject(mockMatchUser)
-          }
-        ];
-        
-        setMessages(mockMessages);
-        return mockMessages;
-      } 
-      else if (matchId === "mock-match-2") {
-        const mockUser = {
-          id: "mock-user-id",
-          created_at: new Date().toISOString(),
-          first_name: "太郎",
-          last_name: "同志社",
-          avatar_url: "/lovable-uploads/dcec855f-513e-4a70-aae4-fa4c16529c99.png"
-        };
-        
-        const mockMatchUser = {
-          id: "mock-match-user-2",
-          created_at: new Date().toISOString(),
-          first_name: "John",
-          last_name: "Smith",
-          avatar_url: "/lovable-uploads/9797c959-5651-45e5-b6fc-2d1ff0c0b223.png"
-        };
-        
-        const now = new Date();
-        const yesterday = new Date(now);
-        yesterday.setDate(now.getDate() - 1);
-        
-        const mockMessages: Message[] = [
-          {
-            id: "mock-msg-2-1",
-            content: "Hi there! Nice to meet you.",
-            created_at: yesterday.toISOString(),
-            match_id: matchId,
-            sender_id: "mock-user-id",
-            sender: createStandardizedUserObject(mockUser)
-          },
-          {
-            id: "mock-msg-2-2",
-            content: "Hello! Nice to meet you too! I'm an exchange student from the US.",
-            created_at: yesterday.toISOString(),
-            match_id: matchId,
-            sender_id: "mock-match-user-2",
-            sender: createStandardizedUserObject(mockMatchUser)
-          },
-          {
-            id: "mock-msg-2-3",
-            content: "Do you have any recommendations for places to visit in Kyoto?",
-            created_at: now.toISOString(),
-            match_id: matchId,
-            sender_id: "mock-match-user-2",
-            sender: createStandardizedUserObject(mockMatchUser)
-          }
-        ];
-        
-        setMessages(mockMessages);
-        return mockMessages;
-      }
-      else {
-        // 空のメッセージ配列を返す
-        setMessages([]);
-        return [];
-      }
+      console.log(`Received ${data?.length || 0} messages from database`);
+      
+      const validMessages = (data || [])
+        .filter(message => message.sender)
+        .map(message => {
+          // Create sender with all required properties
+          const sender = createStandardizedUserObject(message.sender);
+          
+          if (!sender) return null;
+          
+          return {
+            id: message.id,
+            content: message.content,
+            created_at: message.created_at,
+            match_id: message.match_id,
+            sender_id: message.sender_id,
+            sender: sender
+          };
+        })
+        .filter(Boolean) as Message[];
+
+      console.log(`Processed ${validMessages.length} valid messages`);
+      setMessages(validMessages);
+      return validMessages;
     } catch (error: any) {
       console.error("Error in fetchMessages:", error);
       toast({

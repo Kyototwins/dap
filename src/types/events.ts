@@ -36,14 +36,6 @@ export interface EventComment {
   };
 }
 
-export interface EventParticipation {
-  id: string;
-  event_id: string;
-  user_id: string;
-  status: string;
-  created_at: string;
-}
-
 export interface EventParticipationMap {
   [key: string]: boolean;
 }
