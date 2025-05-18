@@ -34,7 +34,7 @@ export function LanguagesDisplay({ profile }: LanguagesDisplayProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
-        <Languages className="w-5 h-5 text-amber-600" />
+        <Languages className="w-5 h-5 text-[#7F1184]" />
         <h2 className="text-lg font-semibold">Language Skills</h2>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -44,7 +44,7 @@ export function LanguagesDisplay({ profile }: LanguagesDisplayProps) {
               <div key={lang} className="space-y-2">
                 <div className="flex justify-between items-center">
                   <h3 className="font-medium">{lang}</h3>
-                  <Badge variant="outline">{languageLevelText(languageLevels[lang] || 1)}</Badge>
+                  <Badge variant="secondary">{languageLevelText(languageLevels[lang] || 1)}</Badge>
                 </div>
                 <Progress value={(languageLevels[lang] || 1) * 25} className="h-2" />
               </div>
@@ -57,7 +57,7 @@ export function LanguagesDisplay({ profile }: LanguagesDisplayProps) {
             <h3 className="font-medium mb-3">Currently Learning</h3>
             <div className="flex flex-wrap gap-2">
               {profile.learning_languages.map((lang) => (
-                <Badge key={lang} variant="outline">{lang}</Badge>
+                <Badge key={lang} variant="secondary">{lang}</Badge>
               ))}
             </div>
           </div>
@@ -66,4 +66,3 @@ export function LanguagesDisplay({ profile }: LanguagesDisplayProps) {
     </Card>
   );
 }
-

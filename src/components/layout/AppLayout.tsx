@@ -4,8 +4,12 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { DapLogo } from "@/components/common/DapLogo";
+import { NotificationIndicator } from "@/components/common/NotificationIndicator";
+import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
+import { useAuth } from "@/hooks/useAuth";
+import { useState, useEffect, useRef } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,31 +18,88 @@ interface LayoutProps {
 export function AppLayout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
+  const { handleLogout, isAuthenticated, loading: authLoading } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const lastPathRef = useRef(location.pathname);
+
+  // Monitor and log navigation
+  useEffect(() => {
+    console.log("AppLayout rendered at path:", location.pathname);
+    lastPathRef.current = location.pathname;
+  }, [location.pathname]);
+
+  // Auth redirect logic - separate from navigation logic
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated && !location.pathname.startsWith('/login') && !location.pathname.startsWith('/signup')) {
+      console.log("User not authenticated, redirecting to login");
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate, location.pathname]);
 
   const navItems = [
-    { icon: Search, label: "Matching", path: "/matches" },
-    { icon: MessageSquare, label: "Messages", path: "/messages" },
-    { icon: Calendar, label: "Events", path: "/events" },
-    { icon: User, label: "Profile", path: "/profile" },
+    { icon: Search, label: "Matching", path: "/matches", hasNotification: hasUnreadLikes },
+    { icon: MessageSquare, label: "Messages", path: "/messages", hasNotification: hasUnreadMessages },
+    { icon: Calendar, label: "Events", path: "/events", hasNotification: hasUnreadEvents },
+    { icon: User, label: "Profile", path: "/profile", hasNotification: false },
   ];
 
   const handleNavigation = (path: string) => {
-    if (path === "/messages") {
-      navigate("/messages", { replace: true });
-      console.log("Navigating to messages list view");
-    } else {
-      navigate(path, { replace: true });
+    console.log(`Navigating to: ${path} from: ${location.pathname}`);
+    
+    try {
+      navigate(path);
+    } catch (error) {
+      console.error("Navigation error:", error);
     }
   };
 
-  const handleLogout = async () => {
+  const handleHelpClick = () => {
+    console.log("Navigating to help page");
+    navigate("/help");
+  };
+
+  const handleLogoutClick = async () => {
+    if (isLoggingOut) return; // Prevent multiple clicks
+    
     try {
-      await supabase.auth.signOut();
-      navigate("/login");
+      setIsLoggingOut(true);
+      console.log("Logging out...");
+      
+      // Show toast for feedback
+      toast({
+        title: "Logging out...",
+        duration: 2000,
+      });
+      
+      await handleLogout();
+      
+      // Success toast
+      toast({
+        title: "Successfully logged out",
+        description: "Redirecting to login page...",
+        duration: 3000,
+      });
+      
+      // Explicitly navigate to login page after logout
+      navigate('/login', { replace: true });
+      console.log("Logged out and redirected to login");
     } catch (error) {
       console.error("Error logging out:", error);
+      toast({
+        title: "Logout failed",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoggingOut(false);
     }
   };
+
+  // Don't render the AppLayout until auth is determined
+  if (authLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen pb-16">
@@ -59,7 +120,7 @@ export function AppLayout({ children }: LayoutProps) {
                   <Button 
                     variant="ghost" 
                     className="justify-start" 
-                    onClick={() => navigate("/help")}
+                    onClick={handleHelpClick}
                   >
                     <HelpCircle className="mr-2 h-5 w-5" />
                     Help
@@ -67,10 +128,11 @@ export function AppLayout({ children }: LayoutProps) {
                   <Button 
                     variant="ghost" 
                     className="justify-start text-red-600 hover:text-red-600 hover:bg-red-50" 
-                    onClick={handleLogout}
+                    onClick={handleLogoutClick}
+                    disabled={isLoggingOut}
                   >
                     <LogOut className="mr-2 h-5 w-5" />
-                    Logout
+                    {isLoggingOut ? "Logging out..." : "Logout"}
                   </Button>
                 </div>
               </SheetContent>
@@ -91,7 +153,7 @@ export function AppLayout({ children }: LayoutProps) {
                 key={item.path}
                 onClick={() => handleNavigation(item.path)}
                 className={cn(
-                  "flex flex-col items-center justify-center w-full h-full gap-1",
+                  "flex flex-col items-center justify-center w-full h-full gap-1 relative",
                   "text-gray-500 hover:text-doshisha-purple transition-colors",
                   location.pathname === item.path && "text-doshisha-purple font-medium"
                 )}
@@ -101,6 +163,7 @@ export function AppLayout({ children }: LayoutProps) {
                   location.pathname === item.path && "text-doshisha-purple"
                 )} />
                 <span className="text-xs">{item.label}</span>
+                {item.hasNotification && <NotificationIndicator className="bg-blue-500" />}
               </button>
             ))}
           </div>
