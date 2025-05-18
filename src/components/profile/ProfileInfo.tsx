@@ -70,8 +70,10 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
           </div>
         </div>
         
-        {/* Notification Settings */}
-        <NotificationSettings />
+        {/* Notification Settings - made sure width is 100% */}
+        <div className="w-full mb-6">
+          <NotificationSettings />
+        </div>
         
         {/* Show profile content without "About" heading */}
         <div className="w-full">

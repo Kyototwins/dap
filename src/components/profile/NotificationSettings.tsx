@@ -66,7 +66,7 @@ export function NotificationSettings() {
   }
 
   return (
-    <Card className="mb-6 bg-white">
+    <Card className="mb-6 bg-white w-full">
       <CardHeader className="pb-3">
         <CardTitle className="text-md flex items-center">
           <Bell className="mr-2 h-5 w-5 text-doshisha-purple" />
@@ -74,7 +74,7 @@ export function NotificationSettings() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex flex-col space-y-1">
             <Label htmlFor="notifications" className="font-medium">
               Push Notifications

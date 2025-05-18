@@ -6,10 +6,8 @@ import { HomeScreenPromptMobile } from '@/components/common/HomeScreenPromptMobi
 export function useHomeScreenPrompt() {
   const isMobile = useIsMobile();
   
-  // Return the appropriate component based on device type
-  const HomeScreenPromptComponent = isMobile 
-    ? HomeScreenPromptMobile 
-    : HomeScreenPrompt;
+  // Return null components to prevent the prompt from being displayed
+  const HomeScreenPromptComponent = () => null;
   
   return { HomeScreenPromptComponent };
 }
