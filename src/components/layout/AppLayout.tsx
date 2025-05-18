@@ -22,16 +22,11 @@ export function AppLayout({ children }: LayoutProps) {
   const [navigating, setNavigating] = useState(false);
   const navigationTimeoutRef = useRef<number | null>(null);
   const lastPathRef = useRef(location.pathname);
-  const navigationBlockedUntil = useRef<number>(0);
-  const navigationAttemptCountRef = useRef<Record<string, number>>({});
 
   // Monitor and log navigation
   useEffect(() => {
     console.log("AppLayout rendered at path:", location.pathname);
     lastPathRef.current = location.pathname;
-    
-    // Reset navigation attempt counts when the location changes successfully
-    navigationAttemptCountRef.current = {};
     
     // Clean up any pending navigation timeouts
     return () => {
@@ -57,39 +52,22 @@ export function AppLayout({ children }: LayoutProps) {
   ];
 
   const handleNavigation = (path: string) => {
-    // Force navigation if the user has tried to navigate to the same path multiple times
-    // This helps break out of potential navigation loops
-    const currentAttempts = navigationAttemptCountRef.current[path] || 0;
-    navigationAttemptCountRef.current[path] = currentAttempts + 1;
-    
-    const forceNavigation = currentAttempts >= 2;
-    
-    // Prevent navigation if already navigating or already on that page (unless force navigation)
-    if (navigating && !forceNavigation) {
-      console.log(`Skipping navigation to ${path} - Already navigating`);
-      return;
+    // Prevent navigation if already navigating
+    if (navigating) {
+      console.log(`Navigation already in progress, but will force navigation to ${path}`);
     }
     
-    if (path === location.pathname && !forceNavigation) {
-      console.log(`Already on ${path}, no navigation needed`);
-      return;
-    }
+    // Always allow navigation even if we're already on that page
+    // This helps ensure navigation works reliably across all pages
+    console.log(`Navigating to: ${path} from: ${location.pathname}`);
     
-    if (Date.now() < navigationBlockedUntil.current && !forceNavigation) {
-      console.log(`Navigation to ${path} temporarily blocked to prevent rapid clicks`);
-      return;
-    }
-
     try {
       setNavigating(true);
-      console.log(`Navigating to: ${path} from: ${location.pathname}, force: ${forceNavigation}`);
       
-      // Block further navigation attempts for a short time to prevent rapid clicks
-      navigationBlockedUntil.current = Date.now() + 300;
-      
-      // When forcing navigation or coming from the /messages path, use replace instead of push 
-      // to help break potential navigation loops
-      if (forceNavigation || location.pathname === '/messages') {
+      // Handle special case for Messages page to ensure proper unmounting
+      if (location.pathname === '/messages' && path !== '/messages') {
+        // Use replace instead of push for navigating away from messages
+        // to help prevent navigation issues
         navigate(path, { replace: true });
       } else {
         navigate(path);
@@ -103,7 +81,7 @@ export function AppLayout({ children }: LayoutProps) {
       navigationTimeoutRef.current = window.setTimeout(() => {
         setNavigating(false);
         navigationTimeoutRef.current = null;
-      }, 500) as unknown as number;
+      }, 300) as unknown as number;
     } catch (error) {
       console.error("Navigation error:", error);
       setNavigating(false);
@@ -183,7 +161,6 @@ export function AppLayout({ children }: LayoutProps) {
                   "text-gray-500 hover:text-doshisha-purple transition-colors",
                   location.pathname === item.path && "text-doshisha-purple font-medium"
                 )}
-                disabled={false} // Never disable navigation buttons to ensure they always work
               >
                 <item.icon className={cn(
                   "w-5 h-5",
