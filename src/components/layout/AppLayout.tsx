@@ -52,44 +52,24 @@ export function AppLayout({ children }: LayoutProps) {
   ];
 
   const handleNavigation = (path: string) => {
-    // Prevent navigation if already navigating
-    if (navigating) {
-      console.log(`Navigation already in progress, but will force navigation to ${path}`);
-    }
-    
-    // Always allow navigation even if we're already on that page
-    // This helps ensure navigation works reliably across all pages
+    // Don't block navigation anymore
     console.log(`Navigating to: ${path} from: ${location.pathname}`);
     
     try {
-      setNavigating(true);
-      
-      // Handle special case for Messages page to ensure proper unmounting
-      if (location.pathname === '/messages' && path !== '/messages') {
-        // Use replace instead of push for navigating away from messages
-        // to help prevent navigation issues
-        navigate(path, { replace: true });
-      } else {
-        navigate(path);
-      }
-      
-      // Reset the navigating flag after a delay
-      if (navigationTimeoutRef.current) {
-        window.clearTimeout(navigationTimeoutRef.current);
-      }
-      
-      navigationTimeoutRef.current = window.setTimeout(() => {
-        setNavigating(false);
-        navigationTimeoutRef.current = null;
-      }, 300) as unknown as number;
+      navigate(path);
     } catch (error) {
       console.error("Navigation error:", error);
-      setNavigating(false);
     }
+  };
+
+  const handleHelpClick = () => {
+    console.log("Navigating to help page");
+    navigate("/help");
   };
 
   const handleLogoutClick = async () => {
     try {
+      console.log("Logging out...");
       await handleLogout();
       // Explicitly navigate to login page after logout
       navigate('/login', { replace: true });
@@ -123,8 +103,7 @@ export function AppLayout({ children }: LayoutProps) {
                   <Button 
                     variant="ghost" 
                     className="justify-start" 
-                    onClick={() => navigate("/help")}
-                    disabled={navigating}
+                    onClick={handleHelpClick}
                   >
                     <HelpCircle className="mr-2 h-5 w-5" />
                     Help
@@ -133,7 +112,6 @@ export function AppLayout({ children }: LayoutProps) {
                     variant="ghost" 
                     className="justify-start text-red-600 hover:text-red-600 hover:bg-red-50" 
                     onClick={handleLogoutClick}
-                    disabled={navigating}
                   >
                     <LogOut className="mr-2 h-5 w-5" />
                     Logout
