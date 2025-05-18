@@ -10,6 +10,7 @@ interface NotificationContextProps {
   markAsRead: (notificationId: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
   refetchNotifications: () => Promise<void>;
+  deleteNotification: (notificationId: string) => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextProps>({
@@ -17,7 +18,8 @@ const NotificationContext = createContext<NotificationContextProps>({
   unreadCount: 0,
   markAsRead: async () => {},
   markAllAsRead: async () => {},
-  refetchNotifications: async () => {}
+  refetchNotifications: async () => {},
+  deleteNotification: async () => {}
 });
 
 export const useNotifications = () => useContext(NotificationContext);
@@ -125,6 +127,38 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
+  // Add delete notification functionality
+  const deleteNotification = async (notificationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId);
+
+      if (error) throw error;
+
+      // Update local state
+      const deletedNotification = notifications.find(n => n.id === notificationId);
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      
+      // Update unread count if the deleted notification was unread
+      if (deletedNotification && !deletedNotification.read) {
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+      
+      toast({
+        title: "通知を削除しました",
+        description: "通知が正常に削除されました。",
+      });
+    } catch (error: any) {
+      toast({
+        title: "通知の削除に失敗しました",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     fetchNotifications();
 
@@ -191,7 +225,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         unreadCount, 
         markAsRead, 
         markAllAsRead,
-        refetchNotifications: fetchNotifications
+        refetchNotifications: fetchNotifications,
+        deleteNotification
       }}
     >
       {children}

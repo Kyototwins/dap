@@ -7,13 +7,16 @@ import { Notification, NotificationType } from "@/types/notifications";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Check, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface NotificationsListProps {
   onClose: () => void;
 }
 
 export function NotificationsList({ onClose }: NotificationsListProps) {
-  const { notifications, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleClick = async (notification: Notification) => {
@@ -42,6 +45,16 @@ export function NotificationsList({ onClose }: NotificationsListProps) {
     }
 
     onClose();
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // Prevent triggering the parent click handler
+    setIsDeleting(id);
+    try {
+      await deleteNotification(id);
+    } finally {
+      setIsDeleting(null);
+    }
   };
 
   const getNotificationIcon = (type: NotificationType) => {
@@ -92,6 +105,7 @@ export function NotificationsList({ onClose }: NotificationsListProps) {
                   !notification.read ? 'bg-amber-50/30' : ''
                 }`}
                 onClick={() => handleClick(notification)}
+                disabled={isDeleting === notification.id}
               >
                 <div className="text-lg mt-0.5 flex-shrink-0">
                   {getNotificationIcon(notification.type as NotificationType)}
@@ -105,8 +119,22 @@ export function NotificationsList({ onClose }: NotificationsListProps) {
                     })}
                   </p>
                 </div>
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  {isDeleting === notification.id ? (
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                  ) : (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 p-0 rounded-full hover:bg-red-100 hover:text-red-600"
+                      onClick={(e) => handleDelete(e, notification.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">削除</span>
+                    </Button>
+                  )}
+                </div>
               </button>
-              {/* Removed the delete button since deleteNotification doesn't exist in the context */}
             </div>
           ))}
         </div>

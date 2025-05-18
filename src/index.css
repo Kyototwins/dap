@@ -2,95 +2,125 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
-    --background: #ffffff;
-    --foreground: #000000;
-    --card: #ffffff;
-    --card-foreground: #000000;
-    --popover: #ffffff;
-    --popover-foreground: #000000;
-    --primary: #7f1184;
-    --primary-foreground: #ffffff;
-    --secondary: #8E9196;
-    --secondary-foreground: #ffffff;
-    --muted: #F1F1F1;
-    --muted-foreground: #000000;
-    --accent: #7f1184;
-    --accent-foreground: #ffffff;
-    --destructive: #7f1184;
-    --destructive-foreground: #ffffff;
-    --border: #e4e4e7;
-    --input: #000000;
-    --ring: #7f1184;
-    --radius: 0.75rem;
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 215 20.2% 65.1%;
+
+    --radius: 0.5rem;
+
+    --doshisha-purple: 256 46% 40%;
+    --doshisha-purple-light: 256 46% 50%;
+    --gradient-start: 124 55% 59%;
+    --gradient-end: 188 83% 71%;
   }
 
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 216 34% 17%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
   * {
-    @apply border-border antialiased;
+    @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground overflow-x-hidden;
-  }
-
-  /* Hide scrollbar for all elements */
-  * {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
-  
-  /* WebKit browsers (Chrome, Safari) */
-  *::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* Hide scrollbar but keep functionality */
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* DAP specific styles */
-  .dap-card {
-    @apply rounded-xl bg-white shadow-sm border border-[#e4e4e7]; /* Lighter gray border */
-  }
-  
-  .dap-tag {
-    @apply px-3 py-1 rounded-full text-xs font-medium bg-[#f1f5f9] text-black border-none;
-  }
-  
-  .dap-tag-blue {
-    @apply px-3 py-1 rounded-full text-xs font-medium bg-[#e0f2fe] text-[#0369a1] border-none;
-  }
-  
-  .dap-tag-primary {
-    @apply px-3 py-1 rounded-full text-xs font-medium bg-black text-white border-none;
-  }
-  
-  .dap-button-primary {
-    @apply bg-[#7f1184] text-white px-4 py-2 rounded-xl font-medium hover:bg-[#671073] transition-colors;
-  }
-  
-  .dap-button-secondary {
-    @apply bg-white text-black px-4 py-2 rounded-xl font-medium border border-[#e4e4e7] hover:bg-black hover:text-white transition-colors;
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-/* Remove any remaining custom scrollbar styles */
-::-webkit-scrollbar {
-  display: none;
+/* フォーム関連のカスタムスタイル */
+.form-group {
+  @apply space-y-2;
 }
 
-::-webkit-scrollbar-track {
-  display: none;
+.form-error {
+  @apply text-red-500 text-sm mt-1;
 }
 
-::-webkit-scrollbar-thumb {
-  display: none;
+/* ドシシャカラー */
+.text-doshisha-purple {
+  @apply text-[#6b46c1];
+}
+
+.bg-doshisha-purple {
+  @apply bg-[#6b46c1];
+}
+
+.hover\:bg-doshisha-purple-dark:hover {
+  @apply hover:bg-[#553c9a];
+}
+
+/* アニメーション */
+.animate-bell {
+  animation: bell-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  animation-iteration-count: 2;
+}
+
+@keyframes bell-shake {
+  0% { transform: rotate(0); }
+  15% { transform: rotate(15deg); }
+  30% { transform: rotate(-15deg); }
+  45% { transform: rotate(10deg); }
+  60% { transform: rotate(-10deg); }
+  75% { transform: rotate(5deg); }
+  85% { transform: rotate(-5deg); }
+  100% { transform: rotate(0); }
 }
