@@ -2,10 +2,10 @@
 import { useState, useEffect } from 'react';
 import { Match } from '@/types/matches';
 import { supabase } from '@/integrations/supabase/client';
-import { getUserMatches, enhanceMatchWithUserProfile } from '@/services/matchService';
+import { getUserMatches, enhanceMatchWithUserProfile, type EnhancedMatch } from '@/services/matchService';
 
 export function useMatches() {
-  const [matches, setMatches] = useState<Match[]>([]);
+  const [matches, setMatches] = useState<EnhancedMatch[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

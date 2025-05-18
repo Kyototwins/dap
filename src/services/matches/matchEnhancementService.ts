@@ -1,17 +1,24 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Match } from '@/types/matches';
+import { Profile } from '@/types/messages';
 import { processProfile } from './profileUtils';
 
 // Define a simplified return type to avoid circular references
-interface EnhancedMatch {
+export interface EnhancedMatch {
   id: string;
   user1_id: string;
   user2_id: string;
   created_at: string;
   status: string;
-  otherUser?: any;
-  lastMessage?: any;
+  otherUser?: Partial<Profile>;
+  lastMessage?: {
+    id: string;
+    content: string;
+    created_at: string;
+    sender_id: string;
+    match_id?: string;
+  };
   unreadCount?: number;
 }
 
@@ -50,7 +57,14 @@ export const enhanceMatchWithUserProfile = async (match: Match, currentUserId: s
       .limit(1);
   
     if (messagesData && messagesData.length > 0) {
-      enhancedMatch.lastMessage = messagesData[0];
+      // Explicitly define the structure of lastMessage to avoid circular references
+      enhancedMatch.lastMessage = {
+        id: messagesData[0].id,
+        content: messagesData[0].content,
+        created_at: messagesData[0].created_at,
+        sender_id: messagesData[0].sender_id,
+        match_id: messagesData[0].match_id
+      };
     }
   
     // Count unread messages
@@ -93,8 +107,9 @@ export const getEnhancedMatches = async (userId: string): Promise<EnhancedMatch[
       return [];
     }
 
+    // Use type assertion to avoid type errors during mapping
     const enhancedMatches = await Promise.all(
-      matches.map(match => enhanceMatchWithUserProfile(match, userId))
+      matches.map(match => enhanceMatchWithUserProfile(match as Match, userId))
     );
     return enhancedMatches;
   } catch (error) {

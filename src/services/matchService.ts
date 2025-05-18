@@ -11,3 +11,6 @@ export {
   acceptMatch, 
   rejectMatch 
 } from './matches/matchOperationsService';
+
+// Export EnhancedMatch type from matchEnhancementService
+export type { EnhancedMatch } from './matches/matchEnhancementService';
