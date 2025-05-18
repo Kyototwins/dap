@@ -1,65 +1,51 @@
 
-export interface FilterState {
-  ageRange: [number, number];
-  speakingLanguages: string[];
-  learningLanguages: string[];
-  minLanguageLevel: number;
-  hobbies: string[];
-  countries: string[];
-  sortOption: string;
-}
-
-export interface Match {
-  id: string;
-  status: string;
-  user1_id: string;
-  user2_id: string;
-  otherUser: Profile;
-  lastMessage?: {
-    content: string;
-    created_at: string;
-  };
-  unreadCount: number;
-}
-
+// Define the message type
 export interface Message {
   id: string;
-  content: string;
   created_at: string;
-  match_id: string;
+  content: string;
   sender_id: string;
-  sender: Profile;
+  receiver_id: string;
 }
 
 export interface Profile {
   id: string;
-  first_name: string;
-  last_name: string;
-  avatar_url?: string;
-  about_me?: string;
-  age?: number;
-  gender?: string;
-  ideal_date?: string;
-  image_url_1?: string;
-  image_url_2?: string;
-  life_goal?: string;
-  origin?: string;
-  sexuality?: string;
-  university?: string;
-  department: string;
-  year: string;
-  hobbies: string[];
-  languages: string[];
-  language_levels: Record<string, number>;
-  superpower: string;
-  learning_languages: string[];
-  created_at?: string;
-  photo_comment: string | null;
+  created_at: string;
+  first_name: string | null;
+  last_name: string | null;
+  age: number | null;
+  gender: string | null;
+  origin: string | null;
+  about_me: string | null;
+  avatar_url: string | null;
+  sexuality: string | null;
+  university: string | null;
+  department: string | null;
+  year: string | null;
+  image_url_1: string | null;
+  image_url_2: string | null;
+  ideal_date: string | null;
+  life_goal: string | null;
+  superpower: string | null;
   worst_nightmare: string | null;
   friend_activity: string | null;
   best_quality: string | null;
+  photo_comment: string | null;
   hobby_photo_url: string | null;
-  pet_photo_url: string | null;
   hobby_photo_comment: string | null;
-  pet_photo_comment: string | null;
+  hobbies: string[] | null;
+  languages: string[] | null;
+  learning_languages: string[] | null;
+  language_levels: Record<string, number> | string | null;
+  pet_photo_url: string | null;  // Changed back from favorite_food_photo_url
+  pet_photo_comment: string | null;  // Changed back from favorite_food_photo_comment
+}
+
+export interface Match {
+  id: string;
+  created_at: string;
+  user_id_1: string;
+  user_id_2: string;
+  accepted_1: boolean;
+  accepted_2: boolean;
 }

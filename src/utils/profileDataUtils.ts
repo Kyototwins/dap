@@ -66,9 +66,9 @@ export const createStandardizedUserObject = (userData: any) => {
     worst_nightmare: userData.worst_nightmare || null,
     friend_activity: userData.friend_activity || null,
     best_quality: userData.best_quality || null,
-    hobby_photo_url: null,
-    pet_photo_url: null,
-    hobby_photo_comment: null,
-    pet_photo_comment: null
+    hobby_photo_url: userData.hobby_photo_url || null,
+    pet_photo_url: userData.pet_photo_url || null,
+    hobby_photo_comment: userData.hobby_photo_comment || null,
+    pet_photo_comment: userData.pet_photo_comment || null
   };
 };

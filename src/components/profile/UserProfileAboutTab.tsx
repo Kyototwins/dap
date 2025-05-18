@@ -73,7 +73,7 @@ export function UserProfileAboutTab({ profile }: UserProfileAboutTabProps) {
 
       <UserHobbiesSection profile={profile} title="Interests" />
 
-      {/* Pet Photo Section */}
+      {/* Pet Photo Section - Changed back from Favorite Food */}
       {profile.pet_photo_url && (
         <Card>
           <CardContent className="p-6">
