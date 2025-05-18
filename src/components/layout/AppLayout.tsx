@@ -47,10 +47,9 @@ export function AppLayout({ children }: LayoutProps) {
   const handleLogoutClick = async () => {
     try {
       await handleLogout();
-      // Explicitly navigate to login page after logout
-      // We use replace to prevent back navigation after logout
-      navigate('/login', { replace: true });
-      console.log("Logged out and redirected to login");
+      // Navigate to the home page after logout
+      navigate('/', { replace: true });
+      console.log("Logged out and redirected to home page");
     } catch (error) {
       console.error("Error logging out:", error);
     }

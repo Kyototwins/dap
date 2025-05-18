@@ -84,7 +84,7 @@ export function useAuth() {
     };
   }, [initialized]);
 
-  // Clear auth state on logout and navigate to login page
+  // Clear auth state on logout and navigate to home page
   const handleLogout = useCallback(async () => {
     try {
       console.log("Logging out user");

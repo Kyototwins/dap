@@ -51,7 +51,7 @@ function AuthenticatedApp() {
   return (
     <Routes>
       {/* Public routes - accessible without authentication */}
-      <Route path="/" element={isAuthenticated ? <Navigate to="/matches" replace /> : <Landing />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/matches" replace /> : <Login />} />
       <Route path="/signup" element={isAuthenticated ? <Navigate to="/matches" replace /> : <SignUp />} />
       
@@ -68,27 +68,27 @@ function AuthenticatedApp() {
       {/* Protected routes - AppLayout wrapper */}
       <Route 
         path="/matches" 
-        element={<AppLayout><Matches /></AppLayout>} 
+        element={isAuthenticated ? <AppLayout><Matches /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/messages" 
-        element={<AppLayout><Messages /></AppLayout>} 
+        element={isAuthenticated ? <AppLayout><Messages /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/events" 
-        element={<AppLayout><Events /></AppLayout>} 
+        element={isAuthenticated ? <AppLayout><Events /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/events/new" 
-        element={<AppLayout><CreateEvent /></AppLayout>} 
+        element={isAuthenticated ? <AppLayout><CreateEvent /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/profile" 
-        element={<AppLayout><Profile /></AppLayout>} 
+        element={isAuthenticated ? <AppLayout><Profile /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/profile/:id" 
-        element={<AppLayout><UserProfile /></AppLayout>} 
+        element={isAuthenticated ? <AppLayout><UserProfile /></AppLayout> : <Navigate to="/login" replace />} 
       />
       <Route path="*" element={<NotFound />} />
     </Routes>
