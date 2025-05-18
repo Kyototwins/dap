@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuthOperations } from "./useAuthOperations";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
+import { toast } from "@/components/ui/use-toast";
 
 export type { AuthFormData } from "@/types/auth";
 
@@ -90,6 +91,11 @@ export function useAuth() {
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Error during logout:", error);
+        toast({
+          title: "Logout failed",
+          description: error.message,
+          variant: "destructive",
+        });
         throw error;
       }
       
@@ -97,6 +103,7 @@ export function useAuth() {
       // State is updated through onAuthStateChange
     } catch (error) {
       console.error("Error during logout:", error);
+      throw error;
     } finally {
       setLoading(false);
     }

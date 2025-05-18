@@ -9,6 +9,7 @@ import { NotificationIndicator } from "@/components/common/NotificationIndicator
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect, useRef } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -19,21 +20,13 @@ export function AppLayout({ children }: LayoutProps) {
   const location = useLocation();
   const { hasUnreadMessages, hasUnreadLikes, hasUnreadEvents } = useUnreadNotifications();
   const { handleLogout, isAuthenticated, loading: authLoading } = useAuth();
-  const [navigating, setNavigating] = useState(false);
-  const navigationTimeoutRef = useRef<number | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const lastPathRef = useRef(location.pathname);
 
   // Monitor and log navigation
   useEffect(() => {
     console.log("AppLayout rendered at path:", location.pathname);
     lastPathRef.current = location.pathname;
-    
-    // Clean up any pending navigation timeouts
-    return () => {
-      if (navigationTimeoutRef.current) {
-        window.clearTimeout(navigationTimeoutRef.current);
-      }
-    };
   }, [location.pathname]);
 
   // Auth redirect logic - separate from navigation logic
@@ -52,7 +45,6 @@ export function AppLayout({ children }: LayoutProps) {
   ];
 
   const handleNavigation = (path: string) => {
-    // Don't block navigation anymore
     console.log(`Navigating to: ${path} from: ${location.pathname}`);
     
     try {
@@ -68,14 +60,39 @@ export function AppLayout({ children }: LayoutProps) {
   };
 
   const handleLogoutClick = async () => {
+    if (isLoggingOut) return; // Prevent multiple clicks
+    
     try {
+      setIsLoggingOut(true);
       console.log("Logging out...");
+      
+      // Show toast for feedback
+      toast({
+        title: "Logging out...",
+        duration: 2000,
+      });
+      
       await handleLogout();
+      
+      // Success toast
+      toast({
+        title: "Successfully logged out",
+        description: "Redirecting to login page...",
+        duration: 3000,
+      });
+      
       // Explicitly navigate to login page after logout
       navigate('/login', { replace: true });
       console.log("Logged out and redirected to login");
     } catch (error) {
       console.error("Error logging out:", error);
+      toast({
+        title: "Logout failed",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -112,9 +129,10 @@ export function AppLayout({ children }: LayoutProps) {
                     variant="ghost" 
                     className="justify-start text-red-600 hover:text-red-600 hover:bg-red-50" 
                     onClick={handleLogoutClick}
+                    disabled={isLoggingOut}
                   >
                     <LogOut className="mr-2 h-5 w-5" />
-                    Logout
+                    {isLoggingOut ? "Logging out..." : "Logout"}
                   </Button>
                 </div>
               </SheetContent>
