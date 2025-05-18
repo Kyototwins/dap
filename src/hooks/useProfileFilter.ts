@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Profile } from "@/types/messages";
 import { FilterState } from "@/types/matches";
 import { useConnectionStatus } from "@/hooks/useConnectionStatus";
+import { createStandardizedUserObject } from "@/utils/profileDataUtils";
 
 export function useProfileFilter() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -14,7 +15,7 @@ export function useProfileFilter() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const initialLoadDone = useRef(false);
-  const { online } = useConnectionStatus();
+  const { offline, connectionError } = useConnectionStatus();
 
   // Default filter state
   const [filters, setFilters] = useState<FilterState>({
@@ -29,10 +30,10 @@ export function useProfileFilter() {
 
   // Fetch profiles on component mount
   useEffect(() => {
-    if (!online || initialLoadDone.current) return;
+    if (offline || initialLoadDone.current) return;
     
     fetchProfiles();
-  }, [online]);
+  }, [offline]);
 
   // Fetch profiles from Supabase
   const fetchProfiles = async () => {
@@ -63,33 +64,12 @@ export function useProfileFilter() {
       console.log(`Fetched ${data?.length || 0} profiles`);
       
       // Process profiles to ensure they have all required properties
-      const validProfiles = (data || []).map(profile => {
-        return {
-          id: profile.id,
-          firstName: profile.first_name || "Anonymous",
-          lastName: profile.last_name || "",
-          age: profile.age || 0,
-          avatarUrl: profile.avatar_url || "",
-          bio: profile.about_me || "",
-          university: profile.university || "Unknown University",
-          department: profile.department || "",
-          year: profile.year || "",
-          hobbies: profile.hobbies || [],
-          languages: profile.languages || [],
-          learningLanguages: profile.learning_languages || [],
-          origin: profile.origin || "",
-          photos: [
-            profile.avatar_url,
-            profile.image_url_1,
-            profile.image_url_2
-          ].filter(Boolean) as string[]
-        };
-      });
+      const validProfiles = (data || []).map(profile => createStandardizedUserObject(profile));
 
-      // Update state
-      setProfiles(validProfiles);
-      setFilteredProfiles(validProfiles);
-      setVisibleProfiles(validProfiles.slice(0, 10)); // Show first 10 profiles initially
+      // Update state with standardized profile objects
+      setProfiles(validProfiles as Profile[]);
+      setFilteredProfiles(validProfiles as Profile[]);
+      setVisibleProfiles((validProfiles as Profile[]).slice(0, 10)); // Show first 10 profiles initially
       
       initialLoadDone.current = true;
     } catch (error) {
@@ -107,11 +87,11 @@ export function useProfileFilter() {
       // Filter by search query
       const searchMatches = 
         searchQuery === "" || 
-        `${profile.firstName} ${profile.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        `${profile.first_name || ''} ${profile.last_name || ''}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (profile.languages || []).some(lang => 
           lang.toLowerCase().includes(searchQuery.toLowerCase())
         ) ||
-        (profile.learningLanguages || []).some(lang => 
+        (profile.learning_languages || []).some(lang => 
           lang.toLowerCase().includes(searchQuery.toLowerCase())
         ) ||
         (profile.hobbies || []).some(hobby => 
@@ -123,7 +103,7 @@ export function useProfileFilter() {
       if (!searchMatches) return false;
       
       // Filter by age
-      const ageMatches = profile.age >= filters.ageRange[0] && profile.age <= filters.ageRange[1];
+      const ageMatches = (profile.age || 0) >= filters.ageRange[0] && (profile.age || 0) <= filters.ageRange[1];
       if (!ageMatches) return false;
       
       // Filter by speaking languages
@@ -136,7 +116,7 @@ export function useProfileFilter() {
       // Filter by learning languages
       const learningLanguagesMatch = filters.learningLanguages.length === 0 || 
         filters.learningLanguages.some(lang => 
-          profile.learningLanguages?.includes(lang)
+          profile.learning_languages?.includes(lang)
         );
       if (!learningLanguagesMatch) return false;
       
@@ -164,7 +144,7 @@ export function useProfileFilter() {
       } else if (filters.sortOption === "age_desc") {
         return (b.age || 0) - (a.age || 0);
       } else if (filters.sortOption === "name_asc") {
-        return a.firstName.localeCompare(b.firstName);
+        return (a.first_name || '').localeCompare(b.first_name || '');
       }
       return 0;
     });
