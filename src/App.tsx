@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -31,12 +32,16 @@ const queryClient = new QueryClient();
 function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const { HomeScreenPromptComponent, shouldShowPrompt } = useHomeScreenPrompt();
+  const { HomeScreenPromptComponent } = useHomeScreenPrompt();
+  const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (event === 'SIGNED_IN') {
+          setShowPrompt(true); // ログイン時にプロンプトを表示
+        }
         setSession(session);
       }
     );
@@ -44,6 +49,9 @@ function App() {
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session) {
+        setShowPrompt(true); // 既存のセッションがある場合もプロンプトを表示
+      }
       setLoading(false);
     });
 
@@ -66,7 +74,7 @@ function App() {
               {session && <FirebaseInitializer />}
               
               {/* Show home screen prompt for logged in users */}
-              {session && shouldShowPrompt && <HomeScreenPromptComponent />}
+              {session && showPrompt && <HomeScreenPromptComponent />}
               
               <Routes>
                 <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />
