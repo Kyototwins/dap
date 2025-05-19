@@ -62,6 +62,17 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     getCurrentUser();
   }, []);
 
+  // Scroll to newest messages when a conversation is opened or when messages change
+  useEffect(() => {
+    scrollToNewestMessages();
+  }, [match?.id, messages]);
+
+  const scrollToNewestMessages = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+    }
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();

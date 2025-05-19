@@ -59,6 +59,20 @@ export const translations = {
     'additionalPhoto': 'Additional photo',
     'worstNightmarePlaceholder': 'Tell us about your worst nightmare...',
     'friendActivityPlaceholder': 'What would you like us to do together as friends?',
+    'addToHomeScreen': 'Add to Home Screen',
+    'getQuickAccess': 'Get quick access to DAP from your home screen',
+    'android': 'Android',
+    'iphone': 'iPhone',
+    'step1Android': '1. Open this app in Chrome',
+    'step2Android': '2. Tap the menu icon (⋮) in the top right',
+    'step3Android': '3. Select "Add to Home screen"',
+    'step4Android': '4. Tap "Add" to complete!',
+    'step1iOS': '1. Open this app in Safari',
+    'step2iOS': '2. Tap the share icon (□↑) at the bottom',
+    'step3iOS': '3. Select "Add to Home Screen"',
+    'step4iOS': '4. Tap "Add" to complete!',
+    'dontShowAgain': 'Don\'t show again',
+    'close': 'Close',
   },
   ja: {
     'matching': 'マッチング',
@@ -97,13 +111,32 @@ export const translations = {
     'additionalPhoto': '追加の写真',
     'worstNightmarePlaceholder': 'あなたの最悪の悪夢について教えてください...',
     'friendActivityPlaceholder': '友達として何をしたいですか？',
+    'addToHomeScreen': 'ホーム画面に追加',
+    'getQuickAccess': 'ホーム画面からDAPにすばやくアクセス',
+    'android': 'Android',
+    'iphone': 'iPhone',
+    'step1Android': '1. Chromeでこのアプリを開く',
+    'step2Android': '2. 画面右上「︙（メニュー）」をタップ',
+    'step3Android': '3. 「ホーム画面に追加」を選択',
+    'step4Android': '4. 「追加」をタップで完了！',
+    'step1iOS': '1. Safariでこのアプリを開く',
+    'step2iOS': '2. 画面下の「共有アイコン（□に↑）」をタップ',
+    'step3iOS': '3. 「ホーム画面に追加」を選ぶ',
+    'step4iOS': '4. 「追加」をタップで完了！',
+    'dontShowAgain': '今後表示しない',
+    'close': '閉じる',
   }
 };
 
-export function LanguageProvider({ children }: LanguageProviderProps) {
+// Fix: Define LanguageProvider properly as a React function component
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('app-language');
-    return (saved === 'ja' || saved === 'en') ? saved : 'en';
+    // Get from localStorage on client-side only
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('app-language');
+      return (saved === 'ja' || saved === 'en') ? saved : 'en';
+    }
+    return 'en';
   });
 
   useEffect(() => {
@@ -123,4 +156,4 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       {children}
     </LanguageContext.Provider>
   );
-}
+};

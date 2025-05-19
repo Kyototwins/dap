@@ -16,8 +16,3 @@ export enum NotificationType {
   EVENT_JOIN = "event_join",
   EVENT_COMMENT = "event_comment"
 }
-
-export interface NotificationSettings {
-  email_notifications: boolean;
-  push_notifications: boolean;
-}

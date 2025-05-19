@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ProfileAboutTab } from "./ProfileAboutTab";
 import { ProfileCover } from "./ProfileCover";
+import { NotificationSettings } from "./NotificationSettings";
 
 interface ProfileInfoProps {
   profile: Profile;
@@ -67,6 +68,11 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
               style={{ width: `${completion}%` }}
             />
           </div>
+        </div>
+        
+        {/* Notification Settings - made sure width is 100% */}
+        <div className="w-full mb-6">
+          <NotificationSettings />
         </div>
         
         {/* Show profile content without "About" heading */}

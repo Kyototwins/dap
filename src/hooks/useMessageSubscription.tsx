@@ -48,27 +48,43 @@ export function useMessageSubscription(
           return;
         }
         
-        // Create message object for UI
+        // Create message object for UI that conforms to Message type
         const newMessage: Message = {
           id: payload.new.id,
           content: payload.new.content,
           created_at: payload.new.created_at,
-          match_id: payload.new.match_id, // This is now valid with our updated type
           sender_id: payload.new.sender_id,
-          receiver_id: selectedMatch.otherUser?.id || "", // Add receiver_id
-          sender: sender
+          // Include these properties to match our updated Message interface
+          match_id: payload.new.match_id
+        };
+        
+        // Create enhanced message with sender
+        const enhancedMessage = {
+          ...newMessage,
+          sender
         };
         
         // Add message to state, avoiding duplicates
         setMessages(prev => {
-          if (prev.some(msg => msg.id === newMessage.id)) {
-            console.log("Duplicate message, not adding:", newMessage.id);
+          if (prev.some(msg => msg.id === enhancedMessage.id)) {
+            console.log("Duplicate message, not adding:", enhancedMessage.id);
             return prev;
           }
           
-          console.log("Adding message to state:", newMessage.id);
-          return [...prev, newMessage];
+          console.log("Adding message to state:", enhancedMessage.id);
+          return [...prev, enhancedMessage as unknown as Message];
         });
+        
+        // Update match.lastMessage in local state for display in the match list
+        if (selectedMatch) {
+          selectedMatch.lastMessage = {
+            id: newMessage.id,
+            content: newMessage.content,
+            created_at: newMessage.created_at,
+            sender_id: newMessage.sender_id,
+            match_id: selectedMatch.id
+          };
+        }
       })
       .subscribe();
       
