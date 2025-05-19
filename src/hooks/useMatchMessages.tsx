@@ -36,31 +36,19 @@ export function useMatchMessages() {
           
           if (!sender) return null;
           
-          // Create a message object that conforms to the Message type
-          const messageObj: Message = {
+          return {
             id: message.id,
             content: message.content,
             created_at: message.created_at,
-            sender_id: message.sender_id,
             match_id: message.match_id,
-            // Include receiver_id but it might be undefined in the database
-            receiver_id: undefined
-          };
-          
-          // Add sender object as a non-interface property
-          const enhancedMessage = {
-            ...messageObj,
+            sender_id: message.sender_id,
             sender: sender
           };
-          
-          return enhancedMessage;
         })
         .filter(Boolean) as Message[];
 
       console.log(`Processed ${validMessages.length} valid messages`);
-      setMessages(validMessages as Message[]);
-      
-      // Return the messages so they can be used by the caller
+      setMessages(validMessages);
       return validMessages;
     } catch (error: any) {
       console.error("Error in fetchMessages:", error);

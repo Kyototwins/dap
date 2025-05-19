@@ -1,19 +1,22 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Profile } from '@/types/messages';
-import { FilterState } from '@/types/matches';
+import { useState, useRef, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import type { Profile } from "@/types/messages";
+import type { FilterState } from "@/types/matches";
 
-export const useProfileFilter = () => {
+export function useProfileFilter() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
   const [visibleProfiles, setVisibleProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loadingMore, setLoadingMore] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-
-  // Updated filters structure to match FilterState interface
+  const pageSize = 10;
+  const pageRef = useRef(1);
+  const { toast } = useToast();
+  
+  // Filter states
   const [filters, setFilters] = useState<FilterState>({
     ageRange: [18, 50],
     speakingLanguages: [],
@@ -21,183 +24,211 @@ export const useProfileFilter = () => {
     minLanguageLevel: 1,
     hobbies: [],
     countries: [],
-    sortOption: 'recent'
+    sortOption: "recent"
   });
 
-  useEffect(() => {
-    const getCurrentUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setCurrentUserId(user.id);
-      }
-    };
-
-    getCurrentUser();
-    loadProfiles();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [filters, profiles, searchQuery]);
-
-  const loadProfiles = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    const currentUserId = user?.id;
-
+  // Fetch profile data
+  const fetchProfiles = async () => {
+    setLoading(true);
     try {
-      let { data, error, status } = await supabase
-        .from('profiles')
-        .select('*')
-        .neq('id', currentUserId || '');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .neq("id", user.id);
+
+      if (error) throw error;
       
-      if (error && status !== 406) {
-        throw error;
-      }
-
-      if (data) {
-        // Process the profiles to ensure they conform to the Profile type
-        // Especially handle language_levels which might be stored as JSON string
-        const processedProfiles = data.map(profile => {
-          // Parse language_levels if it's a string
-          let processedLanguageLevels = profile.language_levels;
-          if (typeof profile.language_levels === 'string') {
-            try {
-              processedLanguageLevels = JSON.parse(profile.language_levels);
-            } catch (e) {
-              console.error("Error parsing language levels:", e);
-              // Keep it as is if parsing fails
-            }
-          }
-          
-          return {
-            ...profile,
-            language_levels: processedLanguageLevels,
-            // Ensure fcm_token exists to satisfy TypeScript
-            fcm_token: profile.fcm_token ?? null
-          } as Profile;
-        });
-
-        setProfiles(processedProfiles);
-        setFilteredProfiles(processedProfiles);
-        setVisibleProfiles(processedProfiles.slice(0, 10)); // Initial visible profiles
-      }
-    } catch (error) {
-      console.error('Error fetching profiles:', error);
+      // Map the data to match the Profile type with all required fields
+      const typedProfiles = data?.map(profile => ({
+        id: profile.id,
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        avatar_url: profile.avatar_url || null,
+        about_me: profile.about_me || null,
+        age: profile.age || null,
+        gender: profile.gender || null,
+        university: profile.university || null,
+        department: profile.department || '',
+        year: profile.year || '',
+        hobbies: profile.hobbies || [],
+        languages: profile.languages || [],
+        language_levels: profile.language_levels as Record<string, number>,
+        superpower: profile.superpower || '',
+        learning_languages: profile.learning_languages || [],
+        origin: profile.origin || null,
+        sexuality: profile.sexuality || null,
+        ideal_date: profile.ideal_date || null,
+        life_goal: profile.life_goal || null,
+        image_url_1: profile.image_url_1 || null,
+        image_url_2: profile.image_url_2 || null,
+        created_at: profile.created_at || '',
+        photo_comment: profile.photo_comment || null,
+        worst_nightmare: profile.worst_nightmare || null,
+        friend_activity: profile.friend_activity || null,
+        best_quality: profile.best_quality || null,
+        hobby_photo_url: null,
+        pet_photo_url: null,
+        hobby_photo_comment: null,
+        pet_photo_comment: null
+      })) || [];
+      
+      setProfiles(typedProfiles);
+      applyFilters(typedProfiles, searchQuery, filters);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const applyFilters = () => {
-    let result = [...profiles];
+  // Apply search and filters
+  const applyFilters = (data: Profile[], query: string, filterState: FilterState) => {
+    let result = [...data];
 
-    // Apply search query filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(profile => {
-        const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`.toLowerCase();
-        const hasName = fullName.includes(query);
-        const hasLanguage = profile.languages?.some(lang => lang.toLowerCase().includes(query)) || false;
-        const hasHobby = profile.hobbies?.some(hobby => hobby.toLowerCase().includes(query)) || false;
-        return hasName || hasLanguage || hasHobby;
+    // Filter by search query
+    if (query) {
+      const searchLower = query.toLowerCase();
+      result = result.filter((profile) => {
+        return (
+          profile.first_name?.toLowerCase().includes(searchLower) ||
+          profile.last_name?.toLowerCase().includes(searchLower) ||
+          profile.about_me?.toLowerCase().includes(searchLower) ||
+          profile.university?.toLowerCase().includes(searchLower) ||
+          profile.department?.toLowerCase().includes(searchLower)
+        );
       });
     }
 
-    // Apply filter by age range
-    result = result.filter(profile => 
-      profile.age !== null &&
-      profile.age >= filters.ageRange[0] && 
-      profile.age <= filters.ageRange[1]
-    );
+    // Age filtering
+    result = result.filter(profile => {
+      if (!profile.age) return true;
+      return profile.age >= filterState.ageRange[0] && profile.age <= filterState.ageRange[1];
+    });
 
-    // Apply filter by speaking languages
-    if (filters.speakingLanguages.length > 0) {
+    // Origin filtering
+    if (filterState.countries.length > 0) {
       result = result.filter(profile => 
-        profile.languages && 
-        filters.speakingLanguages.some(lang => profile.languages?.includes(lang))
+        !profile.origin || filterState.countries.includes(profile.origin)
       );
     }
 
-    // Apply filter by learning languages
-    if (filters.learningLanguages.length > 0) {
-      result = result.filter(profile => 
-        profile.learning_languages && 
-        filters.learningLanguages.some(lang => profile.learning_languages?.includes(lang))
-      );
+    // Speaking languages filtering
+    if (filterState.speakingLanguages.length > 0) {
+      result = result.filter(profile => {
+        if (!profile.languages || profile.languages.length === 0) return false;
+        
+        return filterState.speakingLanguages.some(lang => {
+          const hasLanguage = profile.languages?.includes(lang);
+          if (!hasLanguage) return false;
+          
+          if (profile.language_levels && typeof profile.language_levels === 'object') {
+            const level = profile.language_levels[lang];
+            return level >= filterState.minLanguageLevel;
+          }
+          return true;
+        });
+      });
     }
 
-    // Apply filter by hobbies
-    if (filters.hobbies.length > 0) {
-      result = result.filter(profile => 
-        profile.hobbies && 
-        filters.hobbies.some(hobby => profile.hobbies?.includes(hobby))
-      );
+    // Learning languages filtering
+    if (filterState.learningLanguages.length > 0) {
+      result = result.filter(profile => {
+        if (!profile.learning_languages || profile.learning_languages.length === 0) return false;
+        return filterState.learningLanguages.some(lang => 
+          profile.learning_languages?.includes(lang)
+        );
+      });
     }
 
-    // Apply filter by countries
-    if (filters.countries.length > 0) {
-      result = result.filter(profile => 
-        profile.origin && 
-        filters.countries.includes(profile.origin)
-      );
+    // Hobbies filtering
+    if (filterState.hobbies.length > 0) {
+      result = result.filter(profile => {
+        if (!profile.hobbies || profile.hobbies.length === 0) return false;
+        return filterState.hobbies.some(hobby => 
+          profile.hobbies?.includes(hobby)
+        );
+      });
+    }
+
+    // Sorting
+    if (filterState.sortOption === "recent") {
+      result.sort((a, b) => {
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
+    } else if (filterState.sortOption === "active") {
+      result.sort((a, b) => {
+        const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
+        const nameB = `${b.first_name || ''} ${a.last_name || ''}`;
+        return nameA.localeCompare(nameB);
+      });
     }
 
     setFilteredProfiles(result);
-    setVisibleProfiles(result.slice(0, 10)); // Reset visible profiles on filter change
+    pageRef.current = 1;
+    setVisibleProfiles(result.slice(0, pageSize));
   };
 
+  // Initial load
+  useEffect(() => {
+    fetchProfiles();
+  }, []);
+
+  // Apply filters when they change
+  useEffect(() => {
+    if (profiles.length > 0) {
+      applyFilters(profiles, searchQuery, filters);
+    }
+  }, [searchQuery, filters]);
+
+  // Search handler
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
+  // Load more handler
   const handleLoadMore = () => {
     setLoadingMore(true);
+    const nextPage = pageRef.current + 1;
+    const start = (nextPage - 1) * pageSize;
+    const end = nextPage * pageSize;
+    
     setTimeout(() => {
       setVisibleProfiles(prev => [
         ...prev, 
-        ...filteredProfiles.slice(prev.length, prev.length + 10)
+        ...filteredProfiles.slice(start, end)
       ]);
+      pageRef.current = nextPage;
       setLoadingMore(false);
     }, 500);
   };
 
+  // Refresh data handler
   const handleRefresh = () => {
-    setLoading(true);
-    loadProfiles();
+    fetchProfiles();
   };
 
   return {
-    profiles, // Keep for backward compatibility
+    profiles,
     filteredProfiles,
     visibleProfiles,
     loading,
     loadingMore,
-    filters,
     searchQuery,
+    filters,
     isFilterSheetOpen,
     setFilters,
     setIsFilterSheetOpen,
     handleSearchChange,
     handleLoadMore,
     handleRefresh,
-    updateFilter: (filterName: string, value: string | string[]) => {
-      setFilters(prev => ({
-        ...prev,
-        [filterName]: value
-      }));
-    },
-    resetFilters: () => {
-      setFilters({
-        ageRange: [18, 50],
-        speakingLanguages: [],
-        learningLanguages: [],
-        minLanguageLevel: 1,
-        hobbies: [],
-        countries: [],
-        sortOption: 'recent'
-      });
-    },
-    totalCount: profiles.length,
-    filteredCount: filteredProfiles.length
   };
-};
+}
