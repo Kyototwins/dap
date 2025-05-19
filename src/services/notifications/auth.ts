@@ -41,6 +41,7 @@ export const authNotifications = {
         email,
         options: {
           emailRedirectTo: window.location.origin + '/email-confirmation',
+          // Move the message data into the data property
           data: {
             emailMessage: `
               【日本語】
