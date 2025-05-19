@@ -97,6 +97,10 @@ export default function EmailConfirmation() {
             <p className="text-gray-600 mb-4">
               {errorMessage || "メールアドレスの確認処理中にエラーが発生しました。"}
             </p>
+            <p className="text-gray-600 mb-4">
+              <span className="font-medium">アカウント確認は完了している可能性があります。</span><br />
+              ログイン画面に戻ってログインをお試しください。
+            </p>
             <div className="flex flex-col space-y-3 w-full max-w-xs">
               <Button 
                 onClick={() => navigate("/login")}
@@ -107,6 +111,9 @@ export default function EmailConfirmation() {
               <Link to="/" className="text-[#7f1184] hover:underline">
                 ホームページに戻る
               </Link>
+              <p className="text-xs text-gray-500 mt-4">
+                問題が解決しない場合は、DAPのインスタグラムのDMなどにご連絡ください。
+              </p>
             </div>
           </>
         )}
