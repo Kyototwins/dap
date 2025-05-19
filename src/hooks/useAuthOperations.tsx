@@ -36,6 +36,7 @@ export function useAuthOperations() {
           data: {
             full_name: name,
           },
+          emailRedirectTo: window.location.origin + '/login',
         },
       });
       
@@ -50,6 +51,8 @@ export function useAuthOperations() {
       if (error) {
         throw error;
       }
+
+      console.log("Sign-up response:", data);
 
       // メール送信成功のメッセージを表示
       toast({
@@ -79,6 +82,8 @@ export function useAuthOperations() {
         description: errorMessage,
         variant: "destructive",
       });
+      
+      console.error("Sign-up error:", error);
     } finally {
       setLoading(false);
     }

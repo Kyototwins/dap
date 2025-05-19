@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -38,6 +39,7 @@ export default function SignUp() {
       return;
     }
     
+    console.log("Attempting signup with:", { email, password, name });
     await handleSignUp({ email, password, name });
   };
 
