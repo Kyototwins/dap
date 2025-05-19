@@ -28,12 +28,12 @@ export default function SignUp() {
       return;
     }
     
-    // 「doshisha.ac.jp」で終わるメールアドレスに限定
-    const doshishaEmailPattern = /@[\w.-]*doshisha\.ac\.jp$/i;
-    if (!doshishaEmailPattern.test(email)) {
+    // 「doshisha.ac.jp」または「gmail.com」で終わるメールアドレスに対応
+    const validEmailPattern = /@([\w.-]*doshisha\.ac\.jp|gmail\.com)$/i;
+    if (!validEmailPattern.test(email)) {
       toast({
         title: "Email Requirement",
-        description: "Please use your university email address ending with doshisha.ac.jp (e.g. cgej@mail3.doshisha.ac.jp).",
+        description: "Please use your university email (doshisha.ac.jp) or Gmail (gmail.com).",
         variant: "destructive",
       });
       return;
