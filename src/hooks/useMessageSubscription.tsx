@@ -53,8 +53,9 @@ export function useMessageSubscription(
           id: payload.new.id,
           content: payload.new.content,
           created_at: payload.new.created_at,
-          match_id: payload.new.match_id,
+          match_id: payload.new.match_id, // This is now valid with our updated type
           sender_id: payload.new.sender_id,
+          receiver_id: selectedMatch.otherUser?.id || "", // Add receiver_id
           sender: sender
         };
         

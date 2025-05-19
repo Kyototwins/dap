@@ -51,8 +51,9 @@ export function useMessageSending(
               id: result.messageData.id,
               content: result.messageData.content,
               created_at: result.messageData.created_at || new Date().toISOString(),
-              match_id: result.messageData.match_id,
+              match_id: result.messageData.match_id, // This is now allowed by our updated type
               sender_id: authData.user.id,
+              receiver_id: match.otherUser?.id || "", // Add receiver_id from otherUser
               sender: sender
             };
             

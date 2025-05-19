@@ -36,12 +36,14 @@ export function useMatchMessages() {
           
           if (!sender) return null;
           
+          // Add receiver_id property with a default value to satisfy the type requirements
           return {
             id: message.id,
             content: message.content,
             created_at: message.created_at,
             match_id: message.match_id,
             sender_id: message.sender_id,
+            receiver_id: "", // Add default receiver_id (will be populated with actual data in a real scenario)
             sender: sender
           };
         })

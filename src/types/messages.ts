@@ -6,6 +6,8 @@ export interface Message {
   content: string;
   sender_id: string;
   receiver_id: string;
+  match_id?: string; // Add match_id property to support the current code
+  sender?: Profile; // Add sender property used in components
 }
 
 export interface Profile {
@@ -41,11 +43,24 @@ export interface Profile {
   pet_photo_comment: string | null;  // Changed back from favorite_food_photo_comment
 }
 
+// Update the Match interface to include all the properties being used
 export interface Match {
   id: string;
   created_at: string;
-  user_id_1: string;
-  user_id_2: string;
-  accepted_1: boolean;
-  accepted_2: boolean;
+  // Original properties
+  user_id_1?: string;
+  user_id_2?: string;
+  accepted_1?: boolean;
+  accepted_2?: boolean;
+  
+  // Properties used in the current code
+  user1_id?: string;
+  user2_id?: string;
+  status?: string;
+  otherUser?: Profile;
+  lastMessage?: {
+    content: string;
+    created_at: string;
+  };
+  unreadCount?: number;
 }
