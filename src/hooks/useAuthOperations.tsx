@@ -36,7 +36,8 @@ export function useAuthOperations() {
           data: {
             full_name: name,
           },
-          emailRedirectTo: window.location.origin + '/login',
+          // Update redirect URL to point to our confirmation page
+          emailRedirectTo: window.location.origin + '/email-confirmation',
         },
       });
       

@@ -40,7 +40,7 @@ export const authNotifications = {
         type: 'signup',
         email,
         options: {
-          emailRedirectTo: window.location.origin + '/login',
+          emailRedirectTo: window.location.origin + '/email-confirmation',
         }
       });
       
@@ -67,4 +67,3 @@ export const authNotifications = {
     }
   }
 };
-

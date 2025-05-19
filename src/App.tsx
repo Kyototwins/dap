@@ -25,6 +25,7 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Help from "./pages/Help";
+import EmailConfirmation from "./pages/EmailConfirmation";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -80,6 +81,7 @@ function App() {
                 <Route path="/" element={session ? <Navigate to="/matches" /> : <Landing />} />
                 <Route path="/login" element={session ? <Navigate to="/matches" /> : <Login />} />
                 <Route path="/signup" element={session ? <Navigate to="/matches" /> : <SignUp />} />
+                <Route path="/email-confirmation" element={<EmailConfirmation />} />
                 <Route path="/profile/setup" element={session ? <ProfileSetup /> : <Navigate to="/login" />} />
                 <Route path="/help" element={session ? <Help /> : <Navigate to="/login" />} />
                 
