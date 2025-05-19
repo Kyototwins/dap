@@ -28,16 +28,7 @@ export default function SignUp() {
       return;
     }
     
-    // 「doshisha.ac.jp」で終わるメールアドレスに限定
-    const doshishaEmailPattern = /@[\w.-]*doshisha\.ac\.jp$/i;
-    if (!doshishaEmailPattern.test(email)) {
-      toast({
-        title: "Email Requirement",
-        description: "Please use your university email address ending with doshisha.ac.jp (e.g. cgej@mail3.doshisha.ac.jp).",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Removed email domain restriction check - now any email can register
     
     console.log("Attempting signup with:", { email, password, name });
     await handleSignUp({ email, password, name });
@@ -82,13 +73,13 @@ export default function SignUp() {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-gray-700">University Email</Label>
+            <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <Input
                 id="email"
                 type="email"
-                placeholder="your.name@university.edu"
+                placeholder="your.name@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
