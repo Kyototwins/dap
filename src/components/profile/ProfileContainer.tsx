@@ -7,7 +7,7 @@ import { Profile as ProfileType } from "@/types/messages";
 import { ProfileLoading } from "@/components/profile/ProfileLoading";
 import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
-// DeleteAccountButtonのimportを削除
+import { NotificationSettings } from "@/components/profile/NotificationSettings";
 
 export function ProfileContainer() {
   const [profile, setProfile] = useState<ProfileType | null>(null);
@@ -73,6 +73,35 @@ export function ProfileContainer() {
     navigate("/profile/setup");
   };
 
+  const handleNotificationSettingsUpdate = async (emailDigestEnabled: boolean) => {
+    try {
+      if (!profile) return;
+      
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          email_digest_enabled: emailDigestEnabled
+        })
+        .eq("id", profile.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setProfile(prev => prev ? { ...prev, email_digest_enabled: emailDigestEnabled } : null);
+
+      toast({
+        title: "Notification settings updated",
+        description: emailDigestEnabled ? "You will receive daily email notifications" : "Email notifications have been turned off",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error updating notification settings",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return <ProfileLoading />;
   }
@@ -82,13 +111,16 @@ export function ProfileContainer() {
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       <ProfileInfo
         profile={profile}
         completion={completion}
         onEditProfile={handleEditProfile}
       />
-      {/* DeleteAccountButtonは削除 */}
+      <NotificationSettings 
+        emailDigestEnabled={!!profile.email_digest_enabled} 
+        onUpdateSettings={handleNotificationSettingsUpdate}
+      />
     </div>
   );
 }
