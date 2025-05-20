@@ -7,6 +7,7 @@ import { Profile as ProfileType } from "@/types/messages";
 import { ProfileLoading } from "@/components/profile/ProfileLoading";
 import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
+// DeleteAccountButtonのimportを削除
 
 export function ProfileContainer() {
   const [profile, setProfile] = useState<ProfileType | null>(null);
@@ -35,62 +36,9 @@ export function ProfileContainer() {
         .single();
 
       if (error) throw error;
-      
-      // Create a complete profile object with all required fields
-      // Parse language_levels properly to handle both string and Record<string, number>
-      let parsedLanguageLevels: Record<string, number> | null = null;
-      
-      // If language_levels exists, try to parse it
-      if (data.language_levels) {
-        if (typeof data.language_levels === 'string') {
-          try {
-            parsedLanguageLevels = JSON.parse(data.language_levels);
-          } catch (e) {
-            console.error("Error parsing language levels:", e);
-            parsedLanguageLevels = null;
-          }
-        } else if (typeof data.language_levels === 'object') {
-          parsedLanguageLevels = data.language_levels as Record<string, number>;
-        }
-      }
-      
-      const completeProfile: ProfileType = {
-        id: data.id,
-        created_at: data.created_at,
-        first_name: data.first_name,
-        last_name: data.last_name,
-        age: data.age,
-        gender: data.gender,
-        origin: data.origin,
-        about_me: data.about_me,
-        avatar_url: data.avatar_url,
-        sexuality: data.sexuality,
-        university: data.university,
-        department: data.department,
-        year: data.year,
-        image_url_1: data.image_url_1,
-        image_url_2: data.image_url_2,
-        ideal_date: data.ideal_date,
-        life_goal: data.life_goal,
-        superpower: data.superpower,
-        worst_nightmare: data.worst_nightmare,
-        friend_activity: data.friend_activity,
-        best_quality: data.best_quality,
-        photo_comment: data.photo_comment,
-        hobby_photo_url: data.hobby_photo_url,
-        hobby_photo_comment: data.hobby_photo_comment,
-        hobbies: data.hobbies,
-        languages: data.languages,
-        learning_languages: data.learning_languages,
-        language_levels: parsedLanguageLevels,
-        pet_photo_url: data.pet_photo_url,
-        pet_photo_comment: data.pet_photo_comment,
-        fcm_token: data.fcm_token
-      };
-      
-      setProfile(completeProfile);
+      setProfile(data as ProfileType);
 
-      // Calculate profile completion
+      // プロフィールの完成度を計算
       if (data) {
         calculateCompletion(data);
       }
@@ -140,6 +88,7 @@ export function ProfileContainer() {
         completion={completion}
         onEditProfile={handleEditProfile}
       />
+      {/* DeleteAccountButtonは削除 */}
     </div>
   );
 }

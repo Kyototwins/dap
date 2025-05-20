@@ -25,31 +25,12 @@ export default function Messages() {
     logMessagesData();
   }, [matches, messages, selectedMatch, searchParams]);
 
-  // Auto refresh on first load and when returning to page
-  useEffect(() => {
-    handleRefresh();
-    
-    // Add visibility change listener to refresh when returning to the page
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        console.log("Page became visible, refreshing messages");
-        handleRefresh();
-      }
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
-
   const logMessagesData = () => {
     console.log("Messages page rendered");
     console.log(`Matches available: ${matches.length}`);
     if (matches.length > 0) {
       matches.forEach((match, idx) => {
-        console.log(`Match ${idx+1}: ID=${match.id}, Status=${match.status}, User=${match.otherUser?.first_name || 'Unknown'}, LastMessage=${match.lastMessage?.content || 'None'}`);
+        console.log(`Match ${idx+1}: ID=${match.id}, Status=${match.status}, User=${match.otherUser.first_name}`);
       });
     }
     console.log(`Messages available: ${messages.length}`);

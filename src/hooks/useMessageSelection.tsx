@@ -26,7 +26,7 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
       
       // If no messages exist, create an initial welcome message
       if (fetchedMessages.length === 0) {
-        console.log("No messages found, creating welcome message");
+        console.log("No messages found, creating initial message");
         
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
@@ -52,20 +52,8 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
         }
       }
       
-      // Update lastMessage in the match object if messages exist
-      if (fetchedMessages.length > 0) {
-        const latestMessage = fetchedMessages[fetchedMessages.length - 1];
-        match.lastMessage = {
-          id: latestMessage.id,
-          content: latestMessage.content,
-          created_at: latestMessage.created_at,
-          sender_id: latestMessage.sender_id,
-          match_id: match.id
-        };
-      }
-      
       // Mark messages as read if needed
-      if (match.unreadCount && match.unreadCount > 0) {
+      if (match.unreadCount > 0) {
         console.log(`Marking ${match.unreadCount} messages as read`);
         
         // Refresh matches to update UI

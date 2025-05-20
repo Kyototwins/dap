@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -34,21 +35,7 @@ export function useAuthOperations() {
         options: {
           data: {
             full_name: name,
-            // Move email message into the data object
-            emailMessage: `
-              【日本語】
-              確認メールです。以下のリンクをクリックして登録を完了してください。
-              もしリンクを開いた際にエラーが表示されても、サイトに戻ってログインしてみてください。登録は完了している可能性があります。
-              問題が解決しない場合は、DAPのインスタグラムのDMなどにご連絡ください。
-              
-              【English】
-              This is a confirmation email. Please click the link below to complete your registration.
-              If you see an error message when opening the link, please try returning to the site and logging in. Your registration may already be complete.
-              If the issue persists, please contact us via Instagram DM at DAP's account.
-            `
           },
-          // Update redirect URL to point to our confirmation page
-          emailRedirectTo: window.location.origin + '/email-confirmation',
         },
       });
       
@@ -64,12 +51,10 @@ export function useAuthOperations() {
         throw error;
       }
 
-      console.log("Sign-up response:", data);
-
       // メール送信成功のメッセージを表示
       toast({
         title: "確認メールを送信しました",
-        description: "メールに記載されているリンクをクリックして、登録を完了してください。エラーが表示されてもログインしてみてください。",
+        description: "メールに記載されているリンクをクリックして、登録を完了してください。",
       });
 
       // ログインページにリダイレクト
@@ -94,8 +79,6 @@ export function useAuthOperations() {
         description: errorMessage,
         variant: "destructive",
       });
-      
-      console.error("Sign-up error:", error);
     } finally {
       setLoading(false);
     }

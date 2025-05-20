@@ -14,7 +14,7 @@ export function useMessageSending(
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom when messages change or a new message is sent
+  // Scroll to bottom on messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -47,40 +47,23 @@ export function useMessageSending(
           
           if (sender) {
             // Create a proper Message object with all required fields
-            // that conforms to our Message type definition
             const tempMessage: Message = {
               id: result.messageData.id,
               content: result.messageData.content,
               created_at: result.messageData.created_at || new Date().toISOString(),
+              match_id: result.messageData.match_id,
               sender_id: authData.user.id,
-              // Include match_id as an extended property
-              match_id: match.id
+              sender: sender
             };
             
-            // Add the message with sender to our local state
-            const enhancedMessage = {
-              ...tempMessage,
-              sender
-            };
-            
+            // Add the message to our local state
             setMessages(prevMessages => {
               // Check if this message already exists to avoid duplicates
-              if (prevMessages.some(msg => msg.id === enhancedMessage.id)) {
+              if (prevMessages.some(msg => msg.id === tempMessage.id)) {
                 return prevMessages;
               }
-              return [...prevMessages, enhancedMessage as unknown as Message];
+              return [...prevMessages, tempMessage];
             });
-            
-            // Update lastMessage in the match object
-            if (match) {
-              match.lastMessage = {
-                id: tempMessage.id,
-                content: tempMessage.content,
-                created_at: tempMessage.created_at,
-                sender_id: tempMessage.sender_id,
-                match_id: match.id
-              };
-            }
           }
         }
         
