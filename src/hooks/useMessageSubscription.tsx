@@ -1,82 +1,84 @@
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Match, Message } from "@/types/messages";
-import { createStandardizedUserObject } from "@/utils/profileDataUtils";
+import { Message } from "@/types/messages";
 
-// Handle real-time message updates via Supabase channels
 export function useMessageSubscription(
-  selectedMatch: Match | null, 
+  matchId: string | null,
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
 ) {
-  // Set up realtime subscription when the component mounts or when selectedMatch changes
-  useEffect(() => {
-    if (!selectedMatch) return;
-    
-    console.log(`Setting up message subscription for match: ${selectedMatch.id}`);
-    
-    // Create a channel with a unique name for this match
-    const channel = supabase
-      .channel(`messages-channel-${selectedMatch.id}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `match_id=eq.${selectedMatch.id}` // Only listen for this specific match
-      }, async payload => {
-        console.log("New message received:", payload.new);
-        
-        // Skip processing if message is missing required data
-        if (!payload.new) return;
-        
-        // Get sender information
-        const { data: senderData, error: senderError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', payload.new.sender_id)
-          .single();
-        
-        if (senderError) {
-          console.error("Error fetching sender data:", senderError);
-          return;
-        }
-        
-        // Create standardized sender object
-        const sender = createStandardizedUserObject(senderData);
-        if (!sender) {
-          console.error("Could not create standardized sender object");
-          return;
-        }
-        
-        // Create message object for UI
-        const newMessage: Message = {
-          id: payload.new.id,
-          content: payload.new.content,
-          created_at: payload.new.created_at,
-          match_id: payload.new.match_id,
-          sender_id: payload.new.sender_id,
-          sender: sender
-        };
-        
-        // Add message to state, avoiding duplicates
-        setMessages(prev => {
-          if (prev.some(msg => msg.id === newMessage.id)) {
-            console.log("Duplicate message, not adding:", newMessage.id);
-            return prev;
-          }
-          
-          console.log("Adding message to state:", newMessage.id);
-          return [...prev, newMessage];
-        });
-      })
-      .subscribe();
-      
-    console.log("Message subscription activated for match:", selectedMatch.id);
+  const subscriptionRef = useRef<any>(null);
 
-    // Clean up subscription when component unmounts or selectedMatch changes
-    return () => {
-      console.log("Cleaning up message subscription for match:", selectedMatch.id);
-      supabase.removeChannel(channel);
+  useEffect(() => {
+    // Return early if there's no matchId
+    if (!matchId) {
+      return () => {};
+    }
+
+    const setupSubscription = async () => {
+      console.log(`Setting up message subscription for match ${matchId}`);
+      
+      // Clean up any existing subscription
+      if (subscriptionRef.current) {
+        console.log("Removing existing subscription");
+        subscriptionRef.current.unsubscribe();
+      }
+      
+      // Set up real-time subscription to messages for this match
+      const subscription = supabase
+        .channel(`messages:match_id=eq.${matchId}`)
+        .on(
+          "postgres_changes",
+          { 
+            event: "INSERT", 
+            schema: "public", 
+            table: "messages",
+            filter: `match_id=eq.${matchId}` 
+          },
+          (payload) => {
+            console.log("New message received from subscription:", payload);
+            
+            // Add the new message to the messages state
+            const newMessage = payload.new as any;
+            
+            setMessages((prevMessages) => {
+              // Check if message already exists
+              const exists = prevMessages.some((msg) => msg.id === newMessage.id);
+              if (exists) {
+                return prevMessages;
+              }
+              
+              // Add new message with necessary type conversion
+              return [
+                ...prevMessages,
+                {
+                  id: newMessage.id,
+                  content: newMessage.content,
+                  created_at: newMessage.created_at,
+                  sender_id: newMessage.sender_id,
+                  receiver_id: newMessage.receiver_id || "", // Add empty string if null
+                  match_id: newMessage.match_id
+                },
+              ];
+            });
+          }
+        )
+        .subscribe((status) => {
+          console.log("Subscription status:", status);
+        });
+
+      // Store the subscription reference
+      subscriptionRef.current = subscription;
     };
-  }, [selectedMatch, setMessages]);
+
+    setupSubscription();
+
+    // Cleanup on unmount
+    return () => {
+      console.log("Cleaning up message subscription");
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+      }
+    };
+  }, [matchId, setMessages]);
 }

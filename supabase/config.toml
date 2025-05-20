@@ -6,3 +6,6 @@ verify_jwt = false
 
 [functions.send-daily-digest]
 verify_jwt = false
+
+[functions.setup-email-digest-job]
+verify_jwt = false

@@ -5,7 +5,8 @@ export interface Message {
   created_at: string;
   content: string;
   sender_id: string;
-  receiver_id: string;
+  receiver_id?: string;
+  match_id?: string;
 }
 
 export interface Profile {
@@ -33,12 +34,13 @@ export interface Profile {
   photo_comment: string | null;
   hobby_photo_url: string | null;
   hobby_photo_comment: string | null;
+  pet_photo_url: string | null;  
+  pet_photo_comment: string | null;
+  email_digest_enabled?: boolean;
   hobbies: string[] | null;
   languages: string[] | null;
   learning_languages: string[] | null;
   language_levels: Record<string, number> | string | null;
-  pet_photo_url: string | null;  // Changed back from favorite_food_photo_url
-  pet_photo_comment: string | null;  // Changed back from favorite_food_photo_comment
 }
 
 export interface Match {
@@ -48,4 +50,14 @@ export interface Match {
   user_id_2: string;
   accepted_1: boolean;
   accepted_2: boolean;
+  // Additional properties used in the codebase
+  status?: string;
+  user1_id?: string;
+  user2_id?: string;
+  otherUser?: Profile;
+  lastMessage?: {
+    content: string;
+    created_at: string;
+  };
+  unreadCount?: number;
 }
