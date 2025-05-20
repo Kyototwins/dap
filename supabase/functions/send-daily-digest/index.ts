@@ -21,6 +21,9 @@ interface ActivitySummary {
   eventComments: number;
 }
 
+/**
+ * Get all users who have enabled the email digest feature
+ */
 async function getUsersWithDigestEnabled() {
   const { data, error } = await supabase
     .from("profiles")
@@ -31,6 +34,9 @@ async function getUsersWithDigestEnabled() {
   return data;
 }
 
+/**
+ * Get email address for a specific user
+ */
 async function getUserEmail(userId: string) {
   const { data, error } = await supabase.auth.admin.getUserById(userId);
   
@@ -38,6 +44,146 @@ async function getUserEmail(userId: string) {
   return data?.user?.email;
 }
 
+/**
+ * Query for likes received yesterday for a specific user
+ */
+async function getLikesReceived(userId: string, yesterdayStart: string, todayStart: string) {
+  const { data, error } = await supabase
+    .from("matches")
+    .select("id")
+    .eq("user2_id", userId)
+    .eq("status", "matched")
+    .gte("created_at", yesterdayStart)
+    .lt("created_at", todayStart);
+  
+  if (error) {
+    console.error("Error fetching likes:", error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+/**
+ * Query for messages received yesterday for a specific user
+ */
+async function getMessagesReceived(userId: string, yesterdayStart: string, todayStart: string) {
+  // Get messages received yesterday
+  const { data: messagesData, error: messagesError } = await supabase
+    .from("messages")
+    .select("id, match_id, sender_id")
+    .neq("sender_id", userId)
+    .gte("created_at", yesterdayStart)
+    .lt("created_at", todayStart);
+  
+  if (messagesError) {
+    console.error("Error fetching messages:", messagesError);
+    return [];
+  }
+  
+  // Get user's matches
+  const { data: userMatches, error: matchesError } = await supabase
+    .from("matches")
+    .select("id")
+    .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
+  
+  if (matchesError) {
+    console.error("Error fetching matches:", matchesError);
+    return [];
+  }
+  
+  // Filter messages to only include those from the user's matches
+  const userMatchIds = userMatches?.map(match => match.id) || [];
+  return (messagesData || []).filter(msg => userMatchIds.includes(msg.match_id));
+}
+
+/**
+ * Query for new events created yesterday
+ */
+async function getNewEvents(yesterdayStart: string, todayStart: string) {
+  const { data, error } = await supabase
+    .from("events")
+    .select("title")
+    .gte("created_at", yesterdayStart)
+    .lt("created_at", todayStart);
+  
+  if (error) {
+    console.error("Error fetching events:", error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+/**
+ * Query for participations in user's events from yesterday
+ */
+async function getEventParticipations(userId: string, yesterdayStart: string, todayStart: string) {
+  // Get user's events
+  const { data: userEvents, error: userEventsError } = await supabase
+    .from("events")
+    .select("id")
+    .eq("creator_id", userId);
+  
+  if (userEventsError) {
+    console.error("Error fetching user events:", userEventsError);
+    return [];
+  }
+  
+  const userEventIds = userEvents?.map(event => event.id) || [];
+  
+  // Get participations for user's events from yesterday
+  const { data, error } = await supabase
+    .from("event_participants")
+    .select("id")
+    .in("event_id", userEventIds)
+    .gte("created_at", yesterdayStart)
+    .lt("created_at", todayStart);
+  
+  if (error) {
+    console.error("Error fetching participations:", error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+/**
+ * Query for comments on user's events from yesterday
+ */
+async function getEventComments(userId: string, yesterdayStart: string, todayStart: string) {
+  // Get user's events
+  const { data: userEvents, error: userEventsError } = await supabase
+    .from("events")
+    .select("id")
+    .eq("creator_id", userId);
+  
+  if (userEventsError) {
+    console.error("Error fetching user events:", userEventsError);
+    return [];
+  }
+  
+  const userEventIds = userEvents?.map(event => event.id) || [];
+  
+  // Get comments for user's events from yesterday
+  const { data, error } = await supabase
+    .from("event_comments")
+    .select("id")
+    .in("event_id", userEventIds)
+    .gte("created_at", yesterdayStart)
+    .lt("created_at", todayStart);
+  
+  if (error) {
+    console.error("Error fetching comments:", error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+/**
+ * Get activity summary for a specific user for yesterday
+ */
 async function getYesterdayActivity(userId: string): Promise<ActivitySummary> {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -50,94 +196,30 @@ async function getYesterdayActivity(userId: string): Promise<ActivitySummary> {
   
   const todayStart = today.toISOString();
   
-  // Get likes received (based on matches where the user is user2_id and status changed to 'matched' yesterday)
-  const { data: likesData, error: likesError } = await supabase
-    .from("matches")
-    .select("id")
-    .eq("user2_id", userId)
-    .eq("status", "matched")
-    .gte("created_at", yesterdayStart)
-    .lt("created_at", todayStart);
-  
-  if (likesError) console.error("Error fetching likes:", likesError);
-  
-  // Get messages received yesterday
-  const { data: messagesData, error: messagesError } = await supabase
-    .from("messages")
-    .select("id, match_id, sender_id")
-    .neq("sender_id", userId)
-    .gte("created_at", yesterdayStart)
-    .lt("created_at", todayStart);
-  
-  if (messagesError) console.error("Error fetching messages:", messagesError);
-  
-  // Filter messages to only include those from the user's matches
-  const { data: userMatches, error: matchesError } = await supabase
-    .from("matches")
-    .select("id")
-    .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
-  
-  if (matchesError) console.error("Error fetching matches:", matchesError);
-  
-  const userMatchIds = userMatches?.map(match => match.id) || [];
-  const userMessages = messagesData?.filter(msg => userMatchIds.includes(msg.match_id)) || [];
-  
-  // Get new events created yesterday
-  const { data: newEvents, error: eventsError } = await supabase
-    .from("events")
-    .select("title")
-    .gte("created_at", yesterdayStart)
-    .lt("created_at", todayStart);
-  
-  if (eventsError) console.error("Error fetching events:", eventsError);
-  
-  // Get participation count for user's events
-  const { data: userEvents, error: userEventsError } = await supabase
-    .from("events")
-    .select("id")
-    .eq("creator_id", userId);
-  
-  if (userEventsError) console.error("Error fetching user events:", userEventsError);
-  
-  const userEventIds = userEvents?.map(event => event.id) || [];
-  
-  // Get participations for user's events from yesterday
-  const { data: participations, error: participationsError } = await supabase
-    .from("event_participants")
-    .select("id")
-    .in("event_id", userEventIds)
-    .gte("created_at", yesterdayStart)
-    .lt("created_at", todayStart);
-  
-  if (participationsError) console.error("Error fetching participations:", participationsError);
-  
-  // Get comments for user's events from yesterday
-  const { data: comments, error: commentsError } = await supabase
-    .from("event_comments")
-    .select("id")
-    .in("event_id", userEventIds)
-    .gte("created_at", yesterdayStart)
-    .lt("created_at", todayStart);
-  
-  if (commentsError) console.error("Error fetching comments:", commentsError);
+  const likes = await getLikesReceived(userId, yesterdayStart, todayStart);
+  const messages = await getMessagesReceived(userId, yesterdayStart, todayStart);
+  const newEvents = await getNewEvents(yesterdayStart, todayStart);
+  const participations = await getEventParticipations(userId, yesterdayStart, todayStart);
+  const comments = await getEventComments(userId, yesterdayStart, todayStart);
   
   return {
-    likesReceived: likesData?.length || 0,
-    messagesReceived: userMessages?.length || 0,
+    likesReceived: likes.length || 0,
+    messagesReceived: messages.length || 0,
     newEvents: newEvents || [],
-    eventParticipations: participations?.length || 0,
-    eventComments: comments?.length || 0,
+    eventParticipations: participations.length || 0,
+    eventComments: comments.length || 0,
   };
 }
 
-async function sendBrevoEmail(email: string, activity: ActivitySummary) {
-  const appUrl = "https://language-connect-app.com";
-  
+/**
+ * Generate email HTML content based on activity data
+ */
+function generateEmailContent(activity: ActivitySummary, appUrl = "https://language-connect-app.com"): string {
   const newEventsText = activity.newEvents.length > 0 
     ? `New events: ${activity.newEvents.map(event => event.title).join(", ")}`
     : "No new events yesterday";
   
-  const emailContent = `
+  return `
     <html>
     <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
       <h1 style="color: #5640AA;">Your Daily Activity Summary</h1>
@@ -169,7 +251,12 @@ async function sendBrevoEmail(email: string, activity: ActivitySummary) {
     </body>
     </html>
   `;
-  
+}
+
+/**
+ * Send an email using Brevo API
+ */
+async function sendBrevoEmail(email: string, activity: ActivitySummary) {
   try {
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
@@ -185,7 +272,7 @@ async function sendBrevoEmail(email: string, activity: ActivitySummary) {
         },
         to: [{ email }],
         subject: "Your Daily Language Connect Summary",
-        htmlContent: emailContent,
+        htmlContent: generateEmailContent(activity),
       }),
     });
     
@@ -198,6 +285,36 @@ async function sendBrevoEmail(email: string, activity: ActivitySummary) {
   } catch (error) {
     console.error("Error sending email:", error);
     throw error;
+  }
+}
+
+/**
+ * Process a single user for daily digest
+ */
+async function processUserDigest(user: any) {
+  try {
+    // Get user email
+    const email = await getUserEmail(user.id);
+    if (!email) {
+      console.warn(`No email found for user ${user.id}, skipping`);
+      return { userId: user.id, status: "skipped", reason: "no_email" };
+    }
+    
+    // Get yesterday's activity
+    const activity = await getYesterdayActivity(user.id);
+    
+    // Send email
+    await sendBrevoEmail(email, activity);
+    
+    console.log(`Successfully sent digest to ${email}`);
+    return { userId: user.id, email, status: "success" };
+  } catch (error: any) {
+    console.error(`Error processing user ${user.id}:`, error);
+    return {
+      userId: user.id,
+      status: "error",
+      error: error.message
+    };
   }
 }
 
@@ -218,35 +335,8 @@ serve(async (req) => {
     
     // Process each user
     for (const user of usersWithDigest) {
-      try {
-        // Get user email
-        const email = await getUserEmail(user.id);
-        if (!email) {
-          console.warn(`No email found for user ${user.id}, skipping`);
-          continue;
-        }
-        
-        // Get yesterday's activity
-        const activity = await getYesterdayActivity(user.id);
-        
-        // Send email
-        await sendBrevoEmail(email, activity);
-        
-        results.push({
-          userId: user.id,
-          email,
-          status: "success"
-        });
-        
-        console.log(`Successfully sent digest to ${email}`);
-      } catch (userError) {
-        console.error(`Error processing user ${user.id}:`, userError);
-        results.push({
-          userId: user.id,
-          status: "error",
-          error: userError.message
-        });
-      }
+      const result = await processUserDigest(user);
+      results.push(result);
     }
     
     return new Response(
@@ -263,7 +353,7 @@ serve(async (req) => {
         },
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in daily digest function:", error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
