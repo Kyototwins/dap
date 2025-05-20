@@ -4,18 +4,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Message } from "@/types/messages";
 
-export function useMatchMessages(matchId: string, currentUserId: string) {
+export function useMatchMessages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (matchId) {
-      fetchMessages();
-    }
-  }, [matchId]);
-
-  const fetchMessages = async () => {
+  const fetchMessages = async (matchId: string) => {
     try {
       setLoading(true);
       
@@ -45,6 +39,7 @@ export function useMatchMessages(matchId: string, currentUserId: string) {
       }));
 
       setMessages(formattedMessages);
+      return formattedMessages;
     } catch (error: any) {
       console.error('Error fetching messages:', error);
       toast({
@@ -52,6 +47,7 @@ export function useMatchMessages(matchId: string, currentUserId: string) {
         description: error.message,
         variant: "destructive",
       });
+      return [];
     } finally {
       setLoading(false);
     }

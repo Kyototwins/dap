@@ -2,7 +2,7 @@
 import { Send } from "lucide-react";
 import { Match, Message } from "@/types/messages";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useMessageSending } from "@/hooks/useMessageSending";
 import { formatMessageTimestamp } from "@/lib/message-date-utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +19,7 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     newMessage, 
     setNewMessage, 
     sending, 
+    handleContentChange,
     handleSendMessage,
     messagesEndRef
   } = useMessageSending(match, messages, setMessages);
@@ -62,7 +63,7 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     getCurrentUser();
   }, []);
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -122,13 +123,14 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
           }}
           className="flex items-center gap-2"
         >
-          <Input
+          <Textarea
             placeholder="Type a message..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             disabled={sending}
-            className="flex-1"
+            className="flex-1 min-h-[40px] resize-none"
+            rows={1}
           />
           <Button
             type="submit"

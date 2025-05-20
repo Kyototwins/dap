@@ -54,6 +54,34 @@ export const sendMatchMessage = async (
 };
 
 /**
+ * Sends a direct message with receiver information
+ * @param messageData Message data including match_id, sender_id, receiver_id and content
+ * @returns Response from database
+ */
+export const sendDirectMessage = async (messageData: {
+  match_id: string;
+  sender_id: string;
+  receiver_id: string;
+  content: string;
+}) => {
+  try {
+    const { data, error } = await supabase
+      .from("messages")
+      .insert([{
+        match_id: messageData.match_id,
+        sender_id: messageData.sender_id,
+        content: messageData.content.trim(),
+      }])
+      .select();
+    
+    return { data: data?.[0], error };
+  } catch (error) {
+    console.error("Error sending direct message:", error);
+    return { data: null, error };
+  }
+};
+
+/**
  * Gets the current authenticated user
  * @returns Current authenticated user or null
  */

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useMatchMessages } from "@/hooks/useMatchMessages";
-import type { Match } from "@/types/messages";
+import type { Match, Message } from "@/types/messages";
 
 export function useMessageSelection(fetchMatches: () => Promise<void>) {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
@@ -53,7 +53,7 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
       }
       
       // Mark messages as read if needed
-      if (match.unreadCount > 0) {
+      if (match.unreadCount && match.unreadCount > 0) {
         console.log(`Marking ${match.unreadCount} messages as read`);
         
         // Refresh matches to update UI
