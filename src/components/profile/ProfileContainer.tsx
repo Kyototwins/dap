@@ -45,13 +45,13 @@ export function ProfileContainer() {
       if (error) throw error;
       setProfile(data as ProfileType);
 
-      // プロフィールの完成度を計算
+      // Calculate profile completion
       if (data) {
         calculateCompletion(data);
       }
     } catch (error: any) {
       toast({
-        title: "エラーが発生しました",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -123,7 +123,7 @@ export function ProfileContainer() {
 
     } catch (error: any) {
       toast({
-        title: "通知設定の更新に失敗しました",
+        title: "Failed to update notification settings",
         description: error.message,
         variant: "destructive",
       });
@@ -147,22 +147,22 @@ export function ProfileContainer() {
         onEditProfile={handleEditProfile}
       />
       
-      <Tabs defaultValue="about" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="about">プロフィール</TabsTrigger>
-          <TabsTrigger value="notifications">通知設定</TabsTrigger>
+      <Tabs defaultValue="about" value={activeTab} onValueChange={setActiveTab} className="w-full mt-2">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="about">Profile</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="about" className="mt-4">
+        <TabsContent value="about">
           <ProfileAboutTab profile={profile} />
         </TabsContent>
         
-        <TabsContent value="notifications" className="mt-4">
+        <TabsContent value="notifications">
           <NotificationSettings 
             emailDigestEnabled={!!profile.email_digest_enabled} 
             notificationEmail={profile.notification_email || ""}
             defaultEmail={userAuth?.email || ""}
-            notificationTime={profile.notification_time}
+            notificationTime={profile.notification_time || "09:00"}
             onUpdateSettings={handleNotificationSettingsUpdate}
           />
         </TabsContent>

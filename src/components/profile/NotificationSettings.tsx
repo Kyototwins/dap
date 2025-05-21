@@ -46,14 +46,14 @@ export function NotificationSettings({
       await onUpdateSettings(newState, isCustomEmail ? email : undefined, time);
       setEnabled(newState);
       toast({
-        title: newState ? "通知が有効化されました" : "通知が無効化されました",
-        description: newState ? "毎日のダイジェストメールが送信されます" : "通知はオフになりました",
+        title: newState ? "Notifications Enabled" : "Notifications Disabled",
+        description: newState ? "You will receive daily digest emails" : "Notifications have been turned off",
       });
     } catch (error) {
       console.error("Error toggling notifications:", error);
       toast({
-        title: "エラーが発生しました",
-        description: "設定を更新できませんでした。後でもう一度お試しください。",
+        title: "Error",
+        description: "Failed to update settings. Please try again later.",
         variant: "destructive"
       });
     } finally {
@@ -71,14 +71,14 @@ export function NotificationSettings({
       await onUpdateSettings(enabled, emailToSave, time);
       setIsEditing(false);
       toast({
-        title: "メールアドレスが更新されました",
-        description: isCustomEmail ? "カスタムメールアドレスを使用します" : "アカウントのメールアドレスを使用します",
+        title: "Email Address Updated",
+        description: isCustomEmail ? "Using custom email address" : "Using account email address",
       });
     } catch (error) {
       console.error("Error updating email:", error);
       toast({
-        title: "エラーが発生しました",
-        description: "メールアドレスを更新できませんでした。後でもう一度お試しください。",
+        title: "Error",
+        description: "Failed to update email address. Please try again later.",
         variant: "destructive"
       });
     } finally {
@@ -101,14 +101,14 @@ export function NotificationSettings({
     try {
       await onUpdateSettings(enabled, isCustomEmail ? email : undefined, selectedTime);
       toast({
-        title: "通知時間が更新されました",
-        description: `通知時間が ${selectedTime} に設定されました`,
+        title: "Notification Time Updated",
+        description: `Notification time set to ${selectedTime}`,
       });
     } catch (error) {
       console.error("Error updating notification time:", error);
       toast({
-        title: "エラーが発生しました",
-        description: "通知時間を更新できませんでした。後でもう一度お試しください。",
+        title: "Error",
+        description: "Failed to update notification time. Please try again later.",
         variant: "destructive"
       });
     }
@@ -126,14 +126,14 @@ export function NotificationSettings({
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
         <Bell className="w-5 h-5" />
-        <h2 className="text-lg font-semibold">通知設定</h2>
+        <h2 className="text-lg font-semibold">Notification Settings</h2>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <h3 className="font-medium">日次ダイジェストメール</h3>
+            <h3 className="font-medium">Daily Digest Email</h3>
             <p className="text-sm text-muted-foreground">
-              毎日の活動サマリーを受け取る
+              Receive a summary of daily activities
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -142,7 +142,7 @@ export function NotificationSettings({
               onCheckedChange={handleToggleNotifications}
               disabled={loading}
             />
-            <Label htmlFor="daily-digest">{enabled ? "オン" : "オフ"}</Label>
+            <Label htmlFor="daily-digest">{enabled ? "On" : "Off"}</Label>
           </div>
         </div>
         
@@ -150,11 +150,11 @@ export function NotificationSettings({
           <div className="space-y-3 pt-2 border-t">
             <div className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
-              <h3 className="font-medium">通知時間</h3>
+              <h3 className="font-medium">Notification Time</h3>
             </div>
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">
-                通知を受け取る時間を設定します（過去24時間の活動をまとめます）
+                Set the time when you want to receive notifications (summarizing the past 24 hours)
               </p>
               <Select 
                 value={time} 
@@ -162,7 +162,7 @@ export function NotificationSettings({
                 disabled={!enabled || loading}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="通知時間を選択" />
+                  <SelectValue placeholder="Select notification time" />
                 </SelectTrigger>
                 <SelectContent>
                   {generateTimeOptions().map(timeOption => (
@@ -173,7 +173,7 @@ export function NotificationSettings({
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-2">
-                選択した時間に、直前の24時間の活動サマリーが届きます
+                At the selected time, you'll receive a summary of activities from the previous 24 hours
               </p>
             </div>
           </div>
@@ -182,13 +182,13 @@ export function NotificationSettings({
         <div className="space-y-3 pt-2 border-t">
           <div className="flex items-center gap-2">
             <Mail className="w-5 h-5" />
-            <h3 className="font-medium">通知メールアドレス</h3>
+            <h3 className="font-medium">Notification Email Address</h3>
           </div>
           
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">
-                通知用のカスタムメールアドレスを使用
+                Use custom email address for notifications
               </p>
             </div>
             <div className="flex items-center space-x-2">
@@ -197,19 +197,19 @@ export function NotificationSettings({
                 onCheckedChange={handleToggleCustomEmail}
                 disabled={loading || isEditing}
               />
-              <Label>{isCustomEmail ? "カスタム" : "デフォルト"}</Label>
+              <Label>{isCustomEmail ? "Custom" : "Default"}</Label>
             </div>
           </div>
           
           {isEditing ? (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="notification-email">メールアドレス</Label>
+                <Label htmlFor="notification-email">Email Address</Label>
                 <Input
                   id="notification-email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="メールアドレスを入力"
+                  placeholder="Enter your email address"
                   type="email"
                   disabled={loading || !isCustomEmail}
                 />
@@ -222,7 +222,7 @@ export function NotificationSettings({
                   onClick={handleSaveEmail}
                   disabled={loading || !email}
                 >
-                  保存
+                  Save
                 </Button>
                 <Button 
                   variant="outline" 
@@ -234,7 +234,7 @@ export function NotificationSettings({
                   }}
                   disabled={loading}
                 >
-                  キャンセル
+                  Cancel
                 </Button>
               </div>
             </div>
@@ -250,11 +250,11 @@ export function NotificationSettings({
                   onClick={() => setIsEditing(true)}
                   disabled={loading}
                 >
-                  編集
+                  Edit
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                {isCustomEmail ? "カスタムメールアドレスを使用中" : "アカウントのメールアドレスを使用中"}
+                {isCustomEmail ? "Using custom email address" : "Using account email address"}
               </p>
             </div>
           )}
