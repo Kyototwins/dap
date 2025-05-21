@@ -75,10 +75,9 @@ export interface Profile {
   learning_languages?: string[];
   email_digest_enabled?: boolean;
   notification_email?: string;
-  notification_time?: string;
 }
 
-// Add the missing Message and Match interfaces
+// Add missing Message type definition
 export interface Message {
   id: string;
   content: string;
@@ -88,15 +87,21 @@ export interface Message {
   match_id: string;
 }
 
+// Add missing Match type definition
 export interface Match {
   id: string;
   status: string;
   user1_id: string;
   user2_id: string;
-  otherUser: Profile;
+  otherUser: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    avatar_url?: string;
+  };
   lastMessage?: {
     content: string;
     created_at: string;
   };
-  unreadCount: number;
+  unreadCount?: number;
 }

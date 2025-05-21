@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -22,29 +21,16 @@ interface ActivitySummary {
 }
 
 /**
- * Get users who have enabled the email digest feature and whose notification time is current hour
+ * Get all users who have enabled the email digest feature
  */
-async function getUsersForCurrentHour() {
-  // Get current hour in JST (Japan Standard Time)
-  const now = new Date();
-  // Format as HH:00 (24-hour format with leading zero)
-  const currentHour = `${now.getHours().toString().padStart(2, '0')}:00`;
-  
-  console.log(`Getting users for notification time: ${currentHour}`);
-  
+async function getUsersWithDigestEnabled() {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, email_digest_enabled, notification_email, notification_time")
-    .eq("email_digest_enabled", true)
-    .eq("notification_time", currentHour);
+    .select("id, email_digest_enabled, notification_email")
+    .eq("email_digest_enabled", true);
   
-  if (error) {
-    console.error("Error fetching users for current hour:", error);
-    throw error;
-  }
-  
-  console.log(`Found ${data?.length || 0} users with notification time ${currentHour}`);
-  return data || [];
+  if (error) throw error;
+  return data;
 }
 
 /**
@@ -66,16 +52,16 @@ async function getNotificationEmail(userId: string, customEmail: string | null) 
 }
 
 /**
- * Query for likes received in the past 24 hours for a specific user
+ * Query for likes received yesterday for a specific user
  */
-async function getLikesReceived(userId: string, startTime: string, endTime: string) {
+async function getLikesReceived(userId: string, yesterdayStart: string, todayStart: string) {
   const { data, error } = await supabase
     .from("matches")
     .select("id")
     .eq("user2_id", userId)
     .eq("status", "matched")
-    .gte("created_at", startTime)
-    .lt("created_at", endTime);
+    .gte("created_at", yesterdayStart)
+    .lt("created_at", todayStart);
   
   if (error) {
     console.error("Error fetching likes:", error);
@@ -86,16 +72,16 @@ async function getLikesReceived(userId: string, startTime: string, endTime: stri
 }
 
 /**
- * Query for messages received in the past 24 hours for a specific user
+ * Query for messages received yesterday for a specific user
  */
-async function getMessagesReceived(userId: string, startTime: string, endTime: string) {
-  // Get messages received in last 24 hours
+async function getMessagesReceived(userId: string, yesterdayStart: string, todayStart: string) {
+  // Get messages received yesterday
   const { data: messagesData, error: messagesError } = await supabase
     .from("messages")
     .select("id, match_id, sender_id")
     .neq("sender_id", userId)
-    .gte("created_at", startTime)
-    .lt("created_at", endTime);
+    .gte("created_at", yesterdayStart)
+    .lt("created_at", todayStart);
   
   if (messagesError) {
     console.error("Error fetching messages:", messagesError);
@@ -119,14 +105,14 @@ async function getMessagesReceived(userId: string, startTime: string, endTime: s
 }
 
 /**
- * Query for new events created in the past 24 hours
+ * Query for new events created yesterday
  */
-async function getNewEvents(startTime: string, endTime: string) {
+async function getNewEvents(yesterdayStart: string, todayStart: string) {
   const { data, error } = await supabase
     .from("events")
     .select("title")
-    .gte("created_at", startTime)
-    .lt("created_at", endTime);
+    .gte("created_at", yesterdayStart)
+    .lt("created_at", todayStart);
   
   if (error) {
     console.error("Error fetching events:", error);
@@ -137,9 +123,9 @@ async function getNewEvents(startTime: string, endTime: string) {
 }
 
 /**
- * Query for participations in user's events from the past 24 hours
+ * Query for participations in user's events from yesterday
  */
-async function getEventParticipations(userId: string, startTime: string, endTime: string) {
+async function getEventParticipations(userId: string, yesterdayStart: string, todayStart: string) {
   // Get user's events
   const { data: userEvents, error: userEventsError } = await supabase
     .from("events")
@@ -153,13 +139,13 @@ async function getEventParticipations(userId: string, startTime: string, endTime
   
   const userEventIds = userEvents?.map(event => event.id) || [];
   
-  // Get participations for user's events from last 24 hours
+  // Get participations for user's events from yesterday
   const { data, error } = await supabase
     .from("event_participants")
     .select("id")
     .in("event_id", userEventIds)
-    .gte("created_at", startTime)
-    .lt("created_at", endTime);
+    .gte("created_at", yesterdayStart)
+    .lt("created_at", todayStart);
   
   if (error) {
     console.error("Error fetching participations:", error);
@@ -170,9 +156,9 @@ async function getEventParticipations(userId: string, startTime: string, endTime
 }
 
 /**
- * Query for comments on user's events from the past 24 hours
+ * Query for comments on user's events from yesterday
  */
-async function getEventComments(userId: string, startTime: string, endTime: string) {
+async function getEventComments(userId: string, yesterdayStart: string, todayStart: string) {
   // Get user's events
   const { data: userEvents, error: userEventsError } = await supabase
     .from("events")
@@ -186,13 +172,13 @@ async function getEventComments(userId: string, startTime: string, endTime: stri
   
   const userEventIds = userEvents?.map(event => event.id) || [];
   
-  // Get comments for user's events from last 24 hours
+  // Get comments for user's events from yesterday
   const { data, error } = await supabase
     .from("event_comments")
     .select("id")
     .in("event_id", userEventIds)
-    .gte("created_at", startTime)
-    .lt("created_at", endTime);
+    .gte("created_at", yesterdayStart)
+    .lt("created_at", todayStart);
   
   if (error) {
     console.error("Error fetching comments:", error);
@@ -203,24 +189,25 @@ async function getEventComments(userId: string, startTime: string, endTime: stri
 }
 
 /**
- * Get activity summary for a specific user for the past 24 hours
+ * Get activity summary for a specific user for yesterday
  */
-async function get24HourActivity(userId: string): Promise<ActivitySummary> {
-  // Get time period for last 24 hours
-  const now = new Date();
-  const yesterday = new Date(now);
+async function getYesterdayActivity(userId: string): Promise<ActivitySummary> {
+  const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setHours(0, 0, 0, 0);
   
-  const startTime = yesterday.toISOString();
-  const endTime = now.toISOString();
+  const yesterdayStart = yesterday.toISOString();
   
-  console.log(`Getting activity from ${startTime} to ${endTime} for user ${userId}`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   
-  const likes = await getLikesReceived(userId, startTime, endTime);
-  const messages = await getMessagesReceived(userId, startTime, endTime);
-  const newEvents = await getNewEvents(startTime, endTime);
-  const participations = await getEventParticipations(userId, startTime, endTime);
-  const comments = await getEventComments(userId, startTime, endTime);
+  const todayStart = today.toISOString();
+  
+  const likes = await getLikesReceived(userId, yesterdayStart, todayStart);
+  const messages = await getMessagesReceived(userId, yesterdayStart, todayStart);
+  const newEvents = await getNewEvents(yesterdayStart, todayStart);
+  const participations = await getEventParticipations(userId, yesterdayStart, todayStart);
+  const comments = await getEventComments(userId, yesterdayStart, todayStart);
   
   return {
     likesReceived: likes.length || 0,
@@ -236,35 +223,37 @@ async function get24HourActivity(userId: string): Promise<ActivitySummary> {
  */
 function generateEmailContent(activity: ActivitySummary, appUrl = "https://language-connect-app.com"): string {
   const newEventsText = activity.newEvents.length > 0 
-    ? `新しいイベント: ${activity.newEvents.map(event => event.title).join(", ")}`
-    : "過去24時間に新しいイベントはありません";
+    ? `New events: ${activity.newEvents.map(event => event.title).join(", ")}`
+    : "No new events yesterday";
   
   return `
     <html>
     <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-      <h1 style="color: #5640AA;">あなたの日次活動サマリー</h1>
-      <p>こんにちは！過去24時間のLanguage Connectでの活動をお知らせします：</p>
+      <h1 style="color: #5640AA;">Your Daily Activity Summary</h1>
+      <p>Hello! Here's what happened in Language Connect yesterday:</p>
       
       <div style="background-color: #f7f7f7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p><strong>👍 新しいいいね:</strong> ${activity.likesReceived}件</p>
-        <p><strong>💬 新しいメッセージ:</strong> ${activity.messagesReceived}件</p>
-        <p><strong>🎉 ${activity.newEvents.length}件の新しいイベントが投稿されました</strong></p>
-        <p><strong>👥 あなたのイベントへの新しい参加者:</strong> ${activity.eventParticipations}人</p>
-        <p><strong>💬 あなたのイベントへの新しいコメント:</strong> ${activity.eventComments}件</p>
+        <p><strong>👍 New likes received:</strong> ${activity.likesReceived}</p>
+        <p><strong>💬 New messages received:</strong> ${activity.messagesReceived}</p>
+        <p><strong>🎉 ${activity.newEvents.length} new events were posted</strong></p>
+        <p><strong>👥 New participants in your events:</strong> ${activity.eventParticipations}</p>
+        <p><strong>💬 New comments on your events:</strong> ${activity.eventComments}</p>
       </div>
       
-      <p>言語交換コミュニティとの交流を続けましょう！</p>
-      <p><a href="${appUrl}" style="display: inline-block; background-color: #5640AA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Language Connectに移動</a></p>
+      <p>Stay engaged with your language exchange community!</p>
+      <p><a href="${appUrl}" style="display: inline-block; background-color: #5640AA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Visit Language Connect</a></p>
       
       <p style="margin-top: 30px; font-size: 14px; color: #777;">
-        リンクに問題がある場合は、サイトに戻って直接ログインしてください。システムは正常に動作するはずです！
+        If you encounter any issues with the links, please return to the site and log in directly. The system should work for you!<br>
+        リンクに問題がある場合は、サイトに戻ってログインしてみてください。システムは正常に動作するはずです！
       </p>
       <p style="font-size: 14px; color: #777;">
-        問題が解決しない場合は、DAPのインスタグラムDMでご連絡ください。
+        If you continue to experience issues, please contact us via DAP Instagram DM.<br>
+        問題が解決しない場合は、DAPのインスタグラムのDMでご連絡ください。
       </p>
       
       <p style="font-size: 12px; color: #999; margin-top: 30px;">
-        メール設定を管理するには、Language Connectアプリのプロフィール設定にアクセスしてください。
+        To manage your email preferences, visit your profile settings in the Language Connect app.
       </p>
     </body>
     </html>
@@ -289,7 +278,7 @@ async function sendBrevoEmail(email: string, activity: ActivitySummary) {
           email: "notifications@language-connect-app.com",
         },
         to: [{ email }],
-        subject: "Language Connect 日次アクティビティサマリー",
+        subject: "Your Daily Language Connect Summary",
         htmlContent: generateEmailContent(activity),
       }),
     });
@@ -318,19 +307,14 @@ async function processUserDigest(user: any) {
       return { userId: user.id, status: "skipped", reason: "no_email" };
     }
     
-    // Get 24 hour activity
-    const activity = await get24HourActivity(user.id);
+    // Get yesterday's activity
+    const activity = await getYesterdayActivity(user.id);
     
     // Send email
     await sendBrevoEmail(email, activity);
     
     console.log(`Successfully sent digest to ${email}`);
-    return { 
-      userId: user.id, 
-      email, 
-      time: user.notification_time || "09:00", 
-      status: "success" 
-    };
+    return { userId: user.id, email, status: "success" };
   } catch (error: any) {
     console.error(`Error processing user ${user.id}:`, error);
     return {
@@ -348,16 +332,16 @@ serve(async (req) => {
   }
   
   try {
-    console.log("Starting daily digest email process for current hour users");
+    console.log("Starting daily digest email process");
     
-    // Get users with email digest enabled for the current hour
-    const usersForCurrentHour = await getUsersForCurrentHour();
-    console.log(`Found ${usersForCurrentHour.length} users with digest enabled for current hour`);
+    // Get all users with email digest enabled
+    const usersWithDigest = await getUsersWithDigestEnabled();
+    console.log(`Found ${usersWithDigest.length} users with digest enabled`);
     
     const results = [];
     
     // Process each user
-    for (const user of usersForCurrentHour) {
+    for (const user of usersWithDigest) {
       const result = await processUserDigest(user);
       results.push(result);
     }
@@ -365,7 +349,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        processed: usersForCurrentHour.length,
+        processed: usersWithDigest.length,
         results 
       }),
       {
