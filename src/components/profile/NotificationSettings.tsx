@@ -1,180 +1,160 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Bell, Mail } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 
-interface NotificationSettingsProps {
-  emailDigestEnabled: boolean;
-  notificationEmail: string;
-  defaultEmail: string; // The email from auth - used as fallback
-  onUpdateSettings: (emailDigestEnabled: boolean, notificationEmail?: string) => Promise<void>;
-}
-
-export function NotificationSettings({ 
-  emailDigestEnabled, 
-  notificationEmail,
-  defaultEmail,
-  onUpdateSettings 
-}: NotificationSettingsProps) {
-  const [enabled, setEnabled] = useState(emailDigestEnabled);
-  const [email, setEmail] = useState(notificationEmail || defaultEmail);
-  const [isCustomEmail, setIsCustomEmail] = useState(!!notificationEmail && notificationEmail !== defaultEmail);
-  const [loading, setLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+export function NotificationSettings() {
+  const [emailDigestEnabled, setEmailDigestEnabled] = useState(false);
+  const [notificationEmail, setNotificationEmail] = useState("");
+  const [defaultEmail, setDefaultEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Update email when props change
-    setEmail(notificationEmail || defaultEmail);
-    setIsCustomEmail(!!notificationEmail && notificationEmail !== defaultEmail);
-  }, [notificationEmail, defaultEmail]);
+    loadUserSettings();
+  }, []);
 
-  const handleToggleNotifications = async () => {
-    setLoading(true);
+  const loadUserSettings = async () => {
     try {
-      const newState = !enabled;
-      await onUpdateSettings(newState);
-      setEnabled(newState);
+      setIsLoading(true);
+      
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      setDefaultEmail(user.email || "");
+      
+      // Get user profile and notification settings
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("email_digest_enabled, notification_email")
+        .eq("id", user.id)
+        .single();
+      
+      if (error) throw error;
+      
+      setEmailDigestEnabled(profile?.email_digest_enabled || false);
+      setNotificationEmail(profile?.notification_email || "");
+    } catch (error: any) {
+      console.error("Error loading notification settings:", error.message);
+      toast({
+        variant: "destructive",
+        title: "Failed to load settings",
+        description: error.message,
+      });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleSaveEmail = async () => {
-    if (!email) return;
-    
-    setLoading(true);
+  const saveSettings = async () => {
     try {
-      // Use the custom email if isCustomEmail is true, otherwise use null to reset to default
-      const emailToSave = isCustomEmail ? email : null;
-      await onUpdateSettings(enabled, emailToSave);
-      setIsEditing(false);
+      setIsSaving(true);
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          email_digest_enabled: emailDigestEnabled,
+          notification_email: notificationEmail.trim() || null
+        })
+        .eq("id", user.id);
+      
+      if (error) throw error;
+      
+      // If digest is enabled, call the function to set up the cron job
+      if (emailDigestEnabled) {
+        const { error: fnError } = await supabase.functions.invoke("setup-email-digest-job");
+        if (fnError) throw fnError;
+      }
+      
+      toast({
+        title: "Settings saved",
+        description: "Your notification settings have been updated.",
+      });
+    } catch (error: any) {
+      console.error("Error saving notification settings:", error.message);
+      toast({
+        variant: "destructive",
+        title: "Failed to save settings",
+        description: error.message,
+      });
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
-  const handleToggleCustomEmail = () => {
-    const newIsCustom = !isCustomEmail;
-    setIsCustomEmail(newIsCustom);
-    
-    // Reset to default email if toggling off custom email
-    if (!newIsCustom) {
-      setEmail(defaultEmail);
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
+      </div>
+    );
+  }
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center gap-2">
-        <Bell className="w-5 h-5" />
-        <h2 className="text-lg font-semibold">Notification Settings</h2>
+      <CardHeader>
+        <CardTitle>Notification Settings</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h3 className="font-medium">Daily Digest Email</h3>
-            <p className="text-sm text-muted-foreground">
-              Receive a daily summary of your activity at 9:30 AM
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Includes activities from 9:30 AM yesterday to 9:29 AM today
-            </p>
-          </div>
-          <div className="flex items-center space-x-2">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-medium">Daily Email Digest</h3>
+              <p className="text-sm text-gray-500">
+                Receive a daily summary of your notifications at 9:30 AM
+              </p>
+            </div>
             <Switch
-              checked={enabled}
-              onCheckedChange={handleToggleNotifications}
-              disabled={loading}
+              checked={emailDigestEnabled}
+              onCheckedChange={setEmailDigestEnabled}
             />
-            <Label htmlFor="daily-digest">{enabled ? "On" : "Off"}</Label>
           </div>
         </div>
-        
-        <div className="space-y-3 pt-2 border-t">
-          <div className="flex items-center gap-2">
-            <Mail className="w-5 h-5" />
-            <h3 className="font-medium">Notification Email</h3>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">
-                Use custom email for notifications
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                checked={isCustomEmail}
-                onCheckedChange={handleToggleCustomEmail}
-                disabled={loading || isEditing}
+
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-medium mb-2">Notification Email</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              Enter a custom email for notifications or leave blank to use your account email ({defaultEmail})
+            </p>
+            <div className="flex gap-2 items-start">
+              <Input
+                placeholder="Enter email address (optional)"
+                type="email"
+                value={notificationEmail}
+                onChange={(e) => setNotificationEmail(e.target.value)}
               />
-              <Label>{isCustomEmail ? "Custom" : "Default"}</Label>
             </div>
           </div>
-          
-          {isEditing ? (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="notification-email">Email Address</Label>
-                <Input
-                  id="notification-email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter email address"
-                  type="email"
-                  disabled={loading || !isCustomEmail}
-                />
-              </div>
-              
-              <div className="flex gap-2">
-                <Button 
-                  variant="default"
-                  size="sm" 
-                  onClick={handleSaveEmail}
-                  disabled={loading || !email}
-                >
-                  Save
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setEmail(notificationEmail || defaultEmail);
-                    setIsCustomEmail(!!notificationEmail && notificationEmail !== defaultEmail);
-                  }}
-                  disabled={loading}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <div className="p-3 bg-muted rounded-md flex justify-between items-center">
-                <span className="text-sm font-medium break-all">
-                  {isCustomEmail ? email : defaultEmail}
-                </span>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => setIsEditing(true)}
-                  disabled={loading}
-                >
-                  Edit
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {isCustomEmail ? "Using custom email address" : "Using account email address"}
-              </p>
-            </div>
-          )}
         </div>
       </CardContent>
+      <CardFooter>
+        <Button 
+          onClick={saveSettings} 
+          disabled={isSaving}
+          className="bg-[#7f1184] hover:bg-[#671073]"
+        >
+          {isSaving ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save Settings"
+          )}
+        </Button>
+      </CardFooter>
     </Card>
   );
 }

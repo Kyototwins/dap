@@ -5,13 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ProfileAboutTab } from "./ProfileAboutTab";
 import { ProfileCover } from "./ProfileCover";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { NotificationSettings } from "./NotificationSettings";
+import { useState } from "react";
 
 interface ProfileInfoProps {
   profile: Profile;
   completion: number;
   onEditProfile: () => void;
   showContent?: boolean;
-  showTabs?: boolean;
+  showTabs?: boolean 
 }
 
 export function ProfileInfo({ 
@@ -21,6 +24,7 @@ export function ProfileInfo({
   showContent = true,
   showTabs = true 
 }: ProfileInfoProps) {
+  const [activeTab, setActiveTab] = useState("about");
   const universitySuffix = profile.university ? 
     profile.department ? `, ${profile.department}` : "" : "";
   
@@ -53,6 +57,16 @@ export function ProfileInfo({
         </h1>
         <p className="text-gray-600 mb-4">{universityText}</p>
         
+        {/* Tabs */}
+        {showTabs && showContent && (
+          <Tabs defaultValue="about" value={activeTab} onValueChange={setActiveTab} className="mb-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="about">About</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
+        
         {/* Action button - profile edit button only */}
         <div className="flex mb-6">
           <Button 
@@ -80,7 +94,8 @@ export function ProfileInfo({
         {/* Only show content if showContent is true */}
         {showContent && (
           <div className="w-full">
-            <ProfileAboutTab profile={profile} />
+            {activeTab === "about" && <ProfileAboutTab profile={profile} />}
+            {activeTab === "notifications" && <NotificationSettings />}
           </div>
         )}
       </div>
