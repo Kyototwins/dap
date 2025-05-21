@@ -1,3 +1,4 @@
+
 // Define the ImageUpload type
 export interface ImageUpload {
   file: File | null;
@@ -76,3 +77,31 @@ export interface Profile {
   notification_email?: string;
 }
 
+// Add missing Message type definition
+export interface Message {
+  id: string;
+  content: string;
+  created_at: string;
+  sender_id: string;
+  receiver_id: string;
+  match_id: string;
+}
+
+// Add missing Match type definition
+export interface Match {
+  id: string;
+  status: string;
+  user1_id: string;
+  user2_id: string;
+  otherUser: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    avatar_url?: string;
+  };
+  lastMessage?: {
+    content: string;
+    created_at: string;
+  };
+  unreadCount?: number;
+}
