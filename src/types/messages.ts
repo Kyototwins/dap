@@ -77,3 +77,26 @@ export interface Profile {
   notification_email?: string;
   notification_time?: string;
 }
+
+// Add the missing Message and Match interfaces
+export interface Message {
+  id: string;
+  content: string;
+  created_at: string;
+  sender_id: string;
+  receiver_id: string;
+  match_id: string;
+}
+
+export interface Match {
+  id: string;
+  status: string;
+  user1_id: string;
+  user2_id: string;
+  otherUser: Profile;
+  lastMessage?: {
+    content: string;
+    created_at: string;
+  };
+  unreadCount: number;
+}
