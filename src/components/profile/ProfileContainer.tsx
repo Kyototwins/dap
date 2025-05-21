@@ -9,7 +9,7 @@ import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { ProfileAboutTab } from "@/components/profile/ProfileAboutTab";
 import { NotificationSettings } from "@/components/profile/NotificationSettings";
-import { TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { User } from "@supabase/supabase-js";
 
 export function ProfileContainer() {
@@ -134,24 +134,30 @@ export function ProfileContainer() {
         profile={profile}
         completion={completion}
         onEditProfile={handleEditProfile}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
-      
-      <div className="px-4">
-        <TabsContent value="about" className="mt-0">
-          <ProfileAboutTab profile={profile} />
-        </TabsContent>
-        
-        <TabsContent value="notifications" className="mt-0">
-          <NotificationSettings 
-            emailDigestEnabled={!!profile.email_digest_enabled} 
-            notificationEmail={profile.notification_email || userAuth?.email || ""}
-            defaultEmail={userAuth?.email || ""}
-            onUpdateSettings={handleNotificationSettingsUpdate}
-          />
-        </TabsContent>
-      </div>
+      >
+        {/* Move the Tabs component inside ProfileInfo */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="about">About</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          </TabsList>
+          
+          <div className="px-4">
+            <TabsContent value="about" className="mt-0">
+              <ProfileAboutTab profile={profile} />
+            </TabsContent>
+            
+            <TabsContent value="notifications" className="mt-0">
+              <NotificationSettings 
+                emailDigestEnabled={!!profile.email_digest_enabled} 
+                notificationEmail={profile.notification_email || userAuth?.email || ""}
+                defaultEmail={userAuth?.email || ""}
+                onUpdateSettings={handleNotificationSettingsUpdate}
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
+      </ProfileInfo>
     </div>
   );
 }

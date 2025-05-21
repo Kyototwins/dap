@@ -3,17 +3,16 @@ import { Edit } from "lucide-react";
 import { Profile } from "@/types/messages";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 
 interface ProfileInfoProps {
   profile: Profile;
   completion: number;
   onEditProfile: () => void;
-  activeTab: string;
-  onTabChange: (value: string) => void;
+  children: React.ReactNode; // Add children prop to render tab contents
 }
 
-export function ProfileInfo({ profile, completion, onEditProfile, activeTab, onTabChange }: ProfileInfoProps) {
+export function ProfileInfo({ profile, completion, onEditProfile, children }: ProfileInfoProps) {
   const universitySuffix = profile.university ? 
     profile.department ? `, ${profile.department}` : "" : "";
   
@@ -78,13 +77,8 @@ export function ProfileInfo({ profile, completion, onEditProfile, activeTab, onT
           </div>
         </div>
         
-        {/* Tabs positioned below avatar */}
-        <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* Render the tabs and content passed as children */}
+        {children}
       </div>
     </div>
   );
