@@ -9,7 +9,7 @@ import type { Match } from "@/types/messages";
 
 export function useMessages() {
   const { matches, loading, fetchMatches } = useMatches();
-  const { selectedMatch, messages, setMessages, handleSelectMatch } = useMessageSelection(fetchMatches);
+  const { selectedMatch, messages, setMessages, messagesLoaded, handleSelectMatch } = useMessageSelection(fetchMatches);
   const location = useLocation();
   
   // Set up URL parameter handling
@@ -32,6 +32,7 @@ export function useMessages() {
     selectedMatch,
     messages,
     loading,
+    messagesLoaded,
     handleSelectMatch,
     setMessages,
     fetchMatches,

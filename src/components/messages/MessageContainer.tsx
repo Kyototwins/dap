@@ -12,6 +12,7 @@ interface MessageContainerProps {
   messages: Message[];
   onSelectMatch: (match: Match) => void;
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  messagesLoaded?: boolean;
 }
 
 export function MessageContainer({
@@ -20,6 +21,7 @@ export function MessageContainer({
   messages,
   onSelectMatch,
   setMessages,
+  messagesLoaded = true,
 }: MessageContainerProps) {
   const { showMobileChat, handleBackToList } = useMobileChat(selectedMatch);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -68,6 +70,7 @@ export function MessageContainer({
         setMessages={setMessages}
         onBack={handleBackToList}
         showMobileChat={showMobileChat}
+        messagesLoaded={messagesLoaded}
       />
     </div>
   );

@@ -1,5 +1,6 @@
 
 import { MessageChat } from "@/components/messages/MessageChat";
+import { LoadingSpinner } from "@/components/messages/LoadingSpinner";
 import type { Match, Message } from "@/types/messages";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ interface ChatWindowProps {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   onBack: () => void;
   showMobileChat: boolean;
+  messagesLoaded?: boolean;
 }
 
 export function ChatWindow({
@@ -17,7 +19,8 @@ export function ChatWindow({
   messages,
   setMessages,
   onBack,
-  showMobileChat
+  showMobileChat,
+  messagesLoaded = true,
 }: ChatWindowProps) {
   return (
     <div className={`${!showMobileChat ? 'hidden md:block' : 'w-full'} md:w-2/3 overflow-hidden`}>
@@ -42,11 +45,17 @@ export function ChatWindow({
           </div>
           
           <div className="flex-1 overflow-hidden">
-            <MessageChat
-              match={match}
-              messages={messages}
-              setMessages={setMessages}
-            />
+            {!messagesLoaded ? (
+              <div className="h-full flex items-center justify-center">
+                <LoadingSpinner />
+              </div>
+            ) : (
+              <MessageChat
+                match={match}
+                messages={messages}
+                setMessages={setMessages}
+              />
+            )}
           </div>
         </div>
       ) : (

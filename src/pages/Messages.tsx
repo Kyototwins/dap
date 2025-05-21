@@ -15,6 +15,7 @@ export default function Messages() {
     handleSelectMatch,
     setMessages,
     fetchMatches,
+    messagesLoaded,
   } = useMessages();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -73,6 +74,7 @@ export default function Messages() {
         messages={messages}
         onSelectMatch={handleSelectMatch}
         setMessages={setMessages}
+        messagesLoaded={messagesLoaded}
       />
     </div>
   );

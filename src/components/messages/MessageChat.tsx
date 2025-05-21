@@ -24,6 +24,7 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     messagesEndRef
   } = useMessageSending(match, messages, setMessages);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Log messages for debugging
   useEffect(() => {
@@ -43,7 +44,9 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
 
   // Scroll to the bottom of messages
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   // Get current user ID when component mounts
@@ -82,7 +85,7 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     }, 100);
     
     return () => clearTimeout(timeoutId);
-  }, [messages]);
+  }, [messages, match?.id]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -93,7 +96,7 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={chatContainerRef}>
         {messages.length === 0 ? (
           <p className="text-center text-muted-foreground py-4">
             No messages yet. Start a conversation!

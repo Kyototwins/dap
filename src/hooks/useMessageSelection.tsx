@@ -10,6 +10,7 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
   const { messages, setMessages, fetchMessages } = useMatchMessages();
   const { toast } = useToast();
   const [processingMatchSelection, setProcessingMatchSelection] = useState(false);
+  const [messagesLoaded, setMessagesLoaded] = useState(false);
 
   const handleSelectMatch = async (match: Match) => {
     // Prevent multiple simultaneous selections
@@ -18,11 +19,18 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
     try {
       setProcessingMatchSelection(true);
       console.log("Selecting match:", match.id);
+      
+      // First set selected match to update UI immediately
       setSelectedMatch(match);
+      // Reset messages loaded state
+      setMessagesLoaded(false);
       
       // Fetch messages for this match
       const fetchedMessages = await fetchMessages(match.id);
       console.log(`Fetched ${fetchedMessages.length} messages for match ${match.id}`);
+      
+      // Mark messages as loaded
+      setMessagesLoaded(true);
       
       // If no messages exist, create an initial welcome message
       if (fetchedMessages.length === 0) {
@@ -75,6 +83,7 @@ export function useMessageSelection(fetchMatches: () => Promise<void>) {
     selectedMatch,
     messages,
     setMessages,
+    messagesLoaded,
     handleSelectMatch
   };
 }
