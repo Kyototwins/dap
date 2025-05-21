@@ -3,16 +3,17 @@ import { Edit } from "lucide-react";
 import { Profile } from "@/types/messages";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ProfileAboutTab } from "./ProfileAboutTab";
-import { ProfileCover } from "./ProfileCover";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ProfileInfoProps {
   profile: Profile;
   completion: number;
   onEditProfile: () => void;
+  activeTab: string;
+  onTabChange: (value: string) => void;
 }
 
-export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoProps) {
+export function ProfileInfo({ profile, completion, onEditProfile, activeTab, onTabChange }: ProfileInfoProps) {
   const universitySuffix = profile.university ? 
     profile.department ? `, ${profile.department}` : "" : "";
   
@@ -22,7 +23,15 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
   return (
     <div className="pb-6">
       {/* Cover image */}
-      <ProfileCover imageUrl={profile.image_url_1} />
+      <div className="h-32 md:h-48 w-full bg-gradient-to-r from-purple-500 to-pink-500 relative">
+        {profile.image_url_1 && (
+          <img
+            src={profile.image_url_1}
+            alt="Cover"
+            className="w-full h-full object-cover"
+          />
+        )}
+      </div>
       
       {/* Profile avatar */}
       <div className="relative -mt-16 px-4 mb-4">
@@ -69,10 +78,13 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
           </div>
         </div>
         
-        {/* Show profile content without "About" heading */}
-        <div className="w-full">
-          <ProfileAboutTab profile={profile} />
-        </div>
+        {/* Tabs positioned below avatar */}
+        <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="about">About</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
     </div>
   );
