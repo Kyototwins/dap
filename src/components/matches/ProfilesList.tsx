@@ -28,7 +28,7 @@ export function ProfilesList({
   return <div className="grid gap-4 md:gap-6">
       {visibleProfiles.map(profile => <UserCard key={profile.id} profile={profile} />)}
       
-      {visibleProfiles.length < filteredProfiles.length && <Button variant="outline" onClick={onLoadMore} disabled={loadingMore} className="w-full py-6 mt-2 border-dashed border-[#9b87f5] bg-accent-DEFAULT text-accent-DEFAULT">
+      {visibleProfiles.length < filteredProfiles.length && <Button variant="outline" onClick={onLoadMore} disabled={loadingMore} className="w-full py-6 mt-2 border-dashed border-[#7f1184] bg-accent-DEFAULT text-accent-DEFAULT">
           {loadingMore ? <>
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
               Loading...
