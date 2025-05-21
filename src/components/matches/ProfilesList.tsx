@@ -39,7 +39,7 @@ export function ProfilesList({
       {visibleProfiles.length < filteredProfiles.length && (
         <Button
           variant="outline"
-          className="w-full py-6 mt-2 border-dashed border-amber-200 text-amber-600 hover:bg-amber-50"
+          className="w-full py-6 mt-2 border-dashed border-[#9b87f5] text-[#9b87f5] hover:bg-[#9b87f5]/10"
           onClick={onLoadMore}
           disabled={loadingMore}
         >

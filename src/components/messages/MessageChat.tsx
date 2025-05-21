@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useMessageSending } from "@/hooks/useMessageSending";
 import { formatMessageTimestamp } from "@/lib/message-date-utils";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface MessageChatProps {
   match: Match;
@@ -36,7 +36,15 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
         time: messages[0].created_at
       });
     }
+    
+    // Scroll to bottom when messages change or component mounts
+    scrollToBottom();
   }, [messages]);
+
+  // Scroll to the bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   // Get current user ID when component mounts
   useEffect(() => {
@@ -61,7 +69,10 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     };
     
     getCurrentUser();
-  }, []);
+    
+    // Scroll to bottom when match changes
+    scrollToBottom();
+  }, [match?.id]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -75,7 +86,7 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
           <p className="text-center text-muted-foreground py-4">
-            まだメッセージがありません。会話を始めましょう！
+            No messages yet. Start a conversation!
           </p>
         ) : (
           messages.map((message) => {
