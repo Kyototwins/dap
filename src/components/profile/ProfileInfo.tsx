@@ -3,7 +3,6 @@ import { Edit } from "lucide-react";
 import { Profile } from "@/types/messages";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ProfileAboutTab } from "./ProfileAboutTab";
 import { ProfileCover } from "./ProfileCover";
 
 interface ProfileInfoProps {
@@ -67,11 +66,6 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
               style={{ width: `${completion}%` }}
             />
           </div>
-        </div>
-        
-        {/* Show profile content without "About" heading */}
-        <div className="w-full">
-          <ProfileAboutTab profile={profile} />
         </div>
       </div>
     </div>

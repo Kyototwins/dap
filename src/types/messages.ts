@@ -1,3 +1,4 @@
+
 // Define the ImageUpload type
 export interface ImageUpload {
   file: File | null;
@@ -74,5 +75,5 @@ export interface Profile {
   learning_languages?: string[];
   email_digest_enabled?: boolean;
   notification_email?: string;
+  notification_time?: string;
 }
-

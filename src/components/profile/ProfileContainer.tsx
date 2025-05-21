@@ -9,6 +9,7 @@ import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { NotificationSettings } from "@/components/profile/NotificationSettings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProfileAboutTab } from "@/components/profile/ProfileAboutTab";
 import { User } from "@supabase/supabase-js";
 
 export function ProfileContainer() {
@@ -79,17 +80,30 @@ export function ProfileContainer() {
     navigate("/profile/setup");
   };
 
-  const handleNotificationSettingsUpdate = async (emailDigestEnabled: boolean, notificationEmail?: string) => {
+  const handleNotificationSettingsUpdate = async (
+    emailDigestEnabled: boolean, 
+    notificationEmail?: string,
+    notificationTime?: string
+  ) => {
     try {
       if (!profile) return;
       
-      const updateData: { email_digest_enabled: boolean, notification_email?: string } = {
+      const updateData: { 
+        email_digest_enabled: boolean, 
+        notification_email?: string,
+        notification_time?: string
+      } = {
         email_digest_enabled: emailDigestEnabled
       };
       
       // Only update notification email if provided
       if (notificationEmail !== undefined) {
         updateData.notification_email = notificationEmail;
+      }
+      
+      // Only update notification time if provided
+      if (notificationTime !== undefined) {
+        updateData.notification_time = notificationTime;
       }
       
       const { error } = await supabase
@@ -103,19 +117,17 @@ export function ProfileContainer() {
       setProfile(prev => prev ? { 
         ...prev, 
         email_digest_enabled: emailDigestEnabled,
-        notification_email: notificationEmail !== undefined ? notificationEmail : prev.notification_email
+        notification_email: notificationEmail !== undefined ? notificationEmail : prev.notification_email,
+        notification_time: notificationTime !== undefined ? notificationTime : prev.notification_time
       } : null);
 
-      toast({
-        title: "Notification settings updated",
-        description: "Your notification settings have been successfully updated",
-      });
     } catch (error: any) {
       toast({
-        title: "Error updating notification settings",
+        title: "通知設定の更新に失敗しました",
         description: error.message,
         variant: "destructive",
       });
+      throw error;
     }
   };
 
@@ -137,37 +149,20 @@ export function ProfileContainer() {
       
       <Tabs defaultValue="about" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="about">About</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="about">プロフィール</TabsTrigger>
+          <TabsTrigger value="notifications">通知設定</TabsTrigger>
         </TabsList>
         
         <TabsContent value="about" className="mt-4">
-          <div className="space-y-4">
-            {/* About content goes here - will be expanded in the future */}
-            {profile.about_me ? (
-              <div className="p-4 border rounded-lg bg-card">
-                <h3 className="text-lg font-medium mb-2">About Me</h3>
-                <p className="text-muted-foreground whitespace-pre-wrap">{profile.about_me}</p>
-              </div>
-            ) : (
-              <div className="p-4 border rounded-lg bg-card text-center text-muted-foreground">
-                <p>No information provided yet.</p>
-                <button 
-                  className="text-primary underline mt-2"
-                  onClick={handleEditProfile}
-                >
-                  Add details to your profile
-                </button>
-              </div>
-            )}
-          </div>
+          <ProfileAboutTab profile={profile} />
         </TabsContent>
         
         <TabsContent value="notifications" className="mt-4">
           <NotificationSettings 
             emailDigestEnabled={!!profile.email_digest_enabled} 
-            notificationEmail={profile.notification_email || userAuth?.email || ""}
+            notificationEmail={profile.notification_email || ""}
             defaultEmail={userAuth?.email || ""}
+            notificationTime={profile.notification_time}
             onUpdateSettings={handleNotificationSettingsUpdate}
           />
         </TabsContent>

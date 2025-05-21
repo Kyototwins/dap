@@ -28,7 +28,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Email digest job successfully configured to run at 7:00 AM JST daily"
+        message: "Email digest job successfully configured to run at each user's preferred time (default: 9:00 AM JST)"
       }),
       {
         status: 200,
@@ -38,7 +38,7 @@ serve(async (req) => {
         },
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error setting up email digest job:", error);
     return new Response(
       JSON.stringify({ 
