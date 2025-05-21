@@ -78,7 +78,10 @@ export function NotificationSettings({
           <div className="space-y-1">
             <h3 className="font-medium">Daily Digest Email</h3>
             <p className="text-sm text-muted-foreground">
-              Receive a daily summary of your activity at 7:00 AM
+              Receive a daily summary of your activity at 9:30 AM
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Includes activities from 9:30 AM yesterday to 9:29 AM today
             </p>
           </div>
           <div className="flex items-center space-x-2">

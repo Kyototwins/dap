@@ -28,7 +28,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Email digest job successfully configured to run at 7:00 AM JST daily"
+        message: "Email digest job successfully configured to run at 9:30 AM JST daily"
       }),
       {
         status: 200,

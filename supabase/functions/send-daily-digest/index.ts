@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -20,9 +21,7 @@ interface ActivitySummary {
   eventComments: number;
 }
 
-/**
- * Get all users who have enabled the email digest feature
- */
+// Database query functions
 async function getUsersWithDigestEnabled() {
   const { data, error } = await supabase
     .from("profiles")
@@ -33,9 +32,6 @@ async function getUsersWithDigestEnabled() {
   return data;
 }
 
-/**
- * Get email address for a specific user
- */
 async function getUserEmail(userId: string) {
   const { data, error } = await supabase.auth.admin.getUserById(userId);
   
@@ -43,25 +39,20 @@ async function getUserEmail(userId: string) {
   return data?.user?.email;
 }
 
-/**
- * Get either the custom notification email or fallback to user's auth email
- */
 async function getNotificationEmail(userId: string, customEmail: string | null) {
   if (customEmail) return customEmail;
   return await getUserEmail(userId);
 }
 
-/**
- * Query for likes received yesterday for a specific user
- */
-async function getLikesReceived(userId: string, yesterdayStart: string, todayStart: string) {
+// Activity data query functions
+async function getLikesReceived(userId: string, periodStart: string, periodEnd: string) {
   const { data, error } = await supabase
     .from("matches")
     .select("id")
     .eq("user2_id", userId)
     .eq("status", "matched")
-    .gte("created_at", yesterdayStart)
-    .lt("created_at", todayStart);
+    .gte("created_at", periodStart)
+    .lt("created_at", periodEnd);
   
   if (error) {
     console.error("Error fetching likes:", error);
@@ -71,17 +62,14 @@ async function getLikesReceived(userId: string, yesterdayStart: string, todaySta
   return data || [];
 }
 
-/**
- * Query for messages received yesterday for a specific user
- */
-async function getMessagesReceived(userId: string, yesterdayStart: string, todayStart: string) {
-  // Get messages received yesterday
+async function getMessagesReceived(userId: string, periodStart: string, periodEnd: string) {
+  // Get messages received in the time period
   const { data: messagesData, error: messagesError } = await supabase
     .from("messages")
     .select("id, match_id, sender_id")
     .neq("sender_id", userId)
-    .gte("created_at", yesterdayStart)
-    .lt("created_at", todayStart);
+    .gte("created_at", periodStart)
+    .lt("created_at", periodEnd);
   
   if (messagesError) {
     console.error("Error fetching messages:", messagesError);
@@ -104,15 +92,12 @@ async function getMessagesReceived(userId: string, yesterdayStart: string, today
   return (messagesData || []).filter(msg => userMatchIds.includes(msg.match_id));
 }
 
-/**
- * Query for new events created yesterday
- */
-async function getNewEvents(yesterdayStart: string, todayStart: string) {
+async function getNewEvents(periodStart: string, periodEnd: string) {
   const { data, error } = await supabase
     .from("events")
     .select("title")
-    .gte("created_at", yesterdayStart)
-    .lt("created_at", todayStart);
+    .gte("created_at", periodStart)
+    .lt("created_at", periodEnd);
   
   if (error) {
     console.error("Error fetching events:", error);
@@ -122,10 +107,7 @@ async function getNewEvents(yesterdayStart: string, todayStart: string) {
   return data || [];
 }
 
-/**
- * Query for participations in user's events from yesterday
- */
-async function getEventParticipations(userId: string, yesterdayStart: string, todayStart: string) {
+async function getEventParticipations(userId: string, periodStart: string, periodEnd: string) {
   // Get user's events
   const { data: userEvents, error: userEventsError } = await supabase
     .from("events")
@@ -139,13 +121,13 @@ async function getEventParticipations(userId: string, yesterdayStart: string, to
   
   const userEventIds = userEvents?.map(event => event.id) || [];
   
-  // Get participations for user's events from yesterday
+  // Get participations for user's events from the time period
   const { data, error } = await supabase
     .from("event_participants")
     .select("id")
     .in("event_id", userEventIds)
-    .gte("created_at", yesterdayStart)
-    .lt("created_at", todayStart);
+    .gte("created_at", periodStart)
+    .lt("created_at", periodEnd);
   
   if (error) {
     console.error("Error fetching participations:", error);
@@ -155,10 +137,7 @@ async function getEventParticipations(userId: string, yesterdayStart: string, to
   return data || [];
 }
 
-/**
- * Query for comments on user's events from yesterday
- */
-async function getEventComments(userId: string, yesterdayStart: string, todayStart: string) {
+async function getEventComments(userId: string, periodStart: string, periodEnd: string) {
   // Get user's events
   const { data: userEvents, error: userEventsError } = await supabase
     .from("events")
@@ -172,13 +151,13 @@ async function getEventComments(userId: string, yesterdayStart: string, todaySta
   
   const userEventIds = userEvents?.map(event => event.id) || [];
   
-  // Get comments for user's events from yesterday
+  // Get comments for user's events from the time period
   const { data, error } = await supabase
     .from("event_comments")
     .select("id")
     .in("event_id", userEventIds)
-    .gte("created_at", yesterdayStart)
-    .lt("created_at", todayStart);
+    .gte("created_at", periodStart)
+    .lt("created_at", periodEnd);
   
   if (error) {
     console.error("Error fetching comments:", error);
@@ -188,26 +167,28 @@ async function getEventComments(userId: string, yesterdayStart: string, todaySta
   return data || [];
 }
 
-/**
- * Get activity summary for a specific user for yesterday
- */
-async function getYesterdayActivity(userId: string): Promise<ActivitySummary> {
+// Get activity summary for a specific user
+async function getActivitySummary(userId: string): Promise<ActivitySummary> {
+  // Set time to 9:30 AM yesterday
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  yesterday.setHours(0, 0, 0, 0);
+  yesterday.setHours(9, 30, 0, 0);
   
-  const yesterdayStart = yesterday.toISOString();
+  const periodStart = yesterday.toISOString();
   
+  // Set time to 9:29 AM today
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  today.setHours(9, 29, 0, 0);
   
-  const todayStart = today.toISOString();
+  const periodEnd = today.toISOString();
   
-  const likes = await getLikesReceived(userId, yesterdayStart, todayStart);
-  const messages = await getMessagesReceived(userId, yesterdayStart, todayStart);
-  const newEvents = await getNewEvents(yesterdayStart, todayStart);
-  const participations = await getEventParticipations(userId, yesterdayStart, todayStart);
-  const comments = await getEventComments(userId, yesterdayStart, todayStart);
+  console.log(`Fetching activities from ${periodStart} to ${periodEnd} for user ${userId}`);
+  
+  const likes = await getLikesReceived(userId, periodStart, periodEnd);
+  const messages = await getMessagesReceived(userId, periodStart, periodEnd);
+  const newEvents = await getNewEvents(periodStart, periodEnd);
+  const participations = await getEventParticipations(userId, periodStart, periodEnd);
+  const comments = await getEventComments(userId, periodStart, periodEnd);
   
   return {
     likesReceived: likes.length || 0,
@@ -218,9 +199,7 @@ async function getYesterdayActivity(userId: string): Promise<ActivitySummary> {
   };
 }
 
-/**
- * Generate email HTML content based on activity data
- */
+// Email generation
 function generateEmailContent(activity: ActivitySummary, appUrl = "https://language-connect-app.com"): string {
   const newEventsText = activity.newEvents.length > 0 
     ? `New events: ${activity.newEvents.map(event => event.title).join(", ")}`
@@ -230,7 +209,7 @@ function generateEmailContent(activity: ActivitySummary, appUrl = "https://langu
     <html>
     <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
       <h1 style="color: #5640AA;">Your Daily Activity Summary</h1>
-      <p>Hello! Here's what happened in Language Connect yesterday:</p>
+      <p>Hello! Here's what happened in Language Connect from 9:30 AM yesterday to 9:29 AM today:</p>
       
       <div style="background-color: #f7f7f7; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <p><strong>👍 New likes received:</strong> ${activity.likesReceived}</p>
@@ -260,9 +239,7 @@ function generateEmailContent(activity: ActivitySummary, appUrl = "https://langu
   `;
 }
 
-/**
- * Send an email using Brevo API
- */
+// Email sending
 async function sendBrevoEmail(email: string, activity: ActivitySummary) {
   try {
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -295,9 +272,7 @@ async function sendBrevoEmail(email: string, activity: ActivitySummary) {
   }
 }
 
-/**
- * Process a single user for daily digest
- */
+// Process a single user
 async function processUserDigest(user: any) {
   try {
     // Get user email (either custom notification email or default auth email)
@@ -307,8 +282,8 @@ async function processUserDigest(user: any) {
       return { userId: user.id, status: "skipped", reason: "no_email" };
     }
     
-    // Get yesterday's activity
-    const activity = await getYesterdayActivity(user.id);
+    // Get activity summary
+    const activity = await getActivitySummary(user.id);
     
     // Send email
     await sendBrevoEmail(email, activity);
@@ -325,6 +300,7 @@ async function processUserDigest(user: any) {
   }
 }
 
+// Main handler
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -332,7 +308,7 @@ serve(async (req) => {
   }
   
   try {
-    console.log("Starting daily digest email process");
+    console.log("Starting daily digest email process (9:30 AM)");
     
     // Get all users with email digest enabled
     const usersWithDigest = await getUsersWithDigestEnabled();

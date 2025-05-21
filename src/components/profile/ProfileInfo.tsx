@@ -10,9 +10,17 @@ interface ProfileInfoProps {
   profile: Profile;
   completion: number;
   onEditProfile: () => void;
+  showContent?: boolean;
+  showTabs?: boolean;
 }
 
-export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoProps) {
+export function ProfileInfo({ 
+  profile, 
+  completion, 
+  onEditProfile, 
+  showContent = true,
+  showTabs = true 
+}: ProfileInfoProps) {
   const universitySuffix = profile.university ? 
     profile.department ? `, ${profile.department}` : "" : "";
   
@@ -69,10 +77,12 @@ export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoP
           </div>
         </div>
         
-        {/* Show profile content without "About" heading */}
-        <div className="w-full">
-          <ProfileAboutTab profile={profile} />
-        </div>
+        {/* Only show content if showContent is true */}
+        {showContent && (
+          <div className="w-full">
+            <ProfileAboutTab profile={profile} />
+          </div>
+        )}
       </div>
     </div>
   );
