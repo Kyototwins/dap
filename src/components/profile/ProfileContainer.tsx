@@ -81,7 +81,7 @@ export function ProfileContainer() {
 
   const handleNotificationSettingsUpdate = async (emailDigestEnabled: boolean, notificationEmail?: string) => {
     try {
-      if (!profile || !userAuth) return;
+      if (!profile) return;
       
       const updateData: { email_digest_enabled: boolean, notification_email?: string } = {
         email_digest_enabled: emailDigestEnabled
@@ -133,36 +133,45 @@ export function ProfileContainer() {
         profile={profile}
         completion={completion}
         onEditProfile={handleEditProfile}
-        showTabs={false} // Don't show tabs in the ProfileInfo component
       />
-
-      <div className="px-4">
-        <Tabs defaultValue="about" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="about" className="mt-4">
-            <ProfileInfo
-              profile={profile}
-              completion={completion}
-              onEditProfile={handleEditProfile}
-              showContent={true}
-              showTabs={false}
-            />
-          </TabsContent>
-          
-          <TabsContent value="notifications" className="mt-4">
-            <NotificationSettings 
-              emailDigestEnabled={!!profile.email_digest_enabled} 
-              notificationEmail={profile.notification_email || ""}
-              defaultEmail={userAuth?.email || ""}
-              onUpdateSettings={handleNotificationSettingsUpdate}
-            />
-          </TabsContent>
-        </Tabs>
-      </div>
+      
+      <Tabs defaultValue="about" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="about">About</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="about" className="mt-4">
+          <div className="space-y-4">
+            {/* About content goes here - will be expanded in the future */}
+            {profile.about_me ? (
+              <div className="p-4 border rounded-lg bg-card">
+                <h3 className="text-lg font-medium mb-2">About Me</h3>
+                <p className="text-muted-foreground whitespace-pre-wrap">{profile.about_me}</p>
+              </div>
+            ) : (
+              <div className="p-4 border rounded-lg bg-card text-center text-muted-foreground">
+                <p>No information provided yet.</p>
+                <button 
+                  className="text-primary underline mt-2"
+                  onClick={handleEditProfile}
+                >
+                  Add details to your profile
+                </button>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="notifications" className="mt-4">
+          <NotificationSettings 
+            emailDigestEnabled={!!profile.email_digest_enabled} 
+            notificationEmail={profile.notification_email || userAuth?.email || ""}
+            defaultEmail={userAuth?.email || ""}
+            onUpdateSettings={handleNotificationSettingsUpdate}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

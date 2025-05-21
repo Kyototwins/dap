@@ -5,26 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ProfileAboutTab } from "./ProfileAboutTab";
 import { ProfileCover } from "./ProfileCover";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { NotificationSettings } from "./NotificationSettings";
-import { useState } from "react";
 
 interface ProfileInfoProps {
   profile: Profile;
   completion: number;
   onEditProfile: () => void;
-  showContent?: boolean;
-  showTabs?: boolean 
 }
 
-export function ProfileInfo({ 
-  profile, 
-  completion, 
-  onEditProfile, 
-  showContent = true,
-  showTabs = true 
-}: ProfileInfoProps) {
-  const [activeTab, setActiveTab] = useState("about");
+export function ProfileInfo({ profile, completion, onEditProfile }: ProfileInfoProps) {
   const universitySuffix = profile.university ? 
     profile.department ? `, ${profile.department}` : "" : "";
   
@@ -80,24 +68,11 @@ export function ProfileInfo({
             />
           </div>
         </div>
-
-        {/* Tabs */}
-        {showTabs && showContent && (
-          <Tabs defaultValue="about" value={activeTab} onValueChange={setActiveTab} className="mb-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="about">About</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        )}
         
-        {/* Only show content if showContent is true */}
-        {showContent && (
-          <div className="w-full">
-            {activeTab === "about" && <ProfileAboutTab profile={profile} />}
-            {activeTab === "notifications" && <NotificationSettings />}
-          </div>
-        )}
+        {/* Show profile content without "About" heading */}
+        <div className="w-full">
+          <ProfileAboutTab profile={profile} />
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-
 // Define the ImageUpload type
 export interface ImageUpload {
   file: File | null;
@@ -45,20 +44,20 @@ export interface AdditionalDataType {
 
 export interface Profile {
   id: string;
-  created_at?: string;
-  first_name?: string;
-  last_name?: string;
-  age?: number;
-  gender?: string;
+  created_at: string;
+  first_name: string;
+  last_name: string;
   origin?: string;
-  sexuality?: string;
-  about_me?: string;
+  gender?: string;
+  age?: number;
   university?: string;
   department?: string;
   year?: string;
+  about_me?: string;
   avatar_url?: string;
   image_url_1?: string;
   image_url_2?: string;
+  photo_comment?: string;
   ideal_date?: string;
   life_goal?: string;
   superpower?: string;
@@ -66,43 +65,14 @@ export interface Profile {
   friend_activity?: string;
   best_quality?: string;
   hobby_photo_url?: string;
-  pet_photo_url?: string;
-  photo_comment?: string;
   hobby_photo_comment?: string;
+  pet_photo_url?: string;
   pet_photo_comment?: string;
+  language_levels?: Record<string, number> | string;
   hobbies?: string[];
   languages?: string[];
   learning_languages?: string[];
-  language_levels?: Record<string, number> | string;
   email_digest_enabled?: boolean;
   notification_email?: string;
 }
 
-// Add missing Message type definition
-export interface Message {
-  id: string;
-  content: string;
-  created_at: string;
-  sender_id: string;
-  receiver_id: string;
-  match_id: string;
-}
-
-// Add missing Match type definition
-export interface Match {
-  id: string;
-  status: string;
-  user1_id: string;
-  user2_id: string;
-  otherUser: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    avatar_url?: string;
-  };
-  lastMessage?: {
-    content: string;
-    created_at: string;
-  };
-  unreadCount?: number;
-}

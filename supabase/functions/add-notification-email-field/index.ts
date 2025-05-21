@@ -13,45 +13,44 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
   
   try {
-    // Check if notification_email column exists
-    const { data: columnExists, error: checkError } = await supabase
-      .from('profiles')
-      .select('notification_email')
-      .limit(1)
-      .maybeSingle();
-
-    // If we get a "column does not exist" error, we need to add it
-    if (checkError && checkError.message.includes('column "notification_email" does not exist')) {
-      // Add notification_email column
-      const { error: alterError } = await supabase.rpc('add_notification_email_field');
-      
-      if (alterError) {
-        console.error("Error adding notification_email field:", alterError);
-        throw alterError;
-      }
-      
-      return new Response(
-        JSON.stringify({ success: true, message: "Added notification_email field to profiles table" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
-      );
-    }
+    // Execute SQL to add notification_email field if it doesn't exist
+    const { error } = await supabase.rpc('add_notification_email_field');
     
-    // Column already exists
+    if (error) throw error;
+    
     return new Response(
-      JSON.stringify({ success: true, message: "notification_email field already exists" }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      JSON.stringify({ 
+        success: true, 
+        message: "Successfully added notification_email field to profiles table"
+      }),
+      {
+        status: 200,
+        headers: { 
+          "Content-Type": "application/json",
+          ...corsHeaders
+        },
+      }
     );
-  } catch (error) {
-    console.error("Error:", error);
+  } catch (error: any) {
+    console.error("Error adding notification_email field:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      JSON.stringify({ 
+        success: false, 
+        error: error.message 
+      }),
+      {
+        status: 500,
+        headers: { 
+          "Content-Type": "application/json",
+          ...corsHeaders
+        },
+      }
     );
   }
 });
