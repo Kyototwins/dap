@@ -9,17 +9,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 
-export function NotificationSettings() {
-  const [emailDigestEnabled, setEmailDigestEnabled] = useState(false);
-  const [notificationEmail, setNotificationEmail] = useState("");
-  const [defaultEmail, setDefaultEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+interface NotificationSettingsProps {
+  emailDigestEnabled?: boolean;
+  notificationEmail?: string;
+  defaultEmail?: string;
+  onUpdateSettings?: (emailDigestEnabled: boolean, notificationEmail?: string) => Promise<void>;
+}
+
+export function NotificationSettings({
+  emailDigestEnabled: initialEmailDigestEnabled = false,
+  notificationEmail: initialNotificationEmail = "",
+  defaultEmail = "",
+  onUpdateSettings
+}: NotificationSettingsProps = {}) {
+  const [emailDigestEnabled, setEmailDigestEnabled] = useState(initialEmailDigestEnabled);
+  const [notificationEmail, setNotificationEmail] = useState(initialNotificationEmail);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    loadUserSettings();
-  }, []);
+    if (!onUpdateSettings) {
+      loadUserSettings();
+    }
+  }, [onUpdateSettings]);
 
   const loadUserSettings = async () => {
     try {
@@ -29,8 +42,6 @@ export function NotificationSettings() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       
-      setDefaultEmail(user.email || "");
-      
       // Get user profile and notification settings
       const { data: profile, error } = await supabase
         .from("profiles")
@@ -38,10 +49,16 @@ export function NotificationSettings() {
         .eq("id", user.id)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        // If the error is because the columns don't exist, we'll just use default values
+        console.error("Error loading notification settings:", error.message);
+        return;
+      }
       
-      setEmailDigestEnabled(profile?.email_digest_enabled || false);
-      setNotificationEmail(profile?.notification_email || "");
+      if (profile) {
+        setEmailDigestEnabled(profile.email_digest_enabled || false);
+        setNotificationEmail(profile.notification_email || "");
+      }
     } catch (error: any) {
       console.error("Error loading notification settings:", error.message);
       toast({
@@ -55,6 +72,11 @@ export function NotificationSettings() {
   };
 
   const saveSettings = async () => {
+    if (onUpdateSettings) {
+      await onUpdateSettings(emailDigestEnabled, notificationEmail);
+      return;
+    }
+
     try {
       setIsSaving(true);
       

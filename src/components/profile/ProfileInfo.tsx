@@ -57,16 +57,6 @@ export function ProfileInfo({
         </h1>
         <p className="text-gray-600 mb-4">{universityText}</p>
         
-        {/* Tabs */}
-        {showTabs && showContent && (
-          <Tabs defaultValue="about" value={activeTab} onValueChange={setActiveTab} className="mb-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="about">About</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        )}
-        
         {/* Action button - profile edit button only */}
         <div className="flex mb-6">
           <Button 
@@ -90,6 +80,16 @@ export function ProfileInfo({
             />
           </div>
         </div>
+
+        {/* Tabs */}
+        {showTabs && showContent && (
+          <Tabs defaultValue="about" value={activeTab} onValueChange={setActiveTab} className="mb-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="about">About</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
         
         {/* Only show content if showContent is true */}
         {showContent && (

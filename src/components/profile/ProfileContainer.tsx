@@ -81,7 +81,7 @@ export function ProfileContainer() {
 
   const handleNotificationSettingsUpdate = async (emailDigestEnabled: boolean, notificationEmail?: string) => {
     try {
-      if (!profile) return;
+      if (!profile || !userAuth) return;
       
       const updateData: { email_digest_enabled: boolean, notification_email?: string } = {
         email_digest_enabled: emailDigestEnabled
@@ -156,7 +156,7 @@ export function ProfileContainer() {
           <TabsContent value="notifications" className="mt-4">
             <NotificationSettings 
               emailDigestEnabled={!!profile.email_digest_enabled} 
-              notificationEmail={profile.notification_email || userAuth?.email || ""}
+              notificationEmail={profile.notification_email || ""}
               defaultEmail={userAuth?.email || ""}
               onUpdateSettings={handleNotificationSettingsUpdate}
             />

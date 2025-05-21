@@ -45,20 +45,20 @@ export interface AdditionalDataType {
 
 export interface Profile {
   id: string;
-  created_at: string;
-  first_name: string;
-  last_name: string;
-  origin?: string;
-  gender?: string;
+  created_at?: string;
+  first_name?: string;
+  last_name?: string;
   age?: number;
+  gender?: string;
+  origin?: string;
+  sexuality?: string;
+  about_me?: string;
   university?: string;
   department?: string;
   year?: string;
-  about_me?: string;
   avatar_url?: string;
   image_url_1?: string;
   image_url_2?: string;
-  photo_comment?: string;
   ideal_date?: string;
   life_goal?: string;
   superpower?: string;
@@ -66,13 +66,14 @@ export interface Profile {
   friend_activity?: string;
   best_quality?: string;
   hobby_photo_url?: string;
-  hobby_photo_comment?: string;
   pet_photo_url?: string;
+  photo_comment?: string;
+  hobby_photo_comment?: string;
   pet_photo_comment?: string;
-  language_levels?: Record<string, number> | string;
   hobbies?: string[];
   languages?: string[];
   learning_languages?: string[];
+  language_levels?: Record<string, number> | string;
   email_digest_enabled?: boolean;
   notification_email?: string;
 }
