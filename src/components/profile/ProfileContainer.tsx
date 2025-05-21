@@ -150,7 +150,7 @@ export function ProfileContainer() {
             <TabsContent value="notifications" className="mt-0">
               <NotificationSettings 
                 emailDigestEnabled={!!profile.email_digest_enabled} 
-                notificationEmail={profile.notification_email || userAuth?.email || ""}
+                notificationEmail={profile.notification_email || ""}
                 defaultEmail={userAuth?.email || ""}
                 onUpdateSettings={handleNotificationSettingsUpdate}
               />

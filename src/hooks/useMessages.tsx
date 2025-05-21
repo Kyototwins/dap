@@ -5,7 +5,6 @@ import { useMessageSelection } from "@/hooks/useMessageSelection";
 import { useMessageSubscription } from "@/hooks/useMessageSubscription";
 import { useMessageUrlParams } from "@/hooks/useMessageUrlParams";
 import { useLocation } from "react-router-dom";
-import type { Match } from "@/types/messages";
 
 export function useMessages() {
   const { matches, loading, fetchMatches } = useMatches();

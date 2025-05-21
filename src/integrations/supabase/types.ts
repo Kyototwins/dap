@@ -353,6 +353,7 @@ export type Database = {
           last_name: string | null
           learning_languages: string[] | null
           life_goal: string | null
+          notification_email: string | null
           origin: string | null
           pet_photo_comment: string | null
           pet_photo_url: string | null
@@ -387,6 +388,7 @@ export type Database = {
           last_name?: string | null
           learning_languages?: string[] | null
           life_goal?: string | null
+          notification_email?: string | null
           origin?: string | null
           pet_photo_comment?: string | null
           pet_photo_url?: string | null
@@ -421,6 +423,7 @@ export type Database = {
           last_name?: string | null
           learning_languages?: string[] | null
           life_goal?: string | null
+          notification_email?: string | null
           origin?: string | null
           pet_photo_comment?: string | null
           pet_photo_url?: string | null
@@ -438,6 +441,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_notification_email_field: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       join_event: {
         Args:
           | Record<PropertyKey, never>

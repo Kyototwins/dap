@@ -36,7 +36,7 @@ export function NotificationSettings({
     setLoading(true);
     try {
       const newState = !enabled;
-      await onUpdateSettings(newState);
+      await onUpdateSettings(newState, isCustomEmail ? email : undefined);
       setEnabled(newState);
     } finally {
       setLoading(false);
