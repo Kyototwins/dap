@@ -5,6 +5,10 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
 const brevoApiKey = Deno.env.get("BREVO_API_KEY") as string;
 
+if (!brevoApiKey) {
+  console.error("BREVO_API_KEY environment variable is not set");
+}
+
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const corsHeaders = {
@@ -29,7 +33,12 @@ async function getUsersWithDigestEnabled() {
     .select("id, email_digest_enabled, notification_email")
     .eq("email_digest_enabled", true);
   
-  if (error) throw error;
+  if (error) {
+    console.error("Error fetching users with digest enabled:", error);
+    throw error;
+  }
+  
+  console.log(`Found ${data?.length || 0} users with email digest enabled`);
   return data;
 }
 
@@ -39,7 +48,12 @@ async function getUsersWithDigestEnabled() {
 async function getUserEmail(userId: string) {
   const { data, error } = await supabase.auth.admin.getUserById(userId);
   
-  if (error) throw error;
+  if (error) {
+    console.error(`Error fetching auth email for user ${userId}:`, error);
+    throw error;
+  }
+  
+  console.log(`Retrieved auth email for user ${userId}: ${data?.user?.email}`);
   return data?.user?.email;
 }
 
@@ -47,8 +61,14 @@ async function getUserEmail(userId: string) {
  * Get either the custom notification email or fallback to user's auth email
  */
 async function getNotificationEmail(userId: string, customEmail: string | null) {
-  if (customEmail) return customEmail;
-  return await getUserEmail(userId);
+  if (customEmail) {
+    console.log(`Using custom notification email for user ${userId}: ${customEmail}`);
+    return customEmail;
+  }
+  
+  const authEmail = await getUserEmail(userId);
+  console.log(`Using auth email for user ${userId}: ${authEmail}`);
+  return authEmail;
 }
 
 /**
@@ -264,7 +284,13 @@ function generateEmailContent(activity: ActivitySummary, appUrl = "https://langu
  * Send an email using Brevo API
  */
 async function sendBrevoEmail(email: string, activity: ActivitySummary) {
+  if (!brevoApiKey) {
+    throw new Error("BREVO_API_KEY is not set. Unable to send email.");
+  }
+  
   try {
+    console.log(`Attempting to send digest email to ${email}`);
+    
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
@@ -283,12 +309,15 @@ async function sendBrevoEmail(email: string, activity: ActivitySummary) {
       }),
     });
     
+    const responseBody = await response.text();
+    console.log(`Brevo API response status: ${response.status}`);
+    console.log(`Brevo API response body: ${responseBody}`);
+    
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to send email: ${response.status} ${errorText}`);
+      throw new Error(`Failed to send email: ${response.status} ${responseBody}`);
     }
     
-    return await response.json();
+    return JSON.parse(responseBody);
   } catch (error) {
     console.error("Error sending email:", error);
     throw error;
@@ -300,6 +329,8 @@ async function sendBrevoEmail(email: string, activity: ActivitySummary) {
  */
 async function processUserDigest(user: any) {
   try {
+    console.log(`Processing digest for user ${user.id}`);
+    
     // Get user email (either custom notification email or default auth email)
     const email = await getNotificationEmail(user.id, user.notification_email);
     if (!email) {
@@ -309,6 +340,7 @@ async function processUserDigest(user: any) {
     
     // Get yesterday's activity
     const activity = await getYesterdayActivity(user.id);
+    console.log(`Activity summary for user ${user.id}:`, activity);
     
     // Send email
     await sendBrevoEmail(email, activity);
@@ -320,7 +352,8 @@ async function processUserDigest(user: any) {
     return {
       userId: user.id,
       status: "error",
-      error: error.message
+      error: error.message,
+      stack: error.stack
     };
   }
 }
@@ -363,7 +396,11 @@ serve(async (req) => {
   } catch (error: any) {
     console.error("Error in daily digest function:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        stack: error.stack 
+      }),
       {
         status: 500,
         headers: { 

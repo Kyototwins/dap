@@ -6,6 +6,10 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
 const brevoApiKey = Deno.env.get("BREVO_API_KEY") as string;
 
+if (!brevoApiKey) {
+  console.error("BREVO_API_KEY environment variable is not set");
+}
+
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const corsHeaders = {
@@ -16,7 +20,7 @@ const corsHeaders = {
 /**
  * Generate email HTML content for test
  */
-function generateTestEmailContent(username: string): string {
+function generateTestEmailContent(username: string, emailAddress: string): string {
   return `
     <html>
     <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
@@ -27,12 +31,13 @@ function generateTestEmailContent(username: string): string {
         <p>This is a <strong>test notification email</strong> from Language Connect.</p>
         <p>If you received this email, it means that your notification email settings are working correctly.</p>
         <p>Time sent: ${new Date().toISOString()}</p>
+        <p>Target email address: ${emailAddress}</p>
       </div>
       
       <p>Your notification email settings:</p>
       <ul>
         <li>Email delivery: <strong>Enabled</strong></li>
-        <li>You're receiving this at: <strong>${username}</strong></li>
+        <li>You're receiving this at: <strong>${emailAddress}</strong></li>
       </ul>
       
       <p style="margin-top: 30px; font-size: 14px; color: #777;">
@@ -52,7 +57,13 @@ function generateTestEmailContent(username: string): string {
  * Send an email using Brevo API
  */
 async function sendBrevoEmail(email: string, username: string) {
+  if (!brevoApiKey) {
+    throw new Error("BREVO_API_KEY is not set. Unable to send email.");
+  }
+
   try {
+    console.log(`Attempting to send test email to ${email} for user ${username}`);
+    
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
@@ -67,16 +78,19 @@ async function sendBrevoEmail(email: string, username: string) {
         },
         to: [{ email }],
         subject: "Test Notification - Language Connect",
-        htmlContent: generateTestEmailContent(username),
+        htmlContent: generateTestEmailContent(username, email),
       }),
     });
     
+    const responseBody = await response.text();
+    console.log(`Brevo API response status: ${response.status}`);
+    console.log(`Brevo API response body: ${responseBody}`);
+    
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to send email: ${response.status} ${errorText}`);
+      throw new Error(`Failed to send email: ${response.status} ${responseBody}`);
     }
     
-    return await response.json();
+    return JSON.parse(responseBody);
   } catch (error) {
     console.error("Error sending test email:", error);
     throw error;
@@ -90,8 +104,12 @@ serve(async (req) => {
   }
   
   try {
+    console.log("Test notification email function triggered");
+    
     // Parse the request body to get the user ID
     const { userId, email } = await req.json();
+    
+    console.log(`Request received with userId: ${userId}, email: ${email || 'not provided'}`);
     
     if (!userId) {
       return new Response(
@@ -109,13 +127,16 @@ serve(async (req) => {
     // Get user's profile
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("first_name, last_name, notification_email")
+      .select("first_name, last_name, notification_email, email_digest_enabled")
       .eq("id", userId)
       .single();
       
     if (profileError) {
+      console.error("Error fetching user profile:", profileError);
       throw profileError;
     }
+
+    console.log("Profile retrieved:", profile);
     
     // Get user's auth email if not provided
     let userEmail = email;
@@ -123,8 +144,11 @@ serve(async (req) => {
       const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(userId);
       
       if (userError) {
+        console.error("Error fetching user auth data:", userError);
         throw userError;
       }
+      
+      console.log("Auth user data retrieved:", user);
       
       userEmail = profile.notification_email || user?.email;
       
@@ -133,10 +157,14 @@ serve(async (req) => {
       }
     }
     
+    console.log(`Using email address for notifications: ${userEmail}`);
+    
     const username = [profile.first_name, profile.last_name].filter(Boolean).join(' ') || userEmail;
     
     // Send the test email
     const result = await sendBrevoEmail(userEmail, username);
+    
+    console.log("Email sent successfully:", result);
     
     return new Response(
       JSON.stringify({ 
@@ -155,7 +183,11 @@ serve(async (req) => {
   } catch (error: any) {
     console.error("Error sending test notification email:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        stack: error.stack
+      }),
       {
         status: 500,
         headers: { 
