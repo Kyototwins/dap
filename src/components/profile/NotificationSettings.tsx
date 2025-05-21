@@ -56,7 +56,12 @@ export function NotificationSettings({
       }
       
       if (profile) {
-        setEmailDigestEnabled(profile.email_digest_enabled || false);
+        // Make sure the profile has the properties we need
+        const digestEnabled = typeof profile.email_digest_enabled === 'boolean' 
+          ? profile.email_digest_enabled 
+          : false;
+        
+        setEmailDigestEnabled(digestEnabled);
         setNotificationEmail(profile.notification_email || "");
       }
     } catch (error: any) {
