@@ -74,6 +74,16 @@ export function MessageChat({ match, messages, setMessages }: MessageChatProps) 
     scrollToBottom();
   }, [match?.id]);
 
+  // Add an additional effect to ensure scrolling happens after the DOM has updated
+  useEffect(() => {
+    // Use a short timeout to ensure DOM has updated
+    const timeoutId = setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [messages]);
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
