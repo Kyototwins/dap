@@ -8,11 +8,15 @@ import { ProfileLoading } from "@/components/profile/ProfileLoading";
 import { ProfileNotFound } from "@/components/profile/ProfileNotFound";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { NotificationSettings } from "@/components/profile/NotificationSettings";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { User } from "@supabase/supabase-js";
 
 export function ProfileContainer() {
   const [profile, setProfile] = useState<ProfileType | null>(null);
+  const [userAuth, setUserAuth] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [completion, setCompletion] = useState(0);
+  const [activeTab, setActiveTab] = useState("about");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -28,6 +32,8 @@ export function ProfileContainer() {
         navigate("/login");
         return;
       }
+      
+      setUserAuth(user);
 
       const { data, error } = await supabase
         .from("profiles")
@@ -73,25 +79,36 @@ export function ProfileContainer() {
     navigate("/profile/setup");
   };
 
-  const handleNotificationSettingsUpdate = async (emailDigestEnabled: boolean) => {
+  const handleNotificationSettingsUpdate = async (emailDigestEnabled: boolean, notificationEmail?: string) => {
     try {
       if (!profile) return;
       
+      const updateData: { email_digest_enabled: boolean, notification_email?: string } = {
+        email_digest_enabled: emailDigestEnabled
+      };
+      
+      // Only update notification email if provided
+      if (notificationEmail !== undefined) {
+        updateData.notification_email = notificationEmail;
+      }
+      
       const { error } = await supabase
         .from("profiles")
-        .update({
-          email_digest_enabled: emailDigestEnabled
-        })
+        .update(updateData)
         .eq("id", profile.id);
 
       if (error) throw error;
 
       // Update local state
-      setProfile(prev => prev ? { ...prev, email_digest_enabled: emailDigestEnabled } : null);
+      setProfile(prev => prev ? { 
+        ...prev, 
+        email_digest_enabled: emailDigestEnabled,
+        notification_email: notificationEmail !== undefined ? notificationEmail : prev.notification_email
+      } : null);
 
       toast({
         title: "Notification settings updated",
-        description: emailDigestEnabled ? "You will receive daily email notifications" : "Email notifications have been turned off",
+        description: "Your notification settings have been successfully updated",
       });
     } catch (error: any) {
       toast({
@@ -117,10 +134,44 @@ export function ProfileContainer() {
         completion={completion}
         onEditProfile={handleEditProfile}
       />
-      <NotificationSettings 
-        emailDigestEnabled={!!profile.email_digest_enabled} 
-        onUpdateSettings={handleNotificationSettingsUpdate}
-      />
+      
+      <Tabs defaultValue="about" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="about">About</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="about" className="mt-4">
+          <div className="space-y-4">
+            {/* About content goes here - will be expanded in the future */}
+            {profile.about_me ? (
+              <div className="p-4 border rounded-lg bg-card">
+                <h3 className="text-lg font-medium mb-2">About Me</h3>
+                <p className="text-muted-foreground whitespace-pre-wrap">{profile.about_me}</p>
+              </div>
+            ) : (
+              <div className="p-4 border rounded-lg bg-card text-center text-muted-foreground">
+                <p>No information provided yet.</p>
+                <button 
+                  className="text-primary underline mt-2"
+                  onClick={handleEditProfile}
+                >
+                  Add details to your profile
+                </button>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="notifications" className="mt-4">
+          <NotificationSettings 
+            emailDigestEnabled={!!profile.email_digest_enabled} 
+            notificationEmail={profile.notification_email || userAuth?.email || ""}
+            defaultEmail={userAuth?.email || ""}
+            onUpdateSettings={handleNotificationSettingsUpdate}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

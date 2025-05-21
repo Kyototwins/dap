@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -27,7 +26,7 @@ interface ActivitySummary {
 async function getUsersWithDigestEnabled() {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, email_digest_enabled")
+    .select("id, email_digest_enabled, notification_email")
     .eq("email_digest_enabled", true);
   
   if (error) throw error;
@@ -42,6 +41,14 @@ async function getUserEmail(userId: string) {
   
   if (error) throw error;
   return data?.user?.email;
+}
+
+/**
+ * Get either the custom notification email or fallback to user's auth email
+ */
+async function getNotificationEmail(userId: string, customEmail: string | null) {
+  if (customEmail) return customEmail;
+  return await getUserEmail(userId);
 }
 
 /**
@@ -293,8 +300,8 @@ async function sendBrevoEmail(email: string, activity: ActivitySummary) {
  */
 async function processUserDigest(user: any) {
   try {
-    // Get user email
-    const email = await getUserEmail(user.id);
+    // Get user email (either custom notification email or default auth email)
+    const email = await getNotificationEmail(user.id, user.notification_email);
     if (!email) {
       console.warn(`No email found for user ${user.id}, skipping`);
       return { userId: user.id, status: "skipped", reason: "no_email" };

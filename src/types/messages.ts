@@ -1,63 +1,78 @@
+// Define the ImageUpload type
+export interface ImageUpload {
+  file: File | null;
+  preview: string;
+  uploading: boolean;
+}
 
-// Define the message type
-export interface Message {
-  id: string;
-  created_at: string;
-  content: string;
-  sender_id: string;
-  receiver_id?: string;
-  match_id?: string;
+export interface ImageUploadState {
+  avatar: ImageUpload;
+  image1: ImageUpload;
+  image2: ImageUpload;
+  hobby: ImageUpload;
+  pet: ImageUpload;  // Changed back from food to pet
+}
+
+export interface ProfileFormData {
+  firstName: string;
+  lastName: string;
+  age: string;
+  gender: string;
+  origin: string;
+  sexuality: string;
+  aboutMe: string;
+  university: string;
+  department: string;
+  year: string;
+  hobbies: string[];
+  languages: string[];
+  languageLevels: Record<string, number>;
+  learning_languages: string[];
+  photoComment: string;
+  hobbyPhotoComment: string;
+  petPhotoComment: string;  // Changed back from foodPhotoComment
+}
+
+export interface AdditionalDataType {
+  idealDate: string;
+  lifeGoal: string;
+  superpower: string;
+  worstNightmare: string;
+  friendActivity: string;
+  bestQuality: string;
 }
 
 export interface Profile {
   id: string;
   created_at: string;
-  first_name: string | null;
-  last_name: string | null;
-  age: number | null;
-  gender: string | null;
-  origin: string | null;
-  about_me: string | null;
-  avatar_url: string | null;
-  sexuality: string | null;
-  university: string | null;
-  department: string | null;
-  year: string | null;
-  image_url_1: string | null;
-  image_url_2: string | null;
-  ideal_date: string | null;
-  life_goal: string | null;
-  superpower: string | null;
-  worst_nightmare: string | null;
-  friend_activity: string | null;
-  best_quality: string | null;
-  photo_comment: string | null;
-  hobby_photo_url: string | null;
-  hobby_photo_comment: string | null;
-  pet_photo_url: string | null;  
-  pet_photo_comment: string | null;
+  first_name: string;
+  last_name: string;
+  origin?: string;
+  gender?: string;
+  age?: number;
+  university?: string;
+  department?: string;
+  year?: string;
+  about_me?: string;
+  avatar_url?: string;
+  image_url_1?: string;
+  image_url_2?: string;
+  photo_comment?: string;
+  ideal_date?: string;
+  life_goal?: string;
+  superpower?: string;
+  worst_nightmare?: string;
+  friend_activity?: string;
+  best_quality?: string;
+  hobby_photo_url?: string;
+  hobby_photo_comment?: string;
+  pet_photo_url?: string;
+  pet_photo_comment?: string;
+  language_levels?: Record<string, number> | string;
+  hobbies?: string[];
+  languages?: string[];
+  learning_languages?: string[];
   email_digest_enabled?: boolean;
-  hobbies: string[] | null;
-  languages: string[] | null;
-  learning_languages: string[] | null;
-  language_levels: Record<string, number> | string | null;
+  notification_email?: string;
 }
 
-export interface Match {
-  id: string;
-  created_at: string;
-  user_id_1: string;
-  user_id_2: string;
-  accepted_1: boolean;
-  accepted_2: boolean;
-  // Additional properties used in the codebase
-  status?: string;
-  user1_id?: string;
-  user2_id?: string;
-  otherUser?: Profile;
-  lastMessage?: {
-    content: string;
-    created_at: string;
-  };
-  unreadCount?: number;
-}
