@@ -24,11 +24,13 @@ export function useProfileFilter() {
   const { isLoading: loading, refetch } = useQuery({
     queryKey: ['profiles'],
     queryFn: () => fetchProfiles(),
-    onSuccess: (data) => {
-      setProfiles(data);
-      const filteredResults = applyFilters(data, searchQuery, filters);
-      setFilteredProfiles(filteredResults);
-      resetPagination(filteredResults);
+    onSettled: (data) => {
+      if (data) {
+        setProfiles(data);
+        const filteredResults = applyFilters(data, searchQuery, filters);
+        setFilteredProfiles(filteredResults);
+        resetPagination(filteredResults);
+      }
     }
   });
 
