@@ -80,9 +80,9 @@ export function ProfileForm({
           loading={loading} 
         />
         
-        {/* Pet or Favorite Food photo - changed label */}
+        {/* Pet photo - changed back from Favorite Food photo */}
         <ImageUpload 
-          label="Photo of my pet or favorite food" 
+          label="Photo of my pet" 
           image={images.pet} 
           onChange={(e) => onImageChange(e, 'pet')} 
           loading={loading} 

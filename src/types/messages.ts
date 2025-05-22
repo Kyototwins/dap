@@ -1,41 +1,4 @@
 
-export interface Profile {
-  id: string;
-  created_at: string;
-  first_name: string | null;
-  last_name: string | null;
-  email_digest_enabled: boolean | null;
-  notification_email: string | null;
-  notification_time: string | null; // Add notification_time property
-  avatar_url: string | null;
-  about_me: string | null;
-  age: number | null;
-  gender: string | null;
-  origin: string | null;
-  sexuality: string | null;
-  university: string | null;
-  department: string | null;
-  year: string | null;
-  image_url_1: string | null;
-  image_url_2: string | null;
-  hobbies: string[] | null;
-  languages: string[] | null;
-  language_levels: Record<string, number> | null;
-  learning_languages: string[] | null;
-  ideal_date: string | null;
-  life_goal: string | null;
-  superpower: string | null;
-  photo_comment: string | null;
-  hobby_photo_url: string | null;
-  hobby_photo_comment: string | null;
-  pet_photo_url: string | null;
-  pet_photo_comment: string | null;
-  worst_nightmare: string | null;
-  friend_activity: string | null;
-  best_quality: string | null;
-  fcm_token: string | null;
-}
-
 // Define the ImageUpload type
 export interface ImageUpload {
   file: File | null;
@@ -80,7 +43,41 @@ export interface AdditionalDataType {
   bestQuality: string;
 }
 
-// Add Message type definition that was missing
+export interface Profile {
+  id: string;
+  created_at: string;
+  first_name: string;
+  last_name: string;
+  origin?: string;
+  gender?: string;
+  age?: number;
+  university?: string;
+  department?: string;
+  year?: string;
+  about_me?: string;
+  avatar_url?: string;
+  image_url_1?: string;
+  image_url_2?: string;
+  photo_comment?: string;
+  ideal_date?: string;
+  life_goal?: string;
+  superpower?: string;
+  worst_nightmare?: string;
+  friend_activity?: string;
+  best_quality?: string;
+  hobby_photo_url?: string;
+  hobby_photo_comment?: string;
+  pet_photo_url?: string;
+  pet_photo_comment?: string;
+  language_levels?: Record<string, number> | string;
+  hobbies?: string[];
+  languages?: string[];
+  learning_languages?: string[];
+  email_digest_enabled?: boolean;
+  notification_email?: string;
+}
+
+// Add missing Message type definition
 export interface Message {
   id: string;
   content: string;
@@ -90,7 +87,7 @@ export interface Message {
   match_id: string;
 }
 
-// Add Match type definition that was missing
+// Add missing Match type definition
 export interface Match {
   id: string;
   status: string;
@@ -100,7 +97,7 @@ export interface Match {
     id: string;
     first_name: string;
     last_name: string;
-    avatar_url?: string | null;
+    avatar_url?: string;
   };
   lastMessage?: {
     content: string;
