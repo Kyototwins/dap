@@ -85,12 +85,11 @@ export function useProfileFiltering() {
     } else if (filterState.sortOption === "active") {
       result.sort((a, b) => {
         const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
-        const nameB = `${b.first_name || ''} ${a.last_name || ''}`;
+        const nameB = `${b.first_name || ''} ${b.last_name || ''}`;
         return nameA.localeCompare(nameB);
       });
     }
 
-    setFilteredProfiles(result);
     return result;
   };
 

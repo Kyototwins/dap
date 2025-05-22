@@ -1,14 +1,14 @@
 
 import { useState, useEffect } from "react";
-import { useProfileFetching } from "./filters/useProfileFetching";
+import { useQuery } from "@tanstack/react-query";
 import { useProfileFiltering } from "./filters/useProfileFiltering";
 import { usePagination } from "./filters/usePagination";
 import { useFilterState } from "./filters/useFilterState";
+import { fetchProfiles } from "./filters/fetchProfiles";
 import type { Profile } from "@/types/messages";
 
 export function useProfileFilter() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const { loading, fetchProfiles } = useProfileFetching();
   const { filteredProfiles, setFilteredProfiles, applyFilters } = useProfileFiltering();
   const { visibleProfiles, loadingMore, resetPagination, handleLoadMore } = usePagination(10);
   const { 
@@ -20,22 +20,30 @@ export function useProfileFilter() {
     handleSearchChange 
   } = useFilterState();
 
-  // Initial load
-  useEffect(() => {
-    fetchProfiles(setProfiles, applyFilters, searchQuery, filters);
-  }, []);
+  // Use React Query to fetch profiles
+  const { isLoading: loading, refetch } = useQuery({
+    queryKey: ['profiles'],
+    queryFn: () => fetchProfiles(),
+    onSuccess: (data) => {
+      setProfiles(data);
+      const filteredResults = applyFilters(data, searchQuery, filters);
+      setFilteredProfiles(filteredResults);
+      resetPagination(filteredResults);
+    }
+  });
 
   // Apply filters when they change
   useEffect(() => {
     if (profiles.length > 0) {
       const filteredResults = applyFilters(profiles, searchQuery, filters);
+      setFilteredProfiles(filteredResults);
       resetPagination(filteredResults);
     }
   }, [searchQuery, filters]);
 
   // Refresh data handler
   const handleRefresh = () => {
-    fetchProfiles(setProfiles, applyFilters, searchQuery, filters);
+    refetch();
   };
 
   // Load more handler
