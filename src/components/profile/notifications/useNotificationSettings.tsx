@@ -6,13 +6,15 @@ import { supabase } from "@/integrations/supabase/client";
 interface UseNotificationSettingsProps {
   emailDigestEnabled: boolean;
   notificationEmail: string;
+  notificationTime: string;
   defaultEmail: string;
-  onUpdateSettings: (emailDigestEnabled: boolean, notificationEmail?: string) => Promise<void>;
+  onUpdateSettings: (emailDigestEnabled: boolean, notificationEmail?: string, notificationTime?: string) => Promise<void>;
 }
 
 export function useNotificationSettings({
   emailDigestEnabled,
   notificationEmail,
+  notificationTime,
   defaultEmail,
   onUpdateSettings
 }: UseNotificationSettingsProps) {
@@ -22,19 +24,21 @@ export function useNotificationSettings({
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [testEmailSending, setTestEmailSending] = useState(false);
+  const [time, setTime] = useState(notificationTime || "7:00");
   const { toast } = useToast();
 
   useEffect(() => {
     // Update email when props change
     setEmail(notificationEmail || defaultEmail);
     setIsCustomEmail(!!notificationEmail && notificationEmail !== defaultEmail);
-  }, [notificationEmail, defaultEmail]);
+    setTime(notificationTime || "7:00");
+  }, [notificationEmail, defaultEmail, notificationTime]);
 
   const handleToggleNotifications = async () => {
     setLoading(true);
     try {
       const newState = !enabled;
-      await onUpdateSettings(newState, isCustomEmail ? email : undefined);
+      await onUpdateSettings(newState, isCustomEmail ? email : undefined, time);
       setEnabled(newState);
     } finally {
       setLoading(false);
@@ -48,7 +52,7 @@ export function useNotificationSettings({
     try {
       // Use the custom email if isCustomEmail is true, otherwise use null to reset to default
       const emailToSave = isCustomEmail ? email : null;
-      await onUpdateSettings(enabled, emailToSave);
+      await onUpdateSettings(enabled, emailToSave, time);
       setIsEditing(false);
     } finally {
       setLoading(false);
@@ -62,6 +66,16 @@ export function useNotificationSettings({
     // Reset to default email if toggling off custom email
     if (!newIsCustom) {
       setEmail(defaultEmail);
+    }
+  };
+
+  const handleTimeChange = async (newTime: string) => {
+    setLoading(true);
+    try {
+      setTime(newTime);
+      await onUpdateSettings(enabled, isCustomEmail ? email : undefined, newTime);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,11 +124,13 @@ export function useNotificationSettings({
     loading,
     isEditing,
     testEmailSending,
+    time,
     setEmail,
     setIsEditing,
     handleToggleNotifications,
     handleSaveEmail,
     handleToggleCustomEmail,
+    handleTimeChange,
     sendTestEmail,
   };
 }

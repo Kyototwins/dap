@@ -9,13 +9,15 @@ import { useNotificationSettings } from "./notifications/useNotificationSettings
 interface NotificationSettingsProps {
   emailDigestEnabled: boolean;
   notificationEmail: string;
+  notificationTime: string;
   defaultEmail: string; // The email from auth - used as fallback
-  onUpdateSettings: (emailDigestEnabled: boolean, notificationEmail?: string) => Promise<void>;
+  onUpdateSettings: (emailDigestEnabled: boolean, notificationEmail?: string, notificationTime?: string) => Promise<void>;
 }
 
 export function NotificationSettings({ 
   emailDigestEnabled, 
   notificationEmail,
+  notificationTime,
   defaultEmail,
   onUpdateSettings 
 }: NotificationSettingsProps) {
@@ -26,15 +28,18 @@ export function NotificationSettings({
     loading,
     isEditing,
     testEmailSending,
+    time,
     setEmail,
     setIsEditing,
     handleToggleNotifications,
     handleSaveEmail,
     handleToggleCustomEmail,
+    handleTimeChange,
     sendTestEmail
   } = useNotificationSettings({
     emailDigestEnabled,
     notificationEmail,
+    notificationTime,
     defaultEmail,
     onUpdateSettings
   });
@@ -49,7 +54,9 @@ export function NotificationSettings({
         <EmailDigestToggle 
           enabled={enabled}
           loading={loading}
+          notificationTime={time}
           onToggle={handleToggleNotifications}
+          onTimeChange={handleTimeChange}
         />
         
         <div className="space-y-3 pt-2 border-t">
