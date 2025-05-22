@@ -23,14 +23,12 @@ export function useProfileFilter() {
   // Use React Query to fetch profiles
   const { isLoading: loading, refetch } = useQuery({
     queryKey: ['profiles'],
-    queryFn: () => fetchProfiles(),
-    onSettled: (data) => {
-      if (data) {
-        setProfiles(data);
-        const filteredResults = applyFilters(data, searchQuery, filters);
-        setFilteredProfiles(filteredResults);
-        resetPagination(filteredResults);
-      }
+    queryFn: fetchProfiles,
+    onSuccess: (data) => {
+      setProfiles(data);
+      const filteredResults = applyFilters(data, searchQuery, filters);
+      setFilteredProfiles(filteredResults);
+      resetPagination(filteredResults);
     }
   });
 
