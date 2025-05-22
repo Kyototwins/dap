@@ -1,3 +1,4 @@
+
 export interface Profile {
   id: string;
   created_at: string;
@@ -77,4 +78,33 @@ export interface AdditionalDataType {
   worstNightmare: string;
   friendActivity: string;
   bestQuality: string;
+}
+
+// Add Message type definition that was missing
+export interface Message {
+  id: string;
+  content: string;
+  created_at: string;
+  sender_id: string;
+  receiver_id: string;
+  match_id: string;
+}
+
+// Add Match type definition that was missing
+export interface Match {
+  id: string;
+  status: string;
+  user1_id: string;
+  user2_id: string;
+  otherUser: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    avatar_url?: string | null;
+  };
+  lastMessage?: {
+    content: string;
+    created_at: string;
+  };
+  unreadCount?: number;
 }

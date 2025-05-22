@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,36 +45,40 @@ export function useProfileFilter() {
       // Map the data to match the Profile type with all required fields
       const typedProfiles = data?.map(profile => ({
         id: profile.id,
-        first_name: profile.first_name || '',
-        last_name: profile.last_name || '',
+        created_at: profile.created_at || '',
+        first_name: profile.first_name || null,
+        last_name: profile.last_name || null,
+        email_digest_enabled: profile.email_digest_enabled || null,
+        notification_email: profile.notification_email || null,
+        notification_time: profile.notification_time || null,
+        fcm_token: profile.fcm_token || null,
         avatar_url: profile.avatar_url || null,
         about_me: profile.about_me || null,
         age: profile.age || null,
         gender: profile.gender || null,
-        university: profile.university || null,
-        department: profile.department || '',
-        year: profile.year || '',
-        hobbies: profile.hobbies || [],
-        languages: profile.languages || [],
-        language_levels: profile.language_levels as Record<string, number>,
-        superpower: profile.superpower || '',
-        learning_languages: profile.learning_languages || [],
         origin: profile.origin || null,
         sexuality: profile.sexuality || null,
-        ideal_date: profile.ideal_date || null,
-        life_goal: profile.life_goal || null,
+        university: profile.university || null,
+        department: profile.department || null,
+        year: profile.year || null,
         image_url_1: profile.image_url_1 || null,
         image_url_2: profile.image_url_2 || null,
-        created_at: profile.created_at || '',
+        hobbies: profile.hobbies || null,
+        languages: profile.languages || null,
+        language_levels: profile.language_levels as Record<string, number> | null,
+        learning_languages: profile.learning_languages || null,
+        ideal_date: profile.ideal_date || null,
+        life_goal: profile.life_goal || null,
+        superpower: profile.superpower || null,
         photo_comment: profile.photo_comment || null,
+        hobby_photo_url: profile.hobby_photo_url || null,
+        hobby_photo_comment: profile.hobby_photo_comment || null,
+        pet_photo_url: profile.pet_photo_url || null,
+        pet_photo_comment: profile.pet_photo_comment || null,
         worst_nightmare: profile.worst_nightmare || null,
         friend_activity: profile.friend_activity || null,
-        best_quality: profile.best_quality || null,
-        hobby_photo_url: null,
-        pet_photo_url: null,
-        hobby_photo_comment: null,
-        pet_photo_comment: null
-      })) || [];
+        best_quality: profile.best_quality || null
+      })) as Profile[];
       
       setProfiles(typedProfiles);
       applyFilters(typedProfiles, searchQuery, filters);
