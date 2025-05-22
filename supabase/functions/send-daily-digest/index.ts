@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -301,7 +302,7 @@ async function sendBrevoEmail(email: string, activity: ActivitySummary) {
       body: JSON.stringify({
         sender: {
           name: "Language Connect",
-          email: "notifications@language-connect-app.com",
+          email: "notifications@dapsince2025.com",  // Updated sender email domain
         },
         to: [{ email }],
         subject: "Your Daily Language Connect Summary",

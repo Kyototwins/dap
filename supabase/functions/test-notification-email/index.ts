@@ -80,7 +80,7 @@ async function sendBrevoEmail(email: string, username: string) {
     const emailData = {
       sender: {
         name: "Language Connect Test",
-        email: "notifications@language-connect-app.com",
+        email: "notifications@dapsince2025.com",  // Updated sender email domain
       },
       to: [{ email }],
       subject: "Test Notification - Language Connect",
