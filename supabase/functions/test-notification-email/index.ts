@@ -6,9 +6,22 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
 const brevoApiKey = Deno.env.get("BREVO_API_KEY") as string;
 
+if (!supabaseUrl) {
+  console.error("SUPABASE_URL environment variable is not set");
+}
+
+if (!supabaseServiceKey) {
+  console.error("SUPABASE_SERVICE_ROLE_KEY environment variable is not set");
+}
+
 if (!brevoApiKey) {
   console.error("BREVO_API_KEY environment variable is not set");
 }
+
+console.log("Environment variables check completed");
+console.log("SUPABASE_URL exists:", !!supabaseUrl);
+console.log("SUPABASE_SERVICE_ROLE_KEY exists:", !!supabaseServiceKey);
+console.log("BREVO_API_KEY exists:", !!brevoApiKey);
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -64,6 +77,18 @@ async function sendBrevoEmail(email: string, username: string) {
   try {
     console.log(`Attempting to send test email to ${email} for user ${username}`);
     
+    const emailData = {
+      sender: {
+        name: "Language Connect Test",
+        email: "notifications@language-connect-app.com",
+      },
+      to: [{ email }],
+      subject: "Test Notification - Language Connect",
+      htmlContent: generateTestEmailContent(username, email),
+    };
+    
+    console.log("Email payload prepared:", JSON.stringify(emailData));
+    
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
@@ -71,26 +96,31 @@ async function sendBrevoEmail(email: string, username: string) {
         "Content-Type": "application/json",
         "api-key": brevoApiKey,
       },
-      body: JSON.stringify({
-        sender: {
-          name: "Language Connect Test",
-          email: "notifications@language-connect-app.com",
-        },
-        to: [{ email }],
-        subject: "Test Notification - Language Connect",
-        htmlContent: generateTestEmailContent(username, email),
-      }),
+      body: JSON.stringify(emailData),
     });
     
+    const responseStatus = response.status;
     const responseBody = await response.text();
-    console.log(`Brevo API response status: ${response.status}`);
+    
+    console.log(`Brevo API response status: ${responseStatus}`);
     console.log(`Brevo API response body: ${responseBody}`);
     
-    if (!response.ok) {
-      throw new Error(`Failed to send email: ${response.status} ${responseBody}`);
+    // Check if response is in expected format
+    let parsedBody;
+    try {
+      if (responseBody) {
+        parsedBody = JSON.parse(responseBody);
+      }
+    } catch (e) {
+      console.error("Failed to parse response body:", e);
+      console.log("Raw response body:", responseBody);
     }
     
-    return JSON.parse(responseBody);
+    if (!response.ok) {
+      throw new Error(`Failed to send email: ${responseStatus} ${responseBody}`);
+    }
+    
+    return parsedBody || { message: "Email sent successfully but no response body" };
   } catch (error) {
     console.error("Error sending test email:", error);
     throw error;
@@ -107,9 +137,11 @@ serve(async (req) => {
     console.log("Test notification email function triggered");
     
     // Parse the request body to get the user ID
-    const { userId, email } = await req.json();
+    const requestData = await req.json();
+    const { userId, email } = requestData;
     
     console.log(`Request received with userId: ${userId}, email: ${email || 'not provided'}`);
+    console.log("Full request data:", JSON.stringify(requestData));
     
     if (!userId) {
       return new Response(
