@@ -80,17 +80,26 @@ export function ProfileContainer() {
     navigate("/profile/setup");
   };
 
-  const handleNotificationSettingsUpdate = async (emailDigestEnabled: boolean, notificationEmail?: string) => {
+  const handleNotificationSettingsUpdate = async (emailDigestEnabled: boolean, notificationEmail?: string, notificationTime?: string) => {
     try {
       if (!profile) return;
       
-      const updateData: { email_digest_enabled: boolean, notification_email?: string } = {
+      const updateData: { 
+        email_digest_enabled: boolean, 
+        notification_email?: string,
+        notification_time?: string 
+      } = {
         email_digest_enabled: emailDigestEnabled
       };
       
       // Only update notification email if provided
       if (notificationEmail !== undefined) {
         updateData.notification_email = notificationEmail;
+      }
+      
+      // Only update notification time if provided
+      if (notificationTime !== undefined) {
+        updateData.notification_time = notificationTime;
       }
       
       const { error } = await supabase
@@ -104,7 +113,8 @@ export function ProfileContainer() {
       setProfile(prev => prev ? { 
         ...prev, 
         email_digest_enabled: emailDigestEnabled,
-        notification_email: notificationEmail !== undefined ? notificationEmail : prev.notification_email
+        notification_email: notificationEmail !== undefined ? notificationEmail : prev.notification_email,
+        notification_time: notificationTime !== undefined ? notificationTime : prev.notification_time
       } : null);
 
       toast({
@@ -151,6 +161,7 @@ export function ProfileContainer() {
               <NotificationSettings 
                 emailDigestEnabled={!!profile.email_digest_enabled} 
                 notificationEmail={profile.notification_email || ""}
+                notificationTime={profile.notification_time || "7:00"}
                 defaultEmail={userAuth?.email || ""}
                 onUpdateSettings={handleNotificationSettingsUpdate}
               />
