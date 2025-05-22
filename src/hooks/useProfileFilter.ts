@@ -20,15 +20,17 @@ export function useProfileFilter() {
     handleSearchChange 
   } = useFilterState();
 
-  // Use React Query to fetch profiles
+  // Use React Query to fetch profiles with the updated callback structure
   const { isLoading: loading, refetch } = useQuery({
     queryKey: ['profiles'],
     queryFn: fetchProfiles,
-    onSuccess: (data) => {
-      setProfiles(data);
-      const filteredResults = applyFilters(data, searchQuery, filters);
-      setFilteredProfiles(filteredResults);
-      resetPagination(filteredResults);
+    meta: {
+      onSuccess: (data: Profile[]) => {
+        setProfiles(data);
+        const filteredResults = applyFilters(data, searchQuery, filters);
+        setFilteredProfiles(filteredResults);
+        resetPagination(filteredResults);
+      }
     }
   });
 

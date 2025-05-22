@@ -1,6 +1,5 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import type { Profile } from "@/types/messages";
 
 export async function fetchProfiles(): Promise<Profile[]> {
