@@ -43,42 +43,47 @@ export function useProfileFilter() {
       if (error) throw error;
       
       // Map the data to match the Profile type with all required fields
-      const typedProfiles = data?.map(profile => ({
-        id: profile.id,
-        created_at: profile.created_at || '',
-        first_name: profile.first_name || null,
-        last_name: profile.last_name || null,
-        email_digest_enabled: profile.email_digest_enabled || null,
-        notification_email: profile.notification_email || null,
-        notification_time: profile.notification_time || null,
-        fcm_token: profile.fcm_token || null,
-        avatar_url: profile.avatar_url || null,
-        about_me: profile.about_me || null,
-        age: profile.age || null,
-        gender: profile.gender || null,
-        origin: profile.origin || null,
-        sexuality: profile.sexuality || null,
-        university: profile.university || null,
-        department: profile.department || null,
-        year: profile.year || null,
-        image_url_1: profile.image_url_1 || null,
-        image_url_2: profile.image_url_2 || null,
-        hobbies: profile.hobbies || null,
-        languages: profile.languages || null,
-        language_levels: profile.language_levels as Record<string, number> | null,
-        learning_languages: profile.learning_languages || null,
-        ideal_date: profile.ideal_date || null,
-        life_goal: profile.life_goal || null,
-        superpower: profile.superpower || null,
-        photo_comment: profile.photo_comment || null,
-        hobby_photo_url: profile.hobby_photo_url || null,
-        hobby_photo_comment: profile.hobby_photo_comment || null,
-        pet_photo_url: profile.pet_photo_url || null,
-        pet_photo_comment: profile.pet_photo_comment || null,
-        worst_nightmare: profile.worst_nightmare || null,
-        friend_activity: profile.friend_activity || null,
-        best_quality: profile.best_quality || null
-      })) as Profile[];
+      const typedProfiles = data?.map(profile => {
+        // Check if notification_time exists in profile data (TypeScript doesn't know this exists)
+        const dbProfile = profile as any;
+        
+        return {
+          id: dbProfile.id,
+          created_at: dbProfile.created_at || '',
+          first_name: dbProfile.first_name || null,
+          last_name: dbProfile.last_name || null,
+          email_digest_enabled: dbProfile.email_digest_enabled || null,
+          notification_email: dbProfile.notification_email || null,
+          notification_time: dbProfile.notification_time || null,
+          fcm_token: dbProfile.fcm_token || null,
+          avatar_url: dbProfile.avatar_url || null,
+          about_me: dbProfile.about_me || null,
+          age: dbProfile.age || null,
+          gender: dbProfile.gender || null,
+          origin: dbProfile.origin || null,
+          sexuality: dbProfile.sexuality || null,
+          university: dbProfile.university || null,
+          department: dbProfile.department || null,
+          year: dbProfile.year || null,
+          image_url_1: dbProfile.image_url_1 || null,
+          image_url_2: dbProfile.image_url_2 || null,
+          hobbies: dbProfile.hobbies || null,
+          languages: dbProfile.languages || null,
+          language_levels: dbProfile.language_levels as Record<string, number> | null,
+          learning_languages: dbProfile.learning_languages || null,
+          ideal_date: dbProfile.ideal_date || null,
+          life_goal: dbProfile.life_goal || null,
+          superpower: dbProfile.superpower || null,
+          photo_comment: dbProfile.photo_comment || null,
+          hobby_photo_url: dbProfile.hobby_photo_url || null,
+          hobby_photo_comment: dbProfile.hobby_photo_comment || null,
+          pet_photo_url: dbProfile.pet_photo_url || null,
+          pet_photo_comment: dbProfile.pet_photo_comment || null,
+          worst_nightmare: dbProfile.worst_nightmare || null,
+          friend_activity: dbProfile.friend_activity || null,
+          best_quality: dbProfile.best_quality || null
+        } as Profile;
+      }) as Profile[];
       
       setProfiles(typedProfiles);
       applyFilters(typedProfiles, searchQuery, filters);
