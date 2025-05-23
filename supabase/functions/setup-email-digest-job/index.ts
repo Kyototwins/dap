@@ -25,10 +25,21 @@ serve(async (req) => {
     
     if (error) throw error;
     
+    // Also manually invoke the send-daily-digest function once to verify it works
+    const testResponse = await supabase.functions.invoke("send-daily-digest", {
+      body: { test: true }
+    });
+    
+    let responseMessage = "Email digest job successfully configured to run at 7:00 AM JST daily";
+    if (testResponse.data?.success) {
+      responseMessage += ". A test run was also executed successfully.";
+    }
+    
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Email digest job successfully configured to run at 7:00 AM JST daily"
+        message: responseMessage,
+        testRunResult: testResponse.data
       }),
       {
         status: 200,

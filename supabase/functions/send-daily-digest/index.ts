@@ -29,6 +29,7 @@ interface ActivitySummary {
  * Get all users who have enabled the email digest feature
  */
 async function getUsersWithDigestEnabled() {
+  console.log("Fetching users with email_digest_enabled=true");
   const { data, error } = await supabase
     .from("profiles")
     .select("id, email_digest_enabled, notification_email")
@@ -40,7 +41,7 @@ async function getUsersWithDigestEnabled() {
   }
   
   console.log(`Found ${data?.length || 0} users with email digest enabled`);
-  return data;
+  return data || [];
 }
 
 /**
@@ -54,7 +55,7 @@ async function getUserEmail(userId: string) {
     throw error;
   }
   
-  console.log(`Retrieved auth email for user ${userId}: ${data?.user?.email}`);
+  console.log(`Retrieved auth email for user ${userId}: ${data?.user?.email || "no email found"}`);
   return data?.user?.email;
 }
 
@@ -70,6 +71,22 @@ async function getNotificationEmail(userId: string, customEmail: string | null) 
   const authEmail = await getUserEmail(userId);
   console.log(`Using auth email for user ${userId}: ${authEmail}`);
   return authEmail;
+}
+
+/**
+ * Convert a Date to JST (Japan Standard Time)
+ */
+function toJST(date: Date): Date {
+  // JST is UTC+9
+  return new Date(date.getTime() + (9 * 60 * 60 * 1000));
+}
+
+/**
+ * Convert a Date to ISO string in JST timezone
+ */
+function toJSTISOString(date: Date): string {
+  const jstDate = toJST(date);
+  return jstDate.toISOString();
 }
 
 /**
@@ -213,22 +230,28 @@ async function getEventComments(userId: string, yesterdayStart: string, todaySta
  * Get activity summary for a specific user for yesterday
  */
 async function getYesterdayActivity(userId: string): Promise<ActivitySummary> {
+  console.log(`Getting yesterday's activity for user ${userId}`);
+  
+  // Get yesterday's date in JST (start of day)
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  yesterday.setHours(0, 0, 0, 0);
+  yesterday.setUTCHours(0, 0, 0, 0); // This is UTC time
+  const yesterdayJST = toJSTISOString(yesterday);
   
-  const yesterdayStart = yesterday.toISOString();
-  
+  // Get today's date in JST (start of day)
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  today.setUTCHours(0, 0, 0, 0); // This is UTC time
+  const todayJST = toJSTISOString(today);
   
-  const todayStart = today.toISOString();
+  console.log(`Date range for activity: ${yesterdayJST} to ${todayJST}`);
   
-  const likes = await getLikesReceived(userId, yesterdayStart, todayStart);
-  const messages = await getMessagesReceived(userId, yesterdayStart, todayStart);
-  const newEvents = await getNewEvents(yesterdayStart, todayStart);
-  const participations = await getEventParticipations(userId, yesterdayStart, todayStart);
-  const comments = await getEventComments(userId, yesterdayStart, todayStart);
+  const likes = await getLikesReceived(userId, yesterdayJST, todayJST);
+  const messages = await getMessagesReceived(userId, yesterdayJST, todayJST);
+  const newEvents = await getNewEvents(yesterdayJST, todayJST);
+  const participations = await getEventParticipations(userId, yesterdayJST, todayJST);
+  const comments = await getEventComments(userId, yesterdayJST, todayJST);
+  
+  console.log(`Activity summary for user ${userId}: likes=${likes.length}, messages=${messages.length}, events=${newEvents.length}, participations=${participations.length}, comments=${comments.length}`);
   
   return {
     likesReceived: likes.length || 0,
@@ -302,7 +325,7 @@ async function sendBrevoEmail(email: string, activity: ActivitySummary) {
       body: JSON.stringify({
         sender: {
           name: "Language Connect",
-          email: "notifications@dapsince2025.com",  // Updated sender email domain
+          email: "notifications@dapsince2025.com",
         },
         to: [{ email }],
         subject: "Your Daily Language Connect Summary",
@@ -343,7 +366,7 @@ async function processUserDigest(user: any) {
     const activity = await getYesterdayActivity(user.id);
     console.log(`Activity summary for user ${user.id}:`, activity);
     
-    // Send email
+    // Always send an email, even if there is no activity
     await sendBrevoEmail(email, activity);
     
     console.log(`Successfully sent digest to ${email}`);
@@ -367,10 +390,32 @@ serve(async (req) => {
   
   try {
     console.log("Starting daily digest email process");
+    console.log("Current time (UTC):", new Date().toISOString());
+    console.log("Current time (JST):", toJSTISOString(new Date()));
     
     // Get all users with email digest enabled
     const usersWithDigest = await getUsersWithDigestEnabled();
     console.log(`Found ${usersWithDigest.length} users with digest enabled`);
+    
+    // If no users have digest enabled, log this but don't treat it as an error
+    if (usersWithDigest.length === 0) {
+      console.log("No users have enabled email digest. Nothing to do.");
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          processed: 0,
+          results: [],
+          message: "No users have enabled email digest"
+        }),
+        {
+          status: 200,
+          headers: { 
+            "Content-Type": "application/json",
+            ...corsHeaders
+          },
+        }
+      );
+    }
     
     const results = [];
     

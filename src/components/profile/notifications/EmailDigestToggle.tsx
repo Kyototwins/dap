@@ -14,7 +14,10 @@ export function EmailDigestToggle({ enabled, loading, onToggle }: EmailDigestTog
   return (
     <div className="flex items-center justify-between">
       <div className="space-y-1">
-        <h3 className="font-medium">Daily Digest Email</h3>
+        <div className="flex items-center gap-2">
+          <Bell className="w-4 h-4 text-muted-foreground" />
+          <h3 className="font-medium">Daily Digest Email</h3>
+        </div>
         <p className="text-sm text-muted-foreground">
           Receive a daily summary of your activity at 7:00 AM
         </p>
@@ -25,7 +28,9 @@ export function EmailDigestToggle({ enabled, loading, onToggle }: EmailDigestTog
           onCheckedChange={onToggle}
           disabled={loading}
         />
-        <Label htmlFor="daily-digest">{enabled ? "On" : "Off"}</Label>
+        <Label htmlFor="daily-digest">
+          {loading ? "Updating..." : enabled ? "On" : "Off"}
+        </Label>
       </div>
     </div>
   );
