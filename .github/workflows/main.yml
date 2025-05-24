@@ -1,0 +1,14 @@
+name: Supabase Edge Function定期実行
+
+on:
+  schedule:
+    - cron: '34 20 * * *' # 毎日20:34(UTC) = 翌日5:34(JST)
+  workflow_dispatch:
+
+jobs:
+  call-edge-function:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Edge FunctionにPOSTリクエスト
+        run: |
+          curl -X POST https://qakhgctbhyynlgajvuhr.functions.supabase.co/send-daily-digest
