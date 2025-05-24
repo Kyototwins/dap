@@ -2,7 +2,7 @@ name: Supabase Edge Function定期実行
 
 on:
   schedule:
-    - cron: '05 21 * * *' # 毎日20:48(UTC) = 翌日5:48(JST)
+    - cron: '06 21 * * *' # 毎日21:06(UTC) = 翌日6:06(JST)
   workflow_dispatch:
 
 jobs:
