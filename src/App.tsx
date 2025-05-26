@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Help from "./pages/Help";
+import Admin from "./pages/Admin";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -132,6 +132,18 @@ function App() {
                   session ? (
                     <AppLayout>
                       <UserProfile />
+                    </AppLayout>
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  session ? (
+                    <AppLayout>
+                      <Admin />
                     </AppLayout>
                   ) : (
                     <Navigate to="/login" />
