@@ -22,7 +22,6 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Help from "./pages/Help";
-import Digest from "./pages/Digest";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -133,18 +132,6 @@ function App() {
                   session ? (
                     <AppLayout>
                       <UserProfile />
-                    </AppLayout>
-                  ) : (
-                    <Navigate to="/login" />
-                  )
-                }
-              />
-              <Route
-                path="/digest"
-                element={
-                  session ? (
-                    <AppLayout>
-                      <Digest />
                     </AppLayout>
                   ) : (
                     <Navigate to="/login" />
