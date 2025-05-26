@@ -6,7 +6,7 @@ const brevoApiKey = Deno.env.get("BREVO_API_KEY") as string;
 /**
  * Generate email HTML content based on activity data
  */
-export function generateEmailContent(activity: ActivitySummary, appUrl = "https://language-connect-app.com"): string {
+export function generateEmailContent(activity: ActivitySummary, appUrl = "https://dap.lovable.app/"): string {
   const newEventsText = activity.newEvents.length > 0 
     ? `New events: ${activity.newEvents.map(event => event.title).join(", ")}`
     : "No new events yesterday";
@@ -26,7 +26,7 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
       </div>
       
       <p>Stay engaged with your language exchange community!</p>
-      <p><a href="${appUrl}" style="display: inline-block; background-color: #5640AA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Visit Language Connect</a></p>
+      <p><a href="${appUrl}" style="display: inline-block; background-color: #5640AA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Visit DAP and connect!</a></p>
       
       <p style="margin-top: 30px; font-size: 14px; color: #777;">
         If you encounter any issues with the links, please return to the site and log in directly. The system should work for you!<br>
