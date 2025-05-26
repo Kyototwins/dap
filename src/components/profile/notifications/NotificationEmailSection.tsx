@@ -4,7 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Mail } from "lucide-react";
+import { Mail, Star, Sparkles } from "lucide-react";
 
 interface NotificationEmailSectionProps {
   email: string;
@@ -34,19 +34,36 @@ export function NotificationEmailSection({
         <h3 className="font-medium">Notification Email</h3>
       </div>
       
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">
-            Use custom email for notifications
-          </p>
+      <div className="relative border-2 border-dashed border-pink-200 bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg p-4">
+        {/* Cute recommended badge */}
+        <div className="absolute -top-3 left-4 bg-gradient-to-r from-pink-400 to-purple-400 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-md">
+          <Sparkles className="w-3 h-3" />
+          RECOMMENDED
+          <Star className="w-3 h-3" />
         </div>
-        <div className="flex items-center space-x-2">
-          <Switch
-            checked={isCustomEmail}
-            onCheckedChange={onCustomToggle}
-            disabled={loading || isEditing}
-          />
-          <Label>{isCustomEmail ? "Custom" : "Default"}</Label>
+        
+        <div className="mt-2">
+          <div className="flex items-center justify-between mb-3">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-gray-800">
+                💌 Use custom email for notifications
+              </p>
+              <p className="text-xs text-gray-600">
+                Use a different email address that you check regularly!
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={isCustomEmail}
+                onCheckedChange={onCustomToggle}
+                disabled={loading || isEditing}
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-pink-400 data-[state=checked]:to-purple-400"
+              />
+              <Label className="font-medium">
+                {isCustomEmail ? "✨ Custom" : "Default"}
+              </Label>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -61,6 +78,7 @@ export function NotificationEmailSection({
               placeholder="Enter email address"
               type="email"
               disabled={loading || !isCustomEmail}
+              className={isCustomEmail ? "border-pink-300 focus:border-pink-400" : ""}
             />
           </div>
           
@@ -70,6 +88,7 @@ export function NotificationEmailSection({
               size="sm" 
               onClick={onSaveEmail}
               disabled={loading || !email}
+              className="bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500"
             >
               Save
             </Button>
@@ -94,12 +113,13 @@ export function NotificationEmailSection({
               size="sm" 
               onClick={() => onEditToggle(true)}
               disabled={loading}
+              className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
             >
               Edit
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            {isCustomEmail ? "Using custom email address" : "Using account email address"}
+            {isCustomEmail ? "🎉 Using custom email address" : "Using account email address"}
           </p>
         </div>
       )}
