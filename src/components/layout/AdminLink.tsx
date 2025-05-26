@@ -25,7 +25,7 @@ export function AdminLink() {
       className="text-doshisha-purple hover:text-doshisha-purple hover:bg-purple-50"
     >
       <Shield className="w-4 h-4 mr-1" />
-      管理者
+      admin
     </Button>
   );
 }
