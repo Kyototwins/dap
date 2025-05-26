@@ -12,15 +12,20 @@ export function AdminLink() {
     return null;
   }
 
+  const handleAdminClick = () => {
+    console.log("Navigating to admin page");
+    navigate("/admin");
+  };
+
   return (
     <Button 
       variant="ghost" 
       size="sm"
-      onClick={() => navigate("/admin")}
+      onClick={handleAdminClick}
       className="text-doshisha-purple hover:text-doshisha-purple hover:bg-purple-50"
     >
       <Shield className="w-4 h-4 mr-1" />
-      Admin
+      管理者
     </Button>
   );
 }

@@ -33,16 +33,16 @@ export default function Admin() {
       
       if (data?.success) {
         toast({
-          title: "Digest emails sent successfully",
-          description: `Processed ${data.processed} users. Check the logs for details.`,
+          title: "ダイジェストメールを送信しました",
+          description: `${data.processed}人のユーザーに処理しました。詳細はログをご確認ください。`,
         });
       } else {
-        throw new Error(data?.error || "Failed to send digest emails");
+        throw new Error(data?.error || "ダイジェストメールの送信に失敗しました");
       }
     } catch (error: any) {
       console.error("Error sending digest:", error);
       toast({
-        title: "Error sending digest emails",
+        title: "ダイジェストメール送信エラー",
         description: error.message,
         variant: "destructive",
       });
@@ -54,7 +54,7 @@ export default function Admin() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-lg">Loading...</div>
+        <div className="text-lg">読み込み中...</div>
       </div>
     );
   }
@@ -67,7 +67,7 @@ export default function Admin() {
     <div className="space-y-6">
       <div className="flex items-center gap-2">
         <Shield className="w-6 h-6 text-doshisha-purple" />
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <h1 className="text-2xl font-bold">管理者ダッシュボード</h1>
       </div>
 
       <div className="grid gap-6">
@@ -75,13 +75,13 @@ export default function Admin() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="w-5 h-5" />
-              Email Notifications
+              メール通知
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-gray-600">
-              Send daily digest emails to all users who have email notifications enabled.
-              This will send yesterday's activity summary to eligible users.
+              メール通知を有効にしているすべてのユーザーに前日のアクティビティダイジェストを送信します。
+              昨日のアクティビティサマリーが対象ユーザーに送信されます。
             </p>
             <Button 
               onClick={handleSendDigest}
@@ -91,12 +91,12 @@ export default function Admin() {
               {sending ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  Sending Digest...
+                  ダイジェスト送信中...
                 </>
               ) : (
                 <>
                   <Mail className="w-4 h-4 mr-2" />
-                  Send Daily Digest
+                  ダイジェスト通知を送信
                 </>
               )}
             </Button>
@@ -107,12 +107,12 @@ export default function Admin() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="w-5 h-5" />
-              User Management
+              ユーザー管理
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-600">
-              User management features will be available in future updates.
+              ユーザー管理機能は今後のアップデートで利用可能になります。
             </p>
           </CardContent>
         </Card>
