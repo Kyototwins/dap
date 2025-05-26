@@ -10,13 +10,17 @@ import { Shield, Mail, Users } from "lucide-react";
 import { useState } from "react";
 
 export default function Admin() {
-  const { isAdmin, loading } = useUserRole();
+  const { isAdmin, loading, role } = useUserRole();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [sending, setSending] = useState(false);
 
+  console.log("Admin component - isAdmin:", isAdmin, "loading:", loading, "role:", role);
+
   useEffect(() => {
+    console.log("Admin useEffect - loading:", loading, "isAdmin:", isAdmin);
     if (!loading && !isAdmin) {
+      console.log("Redirecting to /matches because user is not admin");
       navigate("/matches");
     }
   }, [isAdmin, loading, navigate]);
@@ -52,6 +56,7 @@ export default function Admin() {
   };
 
   if (loading) {
+    console.log("Admin page showing loading state");
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-lg">読み込み中...</div>
@@ -60,8 +65,11 @@ export default function Admin() {
   }
 
   if (!isAdmin) {
+    console.log("Admin page - user is not admin, returning null");
     return null;
   }
+
+  console.log("Admin page - rendering admin dashboard");
 
   return (
     <div className="space-y-6">
