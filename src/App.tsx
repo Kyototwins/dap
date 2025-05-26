@@ -22,7 +22,7 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Help from "./pages/Help";
-import Admin from "./pages/Admin";
+import Digest from "./pages/Digest";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -140,11 +140,11 @@ function App() {
                 }
               />
               <Route
-                path="/admin"
+                path="/digest"
                 element={
                   session ? (
                     <AppLayout>
-                      <Admin />
+                      <Digest />
                     </AppLayout>
                   ) : (
                     <Navigate to="/login" />
