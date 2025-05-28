@@ -11,10 +11,10 @@ export function TutorialManager() {
   useEffect(() => {
     if (loading) return;
 
-    // Show home screen tutorial first if needed (including remind_later)
-    if (tutorialState.homeScreenTutorial === 'show' || tutorialState.homeScreenTutorial === 'remind_later') {
+    // Show home screen tutorial first if it's set to 'show' only
+    if (tutorialState.homeScreenTutorial === 'show') {
       setCurrentTutorial('home');
-    } else if (tutorialState.emailNotificationTutorial === 'show' || tutorialState.emailNotificationTutorial === 'remind_later') {
+    } else if (tutorialState.emailNotificationTutorial === 'show') {
       setCurrentTutorial('email');
     }
   }, [tutorialState, loading]);
@@ -22,11 +22,7 @@ export function TutorialManager() {
   const handleHomeTutorialRemindLater = async () => {
     await updateTutorialState('homeScreenTutorial', 'remind_later');
     setCurrentTutorial(null);
-    
-    // Show email tutorial if it should be shown
-    if (tutorialState.emailNotificationTutorial === 'show' || tutorialState.emailNotificationTutorial === 'remind_later') {
-      setTimeout(() => setCurrentTutorial('email'), 500);
-    }
+    // Don't show next tutorial immediately
   };
 
   const handleHomeTutorialNeverShow = async () => {
@@ -34,7 +30,7 @@ export function TutorialManager() {
     setCurrentTutorial(null);
     
     // Show email tutorial if it should be shown
-    if (tutorialState.emailNotificationTutorial === 'show' || tutorialState.emailNotificationTutorial === 'remind_later') {
+    if (tutorialState.emailNotificationTutorial === 'show') {
       setTimeout(() => setCurrentTutorial('email'), 500);
     }
   };

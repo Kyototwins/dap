@@ -30,7 +30,23 @@ export function useTutorialPopovers() {
         .single();
 
       if (profile && (profile as any).tutorial_settings) {
-        setTutorialState((profile as any).tutorial_settings as TutorialState);
+        const currentSettings = (profile as any).tutorial_settings as TutorialState;
+        
+        // Convert remind_later back to show on new login
+        const updatedSettings = {
+          homeScreenTutorial: currentSettings.homeScreenTutorial === 'remind_later' ? 'show' : currentSettings.homeScreenTutorial,
+          emailNotificationTutorial: currentSettings.emailNotificationTutorial === 'remind_later' ? 'show' : currentSettings.emailNotificationTutorial
+        };
+
+        // Update database if there were any remind_later statuses
+        if (currentSettings.homeScreenTutorial === 'remind_later' || currentSettings.emailNotificationTutorial === 'remind_later') {
+          await supabase
+            .from('profiles')
+            .update({ tutorial_settings: updatedSettings } as any)
+            .eq('id', user.id);
+        }
+
+        setTutorialState(updatedSettings);
       }
     } catch (error) {
       console.error('Error loading tutorial state:', error);
