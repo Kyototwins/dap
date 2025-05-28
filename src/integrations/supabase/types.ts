@@ -360,6 +360,7 @@ export type Database = {
           photo_comment: string | null
           sexuality: string | null
           superpower: string | null
+          tutorial_settings: Json | null
           university: string | null
           worst_nightmare: string | null
           year: string | null
@@ -395,6 +396,7 @@ export type Database = {
           photo_comment?: string | null
           sexuality?: string | null
           superpower?: string | null
+          tutorial_settings?: Json | null
           university?: string | null
           worst_nightmare?: string | null
           year?: string | null
@@ -430,6 +432,7 @@ export type Database = {
           photo_comment?: string | null
           sexuality?: string | null
           superpower?: string | null
+          tutorial_settings?: Json | null
           university?: string | null
           worst_nightmare?: string | null
           year?: string | null

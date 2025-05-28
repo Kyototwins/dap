@@ -11,10 +11,10 @@ export function TutorialManager() {
   useEffect(() => {
     if (loading) return;
 
-    // Show home screen tutorial first if needed
-    if (tutorialState.homeScreenTutorial === 'show') {
+    // Show home screen tutorial first if needed (including remind_later)
+    if (tutorialState.homeScreenTutorial === 'show' || tutorialState.homeScreenTutorial === 'remind_later') {
       setCurrentTutorial('home');
-    } else if (tutorialState.emailNotificationTutorial === 'show') {
+    } else if (tutorialState.emailNotificationTutorial === 'show' || tutorialState.emailNotificationTutorial === 'remind_later') {
       setCurrentTutorial('email');
     }
   }, [tutorialState, loading]);
@@ -24,7 +24,7 @@ export function TutorialManager() {
     setCurrentTutorial(null);
     
     // Show email tutorial if it should be shown
-    if (tutorialState.emailNotificationTutorial === 'show') {
+    if (tutorialState.emailNotificationTutorial === 'show' || tutorialState.emailNotificationTutorial === 'remind_later') {
       setTimeout(() => setCurrentTutorial('email'), 500);
     }
   };
@@ -34,7 +34,7 @@ export function TutorialManager() {
     setCurrentTutorial(null);
     
     // Show email tutorial if it should be shown
-    if (tutorialState.emailNotificationTutorial === 'show') {
+    if (tutorialState.emailNotificationTutorial === 'show' || tutorialState.emailNotificationTutorial === 'remind_later') {
       setTimeout(() => setCurrentTutorial('email'), 500);
     }
   };

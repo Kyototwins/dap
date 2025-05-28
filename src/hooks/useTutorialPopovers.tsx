@@ -25,12 +25,12 @@ export function useTutorialPopovers() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('tutorial_settings')
+        .select('*')
         .eq('id', user.id)
         .single();
 
-      if (profile?.tutorial_settings) {
-        setTutorialState(profile.tutorial_settings as TutorialState);
+      if (profile && (profile as any).tutorial_settings) {
+        setTutorialState((profile as any).tutorial_settings as TutorialState);
       }
     } catch (error) {
       console.error('Error loading tutorial state:', error);
@@ -51,7 +51,7 @@ export function useTutorialPopovers() {
 
       await supabase
         .from('profiles')
-        .update({ tutorial_settings: newState })
+        .update({ tutorial_settings: newState } as any)
         .eq('id', user.id);
 
       setTutorialState(newState);

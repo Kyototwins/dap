@@ -26,6 +26,7 @@ export default function Login() {
       return;
     }
     
+    // Remove the login success toast - just handle login silently
     await handleLogin({ email, password });
   };
 

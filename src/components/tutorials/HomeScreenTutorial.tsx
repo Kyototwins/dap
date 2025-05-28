@@ -21,7 +21,56 @@ export function HomeScreenTutorial({ open, onRemindLater, onNeverShow }: HomeScr
         
         <div className="space-y-6">
           <div className="text-center">
-            <Smartphone className="w-16 h-16 mx-auto text-purple-600 mb-2" />
+            <div className="relative w-32 h-56 mx-auto mb-4">
+              {/* Smartphone mockup */}
+              <div className="w-full h-full bg-gray-900 rounded-3xl border-4 border-gray-800 relative overflow-hidden">
+                {/* Screen */}
+                <div className="absolute inset-2 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-2">
+                  {/* Status bar */}
+                  <div className="text-white text-xs flex justify-between items-center mb-2">
+                    <span>10:25</span>
+                    <div className="flex gap-1">
+                      <div className="w-1 h-1 bg-white rounded-full"></div>
+                      <div className="w-1 h-1 bg-white rounded-full"></div>
+                      <div className="w-1 h-1 bg-white rounded-full"></div>
+                      <div className="w-2 h-2 bg-white rounded-sm"></div>
+                    </div>
+                  </div>
+                  
+                  {/* App icons grid */}
+                  <div className="grid grid-cols-4 gap-2">
+                    <div className="w-6 h-6 bg-green-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-xs">📞</span>
+                    </div>
+                    <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-xs">📧</span>
+                    </div>
+                    <div className="w-6 h-6 bg-red-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-xs">📸</span>
+                    </div>
+                    <div className="w-6 h-6 bg-orange-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-xs">🎵</span>
+                    </div>
+                    
+                    <div className="w-6 h-6 bg-purple-700 rounded-lg flex items-center justify-center border-2 border-yellow-400">
+                      <span className="text-white text-xs font-bold">D</span>
+                    </div>
+                    <div className="w-6 h-6 bg-gray-500 rounded-lg"></div>
+                    <div className="w-6 h-6 bg-gray-500 rounded-lg"></div>
+                    <div className="w-6 h-6 bg-gray-500 rounded-lg"></div>
+                  </div>
+                  
+                  {/* Arrow pointing to DAP app */}
+                  <div className="absolute -right-8 top-16">
+                    <div className="text-yellow-400 text-lg">👆</div>
+                    <div className="text-xs text-white bg-black bg-opacity-50 rounded px-1 mt-1">DAP</div>
+                  </div>
+                </div>
+                
+                {/* Home indicator */}
+                <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-white rounded-full"></div>
+              </div>
+            </div>
             <p className="text-gray-700">Access DAP instantly like a native app!</p>
           </div>
 
@@ -56,15 +105,15 @@ export function HomeScreenTutorial({ open, onRemindLater, onNeverShow }: HomeScr
 
           <div className="flex gap-3 pt-4">
             <Button 
-              variant="outline" 
               onClick={onRemindLater}
-              className="flex-1 border-purple-300 text-purple-700 hover:bg-purple-50"
+              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold shadow-lg"
             >
               Remind me later
             </Button>
             <Button 
+              variant="outline" 
               onClick={onNeverShow}
-              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              className="flex-1 border-purple-300 text-purple-700 hover:bg-purple-50"
             >
               Don't show again
             </Button>

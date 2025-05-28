@@ -48,15 +48,15 @@ export function EmailNotificationTutorial({ open, onRemindLater, onNeverShow }: 
 
           <div className="flex gap-3 pt-4">
             <Button 
-              variant="outline" 
               onClick={onRemindLater}
-              className="flex-1 border-pink-300 text-pink-700 hover:bg-pink-50"
+              className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold shadow-lg"
             >
               Remind me later
             </Button>
             <Button 
+              variant="outline" 
               onClick={onNeverShow}
-              className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
+              className="flex-1 border-pink-300 text-pink-700 hover:bg-pink-50"
             >
               Don't show again
             </Button>
