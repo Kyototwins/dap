@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { DapLogo } from "@/components/common/DapLogo";
 import { AdminLink } from "@/components/layout/AdminLink";
+import { TutorialManager } from "@/components/tutorials/TutorialManager";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -43,6 +44,8 @@ export function AppLayout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen pb-16">
+      <TutorialManager />
+      
       <header className="fixed top-0 right-0 left-0 z-50 bg-white border-b border-gray-200">
         <div className="container max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <div>
