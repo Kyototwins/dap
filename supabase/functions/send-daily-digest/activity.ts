@@ -10,7 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 export interface ActivitySummary {
   likesReceived: number;
   messagesReceived: number;
-  newEvents: Array<{title: string}>;
+  newEvents: Array<{title: string; date: string}>;
   eventParticipations: number;
   eventComments: number;
 }
@@ -74,7 +74,7 @@ async function getMessagesReceived(userId: string, yesterdayStart: string, today
 async function getNewEvents(yesterdayStart: string, todayStart: string) {
   const { data, error } = await supabase
     .from("events")
-    .select("title")
+    .select("title, date")
     .gte("created_at", yesterdayStart)
     .lt("created_at", todayStart);
   
