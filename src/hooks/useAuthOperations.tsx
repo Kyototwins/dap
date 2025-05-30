@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -135,10 +134,10 @@ export function useAuthOperations() {
       }
 
       // ログイン成功のトースト表示
-      toast({
-        title: "ログインしました",
-        description: "アプリへようこそ！",
-      });
+      // toast({
+      //   title: "ログインしました",
+      //   description: "アプリへようこそ！",
+      // });
 
       // プロフィールの設定状況に応じてリダイレクト
       const hasProfile = profileData && profileData.first_name && profileData.last_name;
