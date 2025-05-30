@@ -51,69 +51,55 @@ export function EventDetailsInfo({
   const buttonIcon = isParticipating ? <Check className="w-4 h-4 mr-1" /> : null;
 
   return (
-    <>
-      <div className="relative">
-        {event.image_url && (
-          <img
-            src={event.image_url}
-            alt={event.title}
-            className="w-full h-48 object-cover rounded-lg"
-          />
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm text-gray-600">
+        <span>{formatEventDate(event.date)}</span>
+        <span>•</span>
+        <span>{event.location}</span>
+      </div>
+      
+      {/* Location and Map Link */}
+      <div className="flex items-center gap-2 text-sm text-gray-600">
+        <MapPin className="h-4 w-4" />
+        <span>{event.location}</span>
+        {event.map_link && (
+          <a 
+            href={event.map_link} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center text-blue-500 hover:text-blue-600 hover:underline ml-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Link2 className="h-4 w-4 mr-1" />
+            <span>Map</span>
+          </a>
         )}
       </div>
-
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>{formatEventDate(event.date)}</span>
-          <span>•</span>
-          <span>{event.location}</span>
-        </div>
+      
+      <div className="flex items-center gap-2">
+        <Badge variant="outline" className="bg-gray-100">
+          {displayCategory}
+        </Badge>
         
-        {/* Location and Map Link */}
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <MapPin className="h-4 w-4" />
-          <span>{event.location}</span>
-          {event.map_link && (
-            <a 
-              href={event.map_link} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center text-blue-500 hover:text-blue-600 hover:underline ml-2"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Link2 className="h-4 w-4 mr-1" />
-              <span>Map</span>
-            </a>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="bg-gray-100">
-            {displayCategory}
-          </Badge>
-          
-          {/* Join button for non-creators */}
-          {!isCreator && onParticipate && (
-            <Button
-              onClick={() => onParticipate(event.id, event.title)}
-              disabled={isProcessing || isParticipating}
-              variant={buttonVariant}
-              className={buttonClass}
-              size="sm"
-            >
-              {isProcessing ? "Processing..." : buttonText}
-              {buttonIcon}
-            </Button>
-          )}
-        </div>
-        <div className="text-sm text-gray-600">
-          Participants: {event.max_participants === 0 
-            ? `${event.current_participants}/∞` 
-            : `${event.current_participants}/${event.max_participants}`}
-        </div>
-        
-        {/* Delete button removed from here */}
+        {/* Join button for non-creators */}
+        {!isCreator && onParticipate && (
+          <Button
+            onClick={() => onParticipate(event.id, event.title)}
+            disabled={isProcessing || isParticipating}
+            variant={buttonVariant}
+            className={buttonClass}
+            size="sm"
+          >
+            {isProcessing ? "Processing..." : buttonText}
+            {buttonIcon}
+          </Button>
+        )}
       </div>
-    </>
+      <div className="text-sm text-gray-600">
+        Participants: {event.max_participants === 0 
+          ? `${event.current_participants}/∞` 
+          : `${event.current_participants}/${event.max_participants}`}
+      </div>
+    </div>
   );
 }
