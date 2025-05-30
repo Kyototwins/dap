@@ -10,7 +10,7 @@ export function useEventFilters(events: Event[]) {
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
-  const [sortOption, setSortOption] = useState<SortOption>("date_asc");
+  const [sortOption, setSortOption] = useState<SortOption>("newest");
 
   useEffect(() => {
     // Apply filters to events

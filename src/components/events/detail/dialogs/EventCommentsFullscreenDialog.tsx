@@ -3,7 +3,7 @@ import { Event, EventComment } from "@/types/events";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { Send, X } from "lucide-react";
 import { EventComments } from "../EventComments";
 
 interface EventCommentsFullscreenDialogProps {
@@ -28,10 +28,18 @@ export function EventCommentsFullscreenDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl w-full h-[95vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="p-4 border-b">
+        <DialogHeader className="p-4 border-b flex flex-row items-center justify-between flex-shrink-0">
           <DialogTitle className="text-lg flex items-center gap-2">
             Comments for: <span className="truncate max-w-xs">{event.title}</span>
           </DialogTitle>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onOpenChange(false)}
+            className="h-6 w-6 p-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </DialogHeader>
         <div className="flex flex-1 flex-col bg-gray-50 py-4 px-6 overflow-hidden">
           <div className="flex-1 min-h-0 overflow-y-auto mb-4">
