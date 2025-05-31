@@ -42,20 +42,18 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/learn-more" element={<LearnMore />} />
-                <Route element={<AppLayout />}>
-                  <Route path="/matches" element={<Matches />} />
-                  <Route path="/messages" element={<Messages />} />
-                  <Route path="/events" element={<Events />} />
-                  <Route path="/events/create" element={<CreateEvent />} />
-                  <Route path="/events/edit/:id" element={<EditEvent />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/profile/setup" element={<ProfileSetup />} />
-                  <Route path="/profile/:id" element={<UserProfile />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/help" element={<Help />} />
-                  <Route path="/admin" element={<Admin />} />
-                  <Route path="/digest" element={<Digest />} />
-                </Route>
+                <Route path="/matches" element={<AppLayout><Matches /></AppLayout>} />
+                <Route path="/messages" element={<AppLayout><Messages /></AppLayout>} />
+                <Route path="/events" element={<AppLayout><Events /></AppLayout>} />
+                <Route path="/events/create" element={<AppLayout><CreateEvent /></AppLayout>} />
+                <Route path="/events/edit/:id" element={<AppLayout><EditEvent /></AppLayout>} />
+                <Route path="/profile" element={<AppLayout><Profile /></AppLayout>} />
+                <Route path="/profile/setup" element={<AppLayout><ProfileSetup /></AppLayout>} />
+                <Route path="/profile/:id" element={<AppLayout><UserProfile /></AppLayout>} />
+                <Route path="/about" element={<AppLayout><About /></AppLayout>} />
+                <Route path="/help" element={<AppLayout><Help /></AppLayout>} />
+                <Route path="/admin" element={<AppLayout><Admin /></AppLayout>} />
+                <Route path="/digest" element={<AppLayout><Digest /></AppLayout>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
