@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Event } from "@/types/events";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,9 +44,19 @@ export function EventDetailsInfo({
 }: EventDetailsInfoProps) {
   const [isEditingDateTime, setIsEditingDateTime] = useState(false);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
-  const [editedDateTime, setEditedDateTime] = useState(format(new Date(event.date), "yyyy-MM-dd'T'HH:mm"));
-  const [editedLocation, setEditedLocation] = useState(event.location);
+  const [editedDateTime, setEditedDateTime] = useState("");
+  const [editedLocation, setEditedLocation] = useState("");
+  const [localEventDate, setLocalEventDate] = useState(event.date);
+  const [localEventLocation, setLocalEventLocation] = useState(event.location);
   const { toast } = useToast();
+
+  // Update local state when event prop changes
+  useEffect(() => {
+    setLocalEventDate(event.date);
+    setLocalEventLocation(event.location);
+    setEditedDateTime(format(new Date(event.date), "yyyy-MM-dd'T'HH:mm"));
+    setEditedLocation(event.location);
+  }, [event.date, event.location]);
 
   const formatEventDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -62,13 +72,20 @@ export function EventDetailsInfo({
       
       if (error) throw error;
       
+      // Update local state immediately
+      setLocalEventDate(editedDateTime);
+      
       toast({
         title: "日時が更新されました",
         description: "イベントの日時が正常に更新されました。",
       });
       
       setIsEditingDateTime(false);
-      if (refreshEvents) refreshEvents();
+      
+      // Refresh events to ensure consistency
+      if (refreshEvents) {
+        refreshEvents();
+      }
       
     } catch (error: any) {
       toast({
@@ -88,13 +105,20 @@ export function EventDetailsInfo({
       
       if (error) throw error;
       
+      // Update local state immediately
+      setLocalEventLocation(editedLocation);
+      
       toast({
         title: "場所が更新されました",
         description: "イベントの場所が正常に更新されました。",
       });
       
       setIsEditingLocation(false);
-      if (refreshEvents) refreshEvents();
+      
+      // Refresh events to ensure consistency
+      if (refreshEvents) {
+        refreshEvents();
+      }
       
     } catch (error: any) {
       toast({
@@ -136,14 +160,14 @@ export function EventDetailsInfo({
             </Button>
             <Button onClick={() => {
               setIsEditingDateTime(false);
-              setEditedDateTime(format(new Date(event.date), "yyyy-MM-dd'T'HH:mm"));
+              setEditedDateTime(format(new Date(localEventDate), "yyyy-MM-dd'T'HH:mm"));
             }} size="sm" variant="outline" className="h-8 w-8 p-0">
               <X className="h-4 w-4" />
             </Button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <span>{formatEventDate(event.date)}</span>
+            <span>{formatEventDate(localEventDate)}</span>
             {isCreator && (
               <Button 
                 onClick={() => setIsEditingDateTime(true)} 
@@ -174,14 +198,14 @@ export function EventDetailsInfo({
             </Button>
             <Button onClick={() => {
               setIsEditingLocation(false);
-              setEditedLocation(event.location);
+              setEditedLocation(localEventLocation);
             }} size="sm" variant="outline" className="h-8 w-8 p-0">
               <X className="h-4 w-4" />
             </Button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <span>{event.location}</span>
+            <span>{localEventLocation}</span>
             {isCreator && (
               <Button 
                 onClick={() => setIsEditingLocation(true)} 
