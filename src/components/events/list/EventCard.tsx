@@ -1,8 +1,8 @@
+
 import { Card } from "@/components/ui/card";
 import { Event } from "@/types/events";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { EventCardImage } from "./EventCardImage";
 import { EventCardHeader } from "./EventCardHeader";
 import { EventCardDetails } from "./EventCardDetails";
@@ -29,7 +29,6 @@ export function EventCard({
   const [isCreator, setIsCreator] = useState(false);
   const [effectiveIsParticipating, setEffectiveIsParticipating] = useState(isParticipating);
   const [displayedParticipants, setDisplayedParticipants] = useState(event.current_participants);
-  const navigate = useNavigate();
   
   // Effect to update displayed participants when the actual event data changes
   useEffect(() => {
@@ -68,11 +67,6 @@ export function EventCard({
   const isDisabled = isProcessing || 
     isPastEvent || 
     (!effectiveIsParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants);
-  
-  const handleEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(`/events/edit/${event.id}`);
-  };
 
   const handleJoinClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -124,7 +118,6 @@ export function EventCard({
           displayedParticipants={displayedParticipants}
           maxParticipants={event.max_participants}
           onJoin={handleJoinClick}
-          onEdit={handleEditClick}
           onDelete={() => onDelete(event.id)}
           eventId={event.id}
         />
