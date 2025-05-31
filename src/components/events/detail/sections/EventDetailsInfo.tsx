@@ -1,3 +1,4 @@
+
 import { Event } from "@/types/events";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -253,7 +254,7 @@ export function EventDetailsInfo({
           {displayCategory}
         </Badge>
         
-        {/* Join button for non-creators only - removed edit button */}
+        {/* Join button for non-creators only */}
         {!isCreator && onParticipate && (
           <Button
             onClick={() => onParticipate(event.id, event.title)}
