@@ -1,13 +1,8 @@
 
-import { useState, useEffect } from "react";
 import { Event } from "@/types/events";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Link2, MapPin, Check, Edit2, Save, X } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
+import { Link2, MapPin, Check } from "lucide-react";
 
 interface EventDetailsInfoProps {
   event: Event;
@@ -15,7 +10,6 @@ interface EventDetailsInfoProps {
   isParticipating?: boolean;
   isProcessing?: boolean;
   onParticipate?: (eventId: string, eventTitle: string) => void;
-  refreshEvents?: () => void;
 }
 
 const categoryTranslationMap: Record<string, string> = {
@@ -39,98 +33,11 @@ export function EventDetailsInfo({
   isCreator, 
   isParticipating = false,
   isProcessing = false,
-  onParticipate,
-  refreshEvents
+  onParticipate
 }: EventDetailsInfoProps) {
-  const [isEditingDateTime, setIsEditingDateTime] = useState(false);
-  const [isEditingLocation, setIsEditingLocation] = useState(false);
-  const [editedDateTime, setEditedDateTime] = useState("");
-  const [editedLocation, setEditedLocation] = useState("");
-  const [localEventDate, setLocalEventDate] = useState(event.date);
-  const [localEventLocation, setLocalEventLocation] = useState(event.location);
-  const { toast } = useToast();
-
-  // Update local state when event prop changes
-  useEffect(() => {
-    setLocalEventDate(event.date);
-    setLocalEventLocation(event.location);
-    setEditedDateTime(format(new Date(event.date), "yyyy-MM-dd'T'HH:mm"));
-    setEditedLocation(event.location);
-  }, [event.date, event.location]);
-
   const formatEventDate = (dateString: string) => {
     const date = new Date(dateString);
     return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
-  };
-
-  const saveDateTime = async () => {
-    try {
-      const { error } = await supabase
-        .from("events")
-        .update({ date: editedDateTime })
-        .eq("id", event.id);
-      
-      if (error) throw error;
-      
-      toast({
-        title: "日時が更新されました",
-        description: "イベントの日時が正常に更新されました。",
-      });
-      
-      setIsEditingDateTime(false);
-      
-      // Update local state immediately with the new value
-      setLocalEventDate(editedDateTime);
-      
-      // Refresh events to sync with all other components
-      if (refreshEvents) {
-        await refreshEvents();
-      }
-      
-    } catch (error: any) {
-      // Reset to original value on error
-      setEditedDateTime(format(new Date(localEventDate), "yyyy-MM-dd'T'HH:mm"));
-      toast({
-        title: "エラーが発生しました",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const saveLocation = async () => {
-    try {
-      const { error } = await supabase
-        .from("events")
-        .update({ location: editedLocation })
-        .eq("id", event.id);
-      
-      if (error) throw error;
-      
-      toast({
-        title: "場所が更新されました",
-        description: "イベントの場所が正常に更新されました。",
-      });
-      
-      setIsEditingLocation(false);
-      
-      // Update local state immediately with the new value
-      setLocalEventLocation(editedLocation);
-      
-      // Refresh events to sync with all other components
-      if (refreshEvents) {
-        await refreshEvents();
-      }
-      
-    } catch (error: any) {
-      // Reset to original value on error
-      setEditedLocation(localEventLocation);
-      toast({
-        title: "エラーが発生しました",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
   };
 
   const displayCategory = categoryTranslationMap[event.category] || event.category;
@@ -143,96 +50,29 @@ export function EventDetailsInfo({
     : "";
   const buttonIcon = isParticipating ? <Check className="w-4 h-4 mr-1" /> : null;
 
-  const today = new Date();
-  const formattedToday = format(today, "yyyy-MM-dd'T'HH:mm");
-
   return (
     <div className="space-y-2">
-      {/* Date and Time */}
       <div className="flex items-center gap-2 text-sm text-gray-600">
-        {isEditingDateTime && isCreator ? (
-          <div className="flex items-center gap-2 flex-1">
-            <Input
-              type="datetime-local"
-              min={formattedToday}
-              value={editedDateTime}
-              onChange={(e) => setEditedDateTime(e.target.value)}
-              className="text-sm h-8"
-            />
-            <Button onClick={saveDateTime} size="sm" className="h-8 w-8 p-0">
-              <Save className="h-4 w-4" />
-            </Button>
-            <Button onClick={() => {
-              setIsEditingDateTime(false);
-              setEditedDateTime(format(new Date(localEventDate), "yyyy-MM-dd'T'HH:mm"));
-            }} size="sm" variant="outline" className="h-8 w-8 p-0">
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <span>{formatEventDate(localEventDate)}</span>
-            {isCreator && (
-              <Button 
-                onClick={() => setIsEditingDateTime(true)} 
-                size="sm" 
-                variant="ghost" 
-                className="h-6 w-6 p-0"
-              >
-                <Edit2 className="h-3 w-3" />
-              </Button>
-            )}
-          </div>
-        )}
+        <span>{formatEventDate(event.date)}</span>
+        <span>•</span>
+        <span>{event.location}</span>
       </div>
       
       {/* Location and Map Link */}
       <div className="flex items-center gap-2 text-sm text-gray-600">
         <MapPin className="h-4 w-4" />
-        {isEditingLocation && isCreator ? (
-          <div className="flex items-center gap-2 flex-1">
-            <Input
-              value={editedLocation}
-              onChange={(e) => setEditedLocation(e.target.value)}
-              className="text-sm h-8"
-              placeholder="場所を入力"
-            />
-            <Button onClick={saveLocation} size="sm" className="h-8 w-8 p-0">
-              <Save className="h-4 w-4" />
-            </Button>
-            <Button onClick={() => {
-              setIsEditingLocation(false);
-              setEditedLocation(localEventLocation);
-            }} size="sm" variant="outline" className="h-8 w-8 p-0">
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <span>{localEventLocation}</span>
-            {isCreator && (
-              <Button 
-                onClick={() => setIsEditingLocation(true)} 
-                size="sm" 
-                variant="ghost" 
-                className="h-6 w-6 p-0"
-              >
-                <Edit2 className="h-3 w-3" />
-              </Button>
-            )}
-            {event.map_link && (
-              <a 
-                href={event.map_link} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center text-blue-500 hover:text-blue-600 hover:underline ml-2"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Link2 className="h-4 w-4 mr-1" />
-                <span>Map</span>
-              </a>
-            )}
-          </div>
+        <span>{event.location}</span>
+        {event.map_link && (
+          <a 
+            href={event.map_link} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center text-blue-500 hover:text-blue-600 hover:underline ml-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Link2 className="h-4 w-4 mr-1" />
+            <span>Map</span>
+          </a>
         )}
       </div>
       

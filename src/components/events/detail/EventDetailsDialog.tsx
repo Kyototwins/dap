@@ -132,7 +132,6 @@ export function EventDetailsDialog({
                   isParticipating={isParticipating}
                   isProcessing={isProcessing}
                   onParticipate={onParticipate}
-                  refreshEvents={refreshEvents}
                 />
               </div>
               
