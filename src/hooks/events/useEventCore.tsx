@@ -49,24 +49,26 @@ export function useEventCore() {
     try {
       const eventsData = await fetchEvents();
       
-      // Apply any stored participant counts from localStorage
+      // Only apply stored participant counts for participant management, 
+      // not for other event updates
       const processedEvents = eventsData.map(event => {
         const storedCount = localStorage.getItem(`event_${event.id}_count`);
         if (storedCount) {
           const count = parseInt(storedCount, 10);
-          // Only use the stored count if it's higher than the current count
+          // Only override participant count if stored count is higher
+          // This ensures other event updates (time, location) are not affected
           if (count > event.current_participants) {
             return { ...event, current_participants: count };
           }
         }
-        // Update localStorage with the current count
+        // Always update localStorage with fresh server data for participant count
         localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
         return event;
       });
       
       setEvents(processedEvents);
       
-      // Update selected event if it exists with fresh data from database
+      // Update selected event with fresh data from database
       if (selectedEvent) {
         const updatedSelectedEvent = processedEvents.find(event => event.id === selectedEvent.id);
         if (updatedSelectedEvent) {

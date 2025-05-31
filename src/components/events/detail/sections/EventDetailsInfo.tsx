@@ -72,9 +72,6 @@ export function EventDetailsInfo({
       
       if (error) throw error;
       
-      // Update local state only after successful database update
-      setLocalEventDate(editedDateTime);
-      
       toast({
         title: "日時が更新されました",
         description: "イベントの日時が正常に更新されました。",
@@ -82,7 +79,10 @@ export function EventDetailsInfo({
       
       setIsEditingDateTime(false);
       
-      // Refresh events to ensure all components are updated
+      // Update local state immediately with the new value
+      setLocalEventDate(editedDateTime);
+      
+      // Refresh events to sync with all other components
       if (refreshEvents) {
         await refreshEvents();
       }
@@ -107,9 +107,6 @@ export function EventDetailsInfo({
       
       if (error) throw error;
       
-      // Update local state only after successful database update
-      setLocalEventLocation(editedLocation);
-      
       toast({
         title: "場所が更新されました",
         description: "イベントの場所が正常に更新されました。",
@@ -117,7 +114,10 @@ export function EventDetailsInfo({
       
       setIsEditingLocation(false);
       
-      // Refresh events to ensure all components are updated
+      // Update local state immediately with the new value
+      setLocalEventLocation(editedLocation);
+      
+      // Refresh events to sync with all other components
       if (refreshEvents) {
         await refreshEvents();
       }
