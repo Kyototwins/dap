@@ -66,7 +66,7 @@ export function useEventCore() {
       
       setEvents(processedEvents);
       
-      // Update selected event if it exists
+      // Update selected event if it exists with fresh data from database
       if (selectedEvent) {
         const updatedSelectedEvent = processedEvents.find(event => event.id === selectedEvent.id);
         if (updatedSelectedEvent) {

@@ -72,7 +72,7 @@ export function EventDetailsInfo({
       
       if (error) throw error;
       
-      // Update local state immediately
+      // Update local state only after successful database update
       setLocalEventDate(editedDateTime);
       
       toast({
@@ -82,12 +82,14 @@ export function EventDetailsInfo({
       
       setIsEditingDateTime(false);
       
-      // Refresh events to ensure consistency
+      // Refresh events to ensure all components are updated
       if (refreshEvents) {
-        refreshEvents();
+        await refreshEvents();
       }
       
     } catch (error: any) {
+      // Reset to original value on error
+      setEditedDateTime(format(new Date(localEventDate), "yyyy-MM-dd'T'HH:mm"));
       toast({
         title: "エラーが発生しました",
         description: error.message,
@@ -105,7 +107,7 @@ export function EventDetailsInfo({
       
       if (error) throw error;
       
-      // Update local state immediately
+      // Update local state only after successful database update
       setLocalEventLocation(editedLocation);
       
       toast({
@@ -115,12 +117,14 @@ export function EventDetailsInfo({
       
       setIsEditingLocation(false);
       
-      // Refresh events to ensure consistency
+      // Refresh events to ensure all components are updated
       if (refreshEvents) {
-        refreshEvents();
+        await refreshEvents();
       }
       
     } catch (error: any) {
+      // Reset to original value on error
+      setEditedLocation(localEventLocation);
       toast({
         title: "エラーが発生しました",
         description: error.message,
