@@ -43,15 +43,17 @@ export function EditEventForm({ event }: EditEventFormProps) {
     uploading: false,
   });
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
     setImage({
       file,
       preview: URL.createObjectURL(file),
-      uploading: true,
+      uploading: false,
     });
+  };
 
+  const uploadImage = async (file: File): Promise<string | null> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("認証されていません");
@@ -69,7 +71,6 @@ export function EditEventForm({ event }: EditEventFormProps) {
         .from('events')
         .getPublicUrl(filePath);
 
-      setImage(prev => ({ ...prev, uploading: false }));
       return publicUrl;
     } catch (error: any) {
       toast({
@@ -77,7 +78,7 @@ export function EditEventForm({ event }: EditEventFormProps) {
         description: error.message,
         variant: "destructive",
       });
-      setImage(prev => ({ ...prev, uploading: false }));
+      return null;
     }
   };
 
@@ -87,8 +88,13 @@ export function EditEventForm({ event }: EditEventFormProps) {
 
     try {
       let imageUrl = event.image_url;
+      
+      // Only upload new image if a file was selected
       if (image.file) {
-        imageUrl = await handleImageChange({ target: { files: [image.file] } } as any) || event.image_url;
+        const uploadedUrl = await uploadImage(image.file);
+        if (uploadedUrl) {
+          imageUrl = uploadedUrl;
+        }
       }
 
       const maxParticipants = formData.max_participants === "" || formData.max_participants === "0" 
