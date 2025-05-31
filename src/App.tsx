@@ -15,7 +15,6 @@ import Matches from "./pages/Matches";
 import Messages from "./pages/Messages";
 import Events from "./pages/Events";
 import CreateEvent from "./pages/CreateEvent";
-import EditEvent from "./pages/EditEvent";
 import UserProfile from "./pages/UserProfile";
 import About from "./pages/About";
 import Help from "./pages/Help";
@@ -46,7 +45,6 @@ function App() {
                 <Route path="/messages" element={<AppLayout><Messages /></AppLayout>} />
                 <Route path="/events" element={<AppLayout><Events /></AppLayout>} />
                 <Route path="/events/create" element={<AppLayout><CreateEvent /></AppLayout>} />
-                <Route path="/events/edit/:id" element={<AppLayout><EditEvent /></AppLayout>} />
                 <Route path="/profile" element={<AppLayout><Profile /></AppLayout>} />
                 <Route path="/profile/setup" element={<AppLayout><ProfileSetup /></AppLayout>} />
                 <Route path="/profile/:id" element={<AppLayout><UserProfile /></AppLayout>} />
