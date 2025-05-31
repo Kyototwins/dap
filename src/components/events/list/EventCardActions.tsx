@@ -92,7 +92,7 @@ export function EventCardActions({
       <EventDeleteDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        onConfirm={onDelete}
+        onConfirmDelete={onDelete}
         eventId={eventId}
       />
     </div>
