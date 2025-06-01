@@ -27,7 +27,7 @@ export async function handleJoinEvent(
     
     const userId = data.user.id;
     
-    // Call backend to update participation
+    // Call backend to update participation - this now properly updates current_participants
     const isJoined = await joinEvent(eventId, eventTitle);
     
     console.log("Join event result:", isJoined, "for event", eventId);
@@ -56,7 +56,8 @@ export async function handleJoinEvent(
       }
     }
     
-    // Always refresh participation status and events data from server to get accurate counts
+    // Always refresh both participation status and events data from server 
+    // This ensures current_participants count is updated from database
     await Promise.all([
       fetchUserParticipations(),
       fetchEvents()

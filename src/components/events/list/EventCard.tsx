@@ -28,14 +28,8 @@ export function EventCard({
 }: EventCardProps) {
   const [isCreator, setIsCreator] = useState(false);
   const [effectiveIsParticipating, setEffectiveIsParticipating] = useState(isParticipating);
-  const [displayedParticipants, setDisplayedParticipants] = useState(event.current_participants);
   
-  // Effect to update displayed participants when the actual event data changes
-  useEffect(() => {
-    setDisplayedParticipants(event.current_participants);
-  }, [event.current_participants]);
-  
-  // Effect to check if the current user is the creator and update participation status
+  // Check if user is creator and update participation status
   useEffect(() => {
     const checkIfCreator = async () => {
       const { data } = await supabase.auth.getUser();
@@ -63,19 +57,18 @@ export function EventCard({
   const currentDate = new Date();
   const isPastEvent = eventDate < currentDate;
   
+  // Use actual current_participants from database
+  const currentParticipants = event.current_participants;
+  
   // Determine if the button should be disabled
   const isDisabled = isProcessing || 
     isPastEvent || 
-    (!effectiveIsParticipating && event.max_participants !== 0 && displayedParticipants >= event.max_participants);
+    (!effectiveIsParticipating && event.max_participants !== 0 && currentParticipants >= event.max_participants);
 
   const handleJoinClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isDisabled && !effectiveIsParticipating) {
       onJoin(event.id, event.title);
-      // Optimistically update the displayed participant count
-      if (!isProcessing) {
-        setDisplayedParticipants(prevCount => prevCount + 1);
-      }
     }
   };
 
@@ -104,7 +97,7 @@ export function EventCard({
           displayCategory={displayCategory}
           eventDate={eventDate}
           location={event.location}
-          currentParticipants={displayedParticipants}
+          currentParticipants={currentParticipants}
           maxParticipants={event.max_participants}
           mapLink={event.map_link}
         />
@@ -115,7 +108,7 @@ export function EventCard({
           isPastEvent={isPastEvent}
           isProcessing={isProcessing}
           isDisabled={isDisabled}
-          displayedParticipants={displayedParticipants}
+          displayedParticipants={currentParticipants}
           maxParticipants={event.max_participants}
           onJoin={handleJoinClick}
           onDelete={() => onDelete(event.id)}
