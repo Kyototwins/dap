@@ -51,18 +51,17 @@ export async function handleJoinEvent(
         const joinedEvents = JSON.parse(joinedEventsStr);
         joinedEvents[eventId] = true;
         localStorage.setItem(userKey, JSON.stringify(joinedEvents));
-        
-        // Save updated participant count
-        const currentCount = eventToJoin.current_participants + 1;
-        localStorage.setItem(`event_${eventId}_count`, String(currentCount));
       } catch (storageError) {
         console.error("Error storing joined event status in localStorage:", storageError);
       }
     }
     
-    // Refresh participation status and events data from server
-    await fetchUserParticipations();
-    await fetchEvents();
+    // Always refresh participation status and events data from server to get accurate counts
+    await Promise.all([
+      fetchUserParticipations(),
+      fetchEvents()
+    ]);
+    
   } catch (error: any) {
     console.error("Join event error:", error);
     // Show error message
@@ -71,9 +70,12 @@ export async function handleJoinEvent(
       description: error.message,
       variant: "destructive"
     });
+    
     // Refresh data from server to ensure UI is in sync
-    await fetchUserParticipations();
-    await fetchEvents();
+    await Promise.all([
+      fetchUserParticipations(),
+      fetchEvents()
+    ]);
   } finally {
     // Clear processing state
     setProcessingEventId(null);

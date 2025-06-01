@@ -17,23 +17,7 @@ export function useEventCore() {
     try {
       setLoading(true);
       const eventsData = await fetchEvents();
-      
-      // Apply any stored participant counts from localStorage
-      const processedEvents = eventsData.map(event => {
-        const storedCount = localStorage.getItem(`event_${event.id}_count`);
-        if (storedCount) {
-          const count = parseInt(storedCount, 10);
-          // Only use the stored count if it's higher than the current count
-          if (count > event.current_participants) {
-            return { ...event, current_participants: count };
-          }
-        }
-        // Update localStorage with the current count
-        localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
-        return event;
-      });
-      
-      setEvents(processedEvents);
+      setEvents(eventsData);
     } catch (error: any) {
       toast({
         title: "Error occurred",
@@ -48,27 +32,11 @@ export function useEventCore() {
   const refreshEvents = useCallback(async () => {
     try {
       const eventsData = await fetchEvents();
-      
-      // Apply any stored participant counts from localStorage
-      const processedEvents = eventsData.map(event => {
-        const storedCount = localStorage.getItem(`event_${event.id}_count`);
-        if (storedCount) {
-          const count = parseInt(storedCount, 10);
-          // Only use the stored count if it's higher than the current count
-          if (count > event.current_participants) {
-            return { ...event, current_participants: count };
-          }
-        }
-        // Update localStorage with the current count
-        localStorage.setItem(`event_${event.id}_count`, String(event.current_participants));
-        return event;
-      });
-      
-      setEvents(processedEvents);
+      setEvents(eventsData);
       
       // Update selected event if it exists
       if (selectedEvent) {
-        const updatedSelectedEvent = processedEvents.find(event => event.id === selectedEvent.id);
+        const updatedSelectedEvent = eventsData.find(event => event.id === selectedEvent.id);
         if (updatedSelectedEvent) {
           setSelectedEvent(updatedSelectedEvent);
         }

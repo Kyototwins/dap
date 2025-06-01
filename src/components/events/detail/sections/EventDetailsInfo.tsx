@@ -47,6 +47,8 @@ export function EventDetailsInfo({
             onParticipate={onParticipate}
             eventId={event.id}
             eventTitle={event.title}
+            maxParticipants={event.max_participants}
+            currentParticipants={event.current_participants}
           />
         )}
       </div>
