@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Link2 } from "lucide-react";
@@ -28,10 +29,13 @@ export function EventCardDetails({
   const formattedDate = format(eventDate, 'yyyy/MM/dd');
   const startTime = format(eventDate, 'h:mm a');
   
-  // For unlimited participants, show the infinity symbol with current participants
+  // Add 1 to include the event creator in the count
+  const totalParticipants = currentParticipants + 1;
+  
+  // For unlimited participants, show the infinity symbol with total participants
   const participantsDisplay = maxParticipants === 0 
-    ? `${currentParticipants}/∞` 
-    : `${currentParticipants}/${maxParticipants}`;
+    ? `${totalParticipants}/∞` 
+    : `${totalParticipants}/${maxParticipants}`;
 
   // Generate a Google Maps link
   const getMapLink = (location: string) => {

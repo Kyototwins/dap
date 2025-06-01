@@ -33,6 +33,9 @@ export function EventCardDetails({
     }).format(date);
   };
 
+  // Add 1 to include the event creator in the count
+  const totalParticipants = currentParticipants + 1;
+
   return (
     <div className="space-y-3 mt-2">
       <p className="text-sm text-gray-600 line-clamp-2">{description}</p>
@@ -70,8 +73,8 @@ export function EventCardDetails({
           <Users className="h-3.5 w-3.5" />
           <span>
             {maxParticipants === 0 
-              ? `${currentParticipants} participating` 
-              : `${currentParticipants}/${maxParticipants} participating`}
+              ? `${totalParticipants} participating` 
+              : `${totalParticipants}/${maxParticipants} participating`}
           </span>
         </div>
       </div>
