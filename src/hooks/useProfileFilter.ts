@@ -30,6 +30,7 @@ export function useProfileFilter() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loadingMore, setLoadingMore] = useState(false);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const [currentUserOrigin, setCurrentUserOrigin] = useState<string | null>(null);
   const pageSize = 10;
   const pageRef = useRef(1);
   const { toast } = useToast();
@@ -51,6 +52,17 @@ export function useProfileFilter() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
+
+      // Get current user's origin
+      const { data: currentUserProfile } = await supabase
+        .from("profiles")
+        .select("origin")
+        .eq("id", user.id)
+        .single();
+
+      if (currentUserProfile) {
+        setCurrentUserOrigin(currentUserProfile.origin);
+      }
 
       const { data, error } = await supabase
         .from("profiles")
@@ -181,17 +193,41 @@ export function useProfileFilter() {
       });
     }
 
-    // Sorting
+    // Origin-based prioritization and sorting
     if (filterState.sortOption === "recent") {
       result.sort((a, b) => {
+        // First prioritize by origin difference
+        const aIsDifferentOrigin = currentUserOrigin === 'Japan' 
+          ? a.origin !== 'Japan' 
+          : a.origin === 'Japan';
+        const bIsDifferentOrigin = currentUserOrigin === 'Japan' 
+          ? b.origin !== 'Japan' 
+          : b.origin === 'Japan';
+        
+        if (aIsDifferentOrigin && !bIsDifferentOrigin) return -1;
+        if (!aIsDifferentOrigin && bIsDifferentOrigin) return 1;
+        
+        // Then sort by created_at
         const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
         const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
         return dateB - dateA;
       });
     } else if (filterState.sortOption === "active") {
       result.sort((a, b) => {
+        // First prioritize by origin difference
+        const aIsDifferentOrigin = currentUserOrigin === 'Japan' 
+          ? a.origin !== 'Japan' 
+          : a.origin === 'Japan';
+        const bIsDifferentOrigin = currentUserOrigin === 'Japan' 
+          ? b.origin !== 'Japan' 
+          : b.origin === 'Japan';
+        
+        if (aIsDifferentOrigin && !bIsDifferentOrigin) return -1;
+        if (!aIsDifferentOrigin && bIsDifferentOrigin) return 1;
+        
+        // Then sort by name
         const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
-        const nameB = `${b.first_name || ''} ${a.last_name || ''}`;
+        const nameB = `${b.first_name || ''} ${b.last_name || ''}`;
         return nameA.localeCompare(nameB);
       });
     }
@@ -211,7 +247,7 @@ export function useProfileFilter() {
     if (profiles.length > 0) {
       applyFilters(profiles, searchQuery, filters);
     }
-  }, [searchQuery, filters]);
+  }, [searchQuery, filters, currentUserOrigin]);
 
   // Search handler
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
