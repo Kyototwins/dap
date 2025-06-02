@@ -1,8 +1,26 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { Profile } from "@/types/messages";
 import type { FilterState } from "@/types/matches";
+
+// プロフィール完了率を計算する関数
+const calculateProfileCompletion = (profile: Profile): number => {
+  const fields = [
+    'first_name', 'last_name', 'age', 'gender', 'origin', 'university',
+    'department', 'about_me', 'avatar_url', 'languages'
+  ];
+
+  const completedFields = fields.filter(field => {
+    if (Array.isArray(profile[field as keyof Profile])) {
+      return (profile[field as keyof Profile] as any[]).length > 0;
+    }
+    return profile[field as keyof Profile] !== null && profile[field as keyof Profile] !== '';
+  });
+
+  return Math.round((completedFields.length / fields.length) * 100);
+};
 
 export function useProfileFilter() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -75,8 +93,14 @@ export function useProfileFilter() {
         pet_photo_comment: null
       })) || [];
       
-      setProfiles(typedProfiles);
-      applyFilters(typedProfiles, searchQuery, filters);
+      // プロフィール完了率が30%以下のユーザーを除外
+      const filteredByCompletion = typedProfiles.filter(profile => {
+        const completion = calculateProfileCompletion(profile);
+        return completion > 30;
+      });
+      
+      setProfiles(filteredByCompletion);
+      applyFilters(filteredByCompletion, searchQuery, filters);
     } catch (error: any) {
       toast({
         title: "Error",
