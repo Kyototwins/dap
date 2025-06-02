@@ -18,7 +18,6 @@ export const mapProfileData = (profileData: any): Profile => ({
   superpower: profileData.superpower || '',
   learning_languages: profileData.learning_languages || [],
   origin: profileData.origin || null,
-  sexuality: profileData.sexuality || null,
   ideal_date: profileData.ideal_date || null,
   life_goal: profileData.life_goal || null,
   image_url_1: profileData.image_url_1 || null,
