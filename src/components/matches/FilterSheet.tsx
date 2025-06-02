@@ -11,7 +11,7 @@ import { FilterState } from "@/types/matches";
 import { SortOptions } from "./filter-components/SortOptions";
 import { AgeRangeSelector } from "./filter-components/AgeRangeSelector";
 import { LanguageSelector } from "./filter-components/LanguageSelector";
-import { HobbySelector } from "./filter-components/HobbySelector"; // Fixed import path
+import { HobbySelector } from "./filter-components/HobbySelector";
 import { CountrySelector } from "./filter-components/CountrySelector";
 import { FilterSheetHeader } from "./filter-components/FilterSheetHeader";
 import { FilterSheetFooter } from "./filter-components/FilterSheetFooter";
@@ -67,7 +67,7 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
       minLanguageLevel: 1,
       hobbies: [],
       countries: [],
-      sortOption: "recent"
+      sortOption: "random"
     });
   };
 
@@ -92,8 +92,8 @@ export function FilterSheet({ filters, setFilters, isOpen, setIsOpen }: FilterSh
         
         <div className="py-6 space-y-6">
           <SortOptions 
-            value={filters.sortOption}
-            onChange={(value) => handleFilterChange("sortOption", value)}
+            sortOption={filters.sortOption}
+            onSortChange={(value) => handleFilterChange("sortOption", value)}
           />
           
           <AgeRangeSelector 
