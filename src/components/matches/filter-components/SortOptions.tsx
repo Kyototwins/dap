@@ -1,33 +1,26 @@
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
-const SORT_OPTIONS = [
-  { value: "recent", label: "Newest Registered" },
-  { value: "active", label: "Most Active" },
-];
+import { Label } from "@/components/ui/label";
 
 interface SortOptionsProps {
-  value: string;
-  onChange: (value: string) => void;
+  sortOption: string;
+  onSortChange: (value: string) => void;
 }
 
-export function SortOptions({ value, onChange }: SortOptionsProps) {
+export function SortOptions({ sortOption, onSortChange }: SortOptionsProps) {
   return (
     <div className="space-y-2">
-      <h3 className="text-sm font-medium border-b pb-2">Sort Order</h3>
-      <RadioGroup 
-        value={value} 
-        onValueChange={onChange}
-        className="space-y-1"
-      >
-        {SORT_OPTIONS.map(option => (
-          <div key={option.value} className="flex items-center space-x-2">
-            <RadioGroupItem value={option.value} id={option.value} />
-            <label htmlFor={option.value} className="text-sm">{option.label}</label>
-          </div>
-        ))}
+      <h3 className="text-sm font-medium border-b pb-2">Sort Options</h3>
+      <RadioGroup value={sortOption} onValueChange={onSortChange}>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="random" id="random" />
+          <Label htmlFor="random" className="text-sm">Random</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="alphabetical" id="alphabetical" />
+          <Label htmlFor="alphabetical" className="text-sm">Alphabetical</Label>
+        </div>
       </RadioGroup>
     </div>
   );
 }
-

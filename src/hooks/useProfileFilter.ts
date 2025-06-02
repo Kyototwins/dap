@@ -22,6 +22,16 @@ const calculateProfileCompletion = (profile: Profile): number => {
   return Math.round((completedFields.length / fields.length) * 100);
 };
 
+// ランダムに配列をシャッフルする関数
+const shuffleArray = <T>(array: T[]): T[] => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
 export function useProfileFilter() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
@@ -35,7 +45,7 @@ export function useProfileFilter() {
   const pageRef = useRef(1);
   const { toast } = useToast();
   
-  // Filter states
+  // Filter states - default to random sorting
   const [filters, setFilters] = useState<FilterState>({
     ageRange: [18, 50],
     speakingLanguages: [],
@@ -43,7 +53,7 @@ export function useProfileFilter() {
     minLanguageLevel: 1,
     hobbies: [],
     countries: [],
-    sortOption: "recent"
+    sortOption: "random"
   });
 
   // Fetch profile data
@@ -207,54 +217,54 @@ export function useProfileFilter() {
     console.log("Profiles after all filters:", result.length);
 
     // Origin-based prioritization and sorting
-    if (filterState.sortOption === "recent") {
-      result.sort((a, b) => {
-        // First prioritize by origin difference
-        const isCurrentUserJapanese = currentUserOrigin?.toLowerCase() === 'japan';
-        const aIsDifferentOrigin = isCurrentUserJapanese 
-          ? a.origin?.toLowerCase() !== 'japan' 
-          : a.origin?.toLowerCase() === 'japan';
-        const bIsDifferentOrigin = isCurrentUserJapanese 
-          ? b.origin?.toLowerCase() !== 'japan' 
-          : b.origin?.toLowerCase() === 'japan';
-        
-        console.log(`Sorting: Current user is Japanese: ${isCurrentUserJapanese}`);
-        console.log(`Profile A (${a.first_name}): origin=${a.origin}, isDifferent=${aIsDifferentOrigin}`);
-        console.log(`Profile B (${b.first_name}): origin=${b.origin}, isDifferent=${bIsDifferentOrigin}`);
-        
-        if (aIsDifferentOrigin && !bIsDifferentOrigin) return -1;
-        if (!aIsDifferentOrigin && bIsDifferentOrigin) return 1;
-        
-        // Then sort by created_at
-        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-        return dateB - dateA;
-      });
-    } else if (filterState.sortOption === "active") {
-      result.sort((a, b) => {
-        // First prioritize by origin difference
-        const isCurrentUserJapanese = currentUserOrigin?.toLowerCase() === 'japan';
-        const aIsDifferentOrigin = isCurrentUserJapanese 
-          ? a.origin?.toLowerCase() !== 'japan' 
-          : a.origin?.toLowerCase() === 'japan';
-        const bIsDifferentOrigin = isCurrentUserJapanese 
-          ? b.origin?.toLowerCase() !== 'japan' 
-          : b.origin?.toLowerCase() === 'japan';
-        
-        if (aIsDifferentOrigin && !bIsDifferentOrigin) return -1;
-        if (!aIsDifferentOrigin && bIsDifferentOrigin) return 1;
-        
-        // Then sort by name
+    const isCurrentUserJapanese = currentUserOrigin?.toLowerCase() === 'japan';
+    
+    // Separate profiles by origin priority
+    const priorityProfiles = result.filter(profile => {
+      return isCurrentUserJapanese 
+        ? profile.origin?.toLowerCase() !== 'japan' 
+        : profile.origin?.toLowerCase() === 'japan';
+    });
+    
+    const otherProfiles = result.filter(profile => {
+      return isCurrentUserJapanese 
+        ? profile.origin?.toLowerCase() === 'japan'
+        : profile.origin?.toLowerCase() !== 'japan';
+    });
+    
+    console.log(`Priority profiles (different origin): ${priorityProfiles.length}`);
+    console.log(`Other profiles (same origin): ${otherProfiles.length}`);
+    
+    // Apply sorting within each group
+    let sortedPriorityProfiles: Profile[];
+    let sortedOtherProfiles: Profile[];
+    
+    if (filterState.sortOption === "alphabetical") {
+      sortedPriorityProfiles = [...priorityProfiles].sort((a, b) => {
         const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
         const nameB = `${b.first_name || ''} ${b.last_name || ''}`;
         return nameA.localeCompare(nameB);
       });
+      
+      sortedOtherProfiles = [...otherProfiles].sort((a, b) => {
+        const nameA = `${a.first_name || ''} ${a.last_name || ''}`;
+        const nameB = `${b.first_name || ''} ${b.last_name || ''}`;
+        return nameA.localeCompare(nameB);
+      });
+    } else {
+      // Random sorting (default)
+      sortedPriorityProfiles = shuffleArray(priorityProfiles);
+      sortedOtherProfiles = shuffleArray(otherProfiles);
     }
+    
+    // Combine: priority profiles first, then others
+    result = [...sortedPriorityProfiles, ...sortedOtherProfiles];
 
     console.log("Final sorted profiles (first 5):", result.slice(0, 5).map(p => ({ 
       name: p.first_name, 
       origin: p.origin,
-      isDifferent: currentUserOrigin?.toLowerCase() === 'japan' ? p.origin?.toLowerCase() !== 'japan' : p.origin?.toLowerCase() === 'japan'
+      isPriority: isCurrentUserJapanese ? p.origin?.toLowerCase() !== 'japan' : p.origin?.toLowerCase() === 'japan',
+      sortType: filterState.sortOption
     })));
 
     setFilteredProfiles(result);
