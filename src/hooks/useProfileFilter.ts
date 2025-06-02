@@ -60,8 +60,11 @@ export function useProfileFilter() {
         .eq("id", user.id)
         .single();
 
+      console.log("Current user profile:", currentUserProfile);
+      
       if (currentUserProfile) {
         setCurrentUserOrigin(currentUserProfile.origin);
+        console.log("Current user origin set to:", currentUserProfile.origin);
       }
 
       const { data, error } = await supabase
@@ -105,11 +108,16 @@ export function useProfileFilter() {
         pet_photo_comment: null
       })) || [];
       
+      console.log("Total profiles fetched:", typedProfiles.length);
+      console.log("Sample profile origins:", typedProfiles.slice(0, 5).map(p => ({ name: p.first_name, origin: p.origin })));
+      
       // プロフィール完了率が30%以下のユーザーを除外
       const filteredByCompletion = typedProfiles.filter(profile => {
         const completion = calculateProfileCompletion(profile);
         return completion > 30;
       });
+      
+      console.log("Profiles after completion filter:", filteredByCompletion.length);
       
       setProfiles(filteredByCompletion);
       applyFilters(filteredByCompletion, searchQuery, filters);
@@ -127,6 +135,9 @@ export function useProfileFilter() {
   // Apply search and filters
   const applyFilters = (data: Profile[], query: string, filterState: FilterState) => {
     let result = [...data];
+
+    console.log("Applying filters with current user origin:", currentUserOrigin);
+    console.log("Total profiles before filtering:", result.length);
 
     // Filter by search query
     if (query) {
@@ -193,16 +204,23 @@ export function useProfileFilter() {
       });
     }
 
+    console.log("Profiles after all filters:", result.length);
+
     // Origin-based prioritization and sorting
     if (filterState.sortOption === "recent") {
       result.sort((a, b) => {
         // First prioritize by origin difference
-        const aIsDifferentOrigin = currentUserOrigin === 'Japan' 
-          ? a.origin !== 'Japan' 
-          : a.origin === 'Japan';
-        const bIsDifferentOrigin = currentUserOrigin === 'Japan' 
-          ? b.origin !== 'Japan' 
-          : b.origin === 'Japan';
+        const isCurrentUserJapanese = currentUserOrigin?.toLowerCase() === 'japan';
+        const aIsDifferentOrigin = isCurrentUserJapanese 
+          ? a.origin?.toLowerCase() !== 'japan' 
+          : a.origin?.toLowerCase() === 'japan';
+        const bIsDifferentOrigin = isCurrentUserJapanese 
+          ? b.origin?.toLowerCase() !== 'japan' 
+          : b.origin?.toLowerCase() === 'japan';
+        
+        console.log(`Sorting: Current user is Japanese: ${isCurrentUserJapanese}`);
+        console.log(`Profile A (${a.first_name}): origin=${a.origin}, isDifferent=${aIsDifferentOrigin}`);
+        console.log(`Profile B (${b.first_name}): origin=${b.origin}, isDifferent=${bIsDifferentOrigin}`);
         
         if (aIsDifferentOrigin && !bIsDifferentOrigin) return -1;
         if (!aIsDifferentOrigin && bIsDifferentOrigin) return 1;
@@ -215,12 +233,13 @@ export function useProfileFilter() {
     } else if (filterState.sortOption === "active") {
       result.sort((a, b) => {
         // First prioritize by origin difference
-        const aIsDifferentOrigin = currentUserOrigin === 'Japan' 
-          ? a.origin !== 'Japan' 
-          : a.origin === 'Japan';
-        const bIsDifferentOrigin = currentUserOrigin === 'Japan' 
-          ? b.origin !== 'Japan' 
-          : b.origin === 'Japan';
+        const isCurrentUserJapanese = currentUserOrigin?.toLowerCase() === 'japan';
+        const aIsDifferentOrigin = isCurrentUserJapanese 
+          ? a.origin?.toLowerCase() !== 'japan' 
+          : a.origin?.toLowerCase() === 'japan';
+        const bIsDifferentOrigin = isCurrentUserJapanese 
+          ? b.origin?.toLowerCase() !== 'japan' 
+          : b.origin?.toLowerCase() === 'japan';
         
         if (aIsDifferentOrigin && !bIsDifferentOrigin) return -1;
         if (!aIsDifferentOrigin && bIsDifferentOrigin) return 1;
@@ -231,6 +250,12 @@ export function useProfileFilter() {
         return nameA.localeCompare(nameB);
       });
     }
+
+    console.log("Final sorted profiles (first 5):", result.slice(0, 5).map(p => ({ 
+      name: p.first_name, 
+      origin: p.origin,
+      isDifferent: currentUserOrigin?.toLowerCase() === 'japan' ? p.origin?.toLowerCase() !== 'japan' : p.origin?.toLowerCase() === 'japan'
+    })));
 
     setFilteredProfiles(result);
     pageRef.current = 1;

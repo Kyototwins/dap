@@ -1,21 +1,21 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ORIGIN_OPTIONS } from "@/components/profile/constants/profileOptions";
 
 // Define a subset of countries for the filter 
 // (keeping the most common ones to avoid overwhelming the filter UI)
+// Updated to match the actual origin values in the database
 const FILTER_COUNTRY_OPTIONS = [
-  { value: "japan", label: "Japan" },
-  { value: "usa", label: "USA" },
-  { value: "china", label: "China" },
-  { value: "korea", label: "Korea" },
-  { value: "uk", label: "UK" },
-  { value: "australia", label: "Australia" },
-  { value: "canada", label: "Canada" },
-  { value: "france", label: "France" },
-  { value: "germany", label: "Germany" },
-  { value: "india", label: "India" },
-  { value: "other", label: "Other" },
+  { value: "Japan", label: "Japan" },
+  { value: "USA", label: "USA" },
+  { value: "China", label: "China" },
+  { value: "Korea", label: "Korea" },
+  { value: "UK", label: "UK" },
+  { value: "Australia", label: "Australia" },
+  { value: "Canada", label: "Canada" },
+  { value: "France", label: "France" },
+  { value: "Germany", label: "Germany" },
+  { value: "India", label: "India" },
+  { value: "Other", label: "Other" },
 ];
 
 interface CountrySelectorProps {
