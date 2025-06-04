@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RefreshCw, Filter, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProfileFilter } from "@/hooks/useProfileFilter";
@@ -12,7 +11,7 @@ import { useUnreadCounts } from "@/hooks/useUnreadCounts";
 
 export default function Matches() {
   const [activeTab, setActiveTab] = useState("discover");
-  const { unreadMatches } = useUnreadCounts();
+  const { unreadMatches, refreshCounts } = useUnreadCounts();
   const {
     filteredProfiles,
     visibleProfiles,
@@ -36,9 +35,20 @@ export default function Matches() {
     refreshLikes
   } = useLikesReceived();
 
+  // Clear unread matches when switching to likes tab
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (value === "likes" && unreadMatches > 0) {
+      // Refresh counts to clear the notification
+      setTimeout(() => {
+        refreshCounts();
+      }, 1000); // Small delay to allow UI to update
+    }
+  };
+
   return (
     <div className="py-4">
-      <Tabs defaultValue="discover" className="w-full mb-6" onValueChange={setActiveTab}>
+      <Tabs defaultValue="discover" className="w-full mb-6" onValueChange={handleTabChange}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="discover">Discover</TabsTrigger>
           <TabsTrigger value="likes" className="flex items-center gap-2 relative">

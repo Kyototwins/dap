@@ -21,7 +21,7 @@ export function useUnreadCounts() {
 
       setUnreadMatches(pendingMatches?.length || 0);
 
-      // Count unread messages (messages where user is receiver and not read)
+      // Count unread messages - check for matches where the last message is from the other user
       const { data: userMatches } = await supabase
         .from("matches")
         .select("id")
@@ -31,7 +31,6 @@ export function useUnreadCounts() {
       if (userMatches) {
         const matchIds = userMatches.map(m => m.id);
         
-        // Get latest message for each match where user is not sender
         let totalUnread = 0;
         for (const matchId of matchIds) {
           const { data: latestMessage } = await supabase
@@ -41,6 +40,7 @@ export function useUnreadCounts() {
             .order("created_at", { ascending: false })
             .limit(1);
 
+          // If there's a latest message and it's not from the current user, count as unread
           if (latestMessage?.[0] && latestMessage[0].sender_id !== user.id) {
             totalUnread++;
           }
