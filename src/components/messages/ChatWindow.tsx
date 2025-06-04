@@ -27,7 +27,7 @@ export function ChatWindow({
 
   const handleUserNameClick = () => {
     if (match) {
-      navigate(`/user-profile/${match.otherUser.id}`);
+      navigate(`/profile/${match.otherUser.id}`);
     }
   };
 

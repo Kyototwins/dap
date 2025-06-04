@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -47,7 +46,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
 
   const handleAvatarClick = (e: React.MouseEvent, userId: string) => {
     e.stopPropagation();
-    navigate(`/user-profile/${userId}`);
+    navigate(`/profile/${userId}`);
   };
 
   useEffect(() => {
