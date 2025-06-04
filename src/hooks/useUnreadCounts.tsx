@@ -21,7 +21,7 @@ export function useUnreadCounts() {
 
       setUnreadMatches(pendingMatches?.length || 0);
 
-      // Count unread messages - get total from match list unread counts
+      // Count unread messages - count matches with unread messages
       const { data: userMatches } = await supabase
         .from("matches")
         .select("id")
@@ -31,7 +31,7 @@ export function useUnreadCounts() {
       if (userMatches) {
         const matchIds = userMatches.map(m => m.id);
         
-        let totalUnread = 0;
+        let totalUnreadChats = 0;
         for (const matchId of matchIds) {
           const { data: latestMessage } = await supabase
             .from("messages")
@@ -40,12 +40,12 @@ export function useUnreadCounts() {
             .order("created_at", { ascending: false })
             .limit(1);
 
-          // If there's a latest message and it's not from the current user, count as unread
+          // If there's a latest message and it's not from the current user, count as unread chat
           if (latestMessage?.[0] && latestMessage[0].sender_id !== user.id) {
-            totalUnread++;
+            totalUnreadChats++;
           }
         }
-        setUnreadMessages(totalUnread);
+        setUnreadMessages(totalUnreadChats);
       }
 
       // Count new events created in last 24 hours

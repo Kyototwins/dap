@@ -47,7 +47,7 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
 
   const handleAvatarClick = (e: React.MouseEvent, userId: string) => {
     e.stopPropagation();
-    navigate(`/user/${userId}`);
+    navigate(`/user-profile/${userId}`);
   };
 
   useEffect(() => {
