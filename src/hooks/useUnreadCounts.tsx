@@ -21,7 +21,7 @@ export function useUnreadCounts() {
 
       setUnreadMatches(pendingMatches?.length || 0);
 
-      // Count unread messages - check for matches where the last message is from the other user
+      // Count unread messages - get total from match list unread counts
       const { data: userMatches } = await supabase
         .from("matches")
         .select("id")

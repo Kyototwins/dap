@@ -7,6 +7,7 @@ import type { Match } from "@/types/messages";
 import { format, formatDistanceToNow } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface MatchListProps {
   matches: Match[];
@@ -15,6 +16,8 @@ interface MatchListProps {
 }
 
 export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListProps) {
+  const navigate = useNavigate();
+
   // Format the message timestamp in a human-readable way
   const formatMessageTime = (timestamp: string) => {
     if (!timestamp) return "";
@@ -40,6 +43,11 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
     
     // Otherwise show date (e.g., "4/10")
     return format(messageDate, "M/d");
+  };
+
+  const handleAvatarClick = (e: React.MouseEvent, userId: string) => {
+    e.stopPropagation();
+    navigate(`/user/${userId}`);
   };
 
   useEffect(() => {
@@ -69,7 +77,10 @@ export function MatchList({ matches, selectedMatch, onSelectMatch }: MatchListPr
               >
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <Avatar className="h-12 w-12">
+                    <Avatar 
+                      className="h-12 w-12 cursor-pointer hover:opacity-80"
+                      onClick={(e) => handleAvatarClick(e, match.otherUser.id)}
+                    >
                       <AvatarImage
                         src={match.otherUser.avatar_url || "/placeholder.svg"}
                         alt={`${match.otherUser.first_name}のアバター`}

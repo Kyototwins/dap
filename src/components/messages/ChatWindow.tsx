@@ -4,6 +4,7 @@ import { LoadingSpinner } from "@/components/messages/LoadingSpinner";
 import type { Match, Message } from "@/types/messages";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface ChatWindowProps {
   match: Match | null;
@@ -22,6 +23,14 @@ export function ChatWindow({
   showMobileChat,
   messagesLoaded = true,
 }: ChatWindowProps) {
+  const navigate = useNavigate();
+
+  const handleUserNameClick = () => {
+    if (match) {
+      navigate(`/user/${match.otherUser.id}`);
+    }
+  };
+
   return (
     <div className={`${!showMobileChat ? 'hidden md:block' : 'w-full'} md:w-2/3 overflow-hidden`}>
       {match ? (
@@ -37,7 +46,10 @@ export function ChatWindow({
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div>
-                <h3 className="font-medium">
+                <h3 
+                  className="font-medium cursor-pointer hover:text-blue-600 transition-colors"
+                  onClick={handleUserNameClick}
+                >
                   {match.otherUser.first_name} {match.otherUser.last_name}
                 </h3>
               </div>
