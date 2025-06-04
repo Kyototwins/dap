@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { DapLogo } from "@/components/common/DapLogo";
 import { AdminLink } from "@/components/layout/AdminLink";
 import { TutorialManager } from "@/components/tutorials/TutorialManager";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { useUnreadCounts } from "@/hooks/useUnreadCounts";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,12 +18,33 @@ interface LayoutProps {
 export function AppLayout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { unreadMatches, unreadMessages, unreadEvents } = useUnreadCounts();
 
   const navItems = [
-    { icon: Search, label: "Matching", path: "/matches" },
-    { icon: MessageSquare, label: "Messages", path: "/messages" },
-    { icon: Calendar, label: "Events", path: "/events" },
-    { icon: User, label: "Profile", path: "/profile" },
+    { 
+      icon: Search, 
+      label: "Matching", 
+      path: "/matches",
+      badge: unreadMatches
+    },
+    { 
+      icon: MessageSquare, 
+      label: "Messages", 
+      path: "/messages",
+      badge: unreadMessages
+    },
+    { 
+      icon: Calendar, 
+      label: "Events", 
+      path: "/events",
+      badge: unreadEvents
+    },
+    { 
+      icon: User, 
+      label: "Profile", 
+      path: "/profile",
+      badge: 0
+    },
   ];
 
   const handleNavigation = (path: string) => {
@@ -52,6 +75,7 @@ export function AppLayout({ children }: LayoutProps) {
             <DapLogo />
           </div>
           <div className="flex items-center gap-2">
+            <NotificationBell />
             <AdminLink />
             <Sheet>
               <SheetTrigger asChild>
@@ -96,15 +120,22 @@ export function AppLayout({ children }: LayoutProps) {
                 key={item.path}
                 onClick={() => handleNavigation(item.path)}
                 className={cn(
-                  "flex flex-col items-center justify-center w-full h-full gap-1",
+                  "flex flex-col items-center justify-center w-full h-full gap-1 relative",
                   "text-gray-500 hover:text-doshisha-purple transition-colors",
                   location.pathname === item.path && "text-doshisha-purple font-medium"
                 )}
               >
-                <item.icon className={cn(
-                  "w-5 h-5",
-                  location.pathname === item.path && "text-doshisha-purple"
-                )} />
+                <div className="relative">
+                  <item.icon className={cn(
+                    "w-5 h-5",
+                    location.pathname === item.path && "text-doshisha-purple"
+                  )} />
+                  {item.badge > 0 && (
+                    <span className="absolute -top-2 -right-2 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {item.badge > 9 ? '9+' : item.badge}
+                    </span>
+                  )}
+                </div>
                 <span className="text-xs">{item.label}</span>
               </button>
             ))}

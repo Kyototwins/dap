@@ -8,9 +8,11 @@ import { FilterSheet } from "@/components/matches/FilterSheet";
 import { ProfilesList } from "@/components/matches/ProfilesList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLikesReceived } from "@/hooks/useLikesReceived";
+import { useUnreadCounts } from "@/hooks/useUnreadCounts";
 
 export default function Matches() {
   const [activeTab, setActiveTab] = useState("discover");
+  const { unreadMatches } = useUnreadCounts();
   const {
     filteredProfiles,
     visibleProfiles,
@@ -39,8 +41,14 @@ export default function Matches() {
       <Tabs defaultValue="discover" className="w-full mb-6" onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="discover">Discover</TabsTrigger>
-          <TabsTrigger value="likes" className="flex items-center gap-2">
-            <Heart className="w-4 h-4" /> Likes Received
+          <TabsTrigger value="likes" className="flex items-center gap-2 relative">
+            <Heart className="w-4 h-4" /> 
+            Likes Received
+            {unreadMatches > 0 && (
+              <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                {unreadMatches > 9 ? '9+' : unreadMatches}
+              </span>
+            )}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="discover" className="mt-4">

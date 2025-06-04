@@ -31,6 +31,23 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
     `
     : '';
   
+  const dailyEncouragement = `
+    <div style="background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #5640AA;">
+      <h3 style="color: #5640AA; margin: 0 0 15px 0;">🌟 毎日アプリをチェックしてね！</h3>
+      <p style="margin: 0 0 10px 0; color: #444;">
+        このダイジェストには含まれていない新しいマッチやメッセージがある可能性があります。
+        <strong>是非毎日アプリを開いて確認してくださいね！</strong>
+      </p>
+      <div style="background-color: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border: 1px solid #ffeaa7;">
+        <h4 style="color: #856404; margin: 0 0 10px 0;">📈 ユーザーが増えています！</h4>
+        <p style="margin: 0; color: #856404; font-weight: bold;">
+          是非積極的にいいねして、メッセージを送り合ってください！<br>
+          素敵な出会いがあなたを待っています✨
+        </p>
+      </div>
+    </div>
+  `;
+  
   return `
     <html>
     <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
@@ -54,6 +71,7 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
       </div>
       
       ${eventInvitation}
+      ${dailyEncouragement}
       
       <p>Stay engaged with your language exchange community!</p>
       <p><a href="${appUrl}" style="display: inline-block; background-color: #5640AA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Visit DAP and connect!</a></p>
