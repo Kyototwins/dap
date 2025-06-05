@@ -30,6 +30,33 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
       </div>
     `
     : '';
+
+  const instagramSection = `
+    <div style="background-color: #f8f0ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #8b5cf6;">
+      <h3 style="color: #8b5cf6; margin: 0 0 15px 0;">📸 Follow us on Instagram!</h3>
+      <p style="margin: 0 0 10px 0; color: #444;">
+        Don't miss out on event updates! Follow our Instagram for the latest news!<br>
+        イベント情報を見逃さないように、インスタのフォローも忘れないで！
+      </p>
+      <p style="margin: 0; color: #8b5cf6; font-weight: bold;">
+        Instagram: @creator_dap
+      </p>
+    </div>
+  `;
+
+  const picnicEventSection = `
+    <div style="background-color: #fff8e1; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffa726;">
+      <h3 style="color: #ffa726; margin: 0 0 15px 0;">🌸 Upcoming Picnic Event!</h3>
+      <p style="margin: 0 0 10px 0; color: #444;">
+        We're planning a picnic event on the weekend at the end of this month!<br>
+        月末の土日にピクニックイベントをしようと考えています！
+      </p>
+      <p style="margin: 0; color: #e65100; font-weight: bold;">
+        Have ideas for events? Send us a DM!<br>
+        こんなイベントしたいってのがある人はDMして！
+      </p>
+    </div>
+  `;
   
   const dailyEncouragement = `
     <div style="background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #5640AA;">
@@ -69,9 +96,12 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
         ` : ''}
         <p><strong>👥 New participants in your events:</strong> ${activity.eventParticipations}</p>
         <p><strong>💬 New comments on your events:</strong> ${activity.eventComments}</p>
+        <p><strong>🆕 New accounts created yesterday:</strong> ${activity.newAccounts}</p>
       </div>
       
       ${eventInvitation}
+      ${instagramSection}
+      ${picnicEventSection}
       ${dailyEncouragement}
       
       <p>Stay engaged with your language exchange community!</p>

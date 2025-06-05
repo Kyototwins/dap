@@ -1,4 +1,3 @@
-
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { toJSTISOString } from "./utils.ts";
 
@@ -13,6 +12,7 @@ export interface ActivitySummary {
   newEvents: Array<{title: string; date: string}>;
   eventParticipations: number;
   eventComments: number;
+  newAccounts: number;
 }
 
 /**
@@ -153,6 +153,24 @@ async function getEventComments(userId: string, yesterdayStart: string, todaySta
 }
 
 /**
+ * Query for new accounts created yesterday
+ */
+async function getNewAccounts(yesterdayStart: string, todayStart: string) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id")
+    .gte("created_at", yesterdayStart)
+    .lt("created_at", todayStart);
+  
+  if (error) {
+    console.error("Error fetching new accounts:", error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+/**
  * Get activity summary for a specific user for yesterday
  */
 export async function getYesterdayActivity(userId: string): Promise<ActivitySummary> {
@@ -176,8 +194,9 @@ export async function getYesterdayActivity(userId: string): Promise<ActivitySumm
   const newEvents = await getNewEvents(yesterdayJST, todayJST);
   const participations = await getEventParticipations(userId, yesterdayJST, todayJST);
   const comments = await getEventComments(userId, yesterdayJST, todayJST);
+  const newAccounts = await getNewAccounts(yesterdayJST, todayJST);
   
-  console.log(`Activity summary for user ${userId}: likes=${likes.length}, messages=${messages.length}, events=${newEvents.length}, participations=${participations.length}, comments=${comments.length}`);
+  console.log(`Activity summary for user ${userId}: likes=${likes.length}, messages=${messages.length}, events=${newEvents.length}, participations=${participations.length}, comments=${comments.length}, newAccounts=${newAccounts.length}`);
   
   return {
     likesReceived: likes.length || 0,
@@ -185,5 +204,6 @@ export async function getYesterdayActivity(userId: string): Promise<ActivitySumm
     newEvents: newEvents || [],
     eventParticipations: participations.length || 0,
     eventComments: comments.length || 0,
+    newAccounts: newAccounts.length || 0,
   };
 }
