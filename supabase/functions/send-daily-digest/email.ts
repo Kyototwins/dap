@@ -9,7 +9,7 @@ const brevoApiKey = Deno.env.get("BREVO_API_KEY") as string;
 export function generateEmailContent(activity: ActivitySummary, appUrl = "https://dap.lovable.app/"): string {
   const newEventsText = activity.newEvents.length > 0 
     ? activity.newEvents.map(event => {
-        const eventDate = new Date(event.date).toLocaleDateString('ja-JP', {
+        const eventDate = new Date(event.date).toLocaleDateString('en-US', {
           month: 'long',
           day: 'numeric',
           hour: '2-digit',
@@ -17,15 +17,15 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
         });
         return `📅 ${eventDate} - ${event.title}`;
       }).join('<br>')
-    : "昨日は新しいイベントはありませんでした";
+    : "No new events were added yesterday";
   
   const eventInvitation = activity.newEvents.length > 0 
     ? `
       <div style="background-color: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #28a745;">
-        <h3 style="color: #28a745; margin: 0 0 10px 0;">🎉 新しいイベントに参加しませんか？</h3>
+        <h3 style="color: #28a745; margin: 0 0 10px 0;">🎉 Join the new events!</h3>
         <p style="margin: 0; color: #2c5530;">
-          新しいイベントが追加されました！素晴らしい仲間と一緒に楽しい時間を過ごしましょう。
-          <br>今すぐチェックして参加登録をお忘れなく！
+          New events have been added! Let's have a great time with wonderful friends.
+          <br>Check them out now and don't forget to register!
         </p>
       </div>
     `
@@ -33,16 +33,17 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
   
   const dailyEncouragement = `
     <div style="background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #5640AA;">
-      <h3 style="color: #5640AA; margin: 0 0 15px 0;">🌟 毎日アプリをチェックしてね！</h3>
+      <h3 style="color: #5640AA; margin: 0 0 15px 0;">🌟 Please check the app daily!</h3>
       <p style="margin: 0 0 10px 0; color: #444;">
-        このダイジェストには含まれていない新しいマッチやメッセージがある可能性があります。
-        <strong>是非毎日アプリを開いて確認してくださいね！</strong>
+        There might be new matches and messages that are not included in this digest.
+        <strong>Please open the app daily to check for updates!</strong>
       </p>
       <div style="background-color: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border: 1px solid #ffeaa7;">
-        <h4 style="color: #856404; margin: 0 0 10px 0;">📈 ユーザーが増えています！</h4>
+        <h4 style="color: #856404; margin: 0 0 10px 0;">📈 The number of users is growing!</h4>
         <p style="margin: 0; color: #856404; font-weight: bold;">
+          Please actively send likes and exchange messages!<br>
           是非積極的にいいねして、メッセージを送り合ってください！<br>
-          素敵な出会いがあなたを待っています✨
+          Wonderful encounters are waiting for you✨
         </p>
       </div>
     </div>
@@ -77,12 +78,10 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
       <p><a href="${appUrl}" style="display: inline-block; background-color: #5640AA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Visit DAP and connect!</a></p>
       
       <p style="margin-top: 30px; font-size: 14px; color: #777;">
-        If you encounter any issues with the links, please return to the site and log in directly. The system should work for you!<br>
-        リンクに問題がある場合は、サイトに戻ってログインしてみてください。システムは正常に動作するはずです！
+        If you encounter any issues with the links, please return to the site and log in directly. The system should work for you!
       </p>
       <p style="font-size: 14px; color: #777;">
-        If you continue to experience issues, please contact us via DAP Instagram DM.<br>
-        問題が解決しない場合は、DAPのインスタグラムのDMでご連絡ください。
+        If you continue to experience issues, please contact us via DAP Instagram DM.
       </p>
       
       <p style="font-size: 12px; color: #999; margin-top: 30px;">
