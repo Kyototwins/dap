@@ -75,6 +75,14 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
       </div>
     </div>
   `;
+
+  const apologyMessage = `
+    <div style="background-color: #ffeaa7; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #fdcb6e;">
+      <p style="margin: 0; color: #6c5ce7; font-size: 14px;">
+        <em>If this is your second notification today, we apologize for the duplicate message. We're working to improve our notification system!</em>
+      </p>
+    </div>
+  `;
   
   return `
     <html>
@@ -85,6 +93,7 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
       <div style="background-color: #f7f7f7; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <p><strong>👍 New likes received:</strong> ${activity.likesReceived}</p>
         <p><strong>💬 New messages received:</strong> ${activity.messagesReceived}</p>
+        <p><strong>🤝 Your total current matches:</strong> ${activity.totalMatches}</p>
         <p><strong>🎉 New events added:</strong> ${activity.newEvents.length}</p>
         ${activity.newEvents.length > 0 ? `
           <div style="margin: 15px 0; padding: 15px; background-color: white; border-radius: 5px; border: 1px solid #ddd;">
@@ -103,6 +112,7 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
       ${instagramSection}
       ${picnicEventSection}
       ${dailyEncouragement}
+      ${apologyMessage}
       
       <p>Stay engaged with your language exchange community!</p>
       <p><a href="${appUrl}" style="display: inline-block; background-color: #5640AA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Visit DAP and connect!</a></p>

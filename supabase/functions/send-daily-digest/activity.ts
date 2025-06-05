@@ -13,6 +13,7 @@ export interface ActivitySummary {
   eventParticipations: number;
   eventComments: number;
   newAccounts: number;
+  totalMatches: number;
 }
 
 /**
@@ -171,6 +172,24 @@ async function getNewAccounts(yesterdayStart: string, todayStart: string) {
 }
 
 /**
+ * Get total number of matches for a user
+ */
+async function getTotalMatches(userId: string) {
+  const { data, error } = await supabase
+    .from("matches")
+    .select("id")
+    .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+    .eq("status", "matched");
+  
+  if (error) {
+    console.error("Error fetching total matches:", error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+/**
  * Get activity summary for a specific user for yesterday
  */
 export async function getYesterdayActivity(userId: string): Promise<ActivitySummary> {
@@ -195,8 +214,9 @@ export async function getYesterdayActivity(userId: string): Promise<ActivitySumm
   const participations = await getEventParticipations(userId, yesterdayJST, todayJST);
   const comments = await getEventComments(userId, yesterdayJST, todayJST);
   const newAccounts = await getNewAccounts(yesterdayJST, todayJST);
+  const totalMatches = await getTotalMatches(userId);
   
-  console.log(`Activity summary for user ${userId}: likes=${likes.length}, messages=${messages.length}, events=${newEvents.length}, participations=${participations.length}, comments=${comments.length}, newAccounts=${newAccounts.length}`);
+  console.log(`Activity summary for user ${userId}: likes=${likes.length}, messages=${messages.length}, events=${newEvents.length}, participations=${participations.length}, comments=${comments.length}, newAccounts=${newAccounts.length}, totalMatches=${totalMatches.length}`);
   
   return {
     likesReceived: likes.length || 0,
@@ -205,5 +225,6 @@ export async function getYesterdayActivity(userId: string): Promise<ActivitySumm
     eventParticipations: participations.length || 0,
     eventComments: comments.length || 0,
     newAccounts: newAccounts.length || 0,
+    totalMatches: totalMatches.length || 0,
   };
 }
