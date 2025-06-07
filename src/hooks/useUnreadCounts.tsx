@@ -21,12 +21,12 @@ export function useUnreadCounts() {
 
       setUnreadMatches(pendingMatches?.length || 0);
 
-      // Count unread messages - total count of all unread messages
+      // Count unread messages - include both "matched" and "pending" status
       const { data: userMatches } = await supabase
         .from("matches")
         .select("id")
         .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
-        .eq("status", "matched");
+        .in("status", ["matched", "pending"]);
 
       if (userMatches) {
         const matchIds = userMatches.map(m => m.id);
