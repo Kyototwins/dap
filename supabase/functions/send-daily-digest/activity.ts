@@ -10,6 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 export interface ActivitySummary {
   likesReceived: number;
   messagesReceived: number;
+  unreadMessages: number;
   newEvents: Array<{title: string; date: string}>;
   eventParticipations: number;
   eventComments: number;
@@ -68,6 +69,57 @@ async function getMessagesReceived(userId: string, yesterdayStart: string, today
   // Filter messages to only include those from the user's matches
   const userMatchIds = userMatches?.map(match => match.id) || [];
   return (messagesData || []).filter(msg => userMatchIds.includes(msg.match_id));
+}
+
+/**
+ * Query for unread messages count (unreplied conversations) for a specific user
+ */
+async function getUnreadMessages(userId: string) {
+  // Get user's matches (including both matched and pending)
+  const { data: userMatches, error: matchesError } = await supabase
+    .from("matches")
+    .select("id")
+    .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+    .in("status", ["matched", "pending"]);
+  
+  if (matchesError) {
+    console.error("Error fetching matches:", matchesError);
+    return 0;
+  }
+  
+  if (!userMatches) {
+    return 0;
+  }
+  
+  const matchIds = userMatches.map(m => m.id);
+  
+  let totalUnreadMessages = 0;
+  for (const matchId of matchIds) {
+    // Get all messages in this match where the current user is not the sender
+    const { data: unreadMessages } = await supabase
+      .from("messages")
+      .select("id")
+      .eq("match_id", matchId)
+      .neq("sender_id", userId);
+
+    if (unreadMessages) {
+      // For simplicity, count conversations with any messages from others as having 1 unread
+      // This matches the UI behavior where we show individual chat badges
+      const { data: latestMessage } = await supabase
+        .from("messages")
+        .select("sender_id")
+        .eq("match_id", matchId)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      // If the latest message is not from current user, count as 1 unread conversation
+      if (latestMessage?.[0] && latestMessage[0].sender_id !== userId) {
+        totalUnreadMessages++;
+      }
+    }
+  }
+  
+  return totalUnreadMessages;
 }
 
 /**
@@ -211,17 +263,19 @@ export async function getYesterdayActivity(userId: string): Promise<ActivitySumm
   
   const likes = await getLikesReceived(userId, yesterdayJST, todayJST);
   const messages = await getMessagesReceived(userId, yesterdayJST, todayJST);
+  const unreadMessages = await getUnreadMessages(userId);
   const newEvents = await getNewEvents(yesterdayJST, todayJST);
   const participations = await getEventParticipations(userId, yesterdayJST, todayJST);
   const comments = await getEventComments(userId, yesterdayJST, todayJST);
   const newAccounts = await getNewAccounts(yesterdayJST, todayJST);
   const totalMatches = await getTotalMatches(userId);
   
-  console.log(`Activity summary for user ${userId}: likes=${likes.length}, messages=${messages.length}, events=${newEvents.length}, participations=${participations.length}, comments=${comments.length}, newAccounts=${newAccounts.length}, totalMatches=${totalMatches.length}`);
+  console.log(`Activity summary for user ${userId}: likes=${likes.length}, messages=${messages.length}, unreadMessages=${unreadMessages}, events=${newEvents.length}, participations=${participations.length}, comments=${comments.length}, newAccounts=${newAccounts.length}, totalMatches=${totalMatches.length}`);
   
   return {
     likesReceived: likes.length || 0,
     messagesReceived: messages.length || 0,
+    unreadMessages: unreadMessages || 0,
     newEvents: newEvents || [],
     eventParticipations: participations.length || 0,
     eventComments: comments.length || 0,

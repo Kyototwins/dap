@@ -93,6 +93,7 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
       <div style="background-color: #f7f7f7; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <p><strong>👍 New likes received:</strong> ${activity.likesReceived}</p>
         <p><strong>💬 New messages received:</strong> ${activity.messagesReceived}</p>
+        <p><strong>📩 Unreplied conversations:</strong> ${activity.unreadMessages}</p>
         <p><strong>🤝 Your total current matches:</strong> ${activity.totalMatches}</p>
         <p><strong>🎉 New events added:</strong> ${activity.newEvents.length}</p>
         ${activity.newEvents.length > 0 ? `
