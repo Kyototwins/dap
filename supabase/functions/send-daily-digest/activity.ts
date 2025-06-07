@@ -1,3 +1,4 @@
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { toJSTISOString } from "./utils.ts";
 
@@ -179,7 +180,7 @@ async function getTotalMatches(userId: string) {
     .from("matches")
     .select("id")
     .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
-    .eq("status", "matched");
+    .in("status", ["matched", "pending"]);
   
   if (error) {
     console.error("Error fetching total matches:", error);
