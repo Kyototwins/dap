@@ -1,4 +1,3 @@
-
 import { ActivitySummary } from "./activity.ts";
 
 const brevoApiKey = Deno.env.get("BREVO_API_KEY") as string;
@@ -153,7 +152,7 @@ export async function sendBrevoEmail(email: string, activity: ActivitySummary) {
       },
       body: JSON.stringify({
         sender: {
-          name: "DIP - Domestic × International Pals",
+          name: "DIP notification",
           email: "notifications@dapsince2025.com",
         },
         to: [{ email }],
