@@ -1,18 +1,20 @@
-
 import React from "react";
 
-interface DapLogoProps {
+interface DipLogoProps {
   className?: string;
   style?: React.CSSProperties;
 }
 
-// 画像を幅120px・高さ48pxに縮小し、左マージン-15に調整
-export const DapLogo: React.FC<DapLogoProps> = ({ className = "", style }) => (
+// Update to use the new DIP logo
+export const DipLogo: React.FC<DipLogoProps> = ({ className = "", style }) => (
   <img
-    src="/lovable-uploads/78b54ef9-c522-4028-bca2-1864dd1be91f.png"
-    alt="DAP Logo"
+    src="/lovable-uploads/54190604-1198-4082-aa3f-3feed91a0a5a.png"
+    alt="DIP Logo"
     style={{ width: 120, height: 48, objectFit: "contain", marginLeft: -15, ...style }}
     className={className}
     draggable={false}
   />
 );
+
+// Keep backwards compatibility
+export const DapLogo = DipLogo;

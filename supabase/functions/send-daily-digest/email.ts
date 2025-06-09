@@ -88,13 +88,13 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
     <html>
     <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
       <h1 style="color: #5640AA;">Your Daily Activity Summary</h1>
-      <p>Hello! Here's what happened in Language Connect yesterday:</p>
+      <p>Hello! Here's what happened in DIP yesterday:</p>
       
       <div style="background-color: #f7f7f7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p><strong>👍 New likes received:</strong> ${activity.likesReceived}</p>
-        <p><strong>💬 New messages received:</strong> ${activity.messagesReceived}</p>
         <p><strong>📩 Unreplied conversations:</strong> ${activity.unreadMessages}</p>
         <p><strong>🤝 Your total current matches:</strong> ${activity.totalMatches}</p>
+        <p><strong>👍 New likes received:</strong> ${activity.likesReceived}</p>
+        <p><strong>💬 New messages received:</strong> ${activity.messagesReceived}</p>
         <p><strong>🎉 New events added:</strong> ${activity.newEvents.length}</p>
         ${activity.newEvents.length > 0 ? `
           <div style="margin: 15px 0; padding: 15px; background-color: white; border-radius: 5px; border: 1px solid #ddd;">
@@ -116,17 +116,17 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
       ${apologyMessage}
       
       <p>Stay engaged with your language exchange community!</p>
-      <p><a href="${appUrl}" style="display: inline-block; background-color: #5640AA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Visit DAP and connect!</a></p>
+      <p><a href="${appUrl}" style="display: inline-block; background-color: #5640AA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Visit DIP and connect!</a></p>
       
       <p style="margin-top: 30px; font-size: 14px; color: #777;">
         If you encounter any issues with the links, please return to the site and log in directly. The system should work for you!
       </p>
       <p style="font-size: 14px; color: #777;">
-        If you continue to experience issues, please contact us via DAP Instagram DM.
+        If you continue to experience issues, please contact us via DIP Instagram DM.
       </p>
       
       <p style="font-size: 12px; color: #999; margin-top: 30px;">
-        To manage your email preferences, visit your profile settings in the Language Connect app.
+        To manage your email preferences, visit your profile settings in the DIP app.
       </p>
     </body>
     </html>
@@ -153,11 +153,11 @@ export async function sendBrevoEmail(email: string, activity: ActivitySummary) {
       },
       body: JSON.stringify({
         sender: {
-          name: "Language Connect",
+          name: "DIP - Domestic × International Pals",
           email: "notifications@dapsince2025.com",
         },
         to: [{ email }],
-        subject: "Your Daily Language Connect Summary",
+        subject: "Your Daily DIP Summary",
         htmlContent: generateEmailContent(activity),
       }),
     });

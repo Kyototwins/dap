@@ -1,8 +1,9 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
-import { DapLogo } from "@/components/common/DapLogo";
+import { DipLogo } from "@/components/common/DapLogo";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -18,19 +19,19 @@ export default function Landing() {
       {/* Header */}
       <header className="flex justify-between items-center p-4 bg-white">
         <div>
-          <DapLogo />
+          <DipLogo />
         </div>
       </header>
 
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center p-6 py-16 bg-[#E5DEFF]">
-        {/* PC中央タイトル: 「Doshisha Abroad Pals」に修正し、「Doshisha」と「Abroad Pals」の間で改行 */}
+        {/* PC中央タイトル: 「Domestic × International Pals」に修正し、「Domestic」と「International Pals」の間で改行 */}
         <h1 className="text-4xl font-bold text-center mb-6 whitespace-pre-line">
-          Doshisha{"\n"}
-          <span className="text-[#7f1184]">Abroad Pals</span>
+          Domestic{"\n"}
+          <span className="text-[#7f1184]">× International Pals</span>
         </h1>
         <p className="text-gray-600 text-center max-w-md mb-8">
-          Join DAP, where university students worldwide connect for language
+          Join DIP, where domestic and international university students connect for language
           exchange, cultural understanding, and meaningful friendships.
         </p>
         <div className="flex flex-col w-full max-w-xs gap-3">
@@ -52,7 +53,7 @@ export default function Landing() {
 
       {/* How It Works - moved right after buttons */}
       <section className="px-6 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">How DAP Works</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">How DIP Works</h2>
         <div className="space-y-8">
           {/* Step 1 */}
           <div className="bg-white rounded-xl p-6 border border-border shadow-sm">
@@ -112,7 +113,7 @@ export default function Landing() {
 
       {/* Footer */}
       <footer className="p-6 bg-gray-50 text-center text-gray-500 text-sm">
-        <p>© 2025 DAP. All rights reserved.</p>
+        <p>© 2025 DIP. All rights reserved.</p>
       </footer>
     </div>
   );
