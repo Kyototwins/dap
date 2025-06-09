@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -25,14 +24,14 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center p-6 py-16 bg-[#E5DEFF]">
-        {/* PC中央タイトル: 「Domestic × International」を一行に、「Pals」で改行 */}
-        <h1 className="text-4xl font-bold text-center mb-4 whitespace-pre-line">
+        {/* レスポンシブタイトル: モバイルでは小さく、PCでは大きく */}
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 whitespace-pre-line">
           <span className="text-[#7f1184]">Domestic × International</span>{"\n"}
           Pals
         </h1>
         
         {/* キャッチコピー追加 */}
-        <p className="text-xl font-semibold text-[#7f1184] text-center mb-6">
+        <p className="text-lg sm:text-xl font-semibold text-[#7f1184] text-center mb-6">
           Do you wanna take a DIP in Japanese or other cultures? Join DIP!
         </p>
         
