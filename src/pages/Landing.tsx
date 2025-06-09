@@ -25,11 +25,17 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center p-6 py-16 bg-[#E5DEFF]">
-        {/* PC中央タイトル: 「Domestic × International Pals」に修正し、「Domestic」と「International Pals」の間で改行 */}
-        <h1 className="text-4xl font-bold text-center mb-6 whitespace-pre-line">
-          Domestic{"\n"}
-          <span className="text-[#7f1184]">× International Pals</span>
+        {/* PC中央タイトル: 「Domestic × International」を一行に、「Pals」で改行 */}
+        <h1 className="text-4xl font-bold text-center mb-4 whitespace-pre-line">
+          <span className="text-[#7f1184]">Domestic × International</span>{"\n"}
+          Pals
         </h1>
+        
+        {/* キャッチコピー追加 */}
+        <p className="text-xl font-semibold text-[#7f1184] text-center mb-6">
+          Do you wanna take a DIP in Japanese or other cultures? Join DIP!
+        </p>
+        
         <p className="text-gray-600 text-center max-w-md mb-8">
           Join DIP, where domestic and international university students connect for language
           exchange, cultural understanding, and meaningful friendships.

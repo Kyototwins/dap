@@ -87,7 +87,7 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
   return `
     <html>
     <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-      <h1 style="color: #5640AA;">Your Daily Activity Summary</h1>
+      <h1 style="color: #5640AA;">Your Daily DIP Summary</h1>
       <p>Hello! Here's what happened in DIP yesterday:</p>
       
       <div style="background-color: #f7f7f7; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -157,7 +157,7 @@ export async function sendBrevoEmail(email: string, activity: ActivitySummary) {
           email: "notifications@dapsince2025.com",
         },
         to: [{ email }],
-        subject: "Your Daily DIP Summary",
+        subject: "Daily DIP Notification",
         htmlContent: generateEmailContent(activity),
       }),
     });
