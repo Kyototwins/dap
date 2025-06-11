@@ -66,7 +66,7 @@ export function InstagramFollowTutorial({
           </AlertDialogAction>
           <AlertDialogCancel
             onClick={onNeverShow}
-            className="w-full text-sm font-semibold py-2 h-10 bg-red-50 hover:bg-red-100 text-red-600 border-red-200"
+            className="w-full text-xs py-1 h-8"
           >
             Don't show again
           </AlertDialogCancel>
