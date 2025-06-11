@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import { useTutorialPopovers } from "@/hooks/useTutorialPopovers";
 import { HomeScreenTutorial } from "./HomeScreenTutorial";
 import { EmailNotificationTutorial } from "./EmailNotificationTutorial";
+import { InstagramFollowTutorial } from "./InstagramFollowTutorial";
 
 export function TutorialManager() {
   const { tutorialState, loading, updateTutorialState } = useTutorialPopovers();
-  const [currentTutorial, setCurrentTutorial] = useState<'home' | 'email' | null>(null);
+  const [currentTutorial, setCurrentTutorial] = useState<'home' | 'email' | 'instagram' | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -16,6 +17,8 @@ export function TutorialManager() {
       setCurrentTutorial('home');
     } else if (tutorialState.emailNotificationTutorial === 'show') {
       setCurrentTutorial('email');
+    } else if (tutorialState.instagramFollowTutorial === 'show') {
+      setCurrentTutorial('instagram');
     }
   }, [tutorialState, loading]);
 
@@ -43,6 +46,21 @@ export function TutorialManager() {
   const handleEmailTutorialNeverShow = async () => {
     await updateTutorialState('emailNotificationTutorial', 'never_show');
     setCurrentTutorial(null);
+    
+    // Show Instagram tutorial if it should be shown
+    if (tutorialState.instagramFollowTutorial === 'show') {
+      setTimeout(() => setCurrentTutorial('instagram'), 500);
+    }
+  };
+
+  const handleInstagramTutorialRemindLater = async () => {
+    await updateTutorialState('instagramFollowTutorial', 'remind_later');
+    setCurrentTutorial(null);
+  };
+
+  const handleInstagramTutorialNeverShow = async () => {
+    await updateTutorialState('instagramFollowTutorial', 'never_show');
+    setCurrentTutorial(null);
   };
 
   if (loading) return null;
@@ -59,6 +77,12 @@ export function TutorialManager() {
         open={currentTutorial === 'email'}
         onRemindLater={handleEmailTutorialRemindLater}
         onNeverShow={handleEmailTutorialNeverShow}
+      />
+      
+      <InstagramFollowTutorial
+        open={currentTutorial === 'instagram'}
+        onRemindLater={handleInstagramTutorialRemindLater}
+        onNeverShow={handleInstagramTutorialNeverShow}
       />
     </>
   );

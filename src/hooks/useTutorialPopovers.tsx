@@ -5,12 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 interface TutorialState {
   homeScreenTutorial: 'show' | 'remind_later' | 'never_show';
   emailNotificationTutorial: 'show' | 'remind_later' | 'never_show';
+  instagramFollowTutorial: 'show' | 'remind_later' | 'never_show';
 }
 
 export function useTutorialPopovers() {
   const [tutorialState, setTutorialState] = useState<TutorialState>({
     homeScreenTutorial: 'show',
-    emailNotificationTutorial: 'show'
+    emailNotificationTutorial: 'show',
+    instagramFollowTutorial: 'show'
   });
   const [loading, setLoading] = useState(true);
 
@@ -35,11 +37,14 @@ export function useTutorialPopovers() {
         // Convert remind_later back to show on new login
         const updatedSettings = {
           homeScreenTutorial: currentSettings.homeScreenTutorial === 'remind_later' ? 'show' : currentSettings.homeScreenTutorial,
-          emailNotificationTutorial: currentSettings.emailNotificationTutorial === 'remind_later' ? 'show' : currentSettings.emailNotificationTutorial
+          emailNotificationTutorial: currentSettings.emailNotificationTutorial === 'remind_later' ? 'show' : currentSettings.emailNotificationTutorial,
+          instagramFollowTutorial: currentSettings.instagramFollowTutorial === 'remind_later' ? 'show' : currentSettings.instagramFollowTutorial || 'show'
         };
 
         // Update database if there were any remind_later statuses
-        if (currentSettings.homeScreenTutorial === 'remind_later' || currentSettings.emailNotificationTutorial === 'remind_later') {
+        if (currentSettings.homeScreenTutorial === 'remind_later' || 
+            currentSettings.emailNotificationTutorial === 'remind_later' ||
+            currentSettings.instagramFollowTutorial === 'remind_later') {
           await supabase
             .from('profiles')
             .update({ tutorial_settings: updatedSettings } as any)
