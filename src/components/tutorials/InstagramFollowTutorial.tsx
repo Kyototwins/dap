@@ -44,7 +44,7 @@ export function InstagramFollowTutorial({
           <button onClick={onRemindLater} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-medium transition-colors py-[4px] text-base">
             Remind me later
           </button>
-          <AlertDialogCancel onClick={onNeverShow} className="w-full text-xs py-1 h-8">
+          <AlertDialogCancel onClick={onNeverShow} className="w-full text-xs h-8 py-[2px]">
             Don't show again
           </AlertDialogCancel>
         </AlertDialogFooter>
