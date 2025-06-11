@@ -1,33 +1,19 @@
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Instagram } from "lucide-react";
-
 interface InstagramFollowTutorialProps {
   open: boolean;
   onRemindLater: () => void;
   onNeverShow: () => void;
 }
-
 export function InstagramFollowTutorial({
   open,
   onRemindLater,
-  onNeverShow,
+  onNeverShow
 }: InstagramFollowTutorialProps) {
   const handleInstagramClick = () => {
     window.open("https://www.instagram.com/_creator_dip_?igsh=MXJncXV0a2dzYjZuNg%3D%3D&utm_source=qr", "_blank");
   };
-
-  return (
-    <AlertDialog open={open}>
+  return <AlertDialog open={open}>
       <AlertDialogContent className="max-w-sm mx-auto">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-center flex items-center justify-center gap-2">
@@ -45,10 +31,7 @@ export function InstagramFollowTutorial({
             </div>
             
             <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-4 rounded-lg">
-              <button
-                onClick={handleInstagramClick}
-                className="text-white font-bold text-xl hover:scale-105 transition-transform"
-              >
+              <button onClick={handleInstagramClick} className="text-white font-bold text-xl hover:scale-105 transition-transform">
                 @_creator_dip_
               </button>
               <p className="text-white text-sm mt-2">
@@ -58,20 +41,13 @@ export function InstagramFollowTutorial({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col space-y-2">
-          <button
-            onClick={onRemindLater}
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-6 text-lg rounded-xl font-medium transition-colors"
-          >
+          <button onClick={onRemindLater} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-medium transition-colors py-[4px] text-base">
             Remind me later
           </button>
-          <AlertDialogCancel
-            onClick={onNeverShow}
-            className="w-full text-xs py-1 h-8"
-          >
+          <AlertDialogCancel onClick={onNeverShow} className="w-full text-xs py-1 h-8">
             Don't show again
           </AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
-    </AlertDialog>
-  );
+    </AlertDialog>;
 }
