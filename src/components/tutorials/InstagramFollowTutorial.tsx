@@ -58,12 +58,12 @@ export function InstagramFollowTutorial({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col space-y-2">
-          <AlertDialogAction
+          <button
             onClick={onRemindLater}
-            className="w-full bg-doshisha-purple hover:bg-doshisha-purple/90 py-6 text-lg"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-6 text-lg rounded-xl font-medium transition-colors"
           >
             Remind me later
-          </AlertDialogAction>
+          </button>
           <AlertDialogCancel
             onClick={onNeverShow}
             className="w-full text-xs py-1 h-8"
