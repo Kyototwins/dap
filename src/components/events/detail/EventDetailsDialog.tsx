@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -102,30 +103,32 @@ export function EventDetailsDialog({
     <>
       {/* Main event details dialog */}
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-md max-h-[95vh] flex flex-col p-0 overflow-hidden">
+        <DialogContent className="max-w-md max-h-[90vh] flex flex-col p-0 overflow-hidden">
           <DialogHeader className="p-4 border-b flex flex-row items-center justify-between flex-shrink-0">
-            <DialogTitle className="text-lg">{event.title}</DialogTitle>
+            <DialogTitle className="text-lg pr-4">{event.title}</DialogTitle>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => onOpenChange(false)}
-              className="h-6 w-6 p-0"
+              className="h-6 w-6 p-0 flex-shrink-0"
             >
               <X className="h-4 w-4" />
             </Button>
           </DialogHeader>
           
-          <ScrollArea className="flex-1">
-            <div className="space-y-4">
+          <ScrollArea className="flex-1 overflow-y-auto">
+            <div className="pb-4">
               {/* Event image section */}
-              <div className="p-4 space-y-4">
+              <div className="p-4 pb-0">
                 <EventImageSection 
                   event={event} 
                   isCreator={isCreator} 
                   refreshEvents={refreshEvents} 
                 />
+              </div>
 
-                {/* Event details information */}
+              {/* Event details information */}
+              <div className="p-4 pb-2">
                 <EventDetailsInfo 
                   event={event}
                   isCreator={isCreator}
@@ -137,7 +140,7 @@ export function EventDetailsDialog({
               </div>
 
               {/* Participation Form Section */}
-              <div className="px-4">
+              <div className="px-4 pb-2">
                 <EventParticipationFormSection event={event} />
               </div>
               

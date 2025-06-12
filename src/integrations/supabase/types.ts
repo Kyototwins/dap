@@ -144,6 +144,7 @@ export type Database = {
           location: string
           map_link: string | null
           max_participants: number
+          participation_form: string | null
           status: string | null
           title: string
         }
@@ -159,6 +160,7 @@ export type Database = {
           location: string
           map_link?: string | null
           max_participants: number
+          participation_form?: string | null
           status?: string | null
           title: string
         }
@@ -174,6 +176,7 @@ export type Database = {
           location?: string
           map_link?: string | null
           max_participants?: number
+          participation_form?: string | null
           status?: string | null
           title?: string
         }
