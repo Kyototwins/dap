@@ -1,3 +1,4 @@
+
 import { ActivitySummary } from "./activity.ts";
 
 const brevoApiKey = Deno.env.get("BREVO_API_KEY") as string;
@@ -18,6 +19,19 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
       }).join('<br>')
     : "No new events were added yesterday";
   
+  const availableEventsText = activity.availableEvents.length > 0
+    ? activity.availableEvents.map(event => {
+        const eventDate = new Date(event.date).toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        const spotsLeft = event.maxParticipants - event.currentParticipants;
+        return `📍 ${eventDate} - ${event.title}<br>&nbsp;&nbsp;&nbsp;&nbsp;📍 ${event.location} (${spotsLeft} spots left)`;
+      }).join('<br>')
+    : "No upcoming events available at the moment";
+  
   const eventInvitation = activity.newEvents.length > 0 
     ? `
       <div style="background-color: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #28a745;">
@@ -25,6 +39,23 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
         <p style="margin: 0; color: #2c5530;">
           New events have been added! Let's have a great time with wonderful friends.
           <br>Check them out now and don't forget to register!
+        </p>
+      </div>
+    `
+    : '';
+
+  const availableEventsSection = activity.availableEvents.length > 0
+    ? `
+      <div style="background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196f3;">
+        <h3 style="color: #2196f3; margin: 0 0 15px 0;">🎊 Events You Can Join Right Now!</h3>
+        <p style="margin: 0 0 15px 0; color: #444;">
+          Don't miss out on these exciting upcoming events! Join now before spots fill up:
+        </p>
+        <div style="font-size: 14px; line-height: 1.8; color: #333;">
+          ${availableEventsText}
+        </div>
+        <p style="margin: 15px 0 0 0; color: #2196f3; font-weight: bold;">
+          <a href="${appUrl}events" style="color: #2196f3; text-decoration: none;">👆 Click here to join these events!</a>
         </p>
       </div>
     `
@@ -109,6 +140,7 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
       </div>
       
       ${eventInvitation}
+      ${availableEventsSection}
       ${instagramSection}
       ${picnicEventSection}
       ${dailyEncouragement}

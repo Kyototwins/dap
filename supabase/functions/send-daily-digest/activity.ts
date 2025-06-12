@@ -1,4 +1,3 @@
-
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { toJSTISOString } from "./utils.ts";
 
@@ -16,6 +15,7 @@ export interface ActivitySummary {
   eventComments: number;
   newAccounts: number;
   totalMatches: number;
+  availableEvents: Array<{title: string; date: string; location: string; currentParticipants: number; maxParticipants: number}>;
 }
 
 /**
@@ -243,6 +243,28 @@ async function getTotalMatches(userId: string) {
 }
 
 /**
+ * Query for currently available events that users can join
+ */
+async function getAvailableEvents() {
+  const now = new Date().toISOString();
+  
+  const { data, error } = await supabase
+    .from("events")
+    .select("title, date, location, current_participants, max_participants")
+    .eq("status", "active")
+    .gte("date", now)
+    .order("date", { ascending: true })
+    .limit(5); // Limit to 5 events to keep email concise
+  
+  if (error) {
+    console.error("Error fetching available events:", error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+/**
  * Get activity summary for a specific user for yesterday
  */
 export async function getYesterdayActivity(userId: string): Promise<ActivitySummary> {
@@ -269,8 +291,9 @@ export async function getYesterdayActivity(userId: string): Promise<ActivitySumm
   const comments = await getEventComments(userId, yesterdayJST, todayJST);
   const newAccounts = await getNewAccounts(yesterdayJST, todayJST);
   const totalMatches = await getTotalMatches(userId);
+  const availableEvents = await getAvailableEvents();
   
-  console.log(`Activity summary for user ${userId}: likes=${likes.length}, messages=${messages.length}, unreadMessages=${unreadMessages}, events=${newEvents.length}, participations=${participations.length}, comments=${comments.length}, newAccounts=${newAccounts.length}, totalMatches=${totalMatches.length}`);
+  console.log(`Activity summary for user ${userId}: likes=${likes.length}, messages=${messages.length}, unreadMessages=${unreadMessages}, events=${newEvents.length}, participations=${participations.length}, comments=${comments.length}, newAccounts=${newAccounts.length}, totalMatches=${totalMatches.length}, availableEvents=${availableEvents.length}`);
   
   return {
     likesReceived: likes.length || 0,
@@ -281,5 +304,6 @@ export async function getYesterdayActivity(userId: string): Promise<ActivitySumm
     eventComments: comments.length || 0,
     newAccounts: newAccounts.length || 0,
     totalMatches: totalMatches.length || 0,
+    availableEvents: availableEvents || [],
   };
 }
