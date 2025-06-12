@@ -25,7 +25,7 @@ export function EventParticipationFormSection({ event }: EventParticipationFormS
             Participation Form Required
           </h3>
           <p className="text-sm text-blue-700 mb-3">
-            Please fill out the participation form to join this event.
+            Please fill out the participation form to join this event. Don't forget to also press the JOIN button in the app after completing the form!
           </p>
           <Button
             onClick={handleFormClick}
