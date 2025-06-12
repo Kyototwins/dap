@@ -117,10 +117,10 @@ export function EventDetailsInfo({
       <EventCategoryDisplay category={event.category} />
 
       {/* Event Date and Time */}
-      <EventDateTimeSection event={event} />
+      <EventDateTimeSection event={event} isCreator={isCreator} refreshEvents={refreshEvents} />
 
       {/* Event Location */}
-      <EventLocationSection event={event} />
+      <EventLocationSection event={event} isCreator={isCreator} refreshEvents={refreshEvents} />
 
       {/* Participants Count */}
       <EventParticipantsCount 
@@ -129,13 +129,17 @@ export function EventDetailsInfo({
       />
 
       {/* Join Button */}
-      <EventJoinButton
-        event={event}
-        isCreator={isCreator}
-        isParticipating={isParticipating}
-        isProcessing={isProcessing}
-        onParticipate={onParticipate}
-      />
+      {onParticipate && (
+        <EventJoinButton
+          isParticipating={isParticipating}
+          isProcessing={isProcessing}
+          onParticipate={onParticipate}
+          eventId={event.id}
+          eventTitle={event.title}
+          maxParticipants={event.max_participants}
+          currentParticipants={event.current_participants}
+        />
+      )}
     </div>
   );
 }
