@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -17,7 +16,8 @@ export function useCreateEvent() {
     date: "",
     category: "",
     max_participants: "",
-    map_link: "", // Added map_link field
+    map_link: "",
+    participation_form: "", // Added participation_form field
   });
   const [image, setImage] = useState<{
     file: File | null;
@@ -103,8 +103,12 @@ export function useCreateEvent() {
 
       // Use optional map_link only if provided
       if (formData.map_link) {
-        // We need to cast to 'any' since the type doesn't have map_link yet
         (eventData as any).map_link = formData.map_link;
+      }
+
+      // Use optional participation_form only if provided
+      if (formData.participation_form) {
+        (eventData as any).participation_form = formData.participation_form;
       }
 
       const { error } = await supabase

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -8,6 +7,7 @@ import { EventDetailsDescription } from "./sections/EventDetailsDescription";
 import { EventCommentSection } from "./sections/EventCommentSection";
 import { EventImageSection } from "./sections/EventImageSection";
 import { EventActionsSection } from "./sections/EventActionsSection";
+import { EventParticipationFormSection } from "./sections/EventParticipationFormSection";
 import { EventCommentsFullscreenDialog } from "./dialogs/EventCommentsFullscreenDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -134,6 +134,11 @@ export function EventDetailsDialog({
                   onParticipate={onParticipate}
                   refreshEvents={refreshEvents}
                 />
+              </div>
+
+              {/* Participation Form Section */}
+              <div className="px-4">
+                <EventParticipationFormSection event={event} />
               </div>
               
               {/* Event description section */}

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +8,7 @@ import { FormSectionTitle } from "./form/FormSectionTitle";
 import { EventMapLinkInput } from "./form/EventMapLinkInput";
 import { EventParticipantsInput } from "./form/EventParticipantsInput";
 import { EventCategorySelect } from "./form/EventCategorySelect";
+import { EventParticipationFormInput } from "./form/EventParticipationFormInput";
 import { FormButtons } from "./form/FormButtons";
 
 export function CreateEventForm() {
@@ -74,6 +74,11 @@ export function CreateEventForm() {
       <EventMapLinkInput 
         value={formData.map_link} 
         onChange={(value) => setFormData({ ...formData, map_link: value })}
+      />
+
+      <EventParticipationFormInput
+        value={formData.participation_form}
+        onChange={(value) => setFormData({ ...formData, participation_form: value })}
       />
 
       <div className="space-y-2">

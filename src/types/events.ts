@@ -1,4 +1,3 @@
-
 export interface EventCreator {
   first_name: string | null;
   last_name: string | null;
@@ -21,6 +20,7 @@ export interface Event {
   created_at: string;
   status?: string;
   map_link?: string | null;
+  participation_form?: string | null;
 }
 
 export interface EventComment {
