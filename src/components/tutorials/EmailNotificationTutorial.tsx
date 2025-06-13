@@ -21,7 +21,8 @@ export function EmailNotificationTutorial({
         <div className="flex-1 overflow-y-auto space-y-4 px-1">
           <div className="text-center">
             <Mail className="w-12 h-12 mx-auto text-pink-600 mb-2" />
-            <p className="text-gray-700 text-sm mx-[25px]">Currently using your university email If you already have changed it, awesome!</p>
+            <p className="text-gray-700 text-sm mx-[40px]">Currently using your university email 
+If you already changed it, awesome!</p>
           </div>
 
           <div className="bg-white rounded-lg p-3 border border-pink-200">
