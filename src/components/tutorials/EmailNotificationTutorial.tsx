@@ -1,22 +1,21 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Mail, Settings } from "lucide-react";
-
 interface EmailNotificationTutorialProps {
   open: boolean;
   onRemindLater: () => void;
   onNeverShow: () => void;
 }
-
-export function EmailNotificationTutorial({ open, onRemindLater, onNeverShow }: EmailNotificationTutorialProps) {
-  return (
-    <Dialog open={open} onOpenChange={() => {}}>
+export function EmailNotificationTutorial({
+  open,
+  onRemindLater,
+  onNeverShow
+}: EmailNotificationTutorialProps) {
+  return <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent className="max-w-md mx-auto bg-gradient-to-br from-pink-50 to-purple-50 border-2 border-pink-200 max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-center text-lg font-bold text-pink-800 mb-2">
-            📧 Change Your Notification Email よく見るメールに変更しよう
-          </DialogTitle>
+          <DialogTitle className="text-center text-lg font-bold text-pink-800 mb-2">Change Your Notification Email 
+よく見るメールに変更しよう</DialogTitle>
         </DialogHeader>
         
         <div className="flex-1 overflow-y-auto space-y-4 px-1">
@@ -44,21 +43,13 @@ export function EmailNotificationTutorial({ open, onRemindLater, onNeverShow }: 
         </div>
 
         <div className="flex gap-2 pt-4 border-t bg-gradient-to-br from-pink-50 to-purple-50">
-          <Button 
-            onClick={onRemindLater}
-            className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold shadow-lg text-sm py-2"
-          >
+          <Button onClick={onRemindLater} className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold shadow-lg text-sm py-2">
             Remind me later
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={onNeverShow}
-            className="flex-1 border-pink-300 text-pink-700 hover:bg-pink-50 text-sm py-2"
-          >
+          <Button variant="outline" onClick={onNeverShow} className="flex-1 border-pink-300 text-pink-700 hover:bg-pink-50 text-sm py-2">
             Don't show again
           </Button>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 }
