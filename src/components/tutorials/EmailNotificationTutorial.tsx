@@ -1,7 +1,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Mail, Star, Sparkles, Settings } from "lucide-react";
+import { Mail, Settings } from "lucide-react";
 
 interface EmailNotificationTutorialProps {
   open: boolean;
@@ -15,34 +15,30 @@ export function EmailNotificationTutorial({ open, onRemindLater, onNeverShow }: 
       <DialogContent className="max-w-md mx-auto bg-gradient-to-br from-pink-50 to-purple-50 border-2 border-pink-200 max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-bold text-pink-800 mb-2">
-            ✨ Recommended! Get Notifications on Your Favorite Email! ✨
+            📧 通知をよく見るメールで受け取ろう！
           </DialogTitle>
         </DialogHeader>
         
         <div className="flex-1 overflow-y-auto space-y-4 px-1">
           <div className="text-center">
-            <Mail className="w-12 h-12 mx-auto text-pink-600 mb-1" />
-            <p className="text-gray-700 text-sm">Never miss important updates from DAP!</p>
+            <Mail className="w-12 h-12 mx-auto text-pink-600 mb-2" />
+            <p className="text-gray-700 text-sm">現在は大学のメールアドレスに通知が届いてるよ</p>
           </div>
 
           <div className="bg-white rounded-lg p-3 border border-pink-200">
             <h3 className="font-bold text-pink-700 mb-2 flex items-center gap-2 text-sm">
               <Settings className="w-4 h-4" />
-              How to customize your notification email:
+              設定方法:
             </h3>
             
             <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
-              <li>Go to your <strong>Profile page</strong></li>
-              <li>Scroll down to <strong>"Notification Settings"</strong></li>
-              <li>Look for the <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-pink-400 to-purple-400 text-white text-xs rounded-full"><Sparkles className="w-3 h-3" />RECOMMENDED<Star className="w-3 h-3" /></span> section</li>
-              <li>Toggle <strong>"Use custom email for notifications"</strong></li>
-              <li>Enter your preferred email address</li>
-              <li>Save your changes</li>
+              <li><strong>プロフィール画面</strong>へ移動</li>
+              <li><strong>Notification Settings</strong>をタップ</li>
+              <li>メールアドレスを変更</li>
             </ol>
 
-            <div className="mt-2 p-2 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg">
-              <p className="text-sm text-pink-700 font-medium">💌 Pro tip:</p>
-              <p className="text-xs text-gray-600">Use an email you check regularly to stay connected!</p>
+            <div className="mt-3 p-2 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg">
+              <p className="text-sm text-pink-700 font-medium">💡 おすすめ：よくチェックするメールアドレスに変更しよう！</p>
             </div>
           </div>
         </div>
