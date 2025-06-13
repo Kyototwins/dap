@@ -15,30 +15,30 @@ export function EmailNotificationTutorial({ open, onRemindLater, onNeverShow }: 
       <DialogContent className="max-w-md mx-auto bg-gradient-to-br from-pink-50 to-purple-50 border-2 border-pink-200 max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-bold text-pink-800 mb-2">
-            📧 通知をよく見るメールで受け取ろう！
+            📧 Change Your Notification Email よく見るメールに変更しよう
           </DialogTitle>
         </DialogHeader>
         
         <div className="flex-1 overflow-y-auto space-y-4 px-1">
           <div className="text-center">
             <Mail className="w-12 h-12 mx-auto text-pink-600 mb-2" />
-            <p className="text-gray-700 text-sm">現在は大学のメールアドレスに通知が届いてるよ</p>
+            <p className="text-gray-700 text-sm">Currently using your university email</p>
           </div>
 
           <div className="bg-white rounded-lg p-3 border border-pink-200">
             <h3 className="font-bold text-pink-700 mb-2 flex items-center gap-2 text-sm">
               <Settings className="w-4 h-4" />
-              設定方法:
+              How to change:
             </h3>
             
             <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
-              <li><strong>プロフィール画面</strong>へ移動</li>
-              <li><strong>Notification Settings</strong>をタップ</li>
-              <li>メールアドレスを変更</li>
+              <li>Go to <strong>Profile</strong></li>
+              <li>Tap <strong>Notification Settings</strong></li>
+              <li>Change email address</li>
             </ol>
 
             <div className="mt-3 p-2 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg">
-              <p className="text-sm text-pink-700 font-medium">💡 おすすめ：よくチェックするメールアドレスに変更しよう！</p>
+              <p className="text-sm text-pink-700 font-medium">💡 Use an email you check often!</p>
             </div>
           </div>
         </div>
