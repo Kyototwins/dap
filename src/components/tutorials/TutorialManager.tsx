@@ -21,22 +21,14 @@ export function TutorialManager() {
 
   const handleInstagramTutorialRemindLater = async () => {
     await updateTutorialState('instagramFollowTutorial', 'remind_later');
-    // After Instagram tutorial, check if we should show email tutorial
-    if (tutorialState.emailNotificationTutorial === 'show') {
-      setCurrentTutorial('email');
-    } else {
-      setCurrentTutorial(null);
-    }
+    // Always show email tutorial after Instagram tutorial is dismissed
+    setCurrentTutorial('email');
   };
 
   const handleInstagramTutorialNeverShow = async () => {
     await updateTutorialState('instagramFollowTutorial', 'never_show');
-    // After Instagram tutorial, check if we should show email tutorial
-    if (tutorialState.emailNotificationTutorial === 'show') {
-      setCurrentTutorial('email');
-    } else {
-      setCurrentTutorial(null);
-    }
+    // Always show email tutorial after Instagram tutorial is dismissed
+    setCurrentTutorial('email');
   };
 
   const handleEmailTutorialRemindLater = async () => {
