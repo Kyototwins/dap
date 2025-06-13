@@ -35,15 +35,17 @@ export function useTutorialPopovers() {
         const currentSettings = (profile as any).tutorial_settings as TutorialState;
         
         // Convert remind_later back to show on new login
+        // Also convert emailNotificationTutorial from never_show back to show
         const updatedSettings = {
           homeScreenTutorial: currentSettings.homeScreenTutorial === 'remind_later' ? 'show' : currentSettings.homeScreenTutorial,
-          emailNotificationTutorial: currentSettings.emailNotificationTutorial === 'remind_later' ? 'show' : currentSettings.emailNotificationTutorial,
+          emailNotificationTutorial: (currentSettings.emailNotificationTutorial === 'remind_later' || currentSettings.emailNotificationTutorial === 'never_show') ? 'show' : currentSettings.emailNotificationTutorial,
           instagramFollowTutorial: currentSettings.instagramFollowTutorial === 'remind_later' ? 'show' : currentSettings.instagramFollowTutorial || 'show'
         };
 
-        // Update database if there were any remind_later statuses
+        // Update database if there were any remind_later statuses or if emailNotificationTutorial was never_show
         if (currentSettings.homeScreenTutorial === 'remind_later' || 
             currentSettings.emailNotificationTutorial === 'remind_later' ||
+            currentSettings.emailNotificationTutorial === 'never_show' ||
             currentSettings.instagramFollowTutorial === 'remind_later') {
           await supabase
             .from('profiles')
