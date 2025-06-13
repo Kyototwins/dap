@@ -14,7 +14,7 @@ export function EmailNotificationTutorial({
   return <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent className="max-w-md mx-auto bg-gradient-to-br from-pink-50 to-purple-50 border-2 border-pink-200 max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-center text-lg font-bold text-pink-800 mb-2">Change Your Notification Email 
+          <DialogTitle className="text-center text-lg font-bold text-pink-800 mb-2 mx-[25px]">Change Your Notification Email  
 よく見るメールに変更しよう</DialogTitle>
         </DialogHeader>
         
