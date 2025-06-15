@@ -1,17 +1,15 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface TutorialState {
   homeScreenTutorial: 'show' | 'remind_later' | 'never_show';
-  emailNotificationTutorial: 'show' | 'remind_later' | 'never_show';
   instagramFollowTutorial: 'show' | 'remind_later' | 'never_show';
-  emailNotificationDismissedAt?: string;
 }
 
 export function useTutorialPopovers() {
   const [tutorialState, setTutorialState] = useState<TutorialState>({
     homeScreenTutorial: 'show',
-    emailNotificationTutorial: 'show',
     instagramFollowTutorial: 'show'
   });
   const [loading, setLoading] = useState(true);
@@ -33,35 +31,16 @@ export function useTutorialPopovers() {
 
       if (profile && (profile as any).tutorial_settings) {
         const currentSettings = (profile as any).tutorial_settings as TutorialState;
-        const today = new Date().toISOString().split('T')[0];
         
         // Convert remind_later back to show on new login
-        // For emailNotificationTutorial, only convert back to show if it was never_show before today
         const updatedSettings = {
           homeScreenTutorial: currentSettings.homeScreenTutorial === 'remind_later' ? 'show' : currentSettings.homeScreenTutorial,
-          emailNotificationTutorial: (() => {
-            if (currentSettings.emailNotificationTutorial === 'remind_later') {
-              return 'show';
-            }
-            if (currentSettings.emailNotificationTutorial === 'never_show') {
-              const dismissedAt = currentSettings.emailNotificationDismissedAt;
-              // If dismissed before today, show again. If dismissed today or later, keep hidden
-              if (!dismissedAt || dismissedAt < today) {
-                return 'show';
-              }
-            }
-            return currentSettings.emailNotificationTutorial;
-          })(),
-          instagramFollowTutorial: currentSettings.instagramFollowTutorial === 'remind_later' ? 'show' : currentSettings.instagramFollowTutorial || 'show',
-          emailNotificationDismissedAt: currentSettings.emailNotificationDismissedAt
+          instagramFollowTutorial: currentSettings.instagramFollowTutorial === 'remind_later' ? 'show' : currentSettings.instagramFollowTutorial || 'show'
         };
 
-        // Update database if there were any remind_later statuses or if emailNotificationTutorial was never_show from before today
+        // Update database if there were any remind_later statuses
         const shouldUpdate = currentSettings.homeScreenTutorial === 'remind_later' || 
-            currentSettings.emailNotificationTutorial === 'remind_later' ||
-            currentSettings.instagramFollowTutorial === 'remind_later' ||
-            (currentSettings.emailNotificationTutorial === 'never_show' && 
-             (!currentSettings.emailNotificationDismissedAt || currentSettings.emailNotificationDismissedAt < today));
+            currentSettings.instagramFollowTutorial === 'remind_later';
 
         if (shouldUpdate) {
           await supabase
@@ -86,11 +65,7 @@ export function useTutorialPopovers() {
 
       const newState = {
         ...tutorialState,
-        [tutorialType]: action,
-        // If dismissing email notification tutorial as never_show, record the date
-        ...(tutorialType === 'emailNotificationTutorial' && action === 'never_show' && {
-          emailNotificationDismissedAt: new Date().toISOString().split('T')[0]
-        })
+        [tutorialType]: action
       };
 
       await supabase
