@@ -7,18 +7,6 @@ const brevoApiKey = Deno.env.get("BREVO_API_KEY") as string;
  * Generate email HTML content based on activity data
  */
 export function generateEmailContent(activity: ActivitySummary, appUrl = "https://dap.lovable.app/"): string {
-  const newEventsText = activity.newEvents.length > 0 
-    ? activity.newEvents.map(event => {
-        const eventDate = new Date(event.date).toLocaleDateString('en-US', {
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-        return `📅 ${eventDate} - ${event.title}`;
-      }).join('<br>')
-    : "No new events were added yesterday";
-  
   const availableEventsText = activity.availableEvents.length > 0
     ? activity.availableEvents.map(event => {
         const eventDate = new Date(event.date).toLocaleDateString('en-US', {
@@ -31,18 +19,6 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
         return `📍 ${eventDate} - ${event.title}<br>&nbsp;&nbsp;&nbsp;&nbsp;📍 ${event.location} (${spotsLeft} spots left)`;
       }).join('<br>')
     : "No upcoming events available at the moment";
-  
-  const eventInvitation = activity.newEvents.length > 0 
-    ? `
-      <div style="background-color: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #28a745;">
-        <h3 style="color: #28a745; margin: 0 0 10px 0;">🎉 Join the new events!</h3>
-        <p style="margin: 0; color: #2c5530;">
-          New events have been added! Let's have a great time with wonderful friends.
-          <br>Check them out now and don't forget to register!
-        </p>
-      </div>
-    `
-    : '';
 
   const availableEventsSection = activity.availableEvents.length > 0
     ? `
@@ -117,7 +93,7 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
   return `
     <html>
     <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-      <h1 style="color: #5640AA;">Your Daily DIP Summary</h1>
+      <h2 style="color: #5640AA; font-size: 18px;">Your Daily DIP Summary</h2>
       <p>Hello! Here's what happened in DIP yesterday:</p>
       
       <div style="background-color: #f7f7f7; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -125,21 +101,10 @@ export function generateEmailContent(activity: ActivitySummary, appUrl = "https:
         <p><strong>🤝 Your total current matches:</strong> ${activity.totalMatches}</p>
         <p><strong>👍 New likes received:</strong> ${activity.likesReceived}</p>
         <p><strong>💬 New messages received:</strong> ${activity.messagesReceived}</p>
-        <p><strong>🎉 New events added:</strong> ${activity.newEvents.length}</p>
-        ${activity.newEvents.length > 0 ? `
-          <div style="margin: 15px 0; padding: 15px; background-color: white; border-radius: 5px; border: 1px solid #ddd;">
-            <h4 style="margin: 0 0 10px 0; color: #5640AA;">New Events:</h4>
-            <div style="font-size: 14px; line-height: 1.6;">
-              ${newEventsText}
-            </div>
-          </div>
-        ` : ''}
         <p><strong>👥 New participants in your events:</strong> ${activity.eventParticipations}</p>
-        <p><strong>💬 New comments on your events:</strong> ${activity.eventComments}</p>
         <p><strong>🆕 New accounts created yesterday:</strong> ${activity.newAccounts}</p>
       </div>
       
-      ${eventInvitation}
       ${availableEventsSection}
       ${instagramSection}
       ${picnicEventSection}
