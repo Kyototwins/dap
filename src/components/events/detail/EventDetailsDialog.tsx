@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Event, EventComment } from "@/types/events";
 import { EventDetailsInfo } from "./sections/EventDetailsInfo";
 import { EventDetailsDescription } from "./sections/EventDetailsDescription";
+import { EventParticipantsList } from "./sections/EventParticipantsList";
 import { EventCommentSection } from "./sections/EventCommentSection";
 import { EventImageSection } from "./sections/EventImageSection";
 import { EventActionsSection } from "./sections/EventActionsSection";
@@ -154,6 +155,9 @@ export function EventDetailsDialog({
                 setEditedDescription={setEditedDescription}
                 saveDescription={saveDescription}
               />
+
+              {/* Participants list section */}
+              <EventParticipantsList event={event} />
               
               {/* Comment section */}
               <EventCommentSection
